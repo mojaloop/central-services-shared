@@ -1,5 +1,0 @@
-projectKey=central-services-shared
-serverUrl=http://localhost:9000
-dashboardUrl=http://localhost:9000/dashboard/index/central-services-shared
-ceTaskId=AVh41j_5kd4BYbXJOD0s
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AVh41j_5kd4BYbXJOD0s
