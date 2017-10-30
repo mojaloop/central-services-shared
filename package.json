@@ -1,0 +1,44 @@
+{
+  "name": "@mojaloop/central-services-shared",
+  "version": "0.3.0",
+  "description": "Shared code for central services",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "npm run test:unit | faucet",
+    "pretest": "standard",
+    "test:unit": "tapes 'test/**/*.test.js'",
+    "test:xunit": "npm run test:unit | tap-xunit",
+    "test:coverage": "istanbul cover tapes -- 'test/**/*.test.js'",
+    "test:coverage-check": "npm run test:coverage && istanbul check-coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojaloop/central-services-shared.git"
+  },
+  "keywords": [
+    "shared",
+    "central",
+    "services"
+  ],
+  "author": "Dwolla",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mojaloop/central-services-shared/issues"
+  },
+  "homepage": "https://github.com/mojaloop/central-services-shared#readme",
+  "dependencies": {
+    "winston": "^2.3.0"
+  },
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "istanbul": "^0.4.5",
+    "sinon": "^1.17.6",
+    "standard": "^8.5.0",
+    "tap-xunit": "^1.4.0",
+    "tape": "^4.6.2",
+    "tapes": "^4.1.0"
+  },
+  "publishConfig": {
+    "registry": "https://modusbox.jfrog.io/modusbox/api/npm/level1-npm-release"
+  }
+}
