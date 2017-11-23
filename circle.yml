@@ -9,7 +9,7 @@ machine:
 
 dependencies:
   pre:
-    - curl -udwolla:$NPM_TOKEN "https://modusbox.jfrog.io/modusbox/api/npm/level1-npm-release/auth/leveloneproject" >> .npmrc
+    - curl -udwolla:$NPM_TOKEN "https://modusbox.jfrog.io/modusbox/api/npm/level1-npm/auth/@mojaloop" >> .npmrc
 
 test:
   pre:
