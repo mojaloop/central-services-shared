@@ -9,8 +9,7 @@ machine:
 
 dependencies:
   pre:
-    - curl -udwolla:$NPM_TOKEN "https://modusbox.jfrog.io/modusbox/api/npm/level1-npm/auth/@mojaloop" >> .npmrc
-
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
 test:
   pre:
     - mkdir -p ./test/results
