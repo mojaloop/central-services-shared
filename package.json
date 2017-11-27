@@ -39,6 +39,6 @@
     "tapes": "^4.1.0"
   },
   "publishConfig": {
-    "registry": "https://modusbox.jfrog.io/modusbox/api/npm/level1-npm-release"
+    "registry": "https://registry.npmjs.org/"
   }
 }
