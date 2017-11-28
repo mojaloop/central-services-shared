@@ -1,3 +1,3 @@
 #!/bin/bash -exv
 
-npm publish
+npm publish --access public
