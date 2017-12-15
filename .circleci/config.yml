@@ -1,0 +1,101 @@
+# CircleCI v2 Config
+version: 2
+
+defaults: &defaults
+  working_directory: /home/circleci/project
+  docker:
+    - image: circleci/node:6.10.3
+
+jobs:
+  setup:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Update NPM install
+          command: sudo npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+  test-unit:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: 
+          name: Create dir for test results
+          command: mkdir -p ./test/results
+      - run: 
+          name: Execute unit tests
+          command: npm -s run test:xunit > ./test/results/tape.xml
+      - store_artifacts:
+          path: ./test/results
+          prefix: test
+      - store_test_results:
+          path: ./test/results
+  test-coverage:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: 
+          name: Execute code coverage check
+          command: npm -s run test:coverage-check
+      - store_artifacts:
+          path: coverage
+          prefix: test
+      - store_test_results:
+          path: coverage/lcov.info
+  deploy:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Update NPM registry auth token
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+      - run: 
+          name: Publish NPM artifact
+          command: npm publish --access public
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - setup:
+          filters:
+              branches:
+                ignore: 
+                  - /feature*/
+                  - /bugfix*/
+      - test-unit:
+          requires:
+            - setup
+          filters:
+            branches:
+              ignore: 
+                - /feature*/
+                - /bugfix*/             
+      - test-coverage:
+          requires:
+            - setup
+          filters:
+            branches:
+              ignore: 
+                - /feature*/
+                - /bugfix*/
+      - deploy:
+          requires:
+            - setup
+            - test-unit
+            - test-coverage
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              only:
+                - master
