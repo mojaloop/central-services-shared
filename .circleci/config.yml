@@ -67,12 +67,14 @@ workflows:
   build_and_test:
     jobs:
       - setup:
+          context: org-global
           filters:
               branches:
                 ignore: 
                   - /feature*/
                   - /bugfix*/
       - test-unit:
+          context: org-global
           requires:
             - setup
           filters:
@@ -81,6 +83,7 @@ workflows:
                 - /feature*/
                 - /bugfix*/             
       - test-coverage:
+          context: org-global
           requires:
             - setup
           filters:
@@ -89,6 +92,7 @@ workflows:
                 - /feature*/
                 - /bugfix*/
       - deploy:
+          context: org-global
           requires:
             - setup
             - test-unit
