@@ -4,7 +4,7 @@ version: 2
 defaults: &defaults
   working_directory: /home/circleci/project
   docker:
-    - image: circleci/node:6.10.3
+    - image: circleci/node:8.9.4
 
 jobs:
   setup:
@@ -24,10 +24,10 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      - run: 
+      - run:
           name: Create dir for test results
           command: mkdir -p ./test/results
-      - run: 
+      - run:
           name: Execute unit tests
           command: npm -s run test:xunit > ./test/results/tape.xml
       - store_artifacts:
@@ -41,7 +41,7 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      - run: 
+      - run:
           name: Execute code coverage check
           command: npm -s run test:coverage-check
       - store_artifacts:
@@ -58,7 +58,7 @@ jobs:
       - run:
           name: Update NPM registry auth token
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-      - run: 
+      - run:
           name: Publish NPM artifact
           command: npm publish --access public
 
@@ -70,7 +70,7 @@ workflows:
           context: org-global
           filters:
               branches:
-                ignore: 
+                ignore:
                   - /feature*/
                   - /bugfix*/
       - test-unit:
@@ -79,16 +79,16 @@ workflows:
             - setup
           filters:
             branches:
-              ignore: 
+              ignore:
                 - /feature*/
-                - /bugfix*/             
+                - /bugfix*/
       - test-coverage:
           context: org-global
           requires:
             - setup
           filters:
             branches:
-              ignore: 
+              ignore:
                 - /feature*/
                 - /bugfix*/
       - deploy:
