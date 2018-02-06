@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -27,16 +27,16 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
-    "winston": "^2.3.0"
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "faucet": "0.0.1",
-    "istanbul": "^0.4.5",
-    "sinon": "^1.17.6",
-    "standard": "^8.5.0",
-    "tap-xunit": "^1.4.0",
-    "tape": "^4.6.2",
-    "tapes": "^4.1.0"
+    "istanbul": "0.4.5",
+    "sinon": "4.2.2",
+    "standard": "10.0.3",
+    "tap-xunit": "2.2.0",
+    "tape": "4.8.0",
+    "tapes": "4.1.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
