@@ -6,6 +6,11 @@ defaults: &defaults
   docker:
     - image: circleci/node:8.9.4
 
+defaults_awsCliDependencies: &defaults_awsCliDependencies | 
+    sudo apt-get install python2.7
+    sudo python2.7 get-pip.py
+    sudo pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
+
 defaults_npm_auth: &defaults_npm_auth
   name: Update NPM registry auth token
   command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
@@ -66,7 +71,7 @@ jobs:
       - run:
           name: Copy code coverage to SonarQube
           command: |
-            if [ "${CIRCLE_BRANCH}" == "develop-test" ];
+            if [ "${CIRCLE_BRANCH}" == "master" ];
             then
                 echo "Sending lcov.info to SonarQube..."  
                 aws s3 cp coverage/lcov.info $AWS_S3_DIR_SONARQUBE/central-services-shared/lcov.info
