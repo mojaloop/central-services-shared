@@ -26,7 +26,7 @@ defaults_npm_auth: &defaults_npm_auth
   name: Update NPM registry auth token
   command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
   
-defaults_npm_publish: &defaults_npm_publish
+defaults_npm_publish_version: &defaults_npm_publish_version
   name: Publish NPM $CIRCLE_TAG artifact
   command: npm publish --tag $CIRCLE_TAG --access public
 
@@ -118,7 +118,7 @@ jobs:
       - run:
           <<: *defaults_npm_auth
       - run:
-          <<: *defaults_npm_publish
+          <<: *defaults_npm_publish_version
       - run:
           <<: *defaults_npm_publish_release
   
@@ -138,7 +138,7 @@ jobs:
       - run:
           <<: *defaults_npm_auth
       - run:      
-          <<: *defaults_npm_publish
+          <<: *defaults_npm_publish_version
       - run:      
           <<: *defaults_npm_publish_release
 
