@@ -102,7 +102,7 @@ jobs:
                 echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube." 
             fi 
   
-  deploy-snapshot:
+  build-snapshot:
     <<: *defaults
     steps:
       - run:
@@ -122,7 +122,7 @@ jobs:
       - run:
           <<: *defaults_npm_publish_release
   
-  deploy:
+  build:
     <<: *defaults 
     steps:
       - run:
@@ -177,7 +177,7 @@ workflows:
               ignore: 
                 - /feature*/
                 - /bugfix*/
-      - deploy-snapshot:
+      - build-snapshot:
           context: org-global
           requires:
             - setup
@@ -189,7 +189,7 @@ workflows:
             branches:
               ignore: 
                 - /.*/
-      - deploy:
+      - build:
           context: org-global
           requires:
             - setup
