@@ -4,29 +4,51 @@ version: 2
 defaults: &defaults
   working_directory: /home/circleci/project
   docker:
-    - image: circleci/node:8.9.4
+    - image: mhart/alpine-node:8.9.4
+
+defaults_Dependencies: &defaults_Dependencies | 
+    apk --no-cache add git
+    apk --no-cache add ca-certificates
+    apk --no-cache add curl
+    apk --no-cache add openssh-client
+
+defaults_awsCliDependencies: &defaults_awsCliDependencies | 
+    apk --no-cache add \
+            python \
+            py-pip \
+            groff \
+            less \
+            mailcap
+    pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
+    apk -v --purge del py-pip
 
 defaults_npm_auth: &defaults_npm_auth
-  - run:
-      name: Update NPM registry auth token
-      command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-  
-defaults_npm_publish: &defaults_npm_publish
-  - run:
-      name: Publish NPM $CIRCLE_TAG artifact
-      command: npm publish --tag $CIRCLE_TAG --access public
-  - run:
-      name: Publish NPM $RELEASE_TAG artifact
-      command: npm publish --tag $RELEASE_TAG --access public
+  name: Update NPM registry auth token
+  command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+
+defaults_npm_publish_version: &defaults_npm_publish
+  name: Update version to prerelease
+  command: |
+    echo "Publishing tag $CIRCLE_TAG"
+    npm publish --tag $CIRCLE_TAG --access public
+
+defaults_npm_publish_release: &defaults_npm_publish_release
+  name: Publish NPM $RELEASE_TAG artifact
+  command: |
+    echo "Publishing tag $RELEASE_TAG"
+    npm publish --tag $RELEASE_TAG --access public
 
 jobs:
   setup:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - checkout
       - run:
           name: Update NPM install
-          command: sudo npm install
+          command: npm install
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
@@ -35,6 +57,9 @@ jobs:
   test-unit:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
@@ -53,6 +78,12 @@ jobs:
   test-coverage:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - run:
+          name: Install AWS CLI dependencies
+          command: *defaults_awsCliDependencies
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
@@ -64,10 +95,23 @@ jobs:
           prefix: test
       - store_test_results:
           path: coverage/lcov.info
+      - run:
+          name: Copy code coverage to SonarQube
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ];
+            then
+                echo "Sending lcov.info to SonarQube..."  
+                aws s3 cp coverage/lcov.info $AWS_S3_DIR_SONARQUBE/central-services-shared/lcov.info
+            else
+                echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube." 
+            fi 
   
-  deploy-snapshot:
+  build-snapshot:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - run:
           name: setup environment vars for SNAPSHOT release
           command: |
@@ -75,12 +119,17 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      <<: *defaults_npm_auth
-      <<: *defaults_npm_publish
+      - run:
+          <<: *defaults_npm_auth
+      - run:
+          <<: *defaults_npm_publish_release
   
-  deploy:
+  build:
     <<: *defaults 
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - run:
           name: setup environment vars for SNAPSHOT release
           command: |
@@ -88,8 +137,10 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      <<: *defaults_npm_auth
-      <<: *defaults_npm_publish
+      - run:
+          <<: *defaults_npm_auth
+      - run:      
+          <<: *defaults_npm_publish_release
 
 workflows:
   version: 2
@@ -126,7 +177,7 @@ workflows:
               ignore: 
                 - /feature*/
                 - /bugfix*/
-      - deploy-snapshot:
+      - build-snapshot:
           context: org-global
           requires:
             - setup
@@ -138,7 +189,7 @@ workflows:
             branches:
               ignore: 
                 - /.*/
-      - deploy:
+      - build:
           context: org-global
           requires:
             - setup
