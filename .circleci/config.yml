@@ -7,17 +7,16 @@ defaults: &defaults
     - image: circleci/node:8.9.4
 
 defaults_npm_auth: &defaults_npm_auth
-  - run:
-      name: Update NPM registry auth token
-      command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+  name: Update NPM registry auth token
+  command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
   
 defaults_npm_publish: &defaults_npm_publish
-  - run:
-      name: Publish NPM $CIRCLE_TAG artifact
-      command: npm publish --tag $CIRCLE_TAG --access public
-  - run:
-      name: Publish NPM $RELEASE_TAG artifact
-      command: npm publish --tag $RELEASE_TAG --access public
+  name: Publish NPM $CIRCLE_TAG artifact
+  command: npm publish --tag $CIRCLE_TAG --access public
+
+defaults_npm_publish_release: &defaults_npm_publish_release
+  name: Publish NPM $RELEASE_TAG artifact
+  command: npm publish --tag $RELEASE_TAG --access public
 
 jobs:
   setup:
@@ -85,8 +84,12 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      <<: *defaults_npm_auth
-      <<: *defaults_npm_publish
+      - run:
+          <<: *defaults_npm_auth
+      - run:
+          <<: *defaults_npm_publish
+      - run:
+          <<: *defaults_npm_publish_release
   
   deploy:
     <<: *defaults 
@@ -98,8 +101,12 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      <<: *defaults_npm_auth
-      <<: *defaults_npm_publish
+      - run:
+          <<: *defaults_npm_auth
+      - run:      
+          <<: *defaults_npm_publish
+      - run:      
+          <<: *defaults_npm_publish_release
 
 workflows:
   version: 2
