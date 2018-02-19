@@ -57,6 +57,9 @@ jobs:
   test-coverage:
     <<: *defaults
     steps:
+      - run:
+          name: Install AWS CLI dependencies
+          command: *defaults_awsCliDependencies
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
