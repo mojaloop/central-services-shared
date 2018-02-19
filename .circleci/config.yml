@@ -25,24 +25,8 @@ defaults_awsCliDependencies: &defaults_awsCliDependencies |
 defaults_npm_auth: &defaults_npm_auth
   name: Update NPM registry auth token
   command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-  
-defaults_npm_version_prerelease: &defaults_npm_version_prerelease
-  name: Update version to prerelease
-  command: npm version prerelease
 
-defaults_npm_version_patch: &defaults_npm_version_patch
-  name: Update patch version
-  command: npm version patch
-
-defaults_npm_version_minor: &defaults_npm_version_minor
-  name: Update minor version
-  command: npm version minor
-
-defaults_npm_version_major: &defaults_npm_version_major
-  name: Update major version
-  command: npm version major
-
-defaults_npm_publish_version: &defaults_npm_publish_version
+defaults_npm_publish_version: &defaults_npm_publish
   name: Update version to prerelease
   command: npm publish --tag $CIRCLE_TAG --access public
 
@@ -134,8 +118,6 @@ jobs:
       - run:
           <<: *defaults_npm_auth
       - run:
-          <<: *defaults_npm_version_prerelease
-      - run:
           <<: *defaults_npm_publish_release
   
   build:
@@ -199,10 +181,10 @@ workflows:
             - test-coverage
           filters:
             tags:
-              ignore: /.*/
+              only: /v[0-9]+(\.[0-9]+)*\-snapshot/
             branches:
               only: 
-                - develop-test
+                - /.*/
       - build:
           context: org-global
           requires:
@@ -211,7 +193,7 @@ workflows:
             - test-coverage
           filters:
             tags:
-              ignore: /.*/
+              only: /v[0-9]+(\.[0-9]+)*/
             branches:
               only: 
-                - master
+                - /.*/
