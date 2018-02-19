@@ -31,12 +31,14 @@ defaults_npm_auth: &defaults_npm_auth
 defaults_npm_publish_version: &defaults_npm_publish
   name: Update version to prerelease
   command: |
+    source $BASH_ENV
     echo "Publishing tag $CIRCLE_TAG"
     npm publish --tag $CIRCLE_TAG --access public
 
 defaults_npm_publish_release: &defaults_npm_publish_release
   name: Publish NPM $RELEASE_TAG artifact
   command: |
+    source $BASH_ENV
     echo "Publishing tag $RELEASE_TAG"
     npm publish --tag $RELEASE_TAG --access public
 
