@@ -6,6 +6,12 @@ defaults: &defaults
   docker:
     - image: mhart/alpine-node:8.9.4
 
+defaults_Dependencies: &defaults_Dependencies | 
+    apk --no-cache add git
+    apk --no-cache add ca-certificates
+    apk --no-cache add curl
+    apk --no-cache add openssh-client
+
 defaults_awsCliDependencies: &defaults_awsCliDependencies | 
     apk --no-cache add \
             python \
@@ -32,6 +38,9 @@ jobs:
   setup:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - checkout
       - run:
           name: Update NPM install
@@ -44,6 +53,9 @@ jobs:
   test-unit:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
@@ -62,6 +74,9 @@ jobs:
   test-coverage:
     <<: *defaults
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - run:
           name: Install AWS CLI dependencies
           command: *defaults_awsCliDependencies
@@ -91,6 +106,9 @@ jobs:
     <<: *defaults
     steps:
       - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - run:
           name: setup environment vars for SNAPSHOT release
           command: |
             echo 'export RELEASE_TAG=$RELEASE_TAG_SNAPSHOT' >> $BASH_ENV
@@ -107,6 +125,9 @@ jobs:
   deploy:
     <<: *defaults 
     steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
       - run:
           name: setup environment vars for SNAPSHOT release
           command: |
