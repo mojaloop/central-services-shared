@@ -6,6 +6,19 @@ defaults: &defaults
   docker:
     - image: circleci/node:8.9.4
 
+defaults_npm_auth: &defaults_npm_auth
+  - run:
+      name: Update NPM registry auth token
+      command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+  
+defaults_npm_publish: &defaults_npm_publish
+  - run:
+      name: Publish NPM $CIRCLE_TAG artifact
+      command: npm publish --tag $CIRCLE_TAG --access public
+  - run:
+      name: Publish NPM $RELEASE_TAG artifact
+      command: npm publish --tag $RELEASE_TAG --access public
+
 jobs:
   setup:
     <<: *defaults
@@ -18,6 +31,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
+  
   test-unit:
     <<: *defaults
     steps:
@@ -35,6 +49,7 @@ jobs:
           prefix: test
       - store_test_results:
           path: ./test/results
+  
   test-coverage:
     <<: *defaults
     steps:
@@ -49,18 +64,32 @@ jobs:
           prefix: test
       - store_test_results:
           path: coverage/lcov.info
-  deploy:
+  
+  deploy-snapshot:
     <<: *defaults
     steps:
+      - run:
+          name: setup environment vars for SNAPSHOT release
+          command: |
+            echo 'export RELEASE_TAG=$RELEASE_TAG_SNAPSHOT' >> $BASH_ENV
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
+      <<: *defaults_npm_auth
+      <<: *defaults_npm_publish
+  
+  deploy:
+    <<: *defaults 
+    steps:
       - run:
-          name: Update NPM registry auth token
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-      - run:
-          name: Publish NPM artifact
-          command: npm publish --access public
+          name: setup environment vars for SNAPSHOT release
+          command: |
+            echo 'export RELEASE_TAG=$RELEASE_TAG' >> $BASH_ENV
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      <<: *defaults_npm_auth
+      <<: *defaults_npm_publish
 
 workflows:
   version: 2
@@ -69,17 +98,21 @@ workflows:
       - setup:
           context: org-global
           filters:
-              branches:
-                ignore:
-                  - /feature*/
-                  - /bugfix*/
+            tags:
+              only: /.*/
+            branches:
+              ignore: 
+                - /feature*/
+                - /bugfix*/
       - test-unit:
           context: org-global
           requires:
             - setup
           filters:
+            tags:
+              only: /.*/
             branches:
-              ignore:
+              ignore: 
                 - /feature*/
                 - /bugfix*/
       - test-coverage:
@@ -87,10 +120,24 @@ workflows:
           requires:
             - setup
           filters:
+            tags:
+              only: /.*/
             branches:
-              ignore:
+              ignore: 
                 - /feature*/
                 - /bugfix*/
+      - deploy-snapshot:
+          context: org-global
+          requires:
+            - setup
+            - test-unit
+            - test-coverage
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*\-snapshot/
+            branches:
+              ignore: 
+                - /.*/
       - deploy:
           context: org-global
           requires:
@@ -101,5 +148,5 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              only:
-                - master
+              ignore: 
+                - /.*/
