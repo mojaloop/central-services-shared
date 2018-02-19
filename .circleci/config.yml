@@ -1,8 +1,10 @@
 # CircleCI v2 Config
 version: 2
 
-defaults: &defaults
+defaults_working_directory: &defaults_working_directory
   working_directory: /home/circleci/project
+
+defaults_docker_node: &defaults_docker_node
   docker:
     - image: mhart/alpine-node:8.9.4
 
@@ -40,7 +42,8 @@ defaults_npm_publish_release: &defaults_npm_publish_release
 
 jobs:
   setup:
-    <<: *defaults
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
     steps:
       - run:
           name: Install general dependencies
@@ -55,7 +58,8 @@ jobs:
             - node_modules
   
   test-unit:
-    <<: *defaults
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
     steps:
       - run:
           name: Install general dependencies
@@ -76,7 +80,8 @@ jobs:
           path: ./test/results
   
   test-coverage:
-    <<: *defaults
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
     steps:
       - run:
           name: Install general dependencies
@@ -107,7 +112,8 @@ jobs:
             fi 
   
   build-snapshot:
-    <<: *defaults
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
     steps:
       - run:
           name: Install general dependencies
@@ -125,7 +131,8 @@ jobs:
           <<: *defaults_npm_publish_release
   
   build:
-    <<: *defaults 
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
     steps:
       - run:
           name: Install general dependencies
