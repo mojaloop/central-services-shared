@@ -30,3 +30,13 @@
  ******/
 
 'use strict'
+
+// TODO:  RDKAFKA Producer code goes here
+
+class Producer {
+  constructor () {
+
+  }
+}
+
+exports.Prodcuer = Producer

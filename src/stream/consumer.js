@@ -30,3 +30,13 @@
  ******/
 
 'use strict'
+
+// TODO:  RDKAFKA Consumer code goes here
+
+class Consumer {
+  constructor () {
+
+  }
+}
+
+exports.Consumer = Consumer
