@@ -4,6 +4,8 @@ const Winston = require('winston')
 
 function Logger () {
   this._logger = new Winston.Logger().add(Winston.transports.Console, { timestamp: true, colorize: true })
+
+  this._logger.level = 'debug'
 }
 
 Logger.prototype.debug = function (...args) {
