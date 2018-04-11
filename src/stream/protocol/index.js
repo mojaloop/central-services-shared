@@ -36,7 +36,7 @@ const Logger = require('../../logger')
 // TODO:  LIME Protocol stuff goes here for validation, transforms, etc
 
 const parseValue = (value, charset = 'utf8', asJSON = true) => {
-  Logger.debug('Protocol::parseMessage() - start')
+  Logger.silly('Protocol::parseMessage() - start')
   var parsedValue = value.toString(charset)
 
   if (asJSON) {
@@ -44,11 +44,11 @@ const parseValue = (value, charset = 'utf8', asJSON = true) => {
       parsedValue = JSON.parse(parsedValue)
     } catch (error) {
       Logger.error(`Protocol::parseMessage() - error - unable to parse message as JSON -  ${error}`)
-      Logger.debug('Protocol::parseMessage() - end')
+      Logger.silly('Protocol::parseMessage() - end')
       // throw new Error('unable to parse message as JSON')
     }
   }
-  Logger.debug('Protocol::parseMessage() - end')
+  Logger.silly('Protocol::parseMessage() - end')
   return parsedValue
 }
 

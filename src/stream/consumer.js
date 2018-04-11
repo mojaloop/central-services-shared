@@ -33,20 +33,31 @@
 
 const Promise = require('bluebird')
 const EventEmitter = require('events')
-// const debug = require('debug')
-// const async = require('async')
 const Logger = require('../logger')
 const Kafka = require('node-rdkafka')
 
 const Protocol = require('./protocol')
 
-// TODO:  RDKAFKA Consumer code goes here
+const CONSUMER_MODES = {
+  flow: 0,
+  poll: 1,
+  recursive: 2
+}
 
 class Consumer extends EventEmitter {
   constructor (topics = [], config = {
-    global: {
+    rdkafka: {
       'group.id': 'kafka',
-      'metadata.broker.list': 'localhost:9092'
+      'metadata.broker.list': 'localhost:9092',
+      'enable.auto.commit': false
+      // 'debug': 'all'
+    },
+    options: {
+      mode: CONSUMER_MODES.flow,
+      batchSize: 10,
+      pollFrequency: 10, // only applicable for poll mode
+      messageCharset: 'utf8',
+      messageAsJSON: true
     },
     topic: {},
     logger: Logger
@@ -58,27 +69,28 @@ class Consumer extends EventEmitter {
     }
 
     let { logger } = config
-    logger.debug('Consumer::constructor() - start')
+    logger.silly('Consumer::constructor() - start')
     this._topics = topics
     this._config = config
     this._status = {}
     this._status.runningInConsumeOnceMode = false
-    logger.debug('Consumer::constructor() - end')
+    this._status.runningInConsumeMode = false
+    logger.silly('Consumer::constructor() - end')
   }
 
   connect () {
     let { logger } = this._config
-    logger.debug('Consumer::connect() - start')
+    logger.silly('Consumer::connect() - start')
     return new Promise((resolve, reject) => {
-      this._consumer = new Kafka.KafkaConsumer(this._config.global, this._config.topic)
+      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafka, this._config.topic)
 
       this._consumer.on('event.log', log => {
-        logger.debug(log.message)
+        logger.silly(log.message)
       })
 
       this._consumer.on('event.error', error => {
-        logger.debug('error from consumer')
-        logger.debug(error)
+        logger.silly('error from consumer')
+        logger.silly(error)
         super.emit('error', error)
       })
 
@@ -91,68 +103,175 @@ class Consumer extends EventEmitter {
       })
 
       this._consumer.on('ready', arg => {
-        logger.info(`node-rdkafka v${Kafka.librdkafkaVersion} ready - ${JSON.stringify(arg)}`)
+        logger.debug(`node-rdkafka v${Kafka.librdkafkaVersion} ready - ${JSON.stringify(arg)}`)
         super.emit('ready', arg)
         this.subscribe()
-        // this._consumer.consume()
-        logger.debug('Consumer::connect() - end')
+        logger.silly('Consumer::connect() - end')
         resolve(true)
       })
 
-      logger.debug('Connecting..')
+      logger.silly('Connecting..')
       this._consumer.connect(null, (error, metadata) => {
         if (error) {
           super.emit('error', error)
-          logger.debug('Consumer::connect() - end')
+          logger.silly('Consumer::connect() - end')
           return reject(error)
         }
         // this.subscribe()
-        logger.debug('Consumer metadata:')
-        logger.debug(metadata)
+        logger.silly('Consumer metadata:')
+        logger.silly(metadata)
         // resolve(true)
+      })
+
+      logger.silly('Registering data event..')
+      this._consumer.on('data', message => {
+        logger.silly(`Consumer::onData() - message: ${JSON.stringify(message)}`)
+        var returnMessage = { ...message }
+        if (message instanceof Array) {
+          returnMessage.map(msg => {
+            var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+            msg.value = parsedValue
+          })
+        } else {
+          var parsedValue = Protocol.parseValue(returnMessage.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+          returnMessage.value = parsedValue
+        }
+        super.emit('message', returnMessage)
       })
     })
   }
 
+  disconnect (cb = () => {}) {
+    let { logger } = this._config
+    logger.silly('Consumer::disconnect() - start')
+    this._consumer.disconnect(cb)
+    logger.silly('Consumer::disconnect() - end')
+  }
+
   subscribe (topics = null) {
     let { logger } = this._config
-    logger.debug('Consumer::subscribe() - start')
+    logger.silly('Consumer::subscribe() - start')
     if (topics) {
       this._topics = topics
     }
 
     if (this._topics) {
-      this._config.logger.debug(`Consumer::subscribe() - subscribing too [${this._topics}]`)
+      this._config.logger.silly(`Consumer::subscribe() - subscribing too [${this._topics}]`)
       this._consumer.subscribe(this._topics)
     }
-    logger.debug('Consumer::subscribe() - end')
+    logger.silly('Consumer::subscribe() - end')
   }
 
-  consume (batchSize = 1, workDoneCb = (error, message) => {}, charset = 'utf8', asJSON = true) {
+  consume (workDoneCb = (error, messages) => {}) {
     let { logger } = this._config
-    logger.debug('Consumer::consume() - start')
+    logger.silly('Consumer::consume() - start')
 
-    this._consumer.on('data', message => {
-      logger.debug(`Consumer::consume() - message: ${JSON.stringify(message)}`)
-
-      var parsedValue = Protocol.parseValue(message.value, charset, asJSON)
-      message.value = parsedValue
-      super.emit('message', message)
-    })
-
-    this._status.runningInConsumeOnceMode = false
-    this._status.runningInConsumeMode = true
-    this._consumer.consume(batchSize)
-    logger.debug('Consumer::consume() - end')
+    switch (this._config.options.mode) {
+      case CONSUMER_MODES.poll:
+        if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
+          this._consumePoller(this._config.options.pollFrequency, this._config.options.batchSize, workDoneCb)
+        } else {
+          // throw error
+          throw new Error('batchSize option is not valid - Select an integer greater then 0')
+        }
+        break
+      case CONSUMER_MODES.recursive:
+        if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
+          super.on('recursive', (error, messages) => {
+            this._consumeRecursive(this._config.options.batchSize, workDoneCb)
+          })
+          this._consumeRecursive(this._config.options.batchSize, workDoneCb)
+        } else {
+          // throw error
+          throw new Error('batchSize option is not valid - Select an integer greater then 0')
+        }
+        break
+      case CONSUMER_MODES.flow:
+        this._consumeFlow(workDoneCb)
+        break
+      default:
+        this._consumeFlow(workDoneCb)
+    }
+    logger.silly('Consumer::consume() - end')
   }
 
+  _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {}) {
+    let { logger } = this._config
+    setInterval(() => {
+      this._consumer.consume(batchSize, (error, messages) => {
+        if (error || !messages.length) {
+          if (error) {
+            logger.error(`Consumer::_consumerPoller() - ERROR - ${error}`)
+          } else {
+            // logger.debug(`Consumer::_consumerPoller() - POLL EMPTY PING`)
+          }
+        } else {
+          messages.map(msg => {
+            var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+            msg.value = parsedValue
+          })
+          if (this._config.options.messageAsJSON) {
+            logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${JSON.stringify(messages)}}`)
+          } else {
+            logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${messages}}`)
+          }
+          workDoneCb(error, messages)
+          super.emit('batch', messages)
+        }
+      })
+    }, pollFrequency)
+  }
+
+  _consumeRecursive (batchSize = 1, workDoneCb = (error, messages) => {}) {
+    let { logger } = this._config
+    this._consumer.consume(batchSize, (error, messages) => {
+      if (error || !messages.length) {
+        return this._consumeRecursive(batchSize, workDoneCb)
+      } else {
+        messages.map(msg => {
+          var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+          msg.value = parsedValue
+        })
+        if (this._config.options.messageAsJSON) {
+          logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${JSON.stringify(messages)}}`)
+        } else {
+          logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${messages}}`)
+        }
+        workDoneCb(error, messages)
+        super.emit('recursive', error, messages)
+        super.emit('batch', messages)
+        return true
+      }
+    })
+  }
+
+  _consumeFlow (workDoneCb = (error, message) => {}) {
+    let { logger } = this._config
+    this._consumer.consume((error, message) => {
+      if (error || !message) {
+
+      } else {
+        var parsedValue = Protocol.parseValue(message.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+        message.value = parsedValue
+        if (this._config.options.messageAsJSON) {
+          logger.debug(`Consumer::_consumerFlow() - message: ${JSON.stringify(message)}`)
+        } else {
+          logger.debug(`Consumer::_consumerFlow() - message: ${message}`)
+        }
+        workDoneCb(error, message)
+        // super.emit('batch', message) // not applicable in flow mode since its one message at a time
+      }
+    })
+  }
+
+  // TODO: WRITE CONSUME ONCE
   consumeOnce (batchSize = 1, workDoneCb = (error, message) => {}, charset = 'utf8', asJSON = true) {
     let { logger } = this._config
-    logger.debug('Consumer::consume() - start')
+    logger.silly('Consumer::consume() - start')
     this._consumer.resume(this._topics)
     return new Promise((resolve, reject) => {
       this._consumer.on('data', message => {
-        logger.debug(`Consumer::consume() - message: ${JSON.stringify(message)}`)
+        logger.silly(`Consumer::consume() - message: ${JSON.stringify(message)}`)
 
         var parsedValue = Protocol.parseValue(message.value, charset, asJSON)
         message.value = parsedValue
@@ -170,15 +289,21 @@ class Consumer extends EventEmitter {
         this._consumer.consume(batchSize, workDoneCb)
       }
     })
-    // logger.debug('Consumer::consume() - end')
+    // logger.silly('Consumer::consume() - end')
   }
 
-
-  commit () {
+  commit (topicPartitions = null) {
     let { logger } = this._config
-    logger.debug('Consumer::commit() - start')
-    this._consumer.commit()
-    logger.debug('Consumer::commit() - end')
+    logger.silly('Consumer::commit() - start')
+    this._consumer.commit(topicPartitions)
+    logger.silly('Consumer::commit() - end')
+  }
+
+  commitMessage (msg) {
+    let { logger } = this._config
+    logger.silly('Consumer::commitMessage() - start')
+    this._consumer.commitMessage(msg)
+    logger.silly('Consumer::commitMessage() - end')
   }
 }
 //
@@ -203,6 +328,8 @@ class Consumer extends EventEmitter {
 //     this._stream.on(type, func)
 //   }
 // }
+
+// TODO: WRITE STREAM CONSUMER
 
 // exports.Consumer = Consumer
 // exports.Stream = Consumer
@@ -231,82 +358,98 @@ var testConsumer = async () => {
   // c.subscribe()
   // Logger.info('testConsumer::subscribe::end')
 
-  Logger.info('testConsumer::consume::start')
-  c.consume()
-  Logger.info('testConsumer::consume::end')
+  Logger.info('testConsumer::consume::start1')
 
-// c.subscribe()
-// consumer.consume();
-// c.on('data', message => Logger.info(message.offset, message.value))
+  c.consume((error, message) => {
+    if (error) {
+      Logger.info(`WTDSDSD!!! error ${error}`)
+    }
+    if (message) { // check if there is a valid message comming back
+      Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
 
-// c.on('first-drain-message', message => Logger.info(message.offset, message.value))
-  c.on('ready', arg => Logger.info(`READY! ${JSON.stringify(arg)}`))
-  c.on('message', message => Logger.info(`ConMessage: ${message.offset}, ${JSON.stringify(message.value)}`))
+      // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+      if (Array.isArray(message) && message.length != null && message.length > 0) {
+        message.forEach(msg => {
+          c.commitMessage(msg)
+        })
+      }
+    } else {
+      c.commitMessage(message)
+    }
+  })
+
+  Logger.info('testConsumer::consume::end1')
+
+  c.on('ready', arg => Logger.info(`onReady: ${JSON.stringify(arg)}`))
+  c.on('message', message => Logger.info(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`))
+  c.on('batch', message => Logger.info(`onBatch: ${JSON.stringify(message)}`))
 
   Logger.info('testConsumer::end')
 }
 
 testConsumer()
+
+
+// //
 //
-
-var testKafkaLib = () => {
-  var consumer = new Kafka.KafkaConsumer({
-    // 'debug': 'all',
-    'metadata.broker.list': 'localhost:9092',
-    'group.id': 'node-rdkafka-consumer-flow-example',
-    'enable.auto.commit': false
-  })
-
-  var topicName = 'test'
-
-// logging debug messages, if debug is enabled
-  consumer.on('event.log', function (log) {
-    console.log(log)
-  })
-
-// logging all errors
-  consumer.on('event.error', function (err) {
-    console.error('Error from consumer')
-    console.error(err)
-  })
-
-// counter to commit offsets every numMessages are received
-  var counter = 0
-  var numMessages = 5
-
-  consumer.on('ready', function (arg) {
-    console.log('consumer ready.' + JSON.stringify(arg))
-
-    consumer.subscribe([topicName])
-    // start consuming messages
-    consumer.consume()
-  })
-
-  consumer.on('data', function (m) {
-    counter++
-
-    // committing offsets every numMessages
-    if (counter % numMessages === 0) {
-      console.log('calling commit')
-      consumer.commit(m)
-    }
-
-    // Output the actual message contents
-    console.log(JSON.stringify(m))
-    console.log(m.value.toString())
-  })
-
-  consumer.on('disconnected', function (arg) {
-    console.log('consumer disconnected. ' + JSON.stringify(arg))
-  })
-
-// starting the consumer
-  consumer.connect()
-
-// stopping this example after 30s
-  setTimeout(function () {
-    consumer.disconnect()
-  }, 30000)
-}
-
-// testKafkaLib()
+// var testKafkaLib = () => {
+//   var consumer = new Kafka.KafkaConsumer({
+//     // 'debug': 'all',
+//     'metadata.broker.list': 'localhost:9092',
+//     'group.id': 'node-rdkafka-consumer-flow-example',
+//     'enable.auto.commit': false
+//   })
+//
+//   var topicName = 'test'
+//
+// // logging debug messages, if debug is enabled
+//   consumer.on('event.log', function (log) {
+//     console.log(log)
+//   })
+//
+// // logging all errors
+//   consumer.on('event.error', function (err) {
+//     console.error('Error from consumer')
+//     console.error(err)
+//   })
+//
+// // counter to commit offsets every numMessages are received
+//   var counter = 0
+//   var numMessages = 5
+//
+//   consumer.on('ready', function (arg) {
+//     console.log('consumer ready.' + JSON.stringify(arg))
+//
+//     consumer.subscribe([topicName])
+//     // start consuming messages
+//     consumer.consume()
+//   })
+//
+//   consumer.on('data', function (m) {
+//     counter++
+//
+//     // committing offsets every numMessages
+//     if (counter % numMessages === 0) {
+//       console.log('calling commit')
+//       consumer.commit(m)
+//     }
+//
+//     // Output the actual message contents
+//     console.log(JSON.stringify(m))
+//     console.log(m.value.toString())
+//   })
+//
+//   consumer.on('disconnected', function (arg) {
+//     console.log('consumer disconnected. ' + JSON.stringify(arg))
+//   })
+//
+// // starting the consumer
+//   consumer.connect()
+//
+// // stopping this example after 30s
+//   setTimeout(function () {
+//     consumer.disconnect()
+//   }, 30000)
+// }
+//
+// // testKafkaLib()
