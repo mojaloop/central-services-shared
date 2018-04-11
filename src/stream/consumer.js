@@ -264,7 +264,7 @@ class Consumer extends EventEmitter {
     })
   }
 
-  // TODO: WRITE CONSUME ONCE
+  // TODO: WRITE CONSUME ONCE - this is not working at the moment
   consumeOnce (batchSize = 1, workDoneCb = (error, message) => {}, charset = 'utf8', asJSON = true) {
     let { logger } = this._config
     logger.silly('Consumer::consume() - start')
@@ -334,6 +334,7 @@ class Consumer extends EventEmitter {
 // exports.Consumer = Consumer
 // exports.Stream = Consumer
 
+// TODO: TO BE MOVED INTO UNIT/INTEGRATION TESTS
 var testConsumer = async () => {
   Logger.info('testConsumer::start')
 
@@ -388,7 +389,6 @@ var testConsumer = async () => {
 }
 
 testConsumer()
-
 
 // //
 //
