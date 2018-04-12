@@ -33,15 +33,17 @@
 
 const Promise = require('bluebird')
 const EventEmitter = require('events')
+const async = require('async')
 const Logger = require('../logger')
 const Kafka = require('node-rdkafka')
 
 const Protocol = require('./protocol')
 
 const CONSUMER_MODES = {
-  flow: 0,
-  poll: 1,
-  recursive: 2
+  flow: 0, // Flow processing messages one at a time as quick as possible
+  poll: 1, // Poll flow processing batch of messages as per the poller frequency
+  recursive: 2, // Recursive flow processing batch of messages as quick as possible
+  queueRecursive: 3 // Recursive flow with a synchronous queue processing batch of messages in a transaction context
 }
 
 class Consumer extends EventEmitter {
@@ -53,9 +55,10 @@ class Consumer extends EventEmitter {
       // 'debug': 'all'
     },
     options: {
-      mode: CONSUMER_MODES.flow,
+      mode: CONSUMER_MODES.queueRecursive,
       batchSize: 10,
       pollFrequency: 10, // only applicable for poll mode
+      recursiveTimeout: 100,
       messageCharset: 'utf8',
       messageAsJSON: true
     },
@@ -186,6 +189,30 @@ class Consumer extends EventEmitter {
           throw new Error('batchSize option is not valid - Select an integer greater then 0')
         }
         break
+      case CONSUMER_MODES.queueRecursive:
+        // intialize a local worker queue with concurrency as 1 (only 1 event is processed at a time)
+        var q = async.queue((message, callbackDone) => {
+          workDoneCb(message.error, message.messages).then((response) => {
+            callbackDone() // this marks the completion of the processing by the worker
+            // super.emit('recursive', message.error, message.messages)
+          })
+        }, 1)
+
+        // a callback function, invoked when queue is empty.
+        q.drain = () => {
+          this._consumer.resume(this._topics) // resume listening new messages from the Kafka consumer group
+        }
+
+        if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
+          super.on('recursive', (error, messages) => {
+            this._consumeQueueRecursive(q, this._config.options.batchSize, workDoneCb)
+          })
+          this._consumeQueueRecursive(q, this._config.options.batchSize, workDoneCb)
+        } else {
+          // throw error
+          throw new Error('batchSize option is not valid - Select an integer greater then 0')
+        }
+        break
       case CONSUMER_MODES.flow:
         this._consumeFlow(workDoneCb)
         break
@@ -206,6 +233,7 @@ class Consumer extends EventEmitter {
             // logger.debug(`Consumer::_consumerPoller() - POLL EMPTY PING`)
           }
         } else {
+          // lets transform the messages into the desired format
           messages.map(msg => {
             var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
             msg.value = parsedValue
@@ -226,8 +254,11 @@ class Consumer extends EventEmitter {
     let { logger } = this._config
     this._consumer.consume(batchSize, (error, messages) => {
       if (error || !messages.length) {
-        return this._consumeRecursive(batchSize, workDoneCb)
+        return setTimeout(() => {
+          return this._consumeRecursive(batchSize, workDoneCb)
+        }, this._config.options.recursiveTimeout)
       } else {
+        // lets transform the messages into the desired format
         messages.map(msg => {
           var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
           msg.value = parsedValue
@@ -240,6 +271,43 @@ class Consumer extends EventEmitter {
         workDoneCb(error, messages)
         super.emit('recursive', error, messages)
         super.emit('batch', messages)
+        return true
+      }
+    })
+  }
+
+  _consumeQueueRecursive (queue, batchSize = 1, workDoneCb = (error, messages) => {}) {
+    let { logger } = this._config
+
+    this._consumer.consume(batchSize, (error, messages) => {
+      if (error || !messages.length) {
+        return setTimeout(() => {
+          return this._consumeRecursive(batchSize, workDoneCb)
+        }, this._config.options.recursiveTimeout)
+      } else {
+        // pause consumer so we can process the messages
+        this._consumer.pause(this._topics)
+
+        // lets transform the messages into the desired format
+        messages.map(msg => {
+          var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+          msg.value = parsedValue
+        })
+
+        if (this._config.options.messageAsJSON) {
+          logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${JSON.stringify(messages)}}`)
+        } else {
+          logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${messages}}`)
+        }
+        // await workDoneCb(error, messages)
+
+        queue.push({error,messages}, function (err, result) {
+          if (err) { logger.error(err) }
+        })
+        // this._consumer.pause(this._topics)
+
+        super.emit('recursive', error, messages)
+        // super.emit('batch', messages)
         return true
       }
     })
@@ -331,7 +399,9 @@ class Consumer extends EventEmitter {
 
 // TODO: WRITE STREAM CONSUMER
 
-// exports.Consumer = Consumer
+exports.Consumer = Consumer
+exports.CONSUMER_MODES = CONSUMER_MODES
+
 // exports.Stream = Consumer
 
 // TODO: TO BE MOVED INTO UNIT/INTEGRATION TESTS
@@ -361,24 +431,49 @@ var testConsumer = async () => {
 
   Logger.info('testConsumer::consume::start1')
 
+  // c.consume((error, message) => {
+  //   if (error) {
+  //     Logger.info(`WTDSDSD!!! error ${error}`)
+  //   }
+  //   if (message) { // check if there is a valid message comming back
+  //     Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+  //
+  //     // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+  //     if (Array.isArray(message) && message.length != null && message.length > 0) {
+  //       message.forEach(msg => {
+  //         c.commitMessage(msg)
+  //       })
+  //     }
+  //   } else {
+  //     c.commitMessage(message)
+  //   }
+  //   setInterval(() => { Logger.info('WAITING 10000') }, 10000)
+  // })
+
   c.consume((error, message) => {
-    if (error) {
-      Logger.info(`WTDSDSD!!! error ${error}`)
-    }
-    if (message) { // check if there is a valid message comming back
-      Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
-
-      // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
-      if (Array.isArray(message) && message.length != null && message.length > 0) {
-        message.forEach(msg => {
-          c.commitMessage(msg)
-        })
+    return new Promise((resolve, reject) => {
+      if (error) {
+        Logger.info(`WTDSDSD!!! error ${error}`)
+        // resolve(false)
+        reject(error)
       }
-    } else {
-      c.commitMessage(message)
-    }
+      if (message) { // check if there is a valid message comming back
+        Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+        // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+        if (Array.isArray(message) && message.length != null && message.length > 0) {
+          message.forEach(msg => {
+            c.commitMessage(msg)
+          })
+        } else {
+          c.commitMessage(message)
+        }
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+      // resolve(true)
+    })
   })
-
   Logger.info('testConsumer::consume::end1')
 
   c.on('ready', arg => Logger.info(`onReady: ${JSON.stringify(arg)}`))
