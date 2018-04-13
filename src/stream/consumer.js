@@ -97,10 +97,10 @@ exports.ENUMS = ENUMS
  * The options that can be configured for the Consumer
  *
  * @typedef {object} Consumer~Options
- * @property {int} mode - @see ENUMS~CONSUMER_MODES. Defaults: CONSUMER_MODES.recursive
- * @property {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
- * @property {int} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
- * @property {int} recursiveTimeout - The timeout in milliseconds for the recursive processing method should timeout. Only applicable when mode = CONSUMER_MODES.recursive. Defaults: 100
+ * @property {number} mode - @see ENUMS~CONSUMER_MODES. Defaults: CONSUMER_MODES.recursive
+ * @property {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+ * @property {number} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
+ * @property {number} recursiveTimeout - The timeout in milliseconds for the recursive processing method should timeout. Only applicable when mode = CONSUMER_MODES.recursive. Defaults: 100
  * @property {string} messageCharset - Parse processed message from Kafka into a string using this encoding character set. Defaults: utf8
  * @property {boolean} messageAsJSON - Parse processed message from Kafka into a JSON object. Defaults: true
  * @property {boolean} sync - Ensures that messages are processed in order via a single thread. This may impact performance. Defaults: false
@@ -402,8 +402,8 @@ class Consumer extends EventEmitter {
    * @fires Consumer#batch
    *
    * Consume messages from in batches by polling in a specified frequency
-   * @param {int} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
-   * @param {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+   * @param {number} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
+   * @param {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
   _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {}) {
@@ -456,9 +456,9 @@ class Consumer extends EventEmitter {
    * @fires Consumer#batch
    * @fires Consumer#recursive
    *
-   * @param {int} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
-   * @param {int} recursiveTimeout - The timeout in milliseconds for the recursive processing method should timeout. Only applicable when mode = CONSUMER_MODES.recursive. Defaults: 100
-   * @param {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+   * @param {number} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
+   * @param {number} recursiveTimeout - The timeout in milliseconds for the recursive processing method should timeout. Only applicable when mode = CONSUMER_MODES.recursive. Defaults: 100
+   * @param {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {boolean} - true when successful
    */
@@ -541,7 +541,7 @@ class Consumer extends EventEmitter {
    *
    * This function will also emit the following events:
    * 1. data - event containing each message consumed
-   * @param {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+   * @param {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {object} - single message that was consumed
    */
