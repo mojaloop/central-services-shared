@@ -2,11 +2,11 @@
  License
  --------------
  Copyright © 2017 Bill & Melinda Gates Foundation
- The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the 'License') and you may not use these files except in compliance with the License. You may obtain a copy of the License at
 
  http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
  Contributors
  --------------
@@ -31,4 +31,74 @@
 
 'use strict'
 
-// TODO:  LIME Protocol stuff goes here for validation, transforms, etc
+const Logger = require('../../logger')
+
+const parseMessage = (from, to, key, message, metadata, type, pp = '') => {
+  return {
+    from: from,
+    to: to,
+    id: key,
+    content: message,
+    type: type,
+    metadata: metadata,
+    pp
+  }
+}
+
+const parseNotify = (from, to, key, message, metadata, event, reason, type, pp = '') => {
+  metadata.resource = message
+  return {
+    from: from,
+    to: to,
+    id: key,
+    type: type,
+    metadata: metadata,
+    pp,
+    event: event,
+    reason: {
+      code: reason.code,
+      description: reason.description
+    }
+  }
+}
+
+const parseCommand = (from, to, key, message, reason, method, metadata, status, type, pp = '') => {
+  return {
+    from: from,
+    to: to,
+    id: key,
+    resource: message,
+    type: type,
+    metadata: metadata,
+    pp,
+    method: method,
+    uri: '',
+    status: status,
+    reason: {
+      code: reason.code,
+      description: reason.description
+    }
+  }
+}
+
+const parseValue = (value, charset = 'utf8', asJSON = true) => {
+  Logger.silly('Protocol::parseMessage() - start')
+  var parsedValue = value.toString(charset)
+
+  if (asJSON) {
+    try {
+      parsedValue = JSON.parse(parsedValue)
+    } catch (error) {
+      Logger.error(`Protocol::parseMessage() - error - unable to parse message as JSON -  ${error}`)
+      Logger.silly('Protocol::parseMessage() - end')
+      // throw new Error('unable to parse message as JSON')
+    }
+  }
+  Logger.silly('Protocol::parseMessage() - end')
+  return parsedValue
+}
+
+exports.parseValue = parseValue
+exports.parseMessage = parseMessage
+exports.parseNotify = parseNotify
+exports.parseCommand = parseCommand
