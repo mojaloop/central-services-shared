@@ -124,14 +124,21 @@ exports.ENUMS = ENUMS
  */
 
 /**
+ * Ready event.
+ *
+ * @event Consumer#message
+ * @type {object}
+ * @property {object} message - Single message that was confusmed in any processing mode
+ */
+
+/**
  * Recursive event.
  *
  * For internal use only
  *
  * @event Consumer#recursive
  * @type {object}
- * @property {object} error - error
- * @property {object} messages - List of messages that were consumed in batch
+ * @property {object} arg - rdkafka ready result
  */
 
 /**
@@ -164,6 +171,7 @@ exports.ENUMS = ENUMS
  *   topic: {}
  * })
  *
+ * @fires Consumer#ready
  * @fires Consumer#message
  * @fires Consumer#batch
  * @fires Consumer#recursive
@@ -215,6 +223,8 @@ class Consumer extends EventEmitter {
 
   /**
    * Connect consumer
+   *
+   * @fires Consumer#ready
    *
    * Connects consumer to the Kafka brocker, and sets up the configured processing mode
    * @return {Promise} - Returns a promise: resolved if successful, or rejection if connection failed

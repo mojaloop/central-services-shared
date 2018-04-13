@@ -39,7 +39,7 @@
 const Consumer = require('../consumer')
 const Logger = require('../../logger')
 
-// TODO: TO BE MOVED INTO UNIT/INTEGRATION TESTS
+// TODO: TO BE REWORKED INTO UNIT/INTEGRATION TEST FRAMEWORK
 var testConsumer = async () => {
   Logger.info('testConsumer::start')
 
@@ -48,15 +48,6 @@ var testConsumer = async () => {
   Logger.info('testConsumer::connect::start')
   var connectionResult = await c.connect()
   Logger.info('testConsumer::connect::end')
-  // c.connect().then(result => {
-  //   Logger.info(`Connected result=${result}`)
-  //
-  //   Logger.info('subscribing')
-  //   c.subscribe()
-  //
-  //   Logger.info('consuming')
-  //   c.consume()
-  // }).catch(error => Logger.error(error))
 
   Logger.info(`Connected result=${connectionResult}`)
 
@@ -65,25 +56,6 @@ var testConsumer = async () => {
   // Logger.info('testConsumer::subscribe::end')
 
   Logger.info('testConsumer::consume::start1')
-
-  // c.consume((error, message) => {
-  //   if (error) {
-  //     Logger.info(`WTDSDSD!!! error ${error}`)
-  //   }
-  //   if (message) { // check if there is a valid message comming back
-  //     Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
-  //
-  //     // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
-  //     if (Array.isArray(message) && message.length != null && message.length > 0) {
-  //       message.forEach(msg => {
-  //         c.commitMessage(msg)
-  //       })
-  //     }
-  //   } else {
-  //     c.commitMessage(message)
-  //   }
-  //   setInterval(() => { Logger.info('WAITING 10000') }, 10000)
-  // })
 
   c.consume((error, message) => {
     return new Promise((resolve, reject) => {

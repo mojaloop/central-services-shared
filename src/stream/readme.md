@@ -1,7 +1,7 @@
 
 **Message Stream Library**
 
-TBD
+Readme for the Message Stream Library for Mojaloop
 
 **Producer** 
 
@@ -9,4 +9,5 @@ TBD
 
 **Consumer**
 
-TBD
+1. Refer to JSDocs for the consumer.js
+2. Refer to the example in [examples/consumer.md](./examples/consumer.md)
