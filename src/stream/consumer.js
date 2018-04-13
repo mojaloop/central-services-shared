@@ -29,6 +29,11 @@
  --------------
  ******/
 
+/**
+ * Kafka Consumer
+ * @module Consumer
+ */
+
 'use strict'
 
 const Promise = require('bluebird')
@@ -39,13 +44,139 @@ const Kafka = require('node-rdkafka')
 
 const Protocol = require('./protocol')
 
+/**
+ * Consumer ENUMs
+ *
+ * This ENUM is for the Consumer Modes of operation
+ *
+ * @typedef {object} ENUMS~CONSUMER_MODES
+ * @property {string} flow - Flow processing messages one at a time as quick as possible
+ * @property {string} poll - Poll flow processing batch of messages as per the poller frequency
+ * @property {string} recursive - Recursive flow processing batch of messages as quick as possible
+ *
+ */
 const CONSUMER_MODES = {
-  flow: 0, // Flow processing messages one at a time as quick as possible
-  poll: 1, // Poll flow processing batch of messages as per the poller frequency
-  recursive: 2, // Recursive flow processing batch of messages as quick as possible
-  queueRecursive: 3 // Recursive flow with a synchronous queue processing batch of messages in a transaction context
+  flow: 0,
+  poll: 1,
+  recursive: 2
 }
 
+/**
+ * ENUMS
+ *
+ * Global ENUMS object
+ *
+ * @typedef {object} ENUMS
+ * @property {object} CONSUMER_MODES - This ENUM is for the Consumer Modes of operation
+ */
+const ENUMS = {
+  CONSUMER_MODES
+}
+
+exports.ENUMS = ENUMS
+
+/**
+ * KafkaConsumer message.
+ *
+ * This is the representation of a message read from Kafka.
+ *
+ * @typedef {object} KafkaConsumer~Message
+ * @property {buffer} value - the message buffer from Kafka.
+ * @property {string} topic - the topic name
+ * @property {number} partition - the partition on the topic the
+ * message was on
+ * @property {number} offset - the offset of the message
+ * @property {string} key - the message key
+ * @property {number} size - message size, in bytes.
+ * @property {number} timestamp - message timestamp
+ */
+
+/**
+ * Consumer Options
+ *
+ * The options that can be configured for the Consumer
+ *
+ * @typedef {object} Consumer~Options
+ * @property {int} mode - @see ENUMS~CONSUMER_MODES. Defaults: CONSUMER_MODES.recursive
+ * @property {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+ * @property {int} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
+ * @property {int} recursiveTimeout - The timeout in milliseconds for the recursive processing method should timeout. Only applicable when mode = CONSUMER_MODES.recursive. Defaults: 100
+ * @property {string} messageCharset - Parse processed message from Kafka into a string using this encoding character set. Defaults: utf8
+ * @property {boolean} messageAsJSON - Parse processed message from Kafka into a JSON object. Defaults: true
+ * @property {boolean} sync - Ensures that messages are processed in order via a single thread. This may impact performance. Defaults: false
+ *
+ */
+
+/**
+ * Batch event.
+ *
+ * @event Consumer#batch
+ * @type {object}
+ * @property {object} messages - List of messages that were consumed in batch
+ */
+
+/**
+ * Message event.
+ *
+ * @event Consumer#message
+ * @type {object}
+ * @property {object} message - Single message that was confusmed in any processing mode
+ */
+
+/**
+ * Recursive event.
+ *
+ * For internal use only
+ *
+ * @event Consumer#recursive
+ * @type {object}
+ * @property {object} error - error
+ * @property {object} messages - List of messages that were consumed in batch
+ */
+
+/**
+ * Consumer class for reading messages from Kafka
+ *
+ * This is the main entry point for reading data from Kafka. You
+ * configure this like you do any other client, with a global
+ * configuration and default topic configuration.
+ *
+ * Once you instantiate this object, connecting will open a socket.
+ * Data will not be read until you tell the consumer what topics
+ * you want to read from.
+ *
+ * @example
+ * var consumer = new Consumer(['test1'], {
+ *   rdkafka: {
+ *     'group.id': 'kafka',
+ *     'metadata.broker.list': 'localhost:9092',
+ *     'enable.auto.commit': false
+ *   },
+ *   options: {
+ *     mode: CONSUMER_MODES.recursive,
+ *     batchSize: 10,
+ *     pollFrequency: 10, // only applicable for poll mode
+ *     recursiveTimeout: 100,
+ *     messageCharset: 'utf8',
+ *     messageAsJSON: true,
+ *     sync: true
+ *   },
+ *   topic: {}
+ * })
+ *
+ * @fires Consumer#message
+ * @fires Consumer#batch
+ * @fires Consumer#recursive
+ *
+ * @param {object} topics - List of topics that will be auto subscribed
+ * @param {object} config - Key value pairs for the configuration of the Consumer with the followin:
+ * rdkafka - specific rdkafka condfigurations (https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md)
+ * options - consumer processing configuration, topic - Key value pairs to create a default. @see Consumer~Options
+ * topic - topic configuration
+ * logger - logger object that supports debug(), info(), verbose() & silly()
+ * @extends EventEmitter
+ * @constructor
+ */
 class Consumer extends EventEmitter {
   constructor (topics = [], config = {
     rdkafka: {
@@ -55,12 +186,13 @@ class Consumer extends EventEmitter {
       // 'debug': 'all'
     },
     options: {
-      mode: CONSUMER_MODES.queueRecursive,
-      batchSize: 10,
+      mode: CONSUMER_MODES.recursive,
+      batchSize: 1,
       pollFrequency: 10, // only applicable for poll mode
       recursiveTimeout: 100,
       messageCharset: 'utf8',
-      messageAsJSON: true
+      messageAsJSON: true,
+      sync: false
     },
     topic: {},
     logger: Logger
@@ -81,6 +213,12 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::constructor() - end')
   }
 
+  /**
+   * Connect consumer
+   *
+   * Connects consumer to the Kafka brocker, and sets up the configured processing mode
+   * @return {Promise} - Returns a promise: resolved if successful, or rejection if connection failed
+   */
   connect () {
     let { logger } = this._config
     logger.silly('Consumer::connect() - start')
@@ -144,6 +282,11 @@ class Consumer extends EventEmitter {
     })
   }
 
+  /**
+   * Disconnect consumer
+   *
+   * Disconnects consumer from the Kafka brocker
+   */
   disconnect (cb = () => {}) {
     let { logger } = this._config
     logger.silly('Consumer::disconnect() - start')
@@ -151,6 +294,12 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::disconnect() - end')
   }
 
+  /**
+   * Subscribe
+   *
+   * Subscribes the consumer to the specified topics. If topics is null, then no action will be taken.
+   * @param {object} topics - List of topics. Defaults: null
+   */
   subscribe (topics = null) {
     let { logger } = this._config
     logger.silly('Consumer::subscribe() - start')
@@ -165,9 +314,43 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::subscribe() - end')
   }
 
+  /**
+   * This callback returns the message read from Kafka.
+   *
+   * @callback Consumer~workDoneCb
+   * @param {Error} error - An error, if one occurred while reading
+   * the data.
+   * @param {object} messages - Either a list or a single message @see KafkaConsumer~Message
+   * @returns {Promise} - Returns resolved on success, or rejections on failure
+   */
+
+  /**
+   * Consume
+   *
+   * Consume messages from Kafka as per the configuration specified in the constructor.
+   * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
+   */
   consume (workDoneCb = (error, messages) => {}) {
     let { logger } = this._config
     logger.silly('Consumer::consume() - start')
+
+    // setup queues to ensure sync processing of messages if options.sync is true
+    if (this._config.options.sync) {
+      this._syncQueue = async.queue((message, callbackDone) => {
+        logger.debug(`Consumer::consume() - Sync Process - ${JSON.stringify(message)}`)
+        workDoneCb(message.error, message.messages).then((response) => {
+          callbackDone() // this marks the completion of the processing by the worker
+          if (this._config.options.mode === CONSUMER_MODES.recursive) { // lets call the recursive event if we are running in recursive mode
+            super.emit('recursive', message.error, message.messages)
+          }
+        })
+      }, 1)
+
+      // a callback function, invoked when queue is empty.
+      this._syncQueue.drain = () => {
+        this._consumer.resume(this._topics) // resume listening new messages from the Kafka consumer group
+      }
+    }
 
     switch (this._config.options.mode) {
       case CONSUMER_MODES.poll:
@@ -181,33 +364,9 @@ class Consumer extends EventEmitter {
       case CONSUMER_MODES.recursive:
         if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
           super.on('recursive', (error, messages) => {
-            this._consumeRecursive(this._config.options.batchSize, workDoneCb)
+            this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
           })
-          this._consumeRecursive(this._config.options.batchSize, workDoneCb)
-        } else {
-          // throw error
-          throw new Error('batchSize option is not valid - Select an integer greater then 0')
-        }
-        break
-      case CONSUMER_MODES.queueRecursive:
-        // intialize a local worker queue with concurrency as 1 (only 1 event is processed at a time)
-        var q = async.queue((message, callbackDone) => {
-          workDoneCb(message.error, message.messages).then((response) => {
-            callbackDone() // this marks the completion of the processing by the worker
-            // super.emit('recursive', message.error, message.messages)
-          })
-        }, 1)
-
-        // a callback function, invoked when queue is empty.
-        q.drain = () => {
-          this._consumer.resume(this._topics) // resume listening new messages from the Kafka consumer group
-        }
-
-        if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
-          super.on('recursive', (error, messages) => {
-            this._consumeQueueRecursive(q, this._config.options.batchSize, workDoneCb)
-          })
-          this._consumeQueueRecursive(q, this._config.options.batchSize, workDoneCb)
+          this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
         } else {
           // throw error
           throw new Error('batchSize option is not valid - Select an integer greater then 0')
@@ -222,6 +381,21 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::consume() - end')
   }
 
+  /**
+   * (Internal) Consume Poller
+   *
+   * This function will also emit the following events:
+   * 1. message - event containing each message consumed
+   * 2. batch - event containing the batch of messages
+   *
+   * @fires Consumer#message
+   * @fires Consumer#batch
+   *
+   * Consume messages from in batches by polling in a specified frequency
+   * @param {int} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
+   * @param {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+   * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
+   */
   _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {}) {
     let { logger } = this._config
     setInterval(() => {
@@ -239,24 +413,50 @@ class Consumer extends EventEmitter {
             msg.value = parsedValue
           })
           if (this._config.options.messageAsJSON) {
-            logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${JSON.stringify(messages)}}`)
+            logger.debug(`Consumer::_consumePoller() - messages[${messages.length}]: ${JSON.stringify(messages)}}`)
           } else {
-            logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${messages}}`)
+            logger.debug(`Consumer::_consumePoller() - messages[${messages.length}]: ${messages}}`)
           }
-          workDoneCb(error, messages)
-          super.emit('batch', messages)
+          if (this._config.options.sync) {
+            this._syncQueue.push({error, messages}, function (err, result) {
+              if (err) { logger.error(err) }
+            })
+          } else {
+            workDoneCb(error, messages)
+            super.emit('batch', messages)
+          }
         }
       })
     }, pollFrequency)
   }
 
-  _consumeRecursive (batchSize = 1, workDoneCb = (error, messages) => {}) {
+  /**
+   * (Internal) Consume Recursively
+   *
+   * Consume messages from via a recursive call.
+   *
+   * This function will also emit the following events:
+   * 1. message - event containing each message consumed
+   * 2. batch - event containing the batch of messages
+   * 3. recursive - event to recursively call the recursive function - for internal use only!
+   *
+   * @fires Consumer#message
+   * @fires Consumer#batch
+   * @fires Consumer#recursive
+   *
+   * @param {int} pollFrequency - The polling frequency in milliseconds. Only applicable when mode = CONSUMER_MODES.poll. Defaults: 10
+   * @param {int} recursiveTimeout - The timeout in milliseconds for the recursive processing method should timeout. Only applicable when mode = CONSUMER_MODES.recursive. Defaults: 100
+   * @param {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+   * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
+   * @returns {boolean} - true when successful
+   */
+  _consumeRecursive (recursiveTimeout = 100, batchSize = 1, workDoneCb = (error, messages) => {}) {
     let { logger } = this._config
     this._consumer.consume(batchSize, (error, messages) => {
       if (error || !messages.length) {
         return setTimeout(() => {
-          return this._consumeRecursive(batchSize, workDoneCb)
-        }, this._config.options.recursiveTimeout)
+          return this._consumeRecursive(recursiveTimeout, batchSize, workDoneCb)
+        }, recursiveTimeout)
       } else {
         // lets transform the messages into the desired format
         messages.map(msg => {
@@ -268,51 +468,33 @@ class Consumer extends EventEmitter {
         } else {
           logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${messages}}`)
         }
-        workDoneCb(error, messages)
-        super.emit('recursive', error, messages)
-        super.emit('batch', messages)
-        return true
-      }
-    })
-  }
 
-  _consumeQueueRecursive (queue, batchSize = 1, workDoneCb = (error, messages) => {}) {
-    let { logger } = this._config
-
-    this._consumer.consume(batchSize, (error, messages) => {
-      if (error || !messages.length) {
-        return setTimeout(() => {
-          return this._consumeRecursive(batchSize, workDoneCb)
-        }, this._config.options.recursiveTimeout)
-      } else {
-        // pause consumer so we can process the messages
-        this._consumer.pause(this._topics)
-
-        // lets transform the messages into the desired format
-        messages.map(msg => {
-          var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
-          msg.value = parsedValue
-        })
-
-        if (this._config.options.messageAsJSON) {
-          logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${JSON.stringify(messages)}}`)
+        if (this._config.options.sync) {
+          this._syncQueue.push({error, messages}, (error, result) => {
+            if (error) { logger.error(error) }
+          })
         } else {
-          logger.debug(`Consumer::_consumerRecursive() - messages[${messages.length}]: ${messages}}`)
+          workDoneCb(error, messages)
+          super.emit('recursive', error, messages)
+          super.emit('batch', messages)
         }
-        // await workDoneCb(error, messages)
-
-        queue.push({error,messages}, function (err, result) {
-          if (err) { logger.error(err) }
-        })
-        // this._consumer.pause(this._topics)
-
-        super.emit('recursive', error, messages)
-        // super.emit('batch', messages)
         return true
       }
     })
   }
 
+  /**
+   * (Internal) Consume Flow
+   *
+   * Consume messages in a flow - one at a time - as quick as possible. If you require performance consider using either the poll or recursive modes which can consume messages in batches.
+   *
+   * This function will also emit the following events:
+   * 1. message - event containing each message consumed
+   *
+   * @fires Consumer#message
+   *
+   * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
+   */
   _consumeFlow (workDoneCb = (error, message) => {}) {
     let { logger } = this._config
     this._consumer.consume((error, message) => {
@@ -326,40 +508,40 @@ class Consumer extends EventEmitter {
         } else {
           logger.debug(`Consumer::_consumerFlow() - message: ${message}`)
         }
-        workDoneCb(error, message)
+        if (this._config.options.sync) {
+          this._syncQueue.push({error, message}, function (err, result) {
+            if (err) { logger.error(err) }
+          })
+        } else {
+          workDoneCb(error, message)
+        }
         // super.emit('batch', message) // not applicable in flow mode since its one message at a time
       }
     })
   }
 
-  // TODO: WRITE CONSUME ONCE - this is not working at the moment
-  consumeOnce (batchSize = 1, workDoneCb = (error, message) => {}, charset = 'utf8', asJSON = true) {
-    let { logger } = this._config
-    logger.silly('Consumer::consume() - start')
-    this._consumer.resume(this._topics)
-    return new Promise((resolve, reject) => {
-      this._consumer.on('data', message => {
-        logger.silly(`Consumer::consume() - message: ${JSON.stringify(message)}`)
-
-        var parsedValue = Protocol.parseValue(message.value, charset, asJSON)
-        message.value = parsedValue
-        // super.emit('message', message)
-        this._consumer.pause(this._topics)
-        resolve(message)
-      })
-
-      // setTimeout(() => {
-      //   reject()
-      // }, CONSUME_ONE_TIMEOUT)
-      if (this._status.runningInConsumeOnceMode === false) {
-        this._status.runningInConsumeOnceMode = true
-        this._status.runningInConsumeMode = false
-        this._consumer.consume(batchSize, workDoneCb)
-      }
-    })
-    // logger.silly('Consumer::consume() - end')
+  /**
+   * Consume Once (Not implemented)
+   *
+   * Consume a single message once and only once.
+   *
+   * @todo Implement method
+   *
+   * This function will also emit the following events:
+   * 1. data - event containing each message consumed
+   * @param {int} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
+   * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
+   * @returns {object} - single message that was consumed
+   */
+  consumeOnce (batchSize = 1, workDoneCb = (error, message) => {}) {
+    throw new Error('Not implemented')
   }
 
+  /**
+   * Commit topics partition
+   *
+   * @param {object} topicPartitions - List of topics that must be commited. If null, it will default to the topics list provided in the constructor. Defaults = null
+   */
   commit (topicPartitions = null) {
     let { logger } = this._config
     logger.silly('Consumer::commit() - start')
@@ -367,6 +549,11 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::commit() - end')
   }
 
+  /**
+   * Commit message
+   *
+   * @param {KafkaConsumer~Message} msg - Kafka message to be commited
+   */
   commitMessage (msg) {
     let { logger } = this._config
     logger.silly('Consumer::commitMessage() - start')
@@ -400,7 +587,8 @@ class Consumer extends EventEmitter {
 // TODO: WRITE STREAM CONSUMER
 
 exports.Consumer = Consumer
-exports.CONSUMER_MODES = CONSUMER_MODES
+// exports.CONSUMER_MODES = CONSUMER_MODES
+exports.ENUMS = ENUMS
 
 // exports.Stream = Consumer
 
