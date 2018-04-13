@@ -178,7 +178,7 @@ exports.ENUMS = ENUMS
  *
  * @param {object} topics - List of topics that will be auto subscribed
  * @param {object} config - Key value pairs for the configuration of the Consumer with the followin:
- * rdkafka - specific rdkafka condfigurations (https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md)
+ * rdkafka - specific rdkafka condfigurations [Refer to configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md}
  * options - consumer processing configuration, topic - Key value pairs to create a default. @see Consumer~Options
  * topic - topic configuration
  * logger - logger object that supports debug(), info(), verbose() & silly()
