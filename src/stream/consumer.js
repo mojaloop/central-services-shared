@@ -126,7 +126,7 @@ exports.ENUMS = ENUMS
 /**
  * Ready event.
  *
- * @event Consumer#message
+ * @event Consumer#ready
  * @type {object}
  * @property {object} message - Single message that was confusmed in any processing mode
  */
