@@ -36,9 +36,9 @@
 
 'use strict'
 
-const Consumer = require('../consumer').Consumer
-const ConsumerEnums = require('../consumer').ENUMS
-const Logger = require('../../logger')
+const Consumer = require('../../src/stream/consumer').Consumer
+const ConsumerEnums = require('../../src/stream/consumer').ENUMS
+const Logger = require('../../src/logger')
 
 // TODO: TO BE REWORKED INTO UNIT/INTEGRATION TEST FRAMEWORK
 var testConsumer = async () => {
