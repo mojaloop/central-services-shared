@@ -123,7 +123,7 @@ module.exports = ENUMS
  *
  * This is the main entry point for writing data to Kafka. You
  * configure this like you do any other client, with a global
- * configuration.
+ * configuration and default topic configuration.
  *
  * @example
  * var producer = new Producer(options, {
@@ -157,7 +157,7 @@ module.exports = ENUMS
  * @constructor
  */
 class Producer extends EventEmitter {
-  constructor (options = {pollIntervalMs: 100}, config = {
+  constructor (config = {
     logger: Logger,
     rdkafkaConf: {
       'metadata.broker.list': 'localhost:9092',
@@ -175,6 +175,9 @@ class Producer extends EventEmitter {
     },
     topicConf: {
       'request.required.acks': 1
+    },
+    options: {
+      pollIntervalMs: 100
     }
   }) {
     super()
@@ -188,7 +191,7 @@ class Producer extends EventEmitter {
     this._status.runningInProduceMode = false
     this._status.runningInProduceBatchMode = false
     this._producerPollIntv = null
-    this._pollIntervalMs = options.pollIntervalMs
+    this._pollIntervalMs = this._config.options.pollIntervalMs
     logger.silly('Producer::constructor() - end')
   }
 
