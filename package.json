@@ -33,7 +33,7 @@
     "faucet": "0.0.1",
     "istanbul": "0.4.5",
     "sinon": "4.2.2",
-    "standard": "10.0.3",
+    "standard": "^10.0.3",
     "tap-xunit": "2.2.0",
     "tape": "4.8.0",
     "tapes": "4.1.0"
