@@ -244,6 +244,7 @@ class Consumer extends EventEmitter {
       this._consumer = new Kafka.KafkaConsumer(this._config.rdkafkaConf, this._config.topicConf)
 
       this._consumer.setDefaultConsumeTimeout(this._config.options.consumeTimeout)
+      // this._setDefaultConsumeTimeout(this._config.options.consumeTimeout)
 
       this._consumer.on('event.log', log => {
         logger.silly(log.message)
@@ -541,6 +542,13 @@ class Consumer extends EventEmitter {
       }
     })
   }
+
+  // _setDefaultConsumeTimeout (consumeTimeout = 1000) {
+  //   let { logger } = this._config
+  //   logger.silly('Consumer::_setDefaultConsumeTimeout() - start')
+  //   this._consumer.setDefaultConsumeTimeout(consumeTimeout)
+  //   logger.silly('Consumer::_setDefaultConsumeTimeout() - end')
+  // }
 
   /**
    * Consume Once (Not implemented)
