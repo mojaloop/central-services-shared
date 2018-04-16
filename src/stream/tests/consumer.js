@@ -37,13 +37,31 @@
 'use strict'
 
 const Consumer = require('../consumer').Consumer
+const ConsumerEnums = require('../consumer').ENUMS
 const Logger = require('../../logger')
 
 // TODO: TO BE REWORKED INTO UNIT/INTEGRATION TEST FRAMEWORK
 var testConsumer = async () => {
   Logger.info('testConsumer::start')
 
-  var c = new Consumer(['test1'])
+  var c = new Consumer(['test1'], {
+    options: {
+      mode: ConsumerEnums.CONSUMER_MODES.recursive,
+      batchSize: 1,
+      recursiveTimeout: 100,
+      messageCharset: 'utf8',
+      messageAsJSON: true,
+      sync: true,
+      consumeTimeout: 1000
+    },
+    rdkafkaConf: {
+      'group.id': 'kafka-test',
+      'metadata.broker.list': 'localhost:9092',
+      'enable.auto.commit': false
+    },
+    topicConf: {},
+    logger: Logger
+  })
 
   Logger.info('testConsumer::connect::start')
   var connectionResult = await c.connect()

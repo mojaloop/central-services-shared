@@ -207,7 +207,7 @@ class Consumer extends EventEmitter {
     rdkafkaConf: {
       'group.id': 'kafka',
       'metadata.broker.list': 'localhost:9092',
-      'enable.auto.commit': false
+      'enable.auto.commit': true
      // 'debug': 'all'
     },
     topicConf: {},

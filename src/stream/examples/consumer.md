@@ -2,10 +2,28 @@
 
 ```JSON
 const Consumer = require('../consumer').Consumer
+const ConsumerEnums = require('../consumer').ENUMS
 
 const testConsumer = async () => {
   console.log('Instantiate consumer')
-  var c = new Consumer(['test1'])
+  var c = new Consumer(['test1'], {
+    options: {
+      mode: ConsumerEnums.CONSUMER_MODES.recursive,
+      batchSize: 1,
+      recursiveTimeout: 100,
+      messageCharset: 'utf8',
+      messageAsJSON: true,
+      sync: true,
+      consumeTimeout: 1000
+    },
+    rdkafkaConf: {
+      'group.id': 'kafka-test',
+      'metadata.broker.list': 'localhost:9092',
+      'enable.auto.commit': false
+    },
+    topicConf: {},
+    logger: Logger
+  })
 
   console.log('Connect consumer')
   var connectionResult = await c.connect()
