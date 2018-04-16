@@ -111,6 +111,14 @@ ENUMS = {
 module.exports = ENUMS
 
 /**
+ * Ready event.
+ *
+ * @event Producer#ready
+ * @type {object}
+ * @property {string} - emits 'ready' on producer event ready
+ */
+
+/**
  * Producer class for adding messages to Kafka
  *
  * This is the main entry point for writing data to Kafka. You
@@ -120,23 +128,25 @@ module.exports = ENUMS
  * @example
  * var producer = new Producer(options, {
  *   rdkafkaConf: {
- *     'metadata.broker.list': options['metadata.broker.list'] || 'localhost:9092',
- *     'client.id': options['client.id'] || 'default-client',
+ *     'metadata.broker.list': 'localhost:9092',
+ *     'client.id': 'default-client',
  *     'event_cb': true,
- *     'compression.codec': options['compression.codec'] || 'none',
- *     'retry.backoff.ms': options['retry.backoff.ms'] || 100,
- *     'message.send.max.retries': options['message.send.max.retries'] || 2,
- *     'socket.keepalive.enable': options['socket.keepalive.enable'] || true,
- *     'queue.buffering.max.messages': options['queue.buffering.max.messages'] || 10,
- *     'queue.buffering.max.ms': options['queue.buffering.max.ms'] || 50,
- *     'batch.num.messages': options['batch.num.messages'] || 10000,
+ *     'compression.codec': 'none',
+ *     'retry.backoff.ms': 100,
+ *     'message.send.max.retries': 2,
+ *     'socket.keepalive.enable': true,
+ *     'queue.buffering.max.messages': 10,
+ *     'queue.buffering.max.ms': 50,
+ *     'batch.num.messages': 10000,
  *     'api.version.request': true,
  *     'dr_cb': true
  *   },
  *   topicConf: {
- *    'request.required.acks': options.requiredAcks || 1
+ *    'request.required.acks': 1
  *   }
  * })
+ *
+ *  * @fires Producer#ready
  *
  * @param {object} options - Key value pairs for mapping to the configuration
  * @param {object} config - Key value pairs for the configuration of the Producer with the following:
@@ -147,25 +157,24 @@ module.exports = ENUMS
  * @constructor
  */
 class Producer extends EventEmitter {
-  constructor (options = {requiredAcks: -1, partitionCount: 1, pollIntervalMs: 100}, config = {
+  constructor (options = {pollIntervalMs: 100}, config = {
     logger: Logger,
     rdkafkaConf: {
-      'metadata.broker.list': options['metadata.broker.list'] || 'localhost:9092',
-      'client.id': options['client.id'] || 'default-client',
+      'metadata.broker.list': 'localhost:9092',
+      'client.id': 'default-client',
       'event_cb': true,
-      'compression.codec': options['compression.codec'] || 'none',
-      'retry.backoff.ms': options['retry.backoff.ms'] || 100,
-      'message.send.max.retries': options['message.send.max.retries'] || 2,
-      'socket.keepalive.enable': options['socket.keepalive.enable'] || true,
-      'queue.buffering.max.messages': options['queue.buffering.max.messages'] || 10,
-      'queue.buffering.max.ms': options['queue.buffering.max.ms'] || 50,
-      'batch.num.messages': options['batch.num.messages'] || 10000,
+      'compression.codec': 'none',
+      'retry.backoff.ms': 100,
+      'message.send.max.retries': 2,
+      'socket.keepalive.enable': true,
+      'queue.buffering.max.messages': 10,
+      'queue.buffering.max.ms': 50,
+      'batch.num.messages': 100,
       'api.version.request': true,
       'dr_cb': true
     },
     topicConf: {
-      // 0=Broker does not send any response/ack to client, 1=Only the leader broker will need to ack the message, -1 or all=broker will block until message is committed by all in sync replicas (ISRs) or broker's min.insync.replicas setting before sending response.
-      'request.required.acks': options.requiredAcks || 1
+      'request.required.acks': 1
     }
   }) {
     super()
@@ -184,6 +193,10 @@ class Producer extends EventEmitter {
   }
 
   /**
+   * Connect Producer
+   *
+   * @fires Producer#ready
+   *
    * @async
    * Connects the producer to the Kafka broker.
    * @returns {Promise} - Returns a promise: resolved if successful, or rejection if connection failed
