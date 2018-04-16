@@ -92,6 +92,12 @@ exports.ENUMS = ENUMS
  */
 
 /**
+ * @typedef {object} Client~watermarkOffsets
+ * @property {number} high - High (newest/end) offset
+ * @property {number} low - Low (oldest/beginning) offset
+ */
+
+/**
  * Consumer Options
  *
  * The options that can be configured for the Consumer
@@ -604,7 +610,7 @@ class Consumer extends EventEmitter {
   /**
    * Get last known offsets from the client.
    *
-   * RDKafka:
+   * RDKAFKA:
    *
    * The low offset is updated periodically (if statistics.interval.ms is set)
    * while the high offset is updated on each fetched message set from the
@@ -623,6 +629,35 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::getWatermarkOffsets() - start')
     logger.silly('Consumer::getWatermarkOffsets() - end')
     return this._consumer.getWatermarkOffsets(topic, partition)
+  }
+
+  /**
+   * Get client metadata.
+   *
+   * RDKAFKA:
+   *
+   * Note: using a <code>metadataOptions.topic</code> parameter has a potential side-effect.
+   * A Topic object will be created, if it did not exist yet, with default options
+   * and it will be cached by librdkafka.
+   *
+   * A subsequent call to create the topic object with specific options (e.g. <code>acks</code>) will return
+   * the previous instance and the specific options will be silently ignored.
+   *
+   * To avoid this side effect, the topic object can be created with the expected options before requesting metadata,
+   * or the metadata request can be performed for all topics (by omitting <code>metadataOptions.topic</code>).
+   *
+   * @param {object} metadataOptions - Metadata options to pass to the client.
+   * @param {string} metadataOptions.topic - Topic string for which to fetch
+   * metadata
+   * @param {number} metadataOptions.timeout - Max time, in ms, to try to fetch
+   * metadata before timing out. Defaults to 3000.
+   * @param {Client~metadataCallback} metaDatacCb - Callback to fire with the metadata.
+   */
+  getMetadata (metadataOptions, metaDatacCb = (error, metadata) => {}) {
+    let { logger } = this._config
+    logger.silly('Consumer::getMetadata() - start')
+    this._consumer.getMetadata(metadataOptions, metaDatacCb)
+    logger.silly('Consumer::getMetadata() - end')
   }
 }
 //
