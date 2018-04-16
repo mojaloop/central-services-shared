@@ -179,21 +179,15 @@ exports.ENUMS = ENUMS
  *
  * @param {object} topics - List of topics that will be auto subscribed
  * @param {object} config - Key value pairs for the configuration of the Consumer with the followin:
- * rdkafka - specific rdkafka condfigurations [Refer to configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md}
  * options - consumer processing configuration, topic - Key value pairs to create a default. @see Consumer~Options
- * topic - topic configuration
+ * rdkafkaConf - specific rdkafka condfigurations [Refer to RDKAFKA configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md}
+ * topicConf - topic configuration [Refer to RDKAFKA configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md#topic-configuration-properties}
  * logger - logger object that supports debug(), info(), verbose() & silly()
  * @extends EventEmitter
  * @constructor
  */
 class Consumer extends EventEmitter {
   constructor (topics = [], config = {
-    rdkafka: {
-      'group.id': 'kafka',
-      'metadata.broker.list': 'localhost:9092',
-      'enable.auto.commit': false
-      // 'debug': 'all'
-    },
     options: {
       mode: CONSUMER_MODES.recursive,
       batchSize: 1,
@@ -204,7 +198,13 @@ class Consumer extends EventEmitter {
       sync: false,
       consumeTimeout: 1000
     },
-    topicConfig: {},
+    rdkafkaConf: {
+      'group.id': 'kafka',
+      'metadata.broker.list': 'localhost:9092',
+      'enable.auto.commit': false
+     // 'debug': 'all'
+    },
+    topicConf: {},
     logger: Logger
   }
   ) {
@@ -235,7 +235,7 @@ class Consumer extends EventEmitter {
     let { logger } = this._config
     logger.silly('Consumer::connect() - start')
     return new Promise((resolve, reject) => {
-      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafka, this._config.topicConfig)
+      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafkaConf, this._config.topicConf)
 
       this._consumer.setDefaultConsumeTimeout(this._config.options.consumeTimeout)
 
