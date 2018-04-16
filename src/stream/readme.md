@@ -9,5 +9,5 @@ TBD
 
 **Consumer**
 
-1. Refer to JSDocs for the consumer.js
+1. Refer to JSDocs for the [consumer.js](./consumer.js)
 2. Refer to the example in [examples/consumer.md](./examples/consumer.md)

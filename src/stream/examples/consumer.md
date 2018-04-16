@@ -1,6 +1,8 @@
 *Example Consumer*
 
 ```JSON
+const Consumer = require('../consumer').Consumer
+
 const testConsumer = async () => {
   console.log('Instantiate consumer')
   var c = new Consumer(['test1'])

@@ -36,7 +36,7 @@
 
 'use strict'
 
-const Consumer = require('../consumer')
+const Consumer = require('../consumer').Consumer
 const Logger = require('../../logger')
 
 // TODO: TO BE REWORKED INTO UNIT/INTEGRATION TEST FRAMEWORK
