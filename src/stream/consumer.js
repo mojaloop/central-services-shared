@@ -104,6 +104,7 @@ exports.ENUMS = ENUMS
  * @property {string} messageCharset - Parse processed message from Kafka into a string using this encoding character set. Defaults: utf8
  * @property {boolean} messageAsJSON - Parse processed message from Kafka into a JSON object. Defaults: true
  * @property {boolean} sync - Ensures that messages are processed in order via a single thread. This may impact performance. Defaults: false
+ * @property {number} consumeTimeout - Set the default consume timeout (milliseconds) provided to RDKafka c++land. Defaults: 1000
  *
  */
 
@@ -200,9 +201,10 @@ class Consumer extends EventEmitter {
       recursiveTimeout: 100,
       messageCharset: 'utf8',
       messageAsJSON: true,
-      sync: false
+      sync: false,
+      consumeTimeout: 1000
     },
-    topic: {},
+    topicConfig: {},
     logger: Logger
   }
   ) {
@@ -233,7 +235,9 @@ class Consumer extends EventEmitter {
     let { logger } = this._config
     logger.silly('Consumer::connect() - start')
     return new Promise((resolve, reject) => {
-      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafka, this._config.topic)
+      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafka, this._config.topicConfig)
+
+      this._consumer.setDefaultConsumeTimeout(this._config.options.consumeTimeout)
 
       this._consumer.on('event.log', log => {
         logger.silly(log.message)
@@ -571,6 +575,54 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::commitMessage() - start')
     this._consumer.commitMessage(msg)
     logger.silly('Consumer::commitMessage() - end')
+  }
+
+  /**
+   * Commit topics partition in sync mode
+   *
+   * @param {object} topicPartitions - List of topics that must be commited. If null, it will default to the topics list provided in the constructor. Defaults = null
+   */
+  commitSync (topicPartitions = null) {
+    let { logger } = this._config
+    logger.silly('Consumer::commitSync() - start')
+    this._consumer.commitSync(topicPartitions)
+    logger.silly('Consumer::commitSync() - end')
+  }
+
+  /**
+   * Commit message in sync mode
+   *
+   * @param {KafkaConsumer~Message} msg - Kafka message to be commited
+   */
+  commitMessageSync (msg) {
+    let { logger } = this._config
+    logger.silly('Consumer::commitMessageSync() - start')
+    this._consumer.commitMessageSync(msg)
+    logger.silly('Consumer::commitMessageSync() - end')
+  }
+
+  /**
+   * Get last known offsets from the client.
+   *
+   * RDKafka:
+   *
+   * The low offset is updated periodically (if statistics.interval.ms is set)
+   * while the high offset is updated on each fetched message set from the
+   * broker.
+   *
+   * If there is no cached offset (either low or high, or both), then this will
+   * throw an error.
+   *
+   * @param {string} topic - Topic to recieve offsets from.
+   * @param {number} partition - Partition of the provided topic to recieve offsets from
+   * @return {Client~watermarkOffsets} - Returns an object with a high and low property, specifying
+   * the high and low offsets for the topic partition
+   */
+  getWatermarkOffsets (topic, partition) {
+    let { logger } = this._config
+    logger.silly('Consumer::getWatermarkOffsets() - start')
+    logger.silly('Consumer::getWatermarkOffsets() - end')
+    return this._consumer.getWatermarkOffsets(topic, partition)
   }
 }
 //
