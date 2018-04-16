@@ -55,7 +55,7 @@ var testConsumer = async () => {
   // c.subscribe()
   // Logger.info('testConsumer::subscribe::end')
 
-  Logger.info('testConsumer::consume::start1')
+  Logger.info('testConsumer::consume::start')
 
   c.consume((error, message) => {
     return new Promise((resolve, reject) => {
@@ -81,7 +81,7 @@ var testConsumer = async () => {
       // resolve(true)
     })
   })
-  Logger.info('testConsumer::consume::end1')
+  Logger.info('testConsumer::consume::end')
 
   c.on('ready', arg => Logger.info(`onReady: ${JSON.stringify(arg)}`))
   c.on('message', message => Logger.info(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`))
