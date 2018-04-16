@@ -36,6 +36,20 @@ const Logger = require('../logger')
 const Kafka = require('node-rdkafka')
 const LimeParser = require('./protocol')
 
+/**
+ * Producer ENUMs
+ *
+ * This ENUM is for the events for the produced message
+ *
+ * @typedef {object} ENUMS~EVENTS
+ * @property {string} prepared - @example: prepare a transfer
+ * @property {string} fulfill - @example: fulfill a transfer
+ * @property {string} reject - @example: reject a transfer
+ * @property {string} position - @example: calculating the financial position of an fsp
+ * @property {string} notification - @example: notifying an fsp of an incoming transfer
+ * @property {string} failed - @example: prepare failed due to invalid payee id
+ * @property {string} duplicate - @example: duplicated transaction
+ */
 const EVENTS = {
   prepared: 'prepared',
   fulfill: 'fulfill',
@@ -45,18 +59,48 @@ const EVENTS = {
   failed: 'failed',
   duplicate: 'duplicate'
 }
-
+/**
+ * The HTTP method for the process
+ *
+ * This ENUM is for the HTTP method that called the producer
+ *
+ * @typedef {object} ENUMS~METHOD
+ * @property {string} get
+ * @property {string} post
+ * @property {string} put
+ * @property {string} delete
+ */
 const METHOD = {
   get: 'get',
   post: 'post',
   put: 'put',
   del: 'delete'
 }
-
+/**
+ * The status of the process being posted to the topic
+ *
+ * This ENUM is for the STATUS of the message being produced
+ *
+ * @typedef {object} ENUMS~STATUS
+ * @property {string} success - successful validation passed
+ * @property {string} failed - failed validation
+ * @property {string} pending - pending proccessing
+ */
 const STATUS = {
   success: 'success',
-  failure: 'failed'
+  failure: 'failed',
+  pending: 'pending'
 }
+/**
+ * ENUMS
+ *
+ * Global ENUMS object
+ *
+ * @typedef {object} ENUMS
+ * @property {object} EVENTS - This ENUM is for the events
+ * @property {object} METHOD - This ENUM is for the METHOD
+ * @property {object} STATUS - This ENUM is for the STATUS
+ */
 const
 ENUMS = {
   EVENTS,
@@ -66,31 +110,65 @@ ENUMS = {
 
 module.exports = ENUMS
 
+/**
+ * Producer class for adding messages to Kafka
+ *
+ * This is the main entry point for writing data to Kafka. You
+ * configure this like you do any other client, with a global
+ * configuration.
+ *
+ * @example
+ * var producer = new Producer(options, {
+ *   rdkafkaConf: {
+ *     'metadata.broker.list': options['metadata.broker.list'] || 'localhost:9092',
+ *     'client.id': options['client.id'] || 'default-client',
+ *     'event_cb': true,
+ *     'compression.codec': options['compression.codec'] || 'none',
+ *     'retry.backoff.ms': options['retry.backoff.ms'] || 100,
+ *     'message.send.max.retries': options['message.send.max.retries'] || 2,
+ *     'socket.keepalive.enable': options['socket.keepalive.enable'] || true,
+ *     'queue.buffering.max.messages': options['queue.buffering.max.messages'] || 10,
+ *     'queue.buffering.max.ms': options['queue.buffering.max.ms'] || 50,
+ *     'batch.num.messages': options['batch.num.messages'] || 10000,
+ *     'api.version.request': true,
+ *     'dr_cb': true
+ *   },
+ *   topicConf: {
+ *    'request.required.acks': options.requiredAcks || 1
+ *   }
+ * })
+ *
+ * @param {object} options - Key value pairs for mapping to the configuration
+ * @param {object} config - Key value pairs for the configuration of the Producer with the following:
+ * rdkafkaConf - specific rdkafka configurations [Refer to configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md}
+ * topicConf - topic configuration
+ * logger - logger object that supports debug(), info(), verbose(), error() & silly()
+ * @extends EventEmitter
+ * @constructor
+ */
 class Producer extends EventEmitter {
-  constructor (options = {requiredAcks: -1, partitionCount: 1}, defaultPartitionCount = 1) {
-    super()
-    var config = {
-      logger: Logger,
-      rdkafka: {
-        // 'debug': options['debug'] || 'all',
-        'metadata.broker.list': options['metadata.broker.list'],
-        'client.id': options['client.id'] || 'default-client',
-        'event_cb': true,
-        'compression.codec': options['compression.codec'] || 'none',
-        'retry.backoff.ms': options['retry.backoff.ms'] || 100,
-        'message.send.max.retries': options['message.send.max.retries'] || 2,
-        'socket.keepalive.enable': options['socket.keepalive.enable'] || true,
-        'queue.buffering.max.messages': options['queue.buffering.max.messages'] || 10,
-        'queue.buffering.max.ms': options['queue.buffering.max.ms'] || 50,
-        'batch.num.messages': options['batch.num.messages'] || 10000,
-        'api.version.request': true,
-        'dr_cb': true
-      },
-      topicConfig: {
-        // 0=Broker does not send any response/ack to client, 1=Only the leader broker will need to ack the message, -1 or all=broker will block until message is committed by all in sync replicas (ISRs) or broker's min.insync.replicas setting before sending response.
-        'request.required.acks': options.requiredAcks || 1
-      }
+  constructor (options = {requiredAcks: -1, partitionCount: 1, pollIntervalMs: 100}, config = {
+    logger: Logger,
+    rdkafkaConf: {
+      'metadata.broker.list': options['metadata.broker.list'] || 'localhost:9092',
+      'client.id': options['client.id'] || 'default-client',
+      'event_cb': true,
+      'compression.codec': options['compression.codec'] || 'none',
+      'retry.backoff.ms': options['retry.backoff.ms'] || 100,
+      'message.send.max.retries': options['message.send.max.retries'] || 2,
+      'socket.keepalive.enable': options['socket.keepalive.enable'] || true,
+      'queue.buffering.max.messages': options['queue.buffering.max.messages'] || 10,
+      'queue.buffering.max.ms': options['queue.buffering.max.ms'] || 50,
+      'batch.num.messages': options['batch.num.messages'] || 10000,
+      'api.version.request': true,
+      'dr_cb': true
+    },
+    topicConf: {
+      // 0=Broker does not send any response/ack to client, 1=Only the leader broker will need to ack the message, -1 or all=broker will block until message is committed by all in sync replicas (ISRs) or broker's min.insync.replicas setting before sending response.
+      'request.required.acks': options.requiredAcks || 1
     }
+  }) {
+    super()
     if (!config) {
       throw new Error('missing a config object')
     }
@@ -101,19 +179,20 @@ class Producer extends EventEmitter {
     this._status.runningInProduceMode = false
     this._status.runningInProduceBatchMode = false
     this._producerPollIntv = null
+    this._pollIntervalMs = options.pollIntervalMs
     logger.silly('Producer::constructor() - end')
   }
 
   /**
    * @async
-   * connects to the broker
-   * @returns {Promise.<*>}
+   * Connects the producer to the Kafka broker.
+   * @returns {Promise} - Returns a promise: resolved if successful, or rejection if connection failed
    */
   async connect () {
     let {logger} = this._config
     logger.silly('Producer::connect() - start')
     return new Promise((resolve, reject) => {
-      this._producer = new Kafka.Producer(this._config.rdkafka, this._config.topicConfig)
+      this._producer = new Kafka.Producer(this._config.rdkafkaConf, this._config.topicConf)
 
       this._producer.on('event.log', log => {
         logger.silly(log.message)
@@ -143,7 +222,11 @@ class Producer extends EventEmitter {
 
       this._producer.on('ready', () => {
         logger.silly(`Native producer ready v. ${Kafka.librdkafkaVersion}, e. ${Kafka.features.join(', ')}.`)
-        this._producer.poll()
+        this._producerPollIntv = setInterval(() => {
+          if (this._producer) {
+            this._producer.poll()
+          }
+        }, this._pollIntervalMs || 100)
         super.emit('ready')
         resolve(true)
       })
@@ -187,7 +270,7 @@ class Producer extends EventEmitter {
         this._config.logger.debug('still connecting')
       }
       var parsedMessage = LimeParser.parseMessage(from, to, key, message, metadata, type, pp)
-      parsedMessage = Buffer.isBuffer(parsedMessage) ? parsedMessage : Buffer.from(parsedMessage)
+      parsedMessage = Buffer.isBuffer(parsedMessage) ? parsedMessage : Buffer.from(JSON.stringify(parsedMessage))
       if (!parsedMessage || !(typeof parsedMessage === 'string' || Buffer.isBuffer(parsedMessage))) {
         throw new Error('message must be a string or an instance of Buffer.')
       }
@@ -234,7 +317,7 @@ class Producer extends EventEmitter {
         this._config.logger.debug('still connecting')
       }
       var parsedNotification = LimeParser.parseNotify(from, to, key, message, metadata, event, reason, type, pp)
-      parsedNotification = Buffer.isBuffer(parsedNotification) ? parsedNotification : Buffer.from(parsedNotification)
+      parsedNotification = Buffer.isBuffer(parsedNotification) ? parsedNotification : Buffer.from(JSON.stringify(parsedNotification))
       if (!parsedNotification || !(typeof parsedNotification === 'string' || Buffer.isBuffer(parsedNotification))) {
         throw new Error('message must be a string or an instance of Buffer.')
       }
@@ -282,7 +365,7 @@ class Producer extends EventEmitter {
         this._config.logger.debug('still connecting')
       }
       var parsedCommand = LimeParser.parseCommand(from, to, key, message, reason, method, metadata, status, type, pp)
-      parsedCommand = Buffer.isBuffer(parsedCommand) ? parsedCommand : Buffer.from(parsedCommand)
+      parsedCommand = Buffer.isBuffer(parsedCommand) ? parsedCommand : Buffer.from(JSON.stringify(parsedCommand))
       if (!parsedCommand || !(typeof parsedCommand === 'string' || Buffer.isBuffer(parsedCommand))) {
         throw new Error('message must be a string or an instance of Buffer.')
       }
@@ -314,7 +397,12 @@ class Producer extends EventEmitter {
     }
   }
 
-  close () {
+  /**
+   * Disconnect producer
+   *
+   * Disconnects producer from the Kafka broker
+   */
+  disconnect () {
     if (this._producer) {
       this._inClosing = true
       clearInterval(this._producerPollIntv)
