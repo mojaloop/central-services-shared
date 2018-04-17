@@ -36,7 +36,7 @@
 
 const Test = require('tapes')(require('tape'))
 const Producer = require('../../src/kafka').Producer
-const ProducerEnums = require('../../src/kafka').Producer.ENUMS
+// const ProducerEnums = require('../../src/kafka').Producer.ENUMS
 const Logger = require('../../src/logger')
 const Kafka = require('node-rdkafka')
 const Sinon = require('sinon')
