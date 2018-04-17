@@ -44,6 +44,7 @@ const Kafka = require('node-rdkafka')
 // const EventEmitter = require('events')
 
 const Sinon = require('sinon')
+const SpyLogger = require('winston-spy')
 
 const KafkaStubs = require('./KafkaStub')
 
@@ -84,7 +85,11 @@ Test('Consumer test', (consumerTests) => {
 
     sandbox.stub(Kafka, 'KafkaConsumer').callsFake(
       () => {
-        return new KafkaStubs.KafkaConsumer()
+        var k = new KafkaStubs.KafkaConsumer()
+        // k.testKafkaConsumersEmitters = (event, message) => {
+        //   this.emit(event, message)
+        // }
+        return k
       }
     )
 
@@ -119,13 +124,71 @@ Test('Consumer test', (consumerTests) => {
     assert.plan(2)
     var c = new Consumer(topicsList, config)
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
     })
   })
+
+  consumerTests.test('Test Consumer::connect - with error on callBack', (assert) => {
+    sandbox.stub(KafkaStubs.KafkaConsumer.prototype, 'connect').callsFake(
+      (err, info) => {
+        if (err) {
+        }
+        info('error test test', null)
+      }
+    )
+
+    assert.plan(2)
+    var c = new Consumer(topicsList, config)
+
+    // consume 'message' event
+    c.on('error', error => {
+      Logger.error(error)
+      assert.ok(Sinon.match(error,'error test test'), 'on Error event received')
+    })
+
+    c.connect().then(result => {
+    }).catch((error) => {
+      assert.ok(Sinon.match(error,'Unhandled "error" event. (error test test)'))
+    })
+  })
+
+  // consumerTests.test('Test Consumer::connect - test KafkaConsumer Event event.log', (assert) => {
+  //   var message = 'this is a test message'
+  //   sandbox.stub(KafkaStubs.KafkaConsumer.prototype, 'consume').callsFake(
+  //     () => {
+  //       this.em
+  //     }
+  //   )
+  //
+  //   assert.plan(2)
+  //   var c = new Consumer()
+  //   c.on('ready', arg => {
+  //     Logger.debug(`onReady: ${JSON.stringify(arg)}`)
+  //     assert.ok(Sinon.match(arg, true), 'on Ready event received')
+  //   })
+  //   c.connect().then(result => {
+  //     var winston = require('winston')
+  //     // var spy = sandbox.spy()
+  //
+  //     // Logger.remove(winston.transports.Console)
+  //
+  //     // Logger.add(winston.transports.SpyLogger, { spy: spy })
+  //
+  //     assert.ok(Sinon.match(result, true))
+  //     try {
+  //       c.consume()
+  //     } catch (error) {
+  //       Logger.error(error)
+  //     }
+  //     // c.testKafkaConsumersEmitters('event.log', message)
+  //     // assert.ok(spy.calledWith('silly', message))
+  //     assert.end()
+  //   })
+  // })
 
   consumerTests.test('Test Consumer::disconnect', (assert) => {
     var discoCallback = (err, metrics) => {
@@ -154,6 +217,15 @@ Test('Consumer test', (consumerTests) => {
     var c = new Consumer(topicsList, config)
     c.connect().then(result => {
       c.subscribe(topicsList)
+      assert.ok(true)
+      assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::subscribe - no params', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      c.subscribe()
       assert.ok(true)
       assert.end()
     })
@@ -284,7 +356,7 @@ Test('Consumer test', (consumerTests) => {
     var c = new Consumer(topicsList, config)
 
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       c.disconnect()
       assert.ok(message, 'on Message event received')
       if (!messageReceived) {
@@ -324,12 +396,12 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
@@ -389,12 +461,12 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
@@ -454,12 +526,12 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
@@ -519,12 +591,12 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
@@ -583,17 +655,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -666,17 +738,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -749,17 +821,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -832,17 +904,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -915,17 +987,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -998,17 +1070,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -1083,17 +1155,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -1167,17 +1239,17 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 
     c.on('batch', messages => {
-      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      Logger.debug(`onBatch: ${JSON.stringify(messages)}`)
       assert.ok(messages, 'on Batch event received')
       assert.ok(Array.isArray(messages), 'batch of messages received')
     })
@@ -1251,7 +1323,7 @@ Test('Consumer test', (consumerTests) => {
       assert.ok(Sinon.match(result, true))
       try {
         c.consume()
-      } catch(error) {
+      } catch (error) {
         Logger.error(error)
         c.disconnect()
         assert.equals(error.message.toString(), 'batchSize option is not valid - Select an integer greater then 0')
@@ -1286,7 +1358,7 @@ Test('Consumer test', (consumerTests) => {
       assert.ok(Sinon.match(result, true))
       try {
         c.consume()
-      } catch(error) {
+      } catch (error) {
         Logger.error(error)
         c.disconnect()
         assert.equals(error.message.toString(), 'batchSize option is not valid - Select an integer greater then 0')
@@ -1320,12 +1392,12 @@ Test('Consumer test', (consumerTests) => {
 
     // consume 'ready' event
     c.on('ready', arg => {
-      console.log(`onReady: ${JSON.stringify(arg)}`)
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
       assert.ok(Sinon.match(arg, true), 'on Ready event received')
     })
     // consume 'message' event
     c.on('message', message => {
-      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      Logger.debug(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
       assert.ok(message, 'on Message event received')
     })
 

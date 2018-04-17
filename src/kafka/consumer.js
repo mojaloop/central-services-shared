@@ -292,15 +292,15 @@ class Consumer extends EventEmitter {
         var returnMessage = { ...message }
         // var returnMessage = {}
         // Object.assign(returnMessage, message)
-        if (message instanceof Array) {
-          returnMessage.map(msg => {
-            var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
-            msg.value = parsedValue
-          })
-        } else {
-          var parsedValue = Protocol.parseValue(returnMessage.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
-          returnMessage.value = parsedValue
-        }
+        // if (message instanceof Array) {
+        //   returnMessage.map(msg => {
+        //     var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+        //     msg.value = parsedValue
+        //   })
+        // } else {
+        var parsedValue = Protocol.parseValue(returnMessage.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+        returnMessage.value = parsedValue
+        // }
         super.emit('message', returnMessage)
       })
     })

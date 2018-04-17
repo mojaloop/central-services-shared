@@ -76,6 +76,10 @@ const messageSampleStub = {
 
 // KafkaClient Stub
 class KafkaClient extends EventEmitter {
+  // this function is called in every method so we can dummy it
+  _dummyFunction () {
+  }
+
   connect (err, info) {
     if (err) {
       Logger.error(err)
@@ -84,6 +88,8 @@ class KafkaClient extends EventEmitter {
     this.metrics = {}
     this.metrics.connectionOpened = Date.now()
     this.name = 'KafkaStub'
+    info(null, this.metrics)
+    this._dummyFunction()
   }
 
   disconnect (cb = (err, metrics) => {
@@ -93,6 +99,7 @@ class KafkaClient extends EventEmitter {
   }) {
     cb(null, this.metrics)
     this.emit('disconnected', this.metrics)
+    this._dummyFunction()
   }
 
   getMetadata (metadataOptions, cb = (err, metadata) => {
@@ -105,15 +112,29 @@ class KafkaClient extends EventEmitter {
     if (cb) {
       cb(null, metadataSample)
     }
+    this._dummyFunction()
   }
 }
 
 // KafkaConsumer Stub
 class KafkaConsumer extends KafkaClient {
+  // this function is called in every method so we can dummy it
+  _dummyFunction () {
+    // this.emit('event.log', 'event.log')
+    // this.emit('event.error', 'event.error')
+    // this.emit('error', 'error')
+  }
+
+  testKafkaConsumersEmitters (event, message) {
+    this.emit(event, message)
+  }
+
   setDefaultConsumeTimeout (timeoutMs) {
+    this._dummyFunction()
   }
 
   subscribe (topics) {
+    this._dummyFunction()
     return topics
   }
 
@@ -173,33 +194,41 @@ class KafkaConsumer extends KafkaClient {
     // Object.assign(copyOfMessageSample, messageSample)
     cb(null, messageSample)
     this.emit('data', copyOfMessageSample)
+    this._dummyFunction()
   }
 
   commit (topicPartition) {
+    this._dummyFunction()
     return topicPartition
   }
 
   commitMessage (msg) {
+    this._dummyFunction()
     return msg
   }
 
   commitSync (topicPartition) {
+    this._dummyFunction()
     return topicPartition
   }
 
   commitMessageSync (msg) {
+    this._dummyFunction()
     return msg
   }
 
   getWatermarkOffsets (topic, partition) {
     var watermarkOffsetSample = {...watermarkOffsetSampleStub}
+    this._dummyFunction()
     return watermarkOffsetSample
   }
 
   resume (topicPartitions) {
+    this._dummyFunction()
   }
 
   pause (topicPartitions) {
+    this._dummyFunction()
   }
 }
 
