@@ -34,6 +34,7 @@
 const Logger = require('../../logger')
 
 const parseMessage = (messageProtocol) => {
+  messageProtocol.metadata['protocol.createdAt'] = Date.now()
   return {
     from: messageProtocol.from,
     to: messageProtocol.to,
