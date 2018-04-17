@@ -203,8 +203,21 @@ class KafkaConsumer extends KafkaClient {
   }
 }
 
+// KafkaConsumer Stub
+class KafkaProducer extends KafkaClient {
+  poll () {
+  }
+
+  flush () {
+  }
+
+  produce () {
+  }
+}
+
 exports.metadataSampleStub = metadataSampleStub
 exports.watermarkOffsetSampleStub = watermarkOffsetSampleStub
 exports.messageSampleStub = messageSampleStub
 exports.KafkaClient = KafkaClient
 exports.KafkaConsumer = KafkaConsumer
+exports.KafkaProducer = KafkaProducer

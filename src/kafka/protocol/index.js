@@ -33,53 +33,54 @@
 
 const Logger = require('../../logger')
 
-const parseMessage = (from, to, key, message, metadata, type, pp = '') => {
+const parseMessage = (messageProtocol) => {
+  messageProtocol.metadata['protocol.createdAt'] = Date.now()
   return {
-    from: from,
-    to: to,
-    id: key,
-    content: message,
-    type: type,
-    metadata: metadata,
-    pp
+    from: messageProtocol.from,
+    to: messageProtocol.to,
+    id: messageProtocol.id,
+    content: messageProtocol.message,
+    type: messageProtocol.type,
+    metadata: messageProtocol.metadata,
+    pp: messageProtocol.pp
   }
 }
 
-const parseNotify = (from, to, key, message, metadata, event, reason, type, pp = '') => {
-  metadata.resource = message
-  return {
-    from: from,
-    to: to,
-    id: key,
-    type: type,
-    metadata: metadata,
-    pp,
-    event: event,
-    reason: {
-      code: reason.code,
-      description: reason.description
-    }
-  }
-}
-
-const parseCommand = (from, to, key, message, reason, method, metadata, status, type, pp = '') => {
-  return {
-    from: from,
-    to: to,
-    id: key,
-    resource: message,
-    type: type,
-    metadata: metadata,
-    pp,
-    method: method,
-    uri: '',
-    status: status,
-    reason: {
-      code: reason.code,
-      description: reason.description
-    }
-  }
-}
+// const parseNotify = (from, to, key, message, metadata, event, reason, type, pp = '') => {
+//   metadata.resource = message
+//   return {
+//     from: from,
+//     to: to,
+//     id: key,
+//     type: type,
+//     metadata: metadata,
+//     pp,
+//     event: event,
+//     reason: {
+//       code: reason.code,
+//       description: reason.description
+//     }
+//   }
+// }
+//
+// const parseCommand = (from, to, key, message, reason, method, metadata, status, type, pp = '') => {
+//   return {
+//     from: from,
+//     to: to,
+//     id: key,
+//     resource: message,
+//     type: type,
+//     metadata: metadata,
+//     pp,
+//     method: method,
+//     uri: '',
+//     status: status,
+//     reason: {
+//       code: reason.code,
+//       description: reason.description
+//     }
+//   }
+// }
 
 const parseValue = (value, charset = 'utf8', asJSON = true) => {
   Logger.silly('Protocol::parseMessage() - start')
@@ -105,5 +106,3 @@ const parseValue = (value, charset = 'utf8', asJSON = true) => {
 
 exports.parseValue = parseValue
 exports.parseMessage = parseMessage
-exports.parseNotify = parseNotify
-exports.parseCommand = parseCommand
