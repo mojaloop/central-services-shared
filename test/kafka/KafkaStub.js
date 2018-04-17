@@ -258,6 +258,20 @@ class KafkaProducer extends KafkaClient {
   }
 }
 
+// KafkaProducerForEventTests Stub
+class KafkaProducerForEventTests extends KafkaProducer {
+  connect (err, info) {
+    super.connect(err, info)
+
+    this.emit('event.error', 'event.error')
+    this.emit('error', 'error')
+    this.emit('event.log', 'event.log')
+    this.emit('delivery-report', 'delivery-report')
+    info(null, this.metrics)
+    this._dummyFunction()
+  }
+}
+
 exports.metadataSampleStub = metadataSampleStub
 exports.watermarkOffsetSampleStub = watermarkOffsetSampleStub
 exports.messageSampleStub = messageSampleStub
@@ -265,3 +279,4 @@ exports.KafkaClient = KafkaClient
 exports.KafkaConsumer = KafkaConsumer
 exports.KafkaProducer = KafkaProducer
 exports.KafkaConsumerForEventTests = KafkaConsumerForEventTests
+exports.KafkaProducerForEventTests = KafkaProducerForEventTests

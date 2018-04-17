@@ -139,33 +139,39 @@ const
  * @constructor
  */
 class Producer extends EventEmitter {
-  constructor (config = {
-    options: {
-      pollIntervalMs: 100,
-      messageCharset: 'utf8'
-    },
-    rdkafkaConf: {
-      'metadata.broker.list': 'localhost:9092',
-      'client.id': 'default-client',
-      'event_cb': true,
-      'compression.codec': 'none',
-      'retry.backoff.ms': 100,
-      'message.send.max.retries': 2,
-      'socket.keepalive.enable': true,
-      'queue.buffering.max.messages': 10,
-      'queue.buffering.max.ms': 50,
-      'batch.num.messages': 100,
-      'api.version.request': true,
-      'dr_cb': true
-    },
-    topicConf: {
-      'request.required.acks': 1
-    },
-    logger: Logger
-  }) {
+  constructor (config = {}) {
     super()
     if (!config) {
-      throw new Error('missing a config object')
+      config = {}
+    }
+    if (!config.options) {
+      config.options = {
+        messageCharset: 'utf8'
+      }
+    }
+    if (!config.rdkafkaConf) {
+      config.rdkafkaConf = {
+        'metadata.broker.list': 'localhost:9092',
+        'client.id': 'default-client',
+        'event_cb': true,
+        'compression.codec': 'none',
+        'retry.backoff.ms': 100,
+        'message.send.max.retries': 2,
+        'socket.keepalive.enable': true,
+        'queue.buffering.max.messages': 10,
+        'queue.buffering.max.ms': 50,
+        'batch.num.messages': 100,
+        'api.version.request': true,
+        'dr_cb': true
+      }
+    }
+    if (!config.topicConf) {
+      config.topicConf = {
+        'request.required.acks': 1
+      }
+    }
+    if (!config.logger) {
+      config.logger = Logger
     }
     let {logger} = config
     logger.silly('Producer::constructor() - start')
@@ -173,8 +179,6 @@ class Producer extends EventEmitter {
     this._status = {}
     this._status.runningInProduceMode = false
     this._status.runningInProduceBatchMode = false
-    this._producerPollIntv = null
-    this._pollIntervalMs = this._config.options.pollIntervalMs
     logger.silly('Producer::constructor() - end')
   }
 
@@ -206,26 +210,16 @@ class Producer extends EventEmitter {
       })
 
       this._producer.on('delivery-report', (error, report) => {
-        if (error) {
-          logger.error(error)
-        }
-        logger.silly('DeliveryReport: ' + JSON.stringify(report))
+        logger.debug('DeliveryReport: ' + JSON.stringify(report))
       })
 
       this._producer.on('disconnected', () => {
-        if (this._inClosing) {
-          this._reset()
-        }
         logger.warn('Disconnected.')
       })
 
       this._producer.on('ready', () => {
         logger.silly(`Native producer ready v. ${Kafka.librdkafkaVersion}, e. ${Kafka.features.join(', ')}.`)
-        this._producerPollIntv = setInterval(() => {
-          if (this._producer) {
-            this._producer.poll()
-          }
-        }, this._pollIntervalMs)
+        this._producer.poll()
         super.emit('ready')
         resolve(true)
       })
@@ -413,8 +407,6 @@ class Producer extends EventEmitter {
    */
   disconnect (cb = () => {}) {
     if (this._producer) {
-      this._inClosing = true
-      clearInterval(this._producerPollIntv)
       this._producer.flush()
       this._producer.disconnect(cb)
     }
