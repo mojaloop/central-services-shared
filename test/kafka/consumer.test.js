@@ -41,11 +41,7 @@ const Consumer = require('../../src/kafka').Consumer
 const ConsumerEnums = require('../../src/kafka').Consumer.ENUMS
 const Logger = require('../../src/logger')
 const Kafka = require('node-rdkafka')
-// const EventEmitter = require('events')
-
 const Sinon = require('sinon')
-const SpyLogger = require('winston-spy')
-
 const KafkaStubs = require('./KafkaStub')
 
 Test('Consumer test', (consumerTests) => {
@@ -158,40 +154,6 @@ Test('Consumer test', (consumerTests) => {
       assert.ok(Sinon.match(error,'Unhandled "error" event. (error test test)'))
     })
   })
-
-  // consumerTests.test('Test Consumer::connect - test KafkaConsumer Event event.log', (assert) => {
-  //   var message = 'this is a test message'
-  //   sandbox.stub(KafkaStubs.KafkaConsumer.prototype, 'consume').callsFake(
-  //     () => {
-  //       this.em
-  //     }
-  //   )
-  //
-  //   assert.plan(2)
-  //   var c = new Consumer()
-  //   c.on('ready', arg => {
-  //     Logger.debug(`onReady: ${JSON.stringify(arg)}`)
-  //     assert.ok(Sinon.match(arg, true), 'on Ready event received')
-  //   })
-  //   c.connect().then(result => {
-  //     var winston = require('winston')
-  //     // var spy = sandbox.spy()
-  //
-  //     // Logger.remove(winston.transports.Console)
-  //
-  //     // Logger.add(winston.transports.SpyLogger, { spy: spy })
-  //
-  //     assert.ok(Sinon.match(result, true))
-  //     try {
-  //       c.consume()
-  //     } catch (error) {
-  //       Logger.error(error)
-  //     }
-  //     // c.testKafkaConsumersEmitters('event.log', message)
-  //     // assert.ok(spy.calledWith('silly', message))
-  //     assert.end()
-  //   })
-  // })
 
   consumerTests.test('Test Consumer::disconnect', (assert) => {
     var discoCallback = (err, metrics) => {
@@ -1147,8 +1109,6 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume recursive sync=true, messageAsJson=true', (assert) => {
-    // assert.plan(2 * 10 + 1)
-
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.recursive,
