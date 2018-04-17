@@ -1,5 +1,9 @@
 instrumentation:
   include-all-sources: true
+  excludes:
+    [
+      '**/examples/**'
+    ]
 check:
   global:
     statements: 90
