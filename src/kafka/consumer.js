@@ -193,31 +193,38 @@ exports.ENUMS = ENUMS
  * @constructor
  */
 class Consumer extends EventEmitter {
-  constructor (topics = [], config = {
-    options: {
-      mode: CONSUMER_MODES.recursive,
-      batchSize: 1,
-      pollFrequency: 10, // only applicable for poll mode
-      recursiveTimeout: 100,
-      messageCharset: 'utf8',
-      messageAsJSON: true,
-      sync: false,
-      consumeTimeout: 1000
-    },
-    rdkafkaConf: {
-      'group.id': 'kafka',
-      'metadata.broker.list': 'localhost:9092',
-      'enable.auto.commit': true
-     // 'debug': 'all'
-    },
-    topicConf: {},
-    logger: Logger
-  }
-  ) {
+  constructor (topics = [], config = {}) {
     super()
-    if (!config) {
-      throw new Error('missing a config object')
+    // if (!config) {
+    //   throw new Error('missing a config object')
+    // } else {
+    if (!config.options) {
+      config.options = {
+        mode: CONSUMER_MODES.recursive,
+        batchSize: 1,
+        pollFrequency: 10, // only applicable for poll mode
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      }
     }
+    if (!config.rdkafkaConf) {
+      config.rdkafkaConf = {
+        'group.id': 'kafka',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': true
+        // 'debug': 'all'
+      }
+    }
+    if (!config.topicConf) {
+      config.topicConf = {}
+    }
+    if (!config.logger) {
+      config.logger = Logger
+    }
+    // }
 
     let { logger } = config
     logger.silly('Consumer::constructor() - start')
@@ -292,15 +299,15 @@ class Consumer extends EventEmitter {
         var returnMessage = { ...message }
         // var returnMessage = {}
         // Object.assign(returnMessage, message)
-        if (message instanceof Array) {
-          returnMessage.map(msg => {
-            var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
-            msg.value = parsedValue
-          })
-        } else {
-          var parsedValue = Protocol.parseValue(returnMessage.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
-          returnMessage.value = parsedValue
-        }
+        // if (message instanceof Array) {
+        //   returnMessage.map(msg => {
+        //     var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+        //     msg.value = parsedValue
+        //   })
+        // } else {
+        var parsedValue = Protocol.parseValue(returnMessage.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
+        returnMessage.value = parsedValue
+        // }
         super.emit('message', returnMessage)
       })
     })
@@ -358,14 +365,13 @@ class Consumer extends EventEmitter {
    * Consume messages from Kafka as per the configuration specified in the constructor.
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  consume (workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  consume (workDoneCb) {
     let { logger } = this._config
     logger.silly('Consumer::consume() - start')
+
+    if (!workDoneCb || typeof workDoneCb !== 'function') {
+      workDoneCb = () => {}
+    }
 
     // setup queues to ensure sync processing of messages if options.sync is true
     if (this._config.options.sync) {
@@ -440,12 +446,7 @@ class Consumer extends EventEmitter {
    * @param {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  _consumePoller (pollFrequency = 10, batchSize, workDoneCb) {
     let { logger } = this._config
     this._pollInterval = setInterval(() => {
       // if (this._status.running) {
@@ -503,12 +504,7 @@ class Consumer extends EventEmitter {
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {boolean} - true when successful
    */
-  _consumeRecursive (recursiveTimeout = 100, batchSize = 1, workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  _consumeRecursive (recursiveTimeout = 100, batchSize, workDoneCb) {
     let { logger } = this._config
     this._consumer.consume(batchSize, (error, messages) => {
       if (error || !messages.length) {
@@ -557,12 +553,7 @@ class Consumer extends EventEmitter {
    *
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  _consumeFlow (workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  _consumeFlow (workDoneCb) {
     let { logger } = this._config
     this._consumer.consume((error, message) => {
       if (error || !message) {
@@ -607,12 +598,10 @@ class Consumer extends EventEmitter {
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {object} - single message that was consumed
    */
-  consumeOnce (batchSize = 1, workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
+  consumeOnce (batchSize = 1, workDoneCb) {
+    if (!workDoneCb || typeof workDoneCb !== 'function') {
+      workDoneCb = () => {}
     }
-  }) {
     throw new Error('Not implemented')
   }
 
@@ -710,12 +699,10 @@ class Consumer extends EventEmitter {
    * metadata before timing out. Defaults to 3000.
    * @param {Client~metadataCallback} metaDatacCb - Callback to fire with the metadata.
    */
-  getMetadata (metadataOptions, metaDatacCb = (error, metadata) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
+  getMetadata (metadataOptions, metaDatacCb) {
+    if (!metaDatacCb || typeof metaDatacCb !== 'function') {
+      metaDatacCb = () => {}
     }
-  }) {
     let { logger } = this._config
     logger.silly('Consumer::getMetadata() - start')
     this._consumer.getMetadata(metadataOptions, metaDatacCb)

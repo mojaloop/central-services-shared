@@ -32,7 +32,7 @@
     "bluebird": "^3.5.1",
     "debug": "^3.1.0",
     "events": "^2.0.0",
-    "node-rdkafka": "^2.3.1",
+    "node-rdkafka": "^2.3.2",
     "winston": "^2.4.0"
   },
   "devDependencies": {
@@ -42,7 +42,8 @@
     "standard": "^10.0.3",
     "tap-xunit": "2.2.0",
     "tape": "^4.9.0",
-    "tapes": "4.1.0"
+    "tapes": "4.1.0",
+    "winston-spy": "^0.2.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
