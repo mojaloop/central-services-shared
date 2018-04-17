@@ -699,12 +699,10 @@ class Consumer extends EventEmitter {
    * metadata before timing out. Defaults to 3000.
    * @param {Client~metadataCallback} metaDatacCb - Callback to fire with the metadata.
    */
-  getMetadata (metadataOptions, metaDatacCb = (error, metadata) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
+  getMetadata (metadataOptions, metaDatacCb) {
+    if (!metaDatacCb || typeof metaDatacCb !== 'function') {
+      metaDatacCb = () => {}
     }
-  }) {
     let { logger } = this._config
     logger.silly('Consumer::getMetadata() - start')
     this._consumer.getMetadata(metadataOptions, metaDatacCb)
