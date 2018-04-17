@@ -86,9 +86,6 @@ Test('Consumer test', (consumerTests) => {
     sandbox.stub(Kafka, 'KafkaConsumer').callsFake(
       () => {
         var k = new KafkaStubs.KafkaConsumer()
-        // k.testKafkaConsumersEmitters = (event, message) => {
-        //   this.emit(event, message)
-        // }
         return k
       }
     )
@@ -110,15 +107,15 @@ Test('Consumer test', (consumerTests) => {
     assert.end()
   })
 
-  consumerTests.test('Test Consumer::constructor - no config', (assert) => {
-    try {
-      var c = new Consumer(topicsList, null)
-    } catch (error) {
-      Logger.error(error)
-      assert.equals(error.message.toString(), 'missing a config object')
-      assert.end()
-    }
-  })
+  // consumerTests.test('Test Consumer::constructor - no config', (assert) => {
+  //   try {
+  //     var c = new Consumer(topicsList, null)
+  //   } catch (error) {
+  //     Logger.error(error)
+  //     assert.equals(error.message.toString(), 'missing a config object')
+  //     assert.end()
+  //   }
+  // })
 
   consumerTests.test('Test Consumer::constructor - no params', (assert) => {
     var c = new Consumer()
@@ -1528,6 +1525,75 @@ Test('Consumer test', (consumerTests) => {
           }
         })
       })
+    })
+  })
+
+  consumerTests.end()
+})
+
+Test('Consumer test for KafkaConsumer events', (consumerTests) => {
+  let sandbox
+  // let clock
+  let config = {}
+  let topicsList = []
+
+  // lets setup the tests
+  consumerTests.beforeEach((test) => {
+    sandbox = Sinon.sandbox.create()
+
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.recursive,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: true,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    topicsList = ['test']
+
+    sandbox.stub(Kafka, 'KafkaConsumer').callsFake(
+      () => {
+        var k = new KafkaStubs.KafkaConsumerForEventTests()
+        return k
+      }
+    )
+
+    test.end()
+  })
+
+  // lets tear down the tests
+  consumerTests.afterEach((test) => {
+    sandbox.restore()
+    test.end()
+  })
+
+  consumerTests.test('Test Consumer::connect - test KafkaConsumer events: event.log, event.error, error', (assert) => {
+    assert.plan(4)
+    var c = new Consumer(topicsList, config)
+
+    // consume 'message' event
+    c.on('error', error => {
+      Logger.error(error)
+      assert.ok(Sinon.match(error, 'event.error') || Sinon.match(error, 'event'), 'on Error event received')
+    })
+
+    c.on('ready', arg => {
+      Logger.debug(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
     })
   })
 

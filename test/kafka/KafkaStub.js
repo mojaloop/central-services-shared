@@ -233,6 +233,20 @@ class KafkaConsumer extends KafkaClient {
 }
 
 // KafkaConsumer Stub
+class KafkaConsumerForEventTests extends KafkaConsumer {
+  connect (err, info) {
+    super.connect(err, info)
+
+    this.emit('event.error', 'event.error')
+    this.emit('event.log', 'event.log')
+    this.emit('error', 'error')
+
+    info(null, this.metrics)
+    this._dummyFunction()
+  }
+}
+
+// KafkaConsumer Stub
 class KafkaProducer extends KafkaClient {
   poll () {
   }
@@ -250,3 +264,4 @@ exports.messageSampleStub = messageSampleStub
 exports.KafkaClient = KafkaClient
 exports.KafkaConsumer = KafkaConsumer
 exports.KafkaProducer = KafkaProducer
+exports.KafkaConsumerForEventTests = KafkaConsumerForEventTests

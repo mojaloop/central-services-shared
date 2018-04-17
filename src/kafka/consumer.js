@@ -193,31 +193,38 @@ exports.ENUMS = ENUMS
  * @constructor
  */
 class Consumer extends EventEmitter {
-  constructor (topics = [], config = {
-    options: {
-      mode: CONSUMER_MODES.recursive,
-      batchSize: 1,
-      pollFrequency: 10, // only applicable for poll mode
-      recursiveTimeout: 100,
-      messageCharset: 'utf8',
-      messageAsJSON: true,
-      sync: false,
-      consumeTimeout: 1000
-    },
-    rdkafkaConf: {
-      'group.id': 'kafka',
-      'metadata.broker.list': 'localhost:9092',
-      'enable.auto.commit': true
-     // 'debug': 'all'
-    },
-    topicConf: {},
-    logger: Logger
-  }
-  ) {
+  constructor (topics = [], config = {}) {
     super()
-    if (!config) {
-      throw new Error('missing a config object')
+    // if (!config) {
+    //   throw new Error('missing a config object')
+    // } else {
+    if (!config.options) {
+      config.options = {
+        mode: CONSUMER_MODES.recursive,
+        batchSize: 1,
+        pollFrequency: 10, // only applicable for poll mode
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      }
     }
+    if (!config.rdkafkaConf) {
+      config.rdkafkaConf = {
+        'group.id': 'kafka',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': true
+        // 'debug': 'all'
+      }
+    }
+    if (!config.topicConf) {
+      config.topicConf = {}
+    }
+    if (!config.logger) {
+      config.logger = Logger
+    }
+    // }
 
     let { logger } = config
     logger.silly('Consumer::constructor() - start')
