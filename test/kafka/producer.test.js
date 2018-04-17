@@ -96,6 +96,15 @@ Test('Producer test', (producerTests) => {
     assert.end()
   })
 
+  producerTests.test('Test Producer::constructor null', (assert) => {
+    try {
+      var producer = new Producer(null)
+    } catch (error) {
+      assert.ok(error.message, 'missing a config object')
+      assert.end()
+    }
+  })
+
   producerTests.test('Test Producer::connect', (assert) => {
     assert.plan(2)
     var producer = new Producer(config)
@@ -148,5 +157,22 @@ Test('Producer test', (producerTests) => {
       })
     })
   })
+
+  producerTests.test('Test Producer::sendMessage producer null', (assert) => {
+    var producer = new Producer(config)
+    producer.sendMessage({
+      message: {test: 'test'},
+      from: 'testAccountSender',
+      to: 'testAccountReceiver',
+      type: 'application/json',
+      pp: '',
+      id: 'id',
+      metadata: {}
+    }, {topicName: 'test', key: '1234'}).then(results => {}).catch((e) => {
+      assert.ok(e.message, 'You must call and await .connect() before trying to produce messages.')
+      assert.end()
+    })
+  })
+
   producerTests.end()
 })

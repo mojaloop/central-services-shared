@@ -225,7 +225,7 @@ class Producer extends EventEmitter {
           if (this._producer) {
             this._producer.poll()
           }
-        }, this._pollIntervalMs || 100)
+        }, this._pollIntervalMs)
         super.emit('ready')
         resolve(true)
       })
@@ -245,8 +245,8 @@ class Producer extends EventEmitter {
     })
   }
 
-  _createBuffer (str, encoding = 'utf8') {
-    var bufferResponse = Buffer.isBuffer(str) ? str : Buffer.from(JSON.stringify(str), encoding)
+  _createBuffer (str, encoding) {
+    var bufferResponse = Buffer.from(JSON.stringify(str), encoding)
     return bufferResponse
   }
 
@@ -271,7 +271,7 @@ class Producer extends EventEmitter {
    *
    * @returns {boolean} or if failed {Error}
    */
-  async sendMessage (messageProtocol, topicConf = {partition: 0, opaqueKey: null}) {
+  async sendMessage (messageProtocol, topicConf) {
     try {
       if (!this._producer) {
         throw new Error('You must call and await .connect() before trying to produce messages.')
@@ -395,16 +395,16 @@ class Producer extends EventEmitter {
   //   }
   // }
 
-  publishHandler (event) {
-    return async (eventMessage) => {
-      const {topic, key, msg} = eventMessage
-      Logger.info('Kafka.publish.publishHandler:: start(%s, %s, %s)', topic, key, msg)
-
-      await this.sendMessage(topic, key, msg).then(results => {
-        Logger.info(`Kafka.publish.publishHandler:: result:'${results}'`)
-      })
-    }
-  }
+  // publishHandler (event) {
+  //   return async (eventMessage) => {
+  //     const {topic, key, msg, id, to, from, metadata, pp, type} = eventMessage
+  //     Logger.info('Kafka.publish.publishHandler:: start(%s, %s, %s)', topic, key, msg)
+  //
+  //     await this.sendMessage({message: msg, id, to, from, metadata, pp, type}, {topicName: topic, key}).then(results => {
+  //       Logger.info(`Kafka.publish.publishHandler:: result:'${results}'`)
+  //     })
+  //   }
+  // }
 
   /**
    * Disconnect producer
