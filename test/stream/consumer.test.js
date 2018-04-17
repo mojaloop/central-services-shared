@@ -185,14 +185,24 @@ class KafkaConsumer extends KafkaClient {
   }
 }
 
+// it('', (assert) => {
+//
+// })
+
 Test('Consumer test', (consumerTests) => {
   let sandbox
+  let clock
   let config = {}
   let topicsList = []
 
   // lets setup the tests
   consumerTests.beforeEach((test) => {
     sandbox = Sinon.sandbox.create()
+    clock = Sinon.useFakeTimers({
+      now: Date.now(),
+      shouldAdvanceTime: false
+    })
+
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.recursive,
@@ -241,7 +251,9 @@ Test('Consumer test', (consumerTests) => {
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
       assert.end()
+      // assert.same(result, true)
     })
+    // assert.same(result, true)
   })
 
   consumerTests.test('Test Consumer::consume flow sync=false', (assert) => {
@@ -340,9 +352,11 @@ Test('Consumer test', (consumerTests) => {
               c.commitMessage(message)
             }
             resolve(true)
+            assert.ok(message, 'message processed')
             assert.end()
           } else {
             resolve(false)
+            assert.fail('message not processed')
             assert.end()
           }
           // resolve(true)
@@ -352,10 +366,13 @@ Test('Consumer test', (consumerTests) => {
     })
   })
 
-  consumerTests.test('Test Consumer::consume recursive sync=false', (assert) => {
+  consumerTests.test('Test Consumer::consume poller sync=false', (assert) => {
+
+    assert.plan(1)
+
     config = {
       options: {
-        mode: ConsumerEnums.CONSUMER_MODES.recursive,
+        mode: ConsumerEnums.CONSUMER_MODES.poll,
         batchSize: 1,
         recursiveTimeout: 100,
         messageCharset: 'utf8',
@@ -394,10 +411,14 @@ Test('Consumer test', (consumerTests) => {
               c.commitMessage(message)
             }
             resolve(true)
-            assert.end()
+            assert.ok(message, 'message processed')
+            // assert.end()
+            // process.exit(0)
           } else {
             resolve(false)
-            assert.end()
+            // assert.end()
+            assert.fail('message not processed')
+            // process.exit(0)
           }
           // resolve(true)
         })
@@ -405,6 +426,67 @@ Test('Consumer test', (consumerTests) => {
       // assert.end()
     })
   })
+
+  // consumerTests.test('Test Consumer::consume recursive sync=false', (assert) => {
+  //
+  //   assert.plan(2 * 10 + 1)
+  //
+  //   config = {
+  //     options: {
+  //       mode: ConsumerEnums.CONSUMER_MODES.recursive,
+  //       batchSize: 1,
+  //       recursiveTimeout: 100,
+  //       messageCharset: 'utf8',
+  //       messageAsJSON: true,
+  //       sync: false,
+  //       consumeTimeout: 1000
+  //     },
+  //     rdkafkaConf: {
+  //       'group.id': 'kafka-test',
+  //       'metadata.broker.list': 'localhost:9092',
+  //       'enable.auto.commit': false
+  //     },
+  //     topicConf: {},
+  //     logger: Logger
+  //   }
+  //
+  //   var c = new Consumer(topicsList, config)
+  //
+  //   c.connect().then(result => {
+  //     assert.ok(Sinon.match(result, true))
+  //
+  //     c.consume((error, message) => {
+  //       return new Promise((resolve, reject) => {
+  //         if (error) {
+  //           Logger.info(`WTDSDSD!!! error ${error}`)
+  //           reject(error)
+  //         }
+  //         if (message) { // check if there is a valid message comming back
+  //           Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+  //           // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+  //           if (Array.isArray(message) && message.length != null && message.length > 0) {
+  //             message.forEach(msg => {
+  //               c.commitMessage(msg)
+  //             })
+  //           } else {
+  //             c.commitMessage(message)
+  //           }
+  //           resolve(true)
+  //           assert.ok(message, 'message processed')
+  //           // assert.end()
+  //           // process.exit(0)
+  //         } else {
+  //           resolve(false)
+  //           assert.fail('message not processed')
+  //           // assert.end()
+  //           // process.exit(0)
+  //         }
+  //         // resolve(true)
+  //       })
+  //     })
+  //     // assert.end()
+  //   })
+  // })
 
   consumerTests.end()
 })
