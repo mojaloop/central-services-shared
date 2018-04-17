@@ -92,6 +92,7 @@ class KafkaClient extends EventEmitter {
     }
   }) {
     cb(null, this.metrics)
+    this.emit('disconnected', this.metrics)
   }
 
   getMetadata (metadataOptions, cb = (err, metadata) => {
