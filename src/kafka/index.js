@@ -29,32 +29,10 @@
  --------------
  ******/
 
-/**
- * Kafka Producer
- * @module Producer
- */
-// TODO: TO BE REWORKED INTO UNIT/INTEGRATION TEST FRAMEWORK
-
 'use strict'
 
-const Producer = require('../producer')
-const Logger = require('../../logger')
-
-var testProducer = async () => {
-  Logger.info('testProducer::start')
-
-  var p = new Producer()
-  Logger.info('testProducer::connect::start')
-  var connectionResult = await p.connect()
-  Logger.info('testProducer::connect::end')
-
-  Logger.info(`Connected result=${connectionResult}`)
-
-  Logger.info('testProducer::sendMessage::start1')
-  await p.sendMessage('testing', {test: 'test'}, '1234', 'testAccountSender', 'testAccountReciever', {date: new Date()}, 'application/json', ' ').then(results => {
-    Logger.info(`testProducer.sendMessage:: result:'${JSON.stringify(results)}'`)
-  })
-  Logger.info('testProducer::sendMessage::end1')
+module.exports = {
+  Producer: require('./producer'),
+  Consumer: require('./consumer'),
+  Protocol: require('./protocol')
 }
-
-testProducer()
