@@ -120,6 +120,12 @@ Test('Consumer test', (consumerTests) => {
     }
   })
 
+  consumerTests.test('Test Consumer::constructor - no params', (assert) => {
+    var c = new Consumer()
+    assert.ok(true)
+    assert.end()
+  })
+
   consumerTests.test('Test Consumer::connect', (assert) => {
     assert.plan(2)
     var c = new Consumer(topicsList, config)
@@ -262,7 +268,7 @@ Test('Consumer test', (consumerTests) => {
     var c = new Consumer(topicsList, config)
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
-      c.getMetadata(null, null)
+      c.getMetadata(null)
       assert.ok(true)
       assert.end()
     })
@@ -328,12 +334,26 @@ Test('Consumer test', (consumerTests) => {
     })
   })
 
-  consumerTests.test('Test Consumer::consumeOnce - Not Implemented', (assert) => {
+  consumerTests.test('Test Consumer::consumeOnce - Not Implemented - default params', (assert) => {
     var c = new Consumer(topicsList, config)
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
       try {
-        c.consumeOnce((error, message) => {
+        c.consumeOnce()
+      } catch (error) {
+        Logger.error(error)
+        assert.equals(error.message.toString(), 'Not implemented')
+        assert.end()
+      }
+    })
+  })
+
+  consumerTests.test('Test Consumer::consumeOnce - Not Implemented - batchSize=10', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      try {
+        c.consumeOnce(1, (error, message) => {
           return new Promise((resolve, reject) => {
             if (error) {
               Logger.info(`WTDSDSD!!! error ${error}`)
@@ -968,7 +988,7 @@ Test('Consumer test', (consumerTests) => {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.recursive,
         batchSize: 1,
-        recursiveTimeout: 100,
+        // recursiveTimeout: 100,
         messageCharset: 'utf8',
         messageAsJSON: true,
         sync: false,
@@ -1426,6 +1446,85 @@ Test('Consumer test', (consumerTests) => {
           } else {
             resolve(false)
             assert.fail('message not processed')
+          }
+        })
+      })
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume poller sync=false, messageAsJson=true - consumer callback with error', (assert) => {
+
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.poll,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var calledConsume = false
+    var c = new Consumer(topicsList, config)
+
+    sandbox.stub(KafkaStubs.KafkaConsumer.prototype, 'consume').callsFake(
+      (number, info) => {
+        info('error test test', null)
+        if (!calledConsume) {
+          c.disconnect()
+          assert.ok(true)
+          assert.end()
+          calledConsume = true
+        }
+      }
+    )
+
+    var pollCount = 0
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          pollCount = pollCount + 1
+          if (pollCount > 1) {
+            c.disconnect()
+            assert.ok(true, 'Message processed once by the poller consumer')
+          } else {
+            if (error) {
+              Logger.info(`WTDSDSD!!! error ${error}`)
+              reject(error)
+            }
+            if (message) { // check if there is a valid message comming back
+              Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+              // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+              if (Array.isArray(message) && message.length != null && message.length > 0) {
+                message.forEach(msg => {
+                  c.commitMessage(msg)
+                })
+              } else {
+                c.commitMessage(message)
+              }
+              resolve(true)
+              assert.ok(message, 'message processed')
+              assert.ok(Array.isArray(message), 'batch of messages received')
+              message.forEach(msg => {
+                assert.equals(typeof msg.value, 'object')
+              })
+            } else {
+              resolve(false)
+              c.disconnect()
+              assert.fail('message not processed')
+            }
           }
         })
       })

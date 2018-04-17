@@ -358,14 +358,13 @@ class Consumer extends EventEmitter {
    * Consume messages from Kafka as per the configuration specified in the constructor.
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  consume (workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  consume (workDoneCb) {
     let { logger } = this._config
     logger.silly('Consumer::consume() - start')
+
+    if (!workDoneCb || typeof workDoneCb !== 'function') {
+      workDoneCb = () => {}
+    }
 
     // setup queues to ensure sync processing of messages if options.sync is true
     if (this._config.options.sync) {
@@ -440,12 +439,7 @@ class Consumer extends EventEmitter {
    * @param {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  _consumePoller (pollFrequency = 10, batchSize, workDoneCb) {
     let { logger } = this._config
     this._pollInterval = setInterval(() => {
       // if (this._status.running) {
@@ -503,12 +497,7 @@ class Consumer extends EventEmitter {
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {boolean} - true when successful
    */
-  _consumeRecursive (recursiveTimeout = 100, batchSize = 1, workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  _consumeRecursive (recursiveTimeout = 100, batchSize, workDoneCb) {
     let { logger } = this._config
     this._consumer.consume(batchSize, (error, messages) => {
       if (error || !messages.length) {
@@ -557,12 +546,7 @@ class Consumer extends EventEmitter {
    *
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  _consumeFlow (workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
-    }
-  }) {
+  _consumeFlow (workDoneCb) {
     let { logger } = this._config
     this._consumer.consume((error, message) => {
       if (error || !message) {
@@ -607,12 +591,10 @@ class Consumer extends EventEmitter {
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {object} - single message that was consumed
    */
-  consumeOnce (batchSize = 1, workDoneCb = (error, messages) => {
-    let { logger } = this._config
-    if (error) {
-      logger.error(`Consumer::consume() - error ${error}`)
+  consumeOnce (batchSize = 1, workDoneCb) {
+    if (!workDoneCb || typeof workDoneCb !== 'function') {
+      workDoneCb = () => {}
     }
-  }) {
     throw new Error('Not implemented')
   }
 
