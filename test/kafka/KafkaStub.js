@@ -71,7 +71,7 @@ const messageSampleStub = {
   offset: 1,
   key: 'key',
   size: 0,
-  timestamp: (new Date()).getTime()
+  timestamp: Date.now()
 }
 
 // KafkaClient Stub

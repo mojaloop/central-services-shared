@@ -149,11 +149,11 @@ Test('Consumer test', (consumerTests) => {
       assert.end()
     })
   })
-*****
+
   consumerTests.test('Test Consumer::subscribe', (assert) => {
     var c = new Consumer(topicsList, config)
     c.connect().then(result => {
-      c.disconnect()
+      c.subscribe(topicsList)
       assert.ok(true)
       assert.end()
     })
@@ -186,6 +186,16 @@ Test('Consumer test', (consumerTests) => {
     })
   })
 
+  consumerTests.test('Test Consumer::getMetadata - no callback function', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.getMetadata(null, null)
+      assert.ok(true)
+      assert.end()
+    })
+  })
+
   consumerTests.test('Test Consumer::commit', (assert) => {
     var c = new Consumer(topicsList, config)
     c.connect().then(result => {
@@ -196,11 +206,31 @@ Test('Consumer test', (consumerTests) => {
     })
   })
 
+  consumerTests.test('Test Consumer::commit - no params', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.commit()
+      assert.ok(true, 'commit passed')
+      assert.end()
+    })
+  })
+
   consumerTests.test('Test Consumer::commitSync', (assert) => {
     var c = new Consumer(topicsList, config)
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
       c.commitSync(topicsList)
+      assert.ok(true, 'commit passed')
+      assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::commitSync - no params', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.commitSync()
       assert.ok(true, 'commit passed')
       assert.end()
     })
@@ -245,6 +275,27 @@ Test('Consumer test', (consumerTests) => {
         assert.equals(error.message.toString(), 'Not implemented')
         assert.end()
       }
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume - defaults', (assert) => {
+    var messageReceived = false
+
+    var c = new Consumer(topicsList, config)
+
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      c.disconnect()
+      assert.ok(message, 'on Message event received')
+      if (!messageReceived) {
+        assert.end()
+        messageReceived = true
+      }
+    })
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.consume()
     })
   })
 
@@ -1168,6 +1219,141 @@ Test('Consumer test', (consumerTests) => {
               resolve(false)
               assert.fail('message not processed')
             }
+          }
+        })
+      })
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume poller sync=false, messageAsJson=true, batchSize=0', (assert) => {
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.poll,
+        batchSize: 0,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      try {
+        c.consume()
+      } catch(error) {
+        Logger.error(error)
+        c.disconnect()
+        assert.equals(error.message.toString(), 'batchSize option is not valid - Select an integer greater then 0')
+        assert.end()
+      }
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume recursive sync=false, messageAsJson=true, batchSize=0', (assert) => {
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.recursive,
+        batchSize: 0,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      try {
+        c.consume()
+      } catch(error) {
+        Logger.error(error)
+        c.disconnect()
+        assert.equals(error.message.toString(), 'batchSize option is not valid - Select an integer greater then 0')
+        assert.end()
+      }
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume flow sync=false, messageAsJson=true - invalid CONSUMER MODE SELECTED', (assert) => {
+    assert.plan(5)
+    config = {
+      options: {
+        mode: 99, // invalid consumer mode
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          if (error) {
+            Logger.info(`WTDSDSD!!! error ${error}`)
+            reject(error)
+          }
+          if (message) { // check if there is a valid message comming back
+            Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+            // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+            if (Array.isArray(message) && message.length != null && message.length > 0) {
+              message.forEach(msg => {
+                c.commitMessage(msg)
+              })
+            } else {
+              c.commitMessage(message)
+            }
+            resolve(true)
+            assert.equals(typeof message.value, 'object')
+            assert.ok(message, 'message processed')
+          } else {
+            resolve(false)
+            assert.fail('message not processed')
           }
         })
       })
