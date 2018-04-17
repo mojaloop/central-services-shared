@@ -31,12 +31,8 @@
 
 'use strict'
 
-// TODO:  RDKAFKA Producer code goes here
-
-class Producer {
-  constructor () {
-
-  }
+module.exports = {
+  Producer: require('./producer'),
+  Consumer: require('./consumer'),
+  Protocol: require('./protocol')
 }
-
-exports.Prodcuer = Producer
