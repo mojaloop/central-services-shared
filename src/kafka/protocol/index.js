@@ -83,6 +83,11 @@ const parseCommand = (from, to, key, message, reason, method, metadata, status, 
 
 const parseValue = (value, charset = 'utf8', asJSON = true) => {
   Logger.silly('Protocol::parseMessage() - start')
+
+  // if (typeof value === 'object') {
+  //   return value
+  // }
+
   var parsedValue = value.toString(charset)
 
   if (asJSON) {

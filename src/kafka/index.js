@@ -30,3 +30,9 @@
  ******/
 
 'use strict'
+
+module.exports = {
+  Producer: require('./producer'),
+  Consumer: require('./consumer'),
+  Protocol: require('./protocol')
+}

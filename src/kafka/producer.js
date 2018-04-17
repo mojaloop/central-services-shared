@@ -34,7 +34,7 @@
 const EventEmitter = require('events')
 const Logger = require('../logger')
 const Kafka = require('node-rdkafka')
-const LimeParser = require('./protocol')
+const Protocol = require('./protocol')
 
 /**
  * Producer ENUMs
@@ -108,8 +108,6 @@ ENUMS = {
   STATUS
 }
 
-module.exports = ENUMS
-
 /**
  * Ready event.
  *
@@ -126,7 +124,12 @@ module.exports = ENUMS
  * configuration and default topic configuration.
  *
  * @example
- * var producer = new Producer(options, {
+ * var producer = new Producer({
+ *  options: {
+ *   {
+ *     pollIntervalMs: 100,
+ *     messageCharset: 'utf8'
+ *   },
  *   rdkafkaConf: {
  *     'metadata.broker.list': 'localhost:9092',
  *     'client.id': 'default-client',
@@ -158,7 +161,10 @@ module.exports = ENUMS
  */
 class Producer extends EventEmitter {
   constructor (config = {
-    logger: Logger,
+    options: {
+      pollIntervalMs: 100,
+      messageCharset: 'utf8'
+    },
     rdkafkaConf: {
       'metadata.broker.list': 'localhost:9092',
       'client.id': 'default-client',
@@ -176,9 +182,7 @@ class Producer extends EventEmitter {
     topicConf: {
       'request.required.acks': 1
     },
-    options: {
-      pollIntervalMs: 100
-    }
+    logger: Logger
   }) {
     super()
     if (!config) {
@@ -262,6 +266,11 @@ class Producer extends EventEmitter {
     })
   }
 
+  _createBuffer (str, encoding = 'utf8') {
+    var bufferResponse = Buffer.isBuffer(str) ? str : Buffer.from(JSON.stringify(str), encoding)
+    return bufferResponse
+  }
+
   /**
    * @async
    * produces a kafka message to a certain topic
@@ -285,8 +294,9 @@ class Producer extends EventEmitter {
       if (this._producer._isConnecting) {
         this._config.logger.debug('still connecting')
       }
-      var parsedMessage = LimeParser.parseMessage(from, to, key, message, metadata, type, pp)
-      parsedMessage = Buffer.isBuffer(parsedMessage) ? parsedMessage : Buffer.from(JSON.stringify(parsedMessage))
+      var parsedMessage = Protocol.parseMessage(from, to, key, message, metadata, type, pp)
+      // parsedMessage = Buffer.isBuffer(parsedMessage) ? parsedMessage : Buffer.from(JSON.stringify(parsedMessage))
+      parsedMessage = this._createBuffer(parsedMessage, this._config.options.messageCharset)
       if (!parsedMessage || !(typeof parsedMessage === 'string' || Buffer.isBuffer(parsedMessage))) {
         throw new Error('message must be a string or an instance of Buffer.')
       }
@@ -332,8 +342,9 @@ class Producer extends EventEmitter {
       if (this._producer._isConnecting) {
         this._config.logger.debug('still connecting')
       }
-      var parsedNotification = LimeParser.parseNotify(from, to, key, message, metadata, event, reason, type, pp)
-      parsedNotification = Buffer.isBuffer(parsedNotification) ? parsedNotification : Buffer.from(JSON.stringify(parsedNotification))
+      var parsedNotification = Protocol.parseNotify(from, to, key, message, metadata, event, reason, type, pp)
+      // parsedNotification = Buffer.isBuffer(parsedNotification) ? parsedNotification : Buffer.from(JSON.stringify(parsedNotification))
+      parsedNotification = this._createBuffer(parsedNotification, this._config.options.messageCharset)
       if (!parsedNotification || !(typeof parsedNotification === 'string' || Buffer.isBuffer(parsedNotification))) {
         throw new Error('message must be a string or an instance of Buffer.')
       }
@@ -380,8 +391,9 @@ class Producer extends EventEmitter {
       if (this._producer._isConnecting) {
         this._config.logger.debug('still connecting')
       }
-      var parsedCommand = LimeParser.parseCommand(from, to, key, message, reason, method, metadata, status, type, pp)
-      parsedCommand = Buffer.isBuffer(parsedCommand) ? parsedCommand : Buffer.from(JSON.stringify(parsedCommand))
+      var parsedCommand = Protocol.parseCommand(from, to, key, message, reason, method, metadata, status, type, pp)
+      // parsedCommand = Buffer.isBuffer(parsedCommand) ? parsedCommand : Buffer.from(JSON.stringify(parsedCommand))
+      parsedCommand = this._createBuffer(parsedCommand, this._config.options.messageCharset)
       if (!parsedCommand || !(typeof parsedCommand === 'string' || Buffer.isBuffer(parsedCommand))) {
         throw new Error('message must be a string or an instance of Buffer.')
       }
@@ -422,9 +434,11 @@ class Producer extends EventEmitter {
     if (this._producer) {
       this._inClosing = true
       clearInterval(this._producerPollIntv)
+      this._producer.flush()
       this._producer.disconnect()
     }
   }
 }
 
 module.exports = Producer
+module.exports.ENUMS = ENUMS

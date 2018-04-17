@@ -92,6 +92,12 @@ exports.ENUMS = ENUMS
  */
 
 /**
+ * @typedef {object} Client~watermarkOffsets
+ * @property {number} high - High (newest/end) offset
+ * @property {number} low - Low (oldest/beginning) offset
+ */
+
+/**
  * Consumer Options
  *
  * The options that can be configured for the Consumer
@@ -104,6 +110,7 @@ exports.ENUMS = ENUMS
  * @property {string} messageCharset - Parse processed message from Kafka into a string using this encoding character set. Defaults: utf8
  * @property {boolean} messageAsJSON - Parse processed message from Kafka into a JSON object. Defaults: true
  * @property {boolean} sync - Ensures that messages are processed in order via a single thread. This may impact performance. Defaults: false
+ * @property {number} consumeTimeout - Set the default consume timeout (milliseconds) provided to RDKafka c++land. Defaults: 1000
  *
  */
 
@@ -178,21 +185,15 @@ exports.ENUMS = ENUMS
  *
  * @param {object} topics - List of topics that will be auto subscribed
  * @param {object} config - Key value pairs for the configuration of the Consumer with the followin:
- * rdkafka - specific rdkafka condfigurations [Refer to configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md}
  * options - consumer processing configuration, topic - Key value pairs to create a default. @see Consumer~Options
- * topic - topic configuration
+ * rdkafkaConf - specific rdkafka condfigurations [Refer to RDKAFKA configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md}
+ * topicConf - topic configuration [Refer to RDKAFKA configuration doc]{@link https://github.com/edenhill/librdkafka/blob/0.11.1.x/CONFIGURATION.md#topic-configuration-properties}
  * logger - logger object that supports debug(), info(), verbose() & silly()
  * @extends EventEmitter
  * @constructor
  */
 class Consumer extends EventEmitter {
   constructor (topics = [], config = {
-    rdkafka: {
-      'group.id': 'kafka',
-      'metadata.broker.list': 'localhost:9092',
-      'enable.auto.commit': false
-      // 'debug': 'all'
-    },
     options: {
       mode: CONSUMER_MODES.recursive,
       batchSize: 1,
@@ -200,9 +201,16 @@ class Consumer extends EventEmitter {
       recursiveTimeout: 100,
       messageCharset: 'utf8',
       messageAsJSON: true,
-      sync: false
+      sync: false,
+      consumeTimeout: 1000
     },
-    topic: {},
+    rdkafkaConf: {
+      'group.id': 'kafka',
+      'metadata.broker.list': 'localhost:9092',
+      'enable.auto.commit': true
+     // 'debug': 'all'
+    },
+    topicConf: {},
     logger: Logger
   }
   ) {
@@ -218,6 +226,7 @@ class Consumer extends EventEmitter {
     this._status = {}
     this._status.runningInConsumeOnceMode = false
     this._status.runningInConsumeMode = false
+    this._status.running = true
     logger.silly('Consumer::constructor() - end')
   }
 
@@ -233,7 +242,10 @@ class Consumer extends EventEmitter {
     let { logger } = this._config
     logger.silly('Consumer::connect() - start')
     return new Promise((resolve, reject) => {
-      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafka, this._config.topic)
+      this._consumer = new Kafka.KafkaConsumer(this._config.rdkafkaConf, this._config.topicConf)
+
+      this._consumer.setDefaultConsumeTimeout(this._config.options.consumeTimeout)
+      // this._setDefaultConsumeTimeout(this._config.options.consumeTimeout)
 
       this._consumer.on('event.log', log => {
         logger.silly(log.message)
@@ -278,6 +290,8 @@ class Consumer extends EventEmitter {
       this._consumer.on('data', message => {
         logger.silly(`Consumer::onData() - message: ${JSON.stringify(message)}`)
         var returnMessage = { ...message }
+        // var returnMessage = {}
+        // Object.assign(returnMessage, message)
         if (message instanceof Array) {
           returnMessage.map(msg => {
             var parsedValue = Protocol.parseValue(msg.value, this._config.options.messageCharset, this._config.options.messageAsJSON)
@@ -300,6 +314,10 @@ class Consumer extends EventEmitter {
   disconnect (cb = () => {}) {
     let { logger } = this._config
     logger.silly('Consumer::disconnect() - start')
+    if (this._pollInterval) {
+      clearInterval(this._pollInterval)
+    }
+    this._status.running = false
     this._consumer.disconnect(cb)
     logger.silly('Consumer::disconnect() - end')
   }
@@ -340,7 +358,12 @@ class Consumer extends EventEmitter {
    * Consume messages from Kafka as per the configuration specified in the constructor.
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  consume (workDoneCb = (error, messages) => {}) {
+  consume (workDoneCb = (error, messages) => {
+    let { logger } = this._config
+    if (error) {
+      logger.error(`Consumer::consume() - error ${error}`)
+    }
+  }) {
     let { logger } = this._config
     logger.silly('Consumer::consume() - start')
 
@@ -348,10 +371,16 @@ class Consumer extends EventEmitter {
     if (this._config.options.sync) {
       this._syncQueue = async.queue((message, callbackDone) => {
         logger.debug(`Consumer::consume() - Sync Process - ${JSON.stringify(message)}`)
-        workDoneCb(message.error, message.messages).then((response) => {
+        let payload
+        if (this._config.options.mode === ENUMS.CONSUMER_MODES.flow) {
+          payload = message.message
+        } else {
+          payload = message.messages
+        }
+        workDoneCb(message.error, payload).then((response) => {
           callbackDone() // this marks the completion of the processing by the worker
           if (this._config.options.mode === CONSUMER_MODES.recursive) { // lets call the recursive event if we are running in recursive mode
-            super.emit('recursive', message.error, message.messages)
+            super.emit('recursive', message.error, payload)
           }
         })
       }, 1)
@@ -374,7 +403,12 @@ class Consumer extends EventEmitter {
       case CONSUMER_MODES.recursive:
         if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
           super.on('recursive', (error, messages) => {
-            this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
+            if (error) {
+              logger.error(`Consumer::consume() - error ${error}`)
+            }
+            if (this._status.running) {
+              this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
+            }
           })
           this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
         } else {
@@ -406,9 +440,15 @@ class Consumer extends EventEmitter {
    * @param {number} batchSize - The batch size to be requested by the Kafka consumer. Defaults: 1
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {}) {
+  _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {
     let { logger } = this._config
-    setInterval(() => {
+    if (error) {
+      logger.error(`Consumer::consume() - error ${error}`)
+    }
+  }) {
+    let { logger } = this._config
+    this._pollInterval = setInterval(() => {
+      // if (this._status.running) {
       this._consumer.consume(batchSize, (error, messages) => {
         if (error || !messages.length) {
           if (error) {
@@ -437,6 +477,7 @@ class Consumer extends EventEmitter {
           }
         }
       })
+      // }
     }, pollFrequency)
   }
 
@@ -462,13 +503,22 @@ class Consumer extends EventEmitter {
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {boolean} - true when successful
    */
-  _consumeRecursive (recursiveTimeout = 100, batchSize = 1, workDoneCb = (error, messages) => {}) {
+  _consumeRecursive (recursiveTimeout = 100, batchSize = 1, workDoneCb = (error, messages) => {
+    let { logger } = this._config
+    if (error) {
+      logger.error(`Consumer::consume() - error ${error}`)
+    }
+  }) {
     let { logger } = this._config
     this._consumer.consume(batchSize, (error, messages) => {
       if (error || !messages.length) {
-        return setTimeout(() => {
-          return this._consumeRecursive(recursiveTimeout, batchSize, workDoneCb)
-        }, recursiveTimeout)
+        if (this._status.running) {
+          return setTimeout(() => {
+            return this._consumeRecursive(recursiveTimeout, batchSize, workDoneCb)
+          }, recursiveTimeout)
+        } else {
+          return false
+        }
       } else {
         // lets transform the messages into the desired format
         messages.map(msg => {
@@ -507,7 +557,12 @@ class Consumer extends EventEmitter {
    *
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    */
-  _consumeFlow (workDoneCb = (error, message) => {}) {
+  _consumeFlow (workDoneCb = (error, messages) => {
+    let { logger } = this._config
+    if (error) {
+      logger.error(`Consumer::consume() - error ${error}`)
+    }
+  }) {
     let { logger } = this._config
     this._consumer.consume((error, message) => {
       if (error || !message) {
@@ -532,6 +587,13 @@ class Consumer extends EventEmitter {
     })
   }
 
+  // _setDefaultConsumeTimeout (consumeTimeout = 1000) {
+  //   let { logger } = this._config
+  //   logger.silly('Consumer::_setDefaultConsumeTimeout() - start')
+  //   this._consumer.setDefaultConsumeTimeout(consumeTimeout)
+  //   logger.silly('Consumer::_setDefaultConsumeTimeout() - end')
+  // }
+
   /**
    * Consume Once (Not implemented)
    *
@@ -545,7 +607,12 @@ class Consumer extends EventEmitter {
    * @param {Consumer~workDoneCb} workDoneCb - Callback function to process the consumed message
    * @returns {object} - single message that was consumed
    */
-  consumeOnce (batchSize = 1, workDoneCb = (error, message) => {}) {
+  consumeOnce (batchSize = 1, workDoneCb = (error, messages) => {
+    let { logger } = this._config
+    if (error) {
+      logger.error(`Consumer::consume() - error ${error}`)
+    }
+  }) {
     throw new Error('Not implemented')
   }
 
@@ -571,6 +638,88 @@ class Consumer extends EventEmitter {
     logger.silly('Consumer::commitMessage() - start')
     this._consumer.commitMessage(msg)
     logger.silly('Consumer::commitMessage() - end')
+  }
+
+  /**
+   * Commit topics partition in sync mode
+   *
+   * @param {object} topicPartitions - List of topics that must be commited. If null, it will default to the topics list provided in the constructor. Defaults = null
+   */
+  commitSync (topicPartitions = null) {
+    let { logger } = this._config
+    logger.silly('Consumer::commitSync() - start')
+    this._consumer.commitSync(topicPartitions)
+    logger.silly('Consumer::commitSync() - end')
+  }
+
+  /**
+   * Commit message in sync mode
+   *
+   * @param {KafkaConsumer~Message} msg - Kafka message to be commited
+   */
+  commitMessageSync (msg) {
+    let { logger } = this._config
+    logger.silly('Consumer::commitMessageSync() - start')
+    this._consumer.commitMessageSync(msg)
+    logger.silly('Consumer::commitMessageSync() - end')
+  }
+
+  /**
+   * Get last known offsets from the client.
+   *
+   * RDKAFKA:
+   *
+   * The low offset is updated periodically (if statistics.interval.ms is set)
+   * while the high offset is updated on each fetched message set from the
+   * broker.
+   *
+   * If there is no cached offset (either low or high, or both), then this will
+   * throw an error.
+   *
+   * @param {string} topic - Topic to recieve offsets from.
+   * @param {number} partition - Partition of the provided topic to recieve offsets from
+   * @return {Client~watermarkOffsets} - Returns an object with a high and low property, specifying
+   * the high and low offsets for the topic partition
+   */
+  getWatermarkOffsets (topic, partition) {
+    let { logger } = this._config
+    logger.silly('Consumer::getWatermarkOffsets() - start')
+    logger.silly('Consumer::getWatermarkOffsets() - end')
+    return this._consumer.getWatermarkOffsets(topic, partition)
+  }
+
+  /**
+   * Get client metadata.
+   *
+   * RDKAFKA:
+   *
+   * Note: using a <code>metadataOptions.topic</code> parameter has a potential side-effect.
+   * A Topic object will be created, if it did not exist yet, with default options
+   * and it will be cached by librdkafka.
+   *
+   * A subsequent call to create the topic object with specific options (e.g. <code>acks</code>) will return
+   * the previous instance and the specific options will be silently ignored.
+   *
+   * To avoid this side effect, the topic object can be created with the expected options before requesting metadata,
+   * or the metadata request can be performed for all topics (by omitting <code>metadataOptions.topic</code>).
+   *
+   * @param {object} metadataOptions - Metadata options to pass to the client.
+   * @param {string} metadataOptions.topic - Topic string for which to fetch
+   * metadata
+   * @param {number} metadataOptions.timeout - Max time, in ms, to try to fetch
+   * metadata before timing out. Defaults to 3000.
+   * @param {Client~metadataCallback} metaDatacCb - Callback to fire with the metadata.
+   */
+  getMetadata (metadataOptions, metaDatacCb = (error, metadata) => {
+    let { logger } = this._config
+    if (error) {
+      logger.error(`Consumer::consume() - error ${error}`)
+    }
+  }) {
+    let { logger } = this._config
+    logger.silly('Consumer::getMetadata() - start')
+    this._consumer.getMetadata(metadataOptions, metaDatacCb)
+    logger.silly('Consumer::getMetadata() - end')
   }
 }
 //
@@ -598,6 +747,5 @@ class Consumer extends EventEmitter {
 
 // TODO: WRITE STREAM CONSUMER
 
-exports.Consumer = Consumer
-// exports.CONSUMER_MODES = CONSUMER_MODES
-exports.ENUMS = ENUMS
+module.exports = Consumer
+module.exports.ENUMS = ENUMS

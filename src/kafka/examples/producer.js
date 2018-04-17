@@ -37,7 +37,7 @@
 
 'use strict'
 
-const Producer = require('../producer')
+const Producer = require('../').Producer
 const Logger = require('../../logger')
 
 var testProducer = async () => {
@@ -51,7 +51,7 @@ var testProducer = async () => {
   Logger.info(`Connected result=${connectionResult}`)
 
   Logger.info('testProducer::sendMessage::start1')
-  await p.sendMessage('testing', {test: 'test'}, '1234', 'testAccountSender', 'testAccountReciever', {date: new Date()}, 'application/json', ' ').then(results => {
+  await p.sendMessage('test', {test: 'test'}, '1234', 'testAccountSender', 'testAccountReciever', {date: new Date()}, 'application/json', ' ').then(results => {
     Logger.info(`testProducer.sendMessage:: result:'${JSON.stringify(results)}'`)
   })
   Logger.info('testProducer::sendMessage::end1')
