@@ -41,168 +41,25 @@ const Consumer = require('../../src/kafka').Consumer
 const ConsumerEnums = require('../../src/kafka').Consumer.ENUMS
 const Logger = require('../../src/logger')
 const Kafka = require('node-rdkafka')
-const EventEmitter = require('events')
+// const EventEmitter = require('events')
 
 const Sinon = require('sinon')
 
-// KafkaClient Stub
-class KafkaClient extends EventEmitter {
-  connect (err, info) {
-    this.emit('ready', 'true')
-  }
-
-  disconnect (err, info) {
-  }
-
-  getMetadata (metadataOptions, cb = (err, metadata) => {}) {
-    var metadataSample = {
-      orig_broker_id: 1,
-      orig_broker_name: 'stub-broker',
-      brokers: [
-        {
-          id: 0,
-          host: 'localhost',
-          port: 9092
-        }
-      ],
-      topics: [
-        {
-          name: 'test',
-          partitions: [
-            {
-              id: 0,
-              leader: 0,
-              replicas: [1],
-              isrs: [1]
-            }
-          ]
-        }
-      ]
-    }
-
-    if (cb) {
-      cb(null, metadataSample)
-    }
-  }
-}
-
-// KafkaConsumer Stub
-class KafkaConsumer extends KafkaClient {
-  setDefaultConsumeTimeout (timeoutMs) {
-  }
-
-  subscribe (topics) {
-    return topics
-  }
-
-  consume (cb) {
-
-  }
-
-  consume (number, cb) {
-    if ((number && typeof number === 'number') || (number && cb)) {
-      if (cb === undefined) {
-        cb = function () {}
-      } else if (typeof cb !== 'function') {
-        throw new TypeError('Callback must be a function')
-      }
-    } else {
-      // See https://github.com/Blizzard/node-rdkafka/issues/220
-      // Docs specify just a callback can be provided but really we needed
-      // a fallback to the number argument
-      // @deprecated
-      if (cb === undefined) {
-        if (typeof number === 'function') {
-          cb = number
-        } else {
-          cb = function () {}
-        }
-      }
-    }
-
-    const encoding = 'utf8'
-
-    const bufferedMessage = Buffer.from(JSON.stringify({
-      hello: 'world'
-    }), encoding)
-
-    const messageSample = {
-      value: bufferedMessage,
-      topic: 'test',
-      partition: 0,
-      offset: 1,
-      key: 'key',
-      size: bufferedMessage.length,
-      timestamp: (new Date()).getTime()
-    }
-
-    if (number > 0) {
-      var messageBatchSample = [0, 1, 2, 3, 4, 5, 6, 7, 9]
-
-      messageBatchSample = messageBatchSample.map(index => {
-        var newMessageSample = {...messageSample}
-        newMessageSample.key = index
-        newMessageSample.offset = index
-        newMessageSample.timestamp = (new Date()).getTime()
-        return newMessageSample
-      })
-
-      cb(null, messageBatchSample)
-      this.emit('batch', messageBatchSample)
-    }
-    const copyOfMessageSample = {...messageSample}
-    cb(null, messageSample)
-    this.emit('data', copyOfMessageSample)
-  }
-
-  commit (topicPartition) {
-    return topicPartition
-  }
-
-  commitMessage (msg) {
-    return msg
-  }
-
-  commitSync (topicPartition) {
-    return topicPartition
-  }
-
-  commitMessageSync (msg) {
-    return msg
-  }
-
-  getWatermarkOffsets (topic, partition) {
-    var watermarkOffsetSample = {
-      high: 10,
-      low: 0
-    }
-    return watermarkOffsetSample
-  }
-
-  resume (topicPartitions) {
-  }
-
-  pause (topicPartitions) {
-  }
-}
-
-// it('', (assert) => {
-//
-// })
+const KafkaStubs = require('./KafkaStub')
 
 Test('Consumer test', (consumerTests) => {
   let sandbox
-  let clock
+  // let clock
   let config = {}
   let topicsList = []
 
   // lets setup the tests
   consumerTests.beforeEach((test) => {
     sandbox = Sinon.sandbox.create()
-    clock = Sinon.useFakeTimers({
-      now: Date.now(),
-      shouldAdvanceTime: false
-    })
+    // clock = Sinon.useFakeTimers({
+    //   now: Date.now(),
+    //   shouldAdvanceTime: true
+    // })
 
     config = {
       options: {
@@ -227,7 +84,7 @@ Test('Consumer test', (consumerTests) => {
 
     sandbox.stub(Kafka, 'KafkaConsumer').callsFake(
       () => {
-        return new KafkaConsumer()
+        return new KafkaStubs.KafkaConsumer()
       }
     )
 
@@ -252,9 +109,82 @@ Test('Consumer test', (consumerTests) => {
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
       assert.end()
-      // assert.same(result, true)
     })
-    // assert.same(result, true)
+  })
+
+  consumerTests.test('Test Consumer::disconnect', (assert) => {
+    var discoCallback = (err, metrics) => {
+      assert.equal(typeof metrics.connectionOpened, 'number')
+      assert.end()
+    }
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      c.disconnect(discoCallback)
+    })
+  })
+
+  consumerTests.test('Test Consumer::getWatermarkOffsets', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      var waterMarkOffset = c.getWatermarkOffsets(topicsList, 0)
+      assert.ok(waterMarkOffset, 'waterMarkOffset result exists')
+      assert.ok(Sinon.match(waterMarkOffset, KafkaStubs.watermarkOffsetSampleStub), 'waterMarkOffset results match')
+      assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::getMetadata', (assert) => {
+    var metaDatacCb = (error, metadata) => {
+      assert.ok(metadata, 'metadata object exists')
+      assert.ok(Sinon.match(metadata, KafkaStubs.metadataSampleStub), 'metadata objects match')
+      assert.end()
+    }
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.getMetadata(null, metaDatacCb)
+    })
+  })
+
+  consumerTests.test('Test Consumer::commit', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.commit(topicsList)
+      assert.ok(true, 'commit passed')
+      assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::commitSync', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.commitSync(topicsList)
+      assert.ok(true, 'commit passed')
+      assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::commitMessage', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.commitMessage(KafkaStubs.messageSampleStub)
+      assert.ok(true, 'commit passed')
+      assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::commitMessageSync', (assert) => {
+    var c = new Consumer(topicsList, config)
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+      c.commitMessageSync(KafkaStubs.messageSampleStub)
+      assert.ok(true, 'commit passed')
+      assert.end()
+    })
   })
 
   consumerTests.test('Test Consumer::consume flow sync=false', (assert) => {
@@ -302,6 +232,7 @@ Test('Consumer test', (consumerTests) => {
             assert.end()
           } else {
             resolve(false)
+            assert.fail('message not processed')
             assert.end()
           }
          // resolve(true)
@@ -311,253 +242,340 @@ Test('Consumer test', (consumerTests) => {
     })
   })
 
-  // consumerTests.test('Test Consumer::consume flow sync=true', (assert) => {
-  //   config = {
-  //     options: {
-  //       mode: ConsumerEnums.CONSUMER_MODES.flow,
-  //       batchSize: 1,
-  //       recursiveTimeout: 100,
-  //       messageCharset: 'utf8',
-  //       messageAsJSON: true,
-  //       sync: true,
-  //       consumeTimeout: 1000
-  //     },
-  //     rdkafkaConf: {
-  //       'group.id': 'kafka-test',
-  //       'metadata.broker.list': 'localhost:9092',
-  //       'enable.auto.commit': false
-  //     },
-  //     topicConf: {},
-  //     logger: Logger
-  //   }
-  //
-  //   var c = new Consumer(topicsList, config)
-  //
-  //   c.connect().then(result => {
-  //     assert.ok(Sinon.match(result, true))
-  //
-  //     c.consume((error, message) => {
-  //       return new Promise((resolve, reject) => {
-  //         if (error) {
-  //           Logger.info(`WTDSDSD!!! error ${error}`)
-  //           reject(error)
-  //         }
-  //         if (message) { // check if there is a valid message comming back
-  //           Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
-  //           // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
-  //           if (Array.isArray(message) && message.length != null && message.length > 0) {
-  //             message.forEach(msg => {
-  //               c.commitMessage(msg)
-  //             })
-  //           } else {
-  //             c.commitMessage(message)
-  //           }
-  //           resolve(true)
-  //           assert.ok(message, 'message processed')
-  //           assert.end()
-  //         } else {
-  //           resolve(false)
-  //           assert.fail('message not processed')
-  //           assert.end()
-  //         }
-  //         // resolve(true)
-  //       })
-  //     })
-  //     // assert.end()
-  //   })
-  // })
+  consumerTests.test('Test Consumer::consume flow sync=true', (assert) => {
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.flow,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: true,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
 
-  // consumerTests.test('Test Consumer::consume poller sync=false', (assert) => {
-  //
-  //   assert.plan(1)
-  //
-  //   config = {
-  //     options: {
-  //       mode: ConsumerEnums.CONSUMER_MODES.poll,
-  //       batchSize: 1,
-  //       recursiveTimeout: 100,
-  //       messageCharset: 'utf8',
-  //       messageAsJSON: true,
-  //       sync: false,
-  //       consumeTimeout: 1000
-  //     },
-  //     rdkafkaConf: {
-  //       'group.id': 'kafka-test',
-  //       'metadata.broker.list': 'localhost:9092',
-  //       'enable.auto.commit': false
-  //     },
-  //     topicConf: {},
-  //     logger: Logger
-  //   }
-  //
-  //   var c = new Consumer(topicsList, config)
-  //
-  //   c.connect().then(result => {
-  //     assert.ok(Sinon.match(result, true))
-  //
-  //     c.consume((error, message) => {
-  //       return new Promise((resolve, reject) => {
-  //         if (error) {
-  //           Logger.info(`WTDSDSD!!! error ${error}`)
-  //           reject(error)
-  //         }
-  //         if (message) { // check if there is a valid message comming back
-  //           Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
-  //           // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
-  //           if (Array.isArray(message) && message.length != null && message.length > 0) {
-  //             message.forEach(msg => {
-  //               c.commitMessage(msg)
-  //             })
-  //           } else {
-  //             c.commitMessage(message)
-  //           }
-  //           resolve(true)
-  //           assert.ok(message, 'message processed')
-  //           // assert.end()
-  //           // process.exit(0)
-  //         } else {
-  //           resolve(false)
-  //           // assert.end()
-  //           assert.fail('message not processed')
-  //           // process.exit(0)
-  //         }
-  //         // resolve(true)
-  //       })
-  //     })
-  //     // assert.end()
-  //   })
-  // })
+    var c = new Consumer(topicsList, config)
 
-  // consumerTests.test('Test Consumer::consume recursive sync=false', (assert) => {
-  //
-  //   assert.plan(2 * 10 + 1)
-  //
-  //   config = {
-  //     options: {
-  //       mode: ConsumerEnums.CONSUMER_MODES.recursive,
-  //       batchSize: 1,
-  //       recursiveTimeout: 100,
-  //       messageCharset: 'utf8',
-  //       messageAsJSON: true,
-  //       sync: false,
-  //       consumeTimeout: 1000
-  //     },
-  //     rdkafkaConf: {
-  //       'group.id': 'kafka-test',
-  //       'metadata.broker.list': 'localhost:9092',
-  //       'enable.auto.commit': false
-  //     },
-  //     topicConf: {},
-  //     logger: Logger
-  //   }
-  //
-  //   var c = new Consumer(topicsList, config)
-  //
-  //   c.connect().then(result => {
-  //     assert.ok(Sinon.match(result, true))
-  //
-  //     c.consume((error, message) => {
-  //       return new Promise((resolve, reject) => {
-  //         if (error) {
-  //           Logger.info(`WTDSDSD!!! error ${error}`)
-  //           reject(error)
-  //         }
-  //         if (message) { // check if there is a valid message comming back
-  //           Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
-  //           // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
-  //           if (Array.isArray(message) && message.length != null && message.length > 0) {
-  //             message.forEach(msg => {
-  //               c.commitMessage(msg)
-  //             })
-  //           } else {
-  //             c.commitMessage(message)
-  //           }
-  //           resolve(true)
-  //           assert.ok(message, 'message processed')
-  //           // assert.end()
-  //           // process.exit(0)
-  //         } else {
-  //           resolve(false)
-  //           assert.fail('message not processed')
-  //           // assert.end()
-  //           // process.exit(0)
-  //         }
-  //         // resolve(true)
-  //       })
-  //     })
-  //     // assert.end()
-  //   })
-  // })
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
 
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          if (error) {
+            Logger.info(`WTDSDSD!!! error ${error}`)
+            reject(error)
+          }
+          if (message) { // check if there is a valid message comming back
+            Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+            // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+            if (Array.isArray(message) && message.length != null && message.length > 0) {
+              message.forEach(msg => {
+                c.commitMessage(msg)
+              })
+            } else {
+              c.commitMessage(message)
+            }
+            resolve(true)
+            assert.ok(message, 'message processed')
+            assert.end()
+          } else {
+            resolve(false)
+            assert.fail('message not processed')
+            assert.end()
+          }
+          // resolve(true)
+        })
+      })
+      // assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume poller sync=false', (assert) => {
+    // assert.plan(2)
+
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.poll,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    var pollCount = 0
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          pollCount = pollCount + 1
+          if (pollCount > 1) {
+            c.disconnect()
+            assert.ok(true, 'Message processed once by the poller consumer')
+            assert.end()
+          } else {
+            if (error) {
+              Logger.info(`WTDSDSD!!! error ${error}`)
+              reject(error)
+            }
+            if (message) { // check if there is a valid message comming back
+              Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+              // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+              if (Array.isArray(message) && message.length != null && message.length > 0) {
+                message.forEach(msg => {
+                  c.commitMessage(msg)
+                })
+              } else {
+                c.commitMessage(message)
+              }
+              resolve(true)
+              assert.ok(message, 'message processed')
+              // c.disconnect()
+              // assert.end()
+              // process.exit(0)
+            } else {
+              resolve(false)
+              // assert.end()
+              c.disconnect()
+              assert.fail('message not processed')
+              // process.exit(0)
+            }
+            // resolve(true)
+          }
+        })
+      })
+      // assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume poller sync=true', (assert) => {
+    // assert.plan(2)
+
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.poll,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: true,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    var pollCount = 0
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          pollCount = pollCount + 1
+          if (pollCount > 1) {
+            c.disconnect()
+            assert.ok(true, 'Message processed once by the poller consumer')
+            assert.end()
+          } else {
+            if (error) {
+              Logger.info(`WTDSDSD!!! error ${error}`)
+              reject(error)
+            }
+            if (message) { // check if there is a valid message comming back
+              Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+              // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+              if (Array.isArray(message) && message.length != null && message.length > 0) {
+                message.forEach(msg => {
+                  c.commitMessage(msg)
+                })
+              } else {
+                c.commitMessage(message)
+              }
+              resolve(true)
+              assert.ok(message, 'message processed')
+              // c.disconnect()
+              // assert.end()
+              // process.exit(0)
+            } else {
+              resolve(false)
+              // assert.end()
+              c.disconnect()
+              assert.fail('message not processed')
+              // process.exit(0)
+            }
+            // resolve(true)
+          }
+        })
+      })
+      // assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume recursive sync=false', (assert) => {
+    // assert.plan(2 * 10 + 1)
+
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.recursive,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: false,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    var recursiveCount = 0
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          recursiveCount = recursiveCount + 1
+          if (recursiveCount > 1) {
+            c.disconnect()
+            assert.ok(true, 'Message processed once by the recursive consumer')
+            assert.end()
+          } else {
+            if (error) {
+              Logger.info(`WTDSDSD!!! error ${error}`)
+              reject(error)
+            }
+            if (message) { // check if there is a valid message comming back
+              Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+              // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+              if (Array.isArray(message) && message.length != null && message.length > 0) {
+                message.forEach(msg => {
+                  c.commitMessage(msg)
+                })
+              } else {
+                c.commitMessage(message)
+              }
+              resolve(true)
+              assert.ok(message, 'message processed')
+              // assert.end()
+              // process.exit(0)
+            } else {
+              resolve(false)
+              assert.fail('message not processed')
+              // assert.end()
+              // process.exit(0)
+            }
+            // resolve(true)
+          }
+        })
+      })
+      // assert.end()
+    })
+  })
+
+  consumerTests.test('Test Consumer::consume recursive sync=true', (assert) => {
+    // assert.plan(2 * 10 + 1)
+
+    config = {
+      options: {
+        mode: ConsumerEnums.CONSUMER_MODES.recursive,
+        batchSize: 1,
+        recursiveTimeout: 100,
+        messageCharset: 'utf8',
+        messageAsJSON: true,
+        sync: true,
+        consumeTimeout: 1000
+      },
+      rdkafkaConf: {
+        'group.id': 'kafka-test',
+        'metadata.broker.list': 'localhost:9092',
+        'enable.auto.commit': false
+      },
+      topicConf: {},
+      logger: Logger
+    }
+
+    var c = new Consumer(topicsList, config)
+
+    var recursiveCount = 0
+
+    c.connect().then(result => {
+      assert.ok(Sinon.match(result, true))
+
+      c.consume((error, message) => {
+        return new Promise((resolve, reject) => {
+          recursiveCount = recursiveCount + 1
+          if (recursiveCount > 1) {
+            c.disconnect()
+            assert.ok(true, 'Message processed once by the recursive consumer')
+            assert.end()
+          } else {
+            if (error) {
+              Logger.info(`WTDSDSD!!! error ${error}`)
+              reject(error)
+            }
+            if (message) { // check if there is a valid message comming back
+              Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
+              // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
+              if (Array.isArray(message) && message.length != null && message.length > 0) {
+                message.forEach(msg => {
+                  c.commitMessage(msg)
+                })
+              } else {
+                c.commitMessage(message)
+              }
+              resolve(true)
+              assert.ok(message, 'message processed')
+              // assert.end()
+              // process.exit(0)
+            } else {
+              resolve(false)
+              assert.fail('message not processed')
+              // assert.end()
+              // process.exit(0)
+            }
+            // resolve(true)
+          }
+        })
+      })
+      // assert.end()
+    })
+  })
   consumerTests.end()
 })
-
-// TODO: TO BE REWORKED INTO UNIT/INTEGRATION TEST FRAMEWORK
-// var testConsumer = async () => {
-//   Logger.info('testConsumer::start')
-//
-//   var c = new Consumer(['test1'], {
-//     options: {
-//       mode: ConsumerEnums.CONSUMER_MODES.recursive,
-//       batchSize: 1,
-//       recursiveTimeout: 100,
-//       messageCharset: 'utf8',
-//       messageAsJSON: true,
-//       sync: true,
-//       consumeTimeout: 1000
-//     },
-//     rdkafkaConf: {
-//       'group.id': 'kafka-test',
-//       'metadata.broker.list': 'localhost:9092',
-//       'enable.auto.commit': false
-//     },
-//     topicConf: {},
-//     logger: Logger
-//   })
-//
-//   Logger.info('testConsumer::connect::start')
-//   var connectionResult = await c.connect()
-//   Logger.info('testConsumer::connect::end')
-//
-//   Logger.info(`Connected result=${connectionResult}`)
-//
-//   // Logger.info('testConsumer::subscribe::start')
-//   // c.subscribe()
-//   // Logger.info('testConsumer::subscribe::end')
-//
-//   Logger.info('testConsumer::consume::start')
-//
-//   c.consume((error, message) => {
-//     return new Promise((resolve, reject) => {
-//       if (error) {
-//         Logger.info(`WTDSDSD!!! error ${error}`)
-//         // resolve(false)
-//         reject(error)
-//       }
-//       if (message) { // check if there is a valid message comming back
-//         Logger.info(`Message Received by callback function - ${JSON.stringify(message)}`)
-//         // lets check if we have received a batch of messages or single. This is dependant on the Consumer Mode
-//         if (Array.isArray(message) && message.length != null && message.length > 0) {
-//           message.forEach(msg => {
-//             c.commitMessage(msg)
-//           })
-//         } else {
-//           c.commitMessage(message)
-//         }
-//         resolve(true)
-//       } else {
-//         resolve(false)
-//       }
-//       // resolve(true)
-//     })
-//   })
-//   Logger.info('testConsumer::consume::end')
-//
-//   c.on('ready', arg => Logger.info(`onReady: ${JSON.stringify(arg)}`))
-//   c.on('message', message => Logger.info(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`))
-//   c.on('batch', message => Logger.info(`onBatch: ${JSON.stringify(message)}`))
-//
-//   Logger.info('testConsumer::end')
-// }
-//
-// testConsumer()

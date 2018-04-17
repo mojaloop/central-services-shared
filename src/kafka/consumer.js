@@ -226,6 +226,7 @@ class Consumer extends EventEmitter {
     this._status = {}
     this._status.runningInConsumeOnceMode = false
     this._status.runningInConsumeMode = false
+    this._status.running = true
     logger.silly('Consumer::constructor() - end')
   }
 
@@ -311,6 +312,10 @@ class Consumer extends EventEmitter {
   disconnect (cb = () => {}) {
     let { logger } = this._config
     logger.silly('Consumer::disconnect() - start')
+    if (this._pollInterval) {
+      clearInterval(this._pollInterval)
+    }
+    this._status.running = false
     this._consumer.disconnect(cb)
     logger.silly('Consumer::disconnect() - end')
   }
@@ -359,10 +364,16 @@ class Consumer extends EventEmitter {
     if (this._config.options.sync) {
       this._syncQueue = async.queue((message, callbackDone) => {
         logger.debug(`Consumer::consume() - Sync Process - ${JSON.stringify(message)}`)
-        workDoneCb(message.error, message.messages).then((response) => {
+        let payload
+        if (this._config.options.mode === ENUMS.CONSUMER_MODES.flow) {
+          payload = message.message
+        } else {
+          payload = message.messages
+        }
+        workDoneCb(message.error, payload).then((response) => {
           callbackDone() // this marks the completion of the processing by the worker
           if (this._config.options.mode === CONSUMER_MODES.recursive) { // lets call the recursive event if we are running in recursive mode
-            super.emit('recursive', message.error, message.messages)
+            super.emit('recursive', message.error, payload)
           }
         })
       }, 1)
@@ -385,7 +396,9 @@ class Consumer extends EventEmitter {
       case CONSUMER_MODES.recursive:
         if (this._config.options.batchSize && typeof this._config.options.batchSize === 'number') {
           super.on('recursive', (error, messages) => {
-            this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
+            if (this._status.running) {
+              this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
+            }
           })
           this._consumeRecursive(this._config.options.recursiveTimeout, this._config.options.batchSize, workDoneCb)
         } else {
@@ -419,7 +432,7 @@ class Consumer extends EventEmitter {
    */
   _consumePoller (pollFrequency = 10, batchSize = 1, workDoneCb = (error, messages) => {}) {
     let { logger } = this._config
-    setInterval(() => {
+    this._pollInterval = setInterval(() => {
       this._consumer.consume(batchSize, (error, messages) => {
         if (error || !messages.length) {
           if (error) {
@@ -477,9 +490,13 @@ class Consumer extends EventEmitter {
     let { logger } = this._config
     this._consumer.consume(batchSize, (error, messages) => {
       if (error || !messages.length) {
-        return setTimeout(() => {
-          return this._consumeRecursive(recursiveTimeout, batchSize, workDoneCb)
-        }, recursiveTimeout)
+        if (this._status.running) {
+          return setTimeout(() => {
+            return this._consumeRecursive(recursiveTimeout, batchSize, workDoneCb)
+          }, recursiveTimeout)
+        } else {
+          return false
+        }
       } else {
         // lets transform the messages into the desired format
         messages.map(msg => {
