@@ -9,6 +9,7 @@
     "test:unit": "tapes 'test/**/*.test.js'",
     "test:xunit": "npm run test:unit | tap-xunit",
     "test:coverage": "istanbul cover tapes -- 'test/**/*.test.js'",
+    "test:coveragekafka": "istanbul cover tapes -- 'test/kafka/**/*.test.js'",
     "test:coverage-check": "npm run test:coverage && istanbul check-coverage"
   },
   "repository": {
@@ -36,7 +37,7 @@
   },
   "devDependencies": {
     "faucet": "0.0.1",
-    "istanbul": "0.4.5",
+    "istanbul": "^1.1.0-alpha.1",
     "sinon": "^4.5.0",
     "standard": "^10.0.3",
     "tap-xunit": "2.2.0",

@@ -266,7 +266,7 @@ class Producer extends EventEmitter {
     })
   }
 
-  _createBuffer(str, encoding = 'utf8') {
+  _createBuffer (str, encoding = 'utf8') {
     var bufferResponse = Buffer.isBuffer(str) ? str : Buffer.from(JSON.stringify(str), encoding)
     return bufferResponse
   }

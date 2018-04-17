@@ -1,5 +1,6 @@
 'use strict'
 const EventEmitter = require('events')
+const Logger = require('../../src/logger').Logger
 
 const metadataSampleStub = {
   orig_broker_id: 1,
@@ -44,17 +45,28 @@ const messageSampleStub = {
 // KafkaClient Stub
 class KafkaClient extends EventEmitter {
   connect (err, info) {
+    if (err) {
+      Logger.error(err)
+    }
     this.emit('ready', 'true')
     this.metrics = {}
     this.metrics.connectionOpened = Date.now()
     this.name = 'KafkaStub'
   }
 
-  disconnect (cb = (err, metrics) => {}) {
+  disconnect (cb = (err, metrics) => {
+    if (err) {
+      Logger.error(err)
+    }
+  }) {
     cb(null, this.metrics)
   }
 
-  getMetadata (metadataOptions, cb = (err, metadata) => {}) {
+  getMetadata (metadataOptions, cb = (err, metadata) => {
+    if (err) {
+      Logger.error(err)
+    }
+  }) {
     var metadataSample = {...metadataSampleStub}
 
     if (cb) {
@@ -124,6 +136,8 @@ class KafkaConsumer extends KafkaClient {
       this.emit('batch', messageBatchSample)
     }
     const copyOfMessageSample = {...messageSample}
+    // var copyOfMessageSample = {}
+    // Object.assign(copyOfMessageSample, messageSample)
     cb(null, messageSample)
     this.emit('data', copyOfMessageSample)
   }

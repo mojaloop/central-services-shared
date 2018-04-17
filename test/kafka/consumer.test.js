@@ -100,20 +100,28 @@ Test('Consumer test', (consumerTests) => {
   consumerTests.test('Test Consumer::constructor', (assert) => {
     const ConsumerSpy = Sinon.spy(Consumer.prototype, 'constructor')
     var c = new ConsumerSpy(topicsList, config)
-    assert.ok(ConsumerSpy.calledOnce)
+    assert.ok(c, 'Consumer instance created')
+    assert.ok(ConsumerSpy.calledOnce, 'Consumer constructor called once')
     assert.end()
   })
 
   consumerTests.test('Test Consumer::connect', (assert) => {
+    assert.plan(2)
     var c = new Consumer(topicsList, config)
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
-      assert.end()
     })
   })
 
   consumerTests.test('Test Consumer::disconnect', (assert) => {
     var discoCallback = (err, metrics) => {
+      if (err) {
+        Logger.error(err)
+      }
       assert.equal(typeof metrics.connectionOpened, 'number')
       assert.end()
     }
@@ -136,6 +144,9 @@ Test('Consumer test', (consumerTests) => {
 
   consumerTests.test('Test Consumer::getMetadata', (assert) => {
     var metaDatacCb = (error, metadata) => {
+      if (error) {
+        Logger.error(error)
+      }
       assert.ok(metadata, 'metadata object exists')
       assert.ok(Sinon.match(metadata, KafkaStubs.metadataSampleStub), 'metadata objects match')
       assert.end()
@@ -188,6 +199,7 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume flow sync=false', (assert) => {
+    assert.plan(4)
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.flow,
@@ -209,6 +221,17 @@ Test('Consumer test', (consumerTests) => {
 
     var c = new Consumer(topicsList, config)
 
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
+
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
 
@@ -229,11 +252,12 @@ Test('Consumer test', (consumerTests) => {
               c.commitMessage(message)
             }
             resolve(true)
-            assert.end()
+            // assert.end()
+            assert.ok(message, 'message processed')
           } else {
             resolve(false)
             assert.fail('message not processed')
-            assert.end()
+            // assert.end()
           }
          // resolve(true)
         })
@@ -243,6 +267,7 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume flow sync=true', (assert) => {
+    assert.plan(4)
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.flow,
@@ -263,6 +288,17 @@ Test('Consumer test', (consumerTests) => {
     }
 
     var c = new Consumer(topicsList, config)
+
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
 
     c.connect().then(result => {
       assert.ok(Sinon.match(result, true))
@@ -285,11 +321,11 @@ Test('Consumer test', (consumerTests) => {
             }
             resolve(true)
             assert.ok(message, 'message processed')
-            assert.end()
+            // assert.end()
           } else {
             resolve(false)
             assert.fail('message not processed')
-            assert.end()
+            // assert.end()
           }
           // resolve(true)
         })
@@ -299,8 +335,6 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume poller sync=false', (assert) => {
-    // assert.plan(2)
-
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.poll,
@@ -321,6 +355,23 @@ Test('Consumer test', (consumerTests) => {
     }
 
     var c = new Consumer(topicsList, config)
+
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
+
+    c.on('batch', messages => {
+      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      assert.ok(messages, 'on Batch event received')
+      assert.ok(Array.isArray(messages), 'batch of messages received')
+    })
 
     var pollCount = 0
 
@@ -351,7 +402,8 @@ Test('Consumer test', (consumerTests) => {
               }
               resolve(true)
               assert.ok(message, 'message processed')
-              // c.disconnect()
+              assert.ok(Array.isArray(message), 'batch of messages received')
+              // c.disconnectåct()
               // assert.end()
               // process.exit(0)
             } else {
@@ -370,8 +422,6 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume poller sync=true', (assert) => {
-    // assert.plan(2)
-
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.poll,
@@ -393,6 +443,23 @@ Test('Consumer test', (consumerTests) => {
 
     var c = new Consumer(topicsList, config)
 
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
+
+    c.on('batch', messages => {
+      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      assert.ok(messages, 'on Batch event received')
+      assert.ok(Array.isArray(messages), 'batch of messages received')
+    })
+
     var pollCount = 0
 
     c.connect().then(result => {
@@ -422,6 +489,7 @@ Test('Consumer test', (consumerTests) => {
               }
               resolve(true)
               assert.ok(message, 'message processed')
+              assert.ok(Array.isArray(message), 'batch of messages received')
               // c.disconnect()
               // assert.end()
               // process.exit(0)
@@ -441,8 +509,6 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume recursive sync=false', (assert) => {
-    // assert.plan(2 * 10 + 1)
-
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.recursive,
@@ -463,6 +529,23 @@ Test('Consumer test', (consumerTests) => {
     }
 
     var c = new Consumer(topicsList, config)
+
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
+
+    c.on('batch', messages => {
+      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      assert.ok(messages, 'on Batch event received')
+      assert.ok(Array.isArray(messages), 'batch of messages received')
+    })
 
     var recursiveCount = 0
 
@@ -493,12 +576,13 @@ Test('Consumer test', (consumerTests) => {
               }
               resolve(true)
               assert.ok(message, 'message processed')
+              assert.ok(Array.isArray(message), 'batch of messages received')
               // assert.end()
               // process.exit(0)
             } else {
               resolve(false)
               assert.fail('message not processed')
-              // assert.end()
+              assert.end()
               // process.exit(0)
             }
             // resolve(true)
@@ -507,6 +591,7 @@ Test('Consumer test', (consumerTests) => {
       })
       // assert.end()
     })
+    // c.disconnect()
   })
 
   consumerTests.test('Test Consumer::consume recursive sync=true', (assert) => {
@@ -533,6 +618,23 @@ Test('Consumer test', (consumerTests) => {
 
     var c = new Consumer(topicsList, config)
 
+    // consume 'ready' event
+    c.on('ready', arg => {
+      console.log(`onReady: ${JSON.stringify(arg)}`)
+      assert.ok(Sinon.match(arg, true), 'on Ready event received')
+    })
+    // consume 'message' event
+    c.on('message', message => {
+      console.log(`onMessage: ${message.offset}, ${JSON.stringify(message.value)}`)
+      assert.ok(message, 'on Message event received')
+    })
+
+    c.on('batch', messages => {
+      console.log(`onBatch: ${JSON.stringify(messages)}`)
+      assert.ok(messages, 'on Batch event received')
+      assert.ok(Array.isArray(messages), 'batch of messages received')
+    })
+
     var recursiveCount = 0
 
     c.connect().then(result => {
@@ -562,6 +664,7 @@ Test('Consumer test', (consumerTests) => {
               }
               resolve(true)
               assert.ok(message, 'message processed')
+              assert.ok(Array.isArray(message), 'batch of messages received')
               // assert.end()
               // process.exit(0)
             } else {
@@ -577,5 +680,6 @@ Test('Consumer test', (consumerTests) => {
       // assert.end()
     })
   })
+
   consumerTests.end()
 })
