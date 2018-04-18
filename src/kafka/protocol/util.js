@@ -30,13 +30,44 @@
  ******/
 
 /**
- * Kafka Protocol
- * @module Protocol
+ * Kafka Util
+ * @module Util
  */
 
 'use strict'
 
-exports.parseValue = require('./util').parseValue
-exports.parseMessage = require('./messages').parseMessage
-exports.parseCommand = require('./messages').parseCommand
-exports.parseNotify = require('./messages').parseNotify
+const Logger = require('../../logger')
+
+/**
+ * Parse Value
+ *
+ * Helper function to convert Kafka Buffer to either a String with a specified encoding, and/or returns the value as a JSON Object
+ *
+ * @param {buffer} value - Buffer object to be converted
+ * @param {string} encoding - Buffer object to be converted
+ * @param {boolean} asJSON - True to convert to JSON, False to leave the result as a String
+ * @return {object} - Returns either a String or JSON Object
+ */
+const parseValue = (value, encoding = 'utf8', asJSON = true) => {
+  Logger.silly('Protocol::parseMessage() - start')
+
+  // if (typeof value === 'object') {
+  //   return value
+  // }
+
+  var parsedValue = value.toString(encoding)
+
+  if (asJSON) {
+    try {
+      parsedValue = JSON.parse(parsedValue)
+    } catch (error) {
+      Logger.warn(`Protocol::parseMessage() - error - unable to parse message as JSON -  ${error}`)
+      Logger.silly('Protocol::parseMessage() - end')
+      // throw new Error('unable to parse message as JSON')
+    }
+  }
+  Logger.silly('Protocol::parseMessage() - end')
+  return parsedValue
+}
+
+exports.parseValue = parseValue

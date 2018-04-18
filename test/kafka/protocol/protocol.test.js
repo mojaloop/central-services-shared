@@ -3,37 +3,26 @@ const Protocol = require('../../../src/kafka').Protocol
 const Logger = require('../../../src/logger')
 const Sinon = require('sinon')
 
-let reason = {}
-let metadata = {}
-let parseM = {}
-let parseMNoMetaData = {}
-let parseC = {}
-let parseCNoMetaData = {}
-let parseN = {}
-let parseNNoMetaData = {}
-
-reason = {
+var reason = {
   code: 'code',
   description: 'description'
 }
 
-metadata = {
-  resource: 'metadata'
+var metadata = {
+  test: 'test'
 }
 
-parseM = {
+var parseM = {
   from: 'from',
   to: 'to',
   id: 'key',
   content: 'message',
   type: 'type',
-  metadata: {
-    test: 'test'
-  },
+  metadata: metadata,
   pp: ''
 }
 
-parseMNoMetaData = {
+var parseMNoMetaData = {
   from: 'from',
   to: 'to',
   id: 'key',
@@ -42,15 +31,13 @@ parseMNoMetaData = {
   pp: ''
 }
 
-parseC = {
+var parseC = {
   from: 'from',
   to: 'to',
   id: 'key',
   resource: 'message',
   type: 'type',
-  metadata: {
-    test: 'test'
-  },
+  metadata: metadata,
   pp: '',
   method: 'method',
   uri: '',
@@ -61,8 +48,7 @@ parseC = {
   }
 }
 
-
-parseCNoMetaData = {
+var parseCNoMetaData = {
   from: 'from',
   to: 'to',
   id: 'key',
@@ -78,14 +64,12 @@ parseCNoMetaData = {
   }
 }
 
-parseN = {
+var parseN = {
   from: 'from',
   to: 'to',
   id: 'key',
   type: 'type',
-  metadata: {
-    test: 'test'
-  },
+  metadata: metadata,
   pp: '',
   event: 'event',
   message: 'message',
@@ -95,7 +79,7 @@ parseN = {
   }
 }
 
-parseNNoMetaData = {
+var parseNNoMetaData = {
   from: 'from',
   to: 'to',
   id: 'key',

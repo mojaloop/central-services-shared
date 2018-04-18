@@ -29,6 +29,11 @@
  --------------
  ******/
 
+/**
+ * Kafka Producer
+ * @module Producer
+ */
+
 'use strict'
 
 const EventEmitter = require('events')
