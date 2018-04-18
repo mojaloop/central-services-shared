@@ -33,7 +33,7 @@
 
 const Logger = require('../../logger')
 
-const parseMessage = (from, to, key, message, metadata, type) => {
+const parseMessage = (from, to, key, message, metadata, type, pp = '') => {
   return {
     from: from,
     to: to,
@@ -41,11 +41,11 @@ const parseMessage = (from, to, key, message, metadata, type) => {
     content: message,
     type: type,
     metadata: metadata,
-    pp: ''
+    pp
   }
 }
 
-const parseNotify = (from, to, key, message, metadata, event, reason, type) => {
+const parseNotify = (from, to, key, message, metadata, event, reason, type, pp = '') => {
   metadata.resource = message
   return {
     from: from,
@@ -53,7 +53,7 @@ const parseNotify = (from, to, key, message, metadata, event, reason, type) => {
     id: key,
     type: type,
     metadata: metadata,
-    pp: '',
+    pp,
     event: event,
     reason: {
       code: reason.code,
@@ -99,7 +99,7 @@ const parseValue = (value, charset = 'utf8', asJSON = true) => {
       // throw new Error('unable to parse message as JSON')
     }
   }
-  Logger.silly('Protocol::parseMessage() - end')
+  Logger.silly('Protocol::parseMessage() - end2')
   return parsedValue
 }
 

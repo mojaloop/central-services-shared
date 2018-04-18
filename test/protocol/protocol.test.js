@@ -66,12 +66,18 @@ Test('Protocol::parseCommand', function (assert) {
 })
 
 Test('Protocol::parseMessage', function (assert) {
-  var test = Protocol.parseMessage(parseM.from, parseM.to, parseM.id, parseM.content, reason, 'method', metadata, 'status', parseM.type)
-   // Logger.debug(test)
+  var test = Protocol.parseMessage(parseM.from, parseM.to, parseM.id, parseM.content, parseM.type, metadata)
+    Logger.debug(test)
   assert.ok(Sinon.match(test, parseM))
   assert.end()
 })
 
+Test('Protocol::parseMessage', function (assert) {
+  var test = Protocol.parseMessage(parseM.from, parseM.to, parseM.id, parseM.content, parseM.type, metadata, parseM.pp)
+   Logger.debug(test)
+  assert.ok(Sinon.match(test, parseM))
+  assert.end()
+})
 Test('Protocol::parseNotify', function (assert) {
   var test = Protocol.parseNotify(parseN.from, parseN.to, parseN.id, 'message', metadata, parseN.event, reason, parseN.type)
    // Logger.debug(test)
