@@ -33,7 +33,7 @@
 
 const Logger = require('../../logger')
 
-const parseMessage = (from, to, key, message, metadata, type, pp = '') => {
+const parseMessage = (from, to, key, message, metadata, type) => {
   return {
     from: from,
     to: to,
@@ -41,11 +41,11 @@ const parseMessage = (from, to, key, message, metadata, type, pp = '') => {
     content: message,
     type: type,
     metadata: metadata,
-    pp
+    pp: ''
   }
 }
 
-const parseNotify = (from, to, key, message, metadata, event, reason, type, pp = '') => {
+const parseNotify = (from, to, key, message, metadata, event, reason, type) => {
   metadata.resource = message
   return {
     from: from,
@@ -53,7 +53,7 @@ const parseNotify = (from, to, key, message, metadata, event, reason, type, pp =
     id: key,
     type: type,
     metadata: metadata,
-    pp,
+    pp: '',
     event: event,
     reason: {
       code: reason.code,
