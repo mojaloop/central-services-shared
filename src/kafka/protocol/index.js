@@ -99,7 +99,7 @@ const parseValue = (value, charset = 'utf8', asJSON = true) => {
       // throw new Error('unable to parse message as JSON')
     }
   }
-  Logger.silly('Protocol::parseMessage() - end2')
+  Logger.silly('Protocol::parseMessage() - end')
   return parsedValue
 }
 
