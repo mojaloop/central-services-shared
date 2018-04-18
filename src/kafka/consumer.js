@@ -383,7 +383,7 @@ class Consumer extends EventEmitter {
         } else {
           payload = message.messages
         }
-        workDoneCb(message.error, payload).then((response) => {
+        Promise.resolve(workDoneCb(message.error, payload)).then((response) => {
           callbackDone() // this marks the completion of the processing by the worker
           if (this._config.options.mode === CONSUMER_MODES.recursive) { // lets call the recursive event if we are running in recursive mode
             super.emit('recursive', message.error, payload)
