@@ -248,7 +248,7 @@ class Producer extends EventEmitter {
    * @async
    * produces a kafka message to a certain topic
    * @typedef {object} messageProtocol, contains message related data to be converted into a LIME protocol message
-   * @property {object} message - value object for the message
+   * @property {object} content - value object for the message
    * @property {string} id - unique identifier for message
    * @property {string} from - uri of the initiating fsp
    * @property {string} to - uri of the receiving fsp

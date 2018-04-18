@@ -33,69 +33,194 @@
 
 const Logger = require('../../logger')
 
+/**
+ * Notification Protocol Object
+ *
+ * @typedef {object} Protocol~Message
+ * @property {string} from - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} to - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} pp - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} id - UUID
+ * @property {object} metadata - Key-value object to store metadata object
+ * @property {string} type - Required. String with pattern "^[-\w]+/[-\w.]+(\+\w+)?$"
+ * @property {object} message - Required. Payload of message
+ *
+ */
+
+/**
+ * Reason Protocol Object
+ *
+ * @typedef {object} Protocol~Reason
+ * @property {number} code - Required. String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} description - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ *
+ */
+
+/**
+ * Notification Protocol Object
+ *
+ * @typedef {object} Protocol~Message
+ * @property {string} from - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} to - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} pp - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} id - Required. UUID
+ * @property {object} metadata - Key-value object to store metadata object
+ * @property {string} event - Required. Enum: ["accepted","validated","authorized","dispatched","received","consumed","failed"]
+ * @property {Protocol~Reason} reason @see Protocol~Reason
+ * @property {object} content - Payload of message
+ *
+ */
+
+/**
+ * Status Protocol Object
+ *
+ * @typedef {object} Protocol~Status
+ * @property {number} code - Required. String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} description - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ *
+ */
+
+/**
+ * Command Protocol Object
+ *
+ * @typedef {object} Protocol~Command
+ * @property {string} from - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} to - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} pp - String with pattern "^(?:([^\"&'/:<>@@]{1,1023})@@)?([^/@@]{1,1023})(?:/(.{1,1023}))?$"
+ * @property {string} id - Required. UUID
+ * @property {object} metadata - Key-value object to store metadata object
+ * @property {string} method - Required. Enum: ["get","set","merge","delete","subscribe","unsubscribe","observe"]
+ * @property {Protocol~Uri} uri - UUID
+ * @property {string} type - String with pattern "^[-\w]+/((json)|([-\w.]+(\+json)))$"
+ * @property {object} resource - Payload of message
+ * @property {Protocol~Status} status - Required. Enum: ["success","failure"]
+ * @property {Protocol~Reason} reason @see Protocol~Reason
+ *
+ */
+
+/**
+ * Parse Protocol Messages
+ *
+ * Validates and enhances Protocol Message with MetaData
+ *
+ * Todo: Validations for Protocol
+ *
+ * @param {Protocol~Message} messageProtocol - Message to validate
+ * @return {Protocol~Message} - Returns validated Protocol result
+ */
 const parseMessage = (messageProtocol) => {
-  messageProtocol.metadata['protocol.createdAt'] = Date.now()
+  if (messageProtocol) {
+    if (!messageProtocol.metadata) {
+      messageProtocol.metadata = {}
+    }
+    messageProtocol.metadata['protocol.createdAt'] = Date.now()
+  } else {
+    throw Error('Invalid input params')
+  }
+
   return {
     from: messageProtocol.from,
     to: messageProtocol.to,
     id: messageProtocol.id,
-    content: messageProtocol.message,
+    content: messageProtocol.content,
     type: messageProtocol.type,
     metadata: messageProtocol.metadata,
     pp: messageProtocol.pp
   }
 }
 
-// const parseNotify = (from, to, key, message, metadata, event, reason, type, pp = '') => {
-//   metadata.resource = message
-//   return {
-//     from: from,
-//     to: to,
-//     id: key,
-//     type: type,
-//     metadata: metadata,
-//     pp,
-//     event: event,
-//     reason: {
-//       code: reason.code,
-//       description: reason.description
-//     }
-//   }
-// }
-//
-// const parseCommand = (from, to, key, message, reason, method, metadata, status, type, pp = '') => {
-//   return {
-//     from: from,
-//     to: to,
-//     id: key,
-//     resource: message,
-//     type: type,
-//     metadata: metadata,
-//     pp,
-//     method: method,
-//     uri: '',
-//     status: status,
-//     reason: {
-//       code: reason.code,
-//       description: reason.description
-//     }
-//   }
-// }
+/**
+ * Parse Protocol Notifications
+ *
+ * Validates and enhances Protocol Notification with MetaData
+ *
+ * Todo: Validations for Protocol
+ *
+ * @param {Protocol~Notification} messageProtocol - Notification to validate
+ * @return {Protocol~Notification} - Returns validated Protocol result
+ */
+const parseNotify = (messageProtocol) => {
+  if (messageProtocol) {
+    if (!messageProtocol.metadata) {
+      messageProtocol.metadata = {}
+    }
+    messageProtocol.metadata['protocol.createdAt'] = Date.now()
+  } else {
+    throw Error('Invalid input params')
+  }
 
-const parseValue = (value, charset = 'utf8', asJSON = true) => {
+  return {
+    from: messageProtocol.from,
+    to: messageProtocol.to,
+    id: messageProtocol.id,
+    type: messageProtocol.type,
+    metadata: messageProtocol.metadata,
+    pp: messageProtocol.pp,
+    event: messageProtocol.event,
+    message: messageProtocol.message,
+    reason: messageProtocol.reason
+  }
+}
+
+/**
+ * Parse Protocol Commands
+ *
+ * Validates and enhances Protocol Command with MetaData
+ *
+ * Todo: Validations for Protocol
+ *
+ * @param {Protocol~Command} messageProtocol - Command to validate
+ * @return {Protocol~Command} - Returns validated Protocol result
+ */
+const parseCommand = (messageProtocol) => {
+  if (messageProtocol) {
+    if (!messageProtocol.metadata) {
+      messageProtocol.metadata = {}
+    }
+    messageProtocol.metadata['protocol.createdAt'] = Date.now()
+  } else {
+    throw Error('Invalid input params')
+  }
+
+  return {
+    from: messageProtocol.from,
+    to: messageProtocol.to,
+    id: messageProtocol.key,
+    resource: messageProtocol.resource,
+    type: messageProtocol.type,
+    metadata: messageProtocol.metadata,
+    pp: messageProtocol.pp,
+    method: messageProtocol.method,
+    uri: messageProtocol.uri,
+    status: messageProtocol.status,
+    reason: messageProtocol.reason
+  }
+}
+
+/**
+ * Parse Value
+ *
+ * Helper function to convert Kafka Buffer to either a String with a specified encoding, and/or returns the value as a JSON Object
+ *
+ * @param {buffer} value - Buffer object to be converted
+ * @param {string} encoding - Buffer object to be converted
+ * @param {boolean} asJSON - True to convert to JSON, False to leave the result as a String
+ * @return {object} - Returns either a String or JSON Object
+ */
+const parseValue = (value, encoding = 'utf8', asJSON = true) => {
   Logger.silly('Protocol::parseMessage() - start')
 
   // if (typeof value === 'object') {
   //   return value
   // }
 
-  var parsedValue = value.toString(charset)
+  var parsedValue = value.toString(encoding)
 
   if (asJSON) {
     try {
       parsedValue = JSON.parse(parsedValue)
     } catch (error) {
-      Logger.error(`Protocol::parseMessage() - error - unable to parse message as JSON -  ${error}`)
+      Logger.warn(`Protocol::parseMessage() - error - unable to parse message as JSON -  ${error}`)
       Logger.silly('Protocol::parseMessage() - end')
       // throw new Error('unable to parse message as JSON')
     }
@@ -106,3 +231,5 @@ const parseValue = (value, charset = 'utf8', asJSON = true) => {
 
 exports.parseValue = parseValue
 exports.parseMessage = parseMessage
+exports.parseCommand = parseCommand
+exports.parseNotify = parseNotify
