@@ -263,6 +263,9 @@ class Producer extends EventEmitter {
    * @property {string} key - optional message key
    * @property {number} partition - optional partition to produce to
    *
+   * TODO: Validate messageProtocol
+   * TODO: Validate topicConf
+   *
    * @returns {boolean} or if failed {Error}
    */
   async sendMessage (messageProtocol, topicConf) {
