@@ -108,7 +108,7 @@
  *
  * Validates and enhances Protocol Message with MetaData
  *
- * TODO: Validations for Protocol
+ * @todo Validations for Protocol
  *
  * @param {Protocol~Message} messageProtocol - Message to validate
  * @return {Protocol~Message} - Returns validated Protocol result
@@ -139,7 +139,7 @@ const parseMessage = (messageProtocol) => {
  *
  * Validates and enhances Protocol Notification with MetaData
  *
- * TODO: Validations for Protocol
+ * @todo Validations for Protocol
  *
  * @param {Protocol~Notification} messageProtocol - Notification to validate
  * @return {Protocol~Notification} - Returns validated Protocol result
@@ -172,7 +172,7 @@ const parseNotify = (messageProtocol) => {
  *
  * Validates and enhances Protocol Command with MetaData
  *
- * TODO: Validations for Protocol
+ * @todo Validations for Protocol
  *
  * @param {Protocol~Command} messageProtocol - Command to validate
  * @return {Protocol~Command} - Returns validated Protocol result
