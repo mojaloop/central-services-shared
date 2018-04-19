@@ -27,3 +27,7 @@ Logger.info('test message %s', 'my string');
 You can also call the Logger.log method which directly calls the Winston log method and gives even more flexibility.
 
 By default, the Logger class is setup to log to the console only, with timestamps and colorized output.
+
+### Kafka
+
+Refer to documentation in [src/kafka/readme.md](./src/kafka/readme.md)
