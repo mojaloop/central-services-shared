@@ -8,13 +8,16 @@ defaults_docker_node: &defaults_docker_node
   docker:
     - image: mhart/alpine-node:8.9.4
 
-defaults_Dependencies: &defaults_Dependencies | 
+defaults_Dependencies: &defaults_Dependencies |
     apk --no-cache add git
     apk --no-cache add ca-certificates
     apk --no-cache add curl
     apk --no-cache add openssh-client
+    apk --no-cache add bash
+    apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake
+    npm install -g node-gyp
 
-defaults_awsCliDependencies: &defaults_awsCliDependencies | 
+defaults_awsCliDependencies: &defaults_awsCliDependencies |
     apk --no-cache add \
             python \
             py-pip \
@@ -58,7 +61,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
-  
+
   test-unit:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
@@ -70,6 +73,9 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
+          name: Install tape, tapes and tap-xunit
+          command: npm install tape tapes tap-xunit
+      - run:
           name: Create dir for test results
           command: mkdir -p ./test/results
       - run:
@@ -80,7 +86,7 @@ jobs:
           prefix: test
       - store_test_results:
           path: ./test/results
-  
+
   test-coverage:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
@@ -107,12 +113,12 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ];
             then
-                echo "Sending lcov.info to SonarQube..."  
+                echo "Sending lcov.info to SonarQube..."
                 aws s3 cp coverage/lcov.info $AWS_S3_DIR_SONARQUBE/central-services-shared/lcov.info
             else
-                echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube." 
-            fi 
-  
+                echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube."
+            fi
+
   build-snapshot:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
@@ -129,7 +135,7 @@ jobs:
           <<: *defaults_npm_auth
       - run:
           <<: *defaults_npm_publish_release
-  
+
   build:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
@@ -144,7 +150,7 @@ jobs:
             echo 'export RELEASE_TAG=$RELEASE_TAG_PROD' >> $BASH_ENV
       - run:
           <<: *defaults_npm_auth
-      - run:      
+      - run:
           <<: *defaults_npm_publish_release
 
 workflows:
@@ -157,7 +163,7 @@ workflows:
             tags:
               only: /.*/
             branches:
-              ignore: 
+              ignore:
                 - /feature*/
                 - /bugfix*/
       - test-unit:
@@ -168,7 +174,7 @@ workflows:
             tags:
               only: /.*/
             branches:
-              ignore: 
+              ignore:
                 - /feature*/
                 - /bugfix*/
       - test-coverage:
@@ -179,7 +185,7 @@ workflows:
             tags:
               only: /.*/
             branches:
-              ignore: 
+              ignore:
                 - /feature*/
                 - /bugfix*/
       - build-snapshot:
@@ -192,7 +198,7 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*\-snapshot+((\.[0-9]+)?)/
             branches:
-              ignore: 
+              ignore:
                 - /.*/
       - build:
           context: org-global
@@ -204,5 +210,5 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: 
+              ignore:
                 - /.*/
