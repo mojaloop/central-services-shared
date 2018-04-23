@@ -1,9 +1,9 @@
 
-**Message Protocol for Stream Processing**
+# Message Protocol for Stream Processing
 
 Based on LIME Protocol: http://limeprotocol.org/
 
-**Envelope** 
+## Envelope 
 
 The JSON documents exchanged in a LIME conversation are called envelopes. The JSON data must be compliant with the RFC 4627 specification, using the UTF-8 encoding.
 
@@ -15,11 +15,11 @@ pp - Acronym for per procurationem. Identifier of a delegate node (a node that r
 id - Identifier of the envelope, which can be any relevant value for the caller.
 metadata - Allows the transport of generic information, in the "name": "value" format. This property is optional for all envelopes. Any value set in this property should not change the behavior of the server.
 
-**Message**
+## Message
 
 A message provides the transport of a content between nodes in a network.
 
-JSON Schema:
+#### JSON Schema:
 
 ```JSON
 {
@@ -111,11 +111,11 @@ Binary text message with notification support:
 }
 ```
 
-**Notification**
+## Notification
 
 A notification transports information about events associated to a message sent in a session. Can be originated by a server or by the message destination node.
 
-JSON Schema:
+#### JSON Schema:
 
 ```JSON
 {
@@ -217,11 +217,11 @@ Failure notification sent by the server:
 }
 ```
 
-**Command**
+## Command
 
 Allows the manipulation of node resources, like server session parameters or information related to the network nodes.
 
-JSON Schema:
+#### JSON Schema:
 
 ```JSON
 {

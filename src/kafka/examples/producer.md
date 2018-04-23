@@ -8,20 +8,61 @@ const Producer = require('central-services-shared').Kafka.Producer
 const Logger = require('central-services-shared').Logger
 
 var testProducer = async () => {
-  Logger.info('testProducer::start')
+  console.log('testProducer::start')
 
-  var p = new Producer()
-  Logger.info('testProducer::connect::start')
+  const confg = {
+    options:
+    {
+      pollIntervalMs: 100,
+      messageCharset: 'utf8'
+    },
+    rdkafkaConf: {
+      'metadata.broker.list': 'localhost:9092',
+      'client.id': 'default-client',
+      'event_cb': true,
+      'compression.codec': 'none',
+      'retry.backoff.ms': 100,
+      'message.send.max.retries': 2,
+      'socket.keepalive.enable': true,
+      'queue.buffering.max.messages': 10,
+      'queue.buffering.max.ms': 50,
+      'batch.num.messages': 10000,
+      'api.version.request': true,
+      'dr_cb': true
+    },
+    topicConf: {
+      'request.required.acks': 1
+    }
+  }
+  
+  var p = new Producer(confg)
+  console.log('testProducer::connect::start')
   var connectionResult = await p.connect()
-  Logger.info('testProducer::connect::end')
+  console.log('testProducer::connect::end')
 
-  Logger.info(`Connected result=${connectionResult}`)
+  console.log(`Connected result=${connectionResult}`)
 
-  Logger.info('testProducer::sendMessage::start1')
-  await p.sendMessage('test', {test: 'test'}, '1234', 'testAccountSender', 'testAccountReciever', {date: new Date()}, 'application/json', ' ').then(results => {
-    Logger.info(`testProducer.sendMessage:: result:'${JSON.stringify(results)}'`)
+  var messageProtocol = {
+    content: {
+      test: 'test'
+    },
+    from: 'http://test.local/test1',
+    to: 'http://test.local/test2',
+    type: 'application/json',
+    metadata: {
+      thisismeta: 'data'
+    }
+  }
+
+  var topicConf = {
+    topicName: 'test'
+  }
+  
+  console.log('testProducer::sendMessage::start1')
+  await p.sendMessage(messageProtocol, topicConf).then(results => {
+    console.log(`testProducer.sendMessage:: result:'${JSON.stringify(results)}'`)
   })
-  Logger.info('testProducer::sendMessage::end1')
+  console.log('testProducer::sendMessage::end1')
 }
 
 testProducer()

@@ -1,17 +1,23 @@
 
-**Message Stream Library**
+# Message Stream Library
 
 Readme for the Message Stream Library for Mojaloop
 
-**Install**
+## Install
 1. npm install @mojaloop/central-services-shared
 
-**Producer** 
+## Producer 
 
-1. Refer to JSDocs for the [producer.js](./producer.js)
-2. Refer to the example in [examples/producer.md](./examples/producer.md)
+### Documentation
+Refer to JSDocs for the [producer.js](./producer.js)
 
-**Consumer**
+### Usage
+Refer to the example in [examples/producer.md](./examples/producer.md)
 
-1. Refer to JSDocs for the [consumer.js](./consumer.js)
-2. Refer to the example in [examples/consumer.md](./examples/consumer.md)
+## Consumer
+
+### Documentation
+Refer to JSDocs for the [consumer.js](./consumer.js)
+
+### Usage
+Refer to the example in [examples/consumer.md](./examples/consumer.md)

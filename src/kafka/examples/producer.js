@@ -43,18 +43,59 @@ const Logger = require('../../logger')
 var testProducer = async () => {
   Logger.info('testProducer::start')
 
-  var p = new Producer()
+  const confg = {
+    options:
+    {
+      pollIntervalMs: 100,
+      messageCharset: 'utf8'
+    },
+    rdkafkaConf: {
+      'metadata.broker.list': 'localhost:9092',
+      'client.id': 'default-client',
+      'event_cb': true,
+      'compression.codec': 'none',
+      'retry.backoff.ms': 100,
+      'message.send.max.retries': 2,
+      'socket.keepalive.enable': true,
+      'queue.buffering.max.messages': 10,
+      'queue.buffering.max.ms': 50,
+      'batch.num.messages': 10000,
+      'api.version.request': true,
+      'dr_cb': true
+    },
+    topicConf: {
+      'request.required.acks': 1
+    }
+  }
+
+  var p = new Producer(confg)
   Logger.info('testProducer::connect::start')
   var connectionResult = await p.connect()
   Logger.info('testProducer::connect::end')
 
   Logger.info(`Connected result=${connectionResult}`)
 
-  Logger.info('testProducer::sendMessage::start1')
-  await p.sendMessage('test', {test: 'test'}, '1234', 'testAccountSender', 'testAccountReciever', {date: new Date()}, 'application/json', ' ').then(results => {
+  var messageProtocol = {
+    content: {
+      test: 'test'
+    },
+    from: 'http://test.local/test1',
+    to: 'http://test.local/test2',
+    type: 'application/json',
+    metadata: {
+      thisismeta: 'data'
+    }
+  }
+
+  var topicConf = {
+    topicName: 'test'
+  }
+
+  Logger.info('testProducer::sendMessage::start')
+  await p.sendMessage(messageProtocol, topicConf).then(results => {
     Logger.info(`testProducer.sendMessage:: result:'${JSON.stringify(results)}'`)
   })
-  Logger.info('testProducer::sendMessage::end1')
+  Logger.info('testProducer::sendMessage::end')
 }
 
 testProducer()
