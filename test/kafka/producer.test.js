@@ -133,12 +133,12 @@ Test('Producer test', (producerTests) => {
     // consume 'message' event
     producer.on('error', error => {
       Logger.error(error)
-      assert.ok(Sinon.match(error,'error test test'), 'on Error event received')
+      assert.ok(Sinon.match(error, 'error test test'), 'on Error event received')
     })
 
     producer.connect().then(result => {
     }).catch((error) => {
-      assert.ok(Sinon.match(error,'Unhandled "error" event. (error test test)'))
+      assert.ok(Sinon.match(error, 'Unhandled "error" event. (error test test)'))
     })
   })
 
