@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Messages - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-Consumer-Consumer.html">Consumer</a><ul class='methods'><li data-type='method'><a href="module-Consumer-Consumer.html#_consumeFlow">_consumeFlow</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#_consumePoller">_consumePoller</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#_consumeRecursive">_consumeRecursive</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commit">commit</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commitMessage">commitMessage</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commitMessageSync">commitMessageSync</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commitSync">commitSync</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#connect">connect</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#consume">consume</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#consumeOnce">consumeOnce</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#disconnect">disconnect</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#getMetadata">getMetadata</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#getWatermarkOffsets">getWatermarkOffsets</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#subscribe">subscribe</a></li></ul></li><li><a href="module-Producer-Producer.html">Producer</a></li></ul><h3>Modules</h3><ul><li><a href="module-Consumer.html">Consumer</a></li><li><a href="module-Messages.html">Messages</a><ul class='methods'><li data-type='method'><a href="module-Messages.html#~parseCommand">parseCommand</a></li><li data-type='method'><a href="module-Messages.html#~parseMessage">parseMessage</a></li><li data-type='method'><a href="module-Messages.html#~parseNotify">parseNotify</a></li></ul></li><li><a href="module-Producer.html">Producer</a><ul class='methods'><li data-type='method'><a href="module-Producer.html#~connect">connect</a></li><li data-type='method'><a href="module-Producer.html#~Disconnectproducer">Disconnect producer</a></li></ul></li><li><a href="module-Protocol.html">Protocol</a></li><li><a href="module-Util.html">Util</a><ul class='methods'><li data-type='method'><a href="module-Util.html#~parseValue">parseValue</a></li></ul></li></ul><h3>Events</h3><ul><li><a href="Consumer.html#event:batch">batch</a></li><li><a href="Consumer.html#event:message">message</a></li><li><a href="Consumer.html#event:ready">ready</a></li><li><a href="Consumer.html#event:recursive">recursive</a></li><li><a href="Producer.html#event:ready">ready</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Messages</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Kafka Messages</p></div>
+        
+
+        
+            
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="protocol_messages.js.html">protocol/messages.js</a>, <a href="protocol_messages.js.html#line32">line 32</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~parseCommand"><span class="type-signature">(inner) </span>parseCommand<span class="signature">(messageProtocol)</span><span class="type-signature"> &rarr; {<a href="Protocol.html#~Command">Protocol~Command</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="protocol_messages.js.html">protocol/messages.js</a>, <a href="protocol_messages.js.html#line180">line 180</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>Validations for Protocol</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Parse Protocol Commands</p>
+<p>Validates and enhances Protocol Command with MetaData</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>messageProtocol</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Protocol.html#~Command">Protocol~Command</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Command to validate</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns validated Protocol result</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Protocol.html#~Command">Protocol~Command</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~parseMessage"><span class="type-signature">(inner) </span>parseMessage<span class="signature">(messageProtocol)</span><span class="type-signature"> &rarr; {<a href="Protocol.html#~Message">Protocol~Message</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="protocol_messages.js.html">protocol/messages.js</a>, <a href="protocol_messages.js.html#line116">line 116</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>Validations for Protocol</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Parse Protocol Messages</p>
+<p>Validates and enhances Protocol Message with MetaData</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>messageProtocol</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Protocol.html#~Message">Protocol~Message</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Message to validate</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns validated Protocol result</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Protocol.html#~Message">Protocol~Message</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~parseNotify"><span class="type-signature">(inner) </span>parseNotify<span class="signature">(messageProtocol)</span><span class="type-signature"> &rarr; {Protocol~Notification}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="protocol_messages.js.html">protocol/messages.js</a>, <a href="protocol_messages.js.html#line147">line 147</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>Validations for Protocol</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Parse Protocol Notifications</p>
+<p>Validates and enhances Protocol Notification with MetaData</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>messageProtocol</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Protocol~Notification</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Notification to validate</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns validated Protocol result</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Protocol~Notification</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

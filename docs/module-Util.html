@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Util - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-Consumer-Consumer.html">Consumer</a><ul class='methods'><li data-type='method'><a href="module-Consumer-Consumer.html#_consumeFlow">_consumeFlow</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#_consumePoller">_consumePoller</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#_consumeRecursive">_consumeRecursive</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commit">commit</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commitMessage">commitMessage</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commitMessageSync">commitMessageSync</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#commitSync">commitSync</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#connect">connect</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#consume">consume</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#consumeOnce">consumeOnce</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#disconnect">disconnect</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#getMetadata">getMetadata</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#getWatermarkOffsets">getWatermarkOffsets</a></li><li data-type='method'><a href="module-Consumer-Consumer.html#subscribe">subscribe</a></li></ul></li><li><a href="module-Producer-Producer.html">Producer</a></li></ul><h3>Modules</h3><ul><li><a href="module-Consumer.html">Consumer</a></li><li><a href="module-Messages.html">Messages</a><ul class='methods'><li data-type='method'><a href="module-Messages.html#~parseCommand">parseCommand</a></li><li data-type='method'><a href="module-Messages.html#~parseMessage">parseMessage</a></li><li data-type='method'><a href="module-Messages.html#~parseNotify">parseNotify</a></li></ul></li><li><a href="module-Producer.html">Producer</a><ul class='methods'><li data-type='method'><a href="module-Producer.html#~connect">connect</a></li><li data-type='method'><a href="module-Producer.html#~Disconnectproducer">Disconnect producer</a></li></ul></li><li><a href="module-Protocol.html">Protocol</a></li><li><a href="module-Util.html">Util</a><ul class='methods'><li data-type='method'><a href="module-Util.html#~parseValue">parseValue</a></li></ul></li></ul><h3>Events</h3><ul><li><a href="Consumer.html#event:batch">batch</a></li><li><a href="Consumer.html#event:message">message</a></li><li><a href="Consumer.html#event:ready">ready</a></li><li><a href="Consumer.html#event:recursive">recursive</a></li><li><a href="Producer.html#event:ready">ready</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Util</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Kafka Util</p></div>
+        
+
+        
+            
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="protocol_util.js.html">protocol/util.js</a>, <a href="protocol_util.js.html#line32">line 32</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~parseValue"><span class="type-signature">(inner) </span>parseValue<span class="signature">(value, encoding, asJSON)</span><span class="type-signature"> &rarr; {object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="protocol_util.js.html">protocol/util.js</a>, <a href="protocol_util.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Parse Value</p>
+<p>Helper function to convert Kafka Buffer to either a String with a specified encoding, and/or returns the value as a JSON Object</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">buffer</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Buffer object to be converted</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>encoding</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>utf8</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Buffer object to be converted</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>asJSON</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>true</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>True to convert to JSON, False to leave the result as a String</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns either a String or JSON Object</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
