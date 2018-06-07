@@ -188,12 +188,12 @@ class Producer extends EventEmitter {
   }
 
   /**
-   * Connect Producer
+   * @function connect
    *
    * @fires Producer#ready
    *
    * @async
-   * Connects the producer to the Kafka broker.
+   * @description Connects the producer to the Kafka broker.
    * @returns {Promise} - Returns a promise: resolved if successful, or rejection if connection failed
    */
   async connect () {
@@ -250,8 +250,10 @@ class Producer extends EventEmitter {
   }
 
   /**
+   * @function sendMessage()
+   *
    * @async
-   * produces a kafka message to a certain topic
+   * @description Produces a kafka message to a certain topic
    * @typedef {object} messageProtocol, contains message related data to be converted into a LIME protocol message
    * @property {object} content - value object for the message
    * @property {string} id - unique identifier for message
@@ -409,9 +411,9 @@ class Producer extends EventEmitter {
   // }
 
   /**
-   * Disconnect producer
+   * @function Disconnect producer
    *
-   * Disconnects producer from the Kafka broker
+   * @description Disconnects producer from the Kafka broker
    */
   disconnect (cb = () => {}) {
     if (this._producer) {

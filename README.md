@@ -1,6 +1,9 @@
 # central-services-shared
 Shared code for central services
 
+##JSDocs
+[JSDocs for Central Services Shared](/docs/index.html)
+
 ## Usage
 ### Logger 
 To use the shared Logger class, you only need to require it in the file you want to perform logging in:
