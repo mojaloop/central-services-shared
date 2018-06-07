@@ -2,7 +2,7 @@
 Shared code for central services
 
 ##JSDocs
-[JSDocs for Central Services Shared](/docs/index.html)
+[JSDocs for Central Services Shared](/central-services-shared/docs/index.html)
 
 ## Usage
 ### Logger 
