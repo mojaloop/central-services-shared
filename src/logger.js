@@ -1,31 +1,27 @@
 'use strict'
 
-const Winston = require('winston')
+const winston = require('winston')
 
-function Logger () {
-  this._logger = new Winston.Logger().add(Winston.transports.Console, { timestamp: true, colorize: true })
-}
+const level = process.env.LOG_LEVEL || 'info'
 
-Logger.prototype.debug = function (...args) {
-  this.log('debug', ...args)
-}
+const transportConsole = new winston.transports.Console({ json: false, timestamp: true, prettyPrint: true, colorize: true, level: level })
 
-Logger.prototype.info = function (...args) {
-  this.log('info', ...args)
-}
+const Logger = new (winston.Logger)({
+  levels: {
+    info: 0,
+    warn: 1,
+    error: 2,
+    verbose: 3,
+    debug: 4,
+    silly: 5
+  },
+  transports: [
+    transportConsole
+  ],
+  exceptionHandlers: [
+    transportConsole
+  ],
+  exitOnError: false
+})
 
-Logger.prototype.warn = function (...args) {
-  this.log('warn', ...args)
-}
-
-Logger.prototype.error = function (...args) {
-  this.log('error', ...args)
-}
-
-Logger.prototype.log = function (...args) {
-  this._logger.log(...args)
-}
-
-Logger.prototype.Logger = Logger
-
-module.exports = new Logger()
+module.exports = Logger

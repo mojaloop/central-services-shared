@@ -35,5 +35,10 @@ Test('Index', indexTest => {
     test.end()
   })
 
+  indexTest.test('Exports Kafka', test => {
+    test.equal(Index.Kafka, require('../src/kafka'))
+    test.end()
+  })
+
   indexTest.end()
 })
