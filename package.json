@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "2.0.0-release",
+  "version": "3.1.0-snapshot",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "bluebird": "^3.5.1",
     "debug": "^3.1.0",
     "events": "^2.0.0",
-    "node-rdkafka": "^2.3.2",
+    "node-rdkafka": "^2.3.4",
     "winston": "^2.4.0"
   },
   "devDependencies": {
