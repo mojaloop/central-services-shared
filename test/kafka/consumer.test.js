@@ -114,7 +114,7 @@ Test('Consumer test', (consumerTests) => {
   // })
 
   consumerTests.test('Test Consumer::constructor - no params', (assert) => {
-    var c = new Consumer()
+    // var c = new Consumer()
     assert.ok(true)
     assert.end()
   })
@@ -146,12 +146,12 @@ Test('Consumer test', (consumerTests) => {
     // consume 'message' event
     c.on('error', error => {
       Logger.error(error)
-      assert.ok(Sinon.match(error,'error test test'), 'on Error event received')
+      assert.ok(Sinon.match(error, 'error test test'), 'on Error event received')
     })
 
     c.connect().then(result => {
     }).catch((error) => {
-      assert.ok(Sinon.match(error,'Unhandled "error" event. (error test test)'))
+      assert.ok(Sinon.match(error, 'Unhandled "error" event. (error test test)'))
     })
   })
 
@@ -1410,7 +1410,6 @@ Test('Consumer test', (consumerTests) => {
   })
 
   consumerTests.test('Test Consumer::consume poller sync=false, messageAsJson=true - consumer callback with error', (assert) => {
-
     config = {
       options: {
         mode: ConsumerEnums.CONSUMER_MODES.poll,

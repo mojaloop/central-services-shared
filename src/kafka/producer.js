@@ -215,6 +215,9 @@ class Producer extends EventEmitter {
       })
 
       this._producer.on('delivery-report', (error, report) => {
+        if (error) {
+          logger.error(error)
+        }
         logger.debug('DeliveryReport: ' + JSON.stringify(report))
       })
 
