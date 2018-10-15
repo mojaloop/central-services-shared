@@ -109,7 +109,7 @@ Test('Protocol::parseCommand - no metadata', function (assert) {
 
 Test('Protocol::parseCommand - no params', function (assert) {
   try {
-    var test = Protocol.parseCommand()
+    Protocol.parseCommand()
   } catch (error) {
     if (error) {
       Logger.error(error)
@@ -135,7 +135,7 @@ Test('Protocol::parseMessage - no metadata', function (assert) {
 
 Test('Protocol::parseMessage - no params', function (assert) {
   try {
-    var test = Protocol.parseMessage()
+    Protocol.parseMessage()
   } catch (error) {
     if (error) {
       Logger.error(error)
@@ -161,7 +161,7 @@ Test('Protocol::parseNotify - no metadata', function (assert) {
 
 Test('Protocol::parseNotify - no params', function (assert) {
   try {
-    var test = Protocol.parseNotify()
+    Protocol.parseNotify()
   } catch (error) {
     if (error) {
       Logger.error(error)
