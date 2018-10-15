@@ -100,18 +100,21 @@ Test('Consumer test', (consumerTests) => {
     var c = new ConsumerSpy(topicsList, config)
     assert.ok(c, 'Consumer instance created')
     assert.ok(ConsumerSpy.calledOnce, 'Consumer constructor called once')
+    ConsumerSpy.restore()
     assert.end()
   })
 
-  // consumerTests.test('Test Consumer::constructor - no config', (assert) => {
-  //   try {
-  //     var c = new Consumer(topicsList, null)
-  //   } catch (error) {
-  //     Logger.error(error)
-  //     assert.equals(error.message.toString(), 'missing a config object')
-  //     assert.end()
-  //   }
-  // })
+  consumerTests.test('Test Consumer::constructor - no config', (assert) => {
+    try {
+      var c = new Consumer(topicsList, {})
+      assert.ok(c, 'Consumer instance created')
+      assert.end()
+    } catch (error) {
+      Logger.error(error)
+      assert.equals(error.message.toString(), 'missing a config object')
+      assert.end()
+    }
+  })
 
   consumerTests.test('Test Consumer::constructor - no params', (assert) => {
     // var c = new Consumer()
