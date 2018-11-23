@@ -8,9 +8,9 @@ const transportConsole = new winston.transports.Console({ json: false, timestamp
 
 const Logger = new (winston.Logger)({
   levels: {
-    info: 0,
+    error: 0,
     warn: 1,
-    error: 2,
+    info: 2,
     verbose: 3,
     debug: 4,
     silly: 5
