@@ -11,9 +11,10 @@ const Logger = new (winston.Logger)({
     error: 0,
     warn: 1,
     info: 2,
-    verbose: 3,
-    debug: 4,
-    silly: 5
+    perf: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6
   },
   transports: [
     transportConsole
