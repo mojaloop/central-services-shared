@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "3.7.1-snapshot",
+  "version": "4.1.0-snapshot",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -9,7 +9,6 @@
     "test:unit": "tapes 'test/**/*.test.js'",
     "test:xunit": "npm run test:unit | tap-xunit",
     "test:coverage": "istanbul cover tapes -- 'test/**/*.test.js'",
-    "test:coveragekafka": "istanbul cover tapes -- 'test/kafka/**/*.test.js'",
     "test:coverage-check": "npm run test:coverage && istanbul check-coverage"
   },
   "repository": {
@@ -29,10 +28,7 @@
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
     "async": "2.6.0",
-    "bluebird": "3.5.1",
     "debug": "3.1.0",
-    "events": "3.0.0",
-    "node-rdkafka": "2.4.2",
     "winston": "2.4.0"
   },
   "devDependencies": {
