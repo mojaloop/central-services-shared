@@ -6,7 +6,7 @@ let Logger
 
 if (!Logger) {
   const level = process.env.LOG_LEVEL || 'info'
-  const filename = process.env.FILE_PATH_NAME || 'logs/combined.log'
+  const filename = process.env.LOG_FILE_PATH_NAME || 'logs/combined.log'
   const transportFile = new winston.transports.File({
     json: false,
     timestamp: true,
