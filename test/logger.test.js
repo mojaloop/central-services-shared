@@ -12,11 +12,11 @@ Test('logger', function (loggerTest) {
 
   loggerTest.beforeEach(t => {
     sandbox = Sinon.sandbox.create()
-    sandbox.stub(Winston, 'Logger')
+    sandbox.stub(Winston, 'createLogger')
     addMethod = Sinon.stub()
     logMethod = Sinon.stub()
     addMethod.returns({ log: logMethod })
-    Winston.Logger.returns({ add: addMethod })
+    Winston.createLogger.returns({ add: addMethod })
     t.end()
   })
 
@@ -29,7 +29,7 @@ Test('logger', function (loggerTest) {
     // var logger = new (Winston.Logger)()
     // assert.ok(Logger)
     // assert.ok(Winston.Logger.calledWithNew)
-    assert.ok(Winston.transports.Console, Sinon.match({ timestamp: true, colorize: true }))
+    assert.ok(Winston.transports.File, Sinon.match({timestamp: true, colorize: true, level: 'info'}))
     assert.end()
   })
 
