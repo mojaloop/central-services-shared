@@ -20,7 +20,7 @@ if (!Logger) {
     format: winston.format.combine(
       winston.format.colorize({all: true}),
       winston.format.timestamp({
-        format: 'YYYY-MM-dd\'T\'HH:mm:ss.SSSZ'
+        format: 'YYYY-MM-DD\'T\'HH:mm:ss.SSSZ'
       }),
       winston.format.prettyPrint(),
       winston.format.printf(info => `${info.timestamp} - ${info.level}: ${info.message}`)
