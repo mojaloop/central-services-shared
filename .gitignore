@@ -40,5 +40,6 @@ jspm_packages
 # IntelliJ #
 # --------------- #
 .idea/
+**/*.iml
 
 #package-lock.json
