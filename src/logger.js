@@ -6,7 +6,7 @@ const level = process.env.LOG_LEVEL || 'info'
 
 const transportConsole = new winston.transports.Console({ json: false, timestamp: true, prettyPrint: true, colorize: true, level: level })
 
-const Logger = new (winston.Logger)({
+const Logger = winston.createLogger({
   levels: {
     error: 0,
     warn: 1,
