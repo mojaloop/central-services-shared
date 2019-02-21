@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run test:unit | faucet",
     "pretest": "standard",
+    "standard": "standard",
     "test:unit": "tapes 'test/**/*.test.js'",
     "test:xunit": "npm run test:unit | tap-xunit",
     "test:coverage": "istanbul cover tapes -- 'test/**/*.test.js'",
@@ -40,6 +41,9 @@
     "tap-xunit": "2.3.0",
     "tape": "4.10.1",
     "tapes": "4.1.0"
+  },
+  "standard": {
+    "ignore": []
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
