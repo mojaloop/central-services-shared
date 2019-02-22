@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run test:unit | faucet",
     "pretest": "standard",
+    "standard": "standard",
     "test:unit": "tapes 'test/**/*.test.js'",
     "test:xunit": "npm run test:unit | tap-xunit",
     "test:coverage": "istanbul cover tapes -- 'test/**/*.test.js'",
@@ -27,19 +28,22 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
-    "async": "2.6.0",
-    "debug": "3.1.0",
-    "winston": "2.4.0"
+    "async": "2.6.2",
+    "debug": "4.1.1",
+    "winston": "3.2.1"
   },
   "devDependencies": {
     "faucet": "0.0.1",
     "istanbul": "1.1.0-alpha.1",
     "pre-commit": "1.2.2",
-    "sinon": "4.5.0",
-    "standard": "10.0.3",
-    "tap-xunit": "2.2.0",
-    "tape": "4.9.0",
+    "sinon": "7.2.4",
+    "standard": "12.0.1",
+    "tap-xunit": "2.3.0",
+    "tape": "4.10.1",
     "tapes": "4.1.0"
+  },
+  "standard": {
+    "ignore": []
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

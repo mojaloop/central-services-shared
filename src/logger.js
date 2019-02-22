@@ -1,12 +1,15 @@
 'use strict'
 
-const winston = require('winston')
-
+const { createLogger, format, transports } = require('winston')
+const { combine, timestamp, colorize, printf } = format
 const level = process.env.LOG_LEVEL || 'info'
 
-const transportConsole = new winston.transports.Console({ json: false, timestamp: true, prettyPrint: true, colorize: true, level: level })
+const customFormat = printf(({ level, message, timestamp }) => {
+  return `${timestamp} - ${level}: ${message}`
+})
 
-const Logger = new (winston.Logger)({
+const Logger = createLogger({
+  level,
   levels: {
     error: 0,
     warn: 1,
@@ -16,11 +19,16 @@ const Logger = new (winston.Logger)({
     debug: 5,
     silly: 6
   },
+  format: combine(
+    timestamp(),
+    colorize(),
+    customFormat
+  ),
   transports: [
-    transportConsole
+    new transports.Console()
   ],
   exceptionHandlers: [
-    transportConsole
+    new transports.Console()
   ],
   exitOnError: false
 })
