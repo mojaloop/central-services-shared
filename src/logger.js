@@ -18,7 +18,7 @@ if (!Logger) {
 
   Logger = winston.createLogger({
     format: winston.format.combine(
-      winston.format.colorize({all: true}),
+      winston.format.colorize({ all: true }),
       winston.format.timestamp({
         format: 'YYYY-MM-dd\'T\'HH:mm:ss.SSSZ'
       }),
