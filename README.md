@@ -87,11 +87,6 @@ For test coverage run:
 npm run test:coverage
 ```
 
-For Kafka test coverage run:
-```
-npm run test:coveragekafka
-```
-
 For test coverage checks run:
 ```
 npm run test:coverage-check
