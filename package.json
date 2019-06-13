@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "5.3.0",
+  "version": "6.4.0",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -33,6 +33,7 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
+    "@hapi/joi": "15.0.3",
     "faucet": "0.0.1",
     "istanbul": "1.1.0-alpha.1",
     "pre-commit": "1.2.2",
