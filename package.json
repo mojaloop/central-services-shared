@@ -28,8 +28,11 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
+    "@hapi/hapi": "18.3.1",
     "async": "2.6.2",
+    "boom": "7.3.0",
     "debug": "4.1.1",
+    "joi": "14.3.1",
     "winston": "3.2.1"
   },
   "devDependencies": {
