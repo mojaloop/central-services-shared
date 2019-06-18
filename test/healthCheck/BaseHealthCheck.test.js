@@ -1,7 +1,7 @@
 'use strict'
 
 const Test = require('tape')
-const Joi = require('joi')
+const Joi = require('@hapi/joi')
 
 const BaseHealthCheck = require('../../src/healthCheck').BaseHealthCheck
 const {

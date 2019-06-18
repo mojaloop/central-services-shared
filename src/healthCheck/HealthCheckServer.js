@@ -24,8 +24,8 @@
  ******/
 
 const Hapi = require('@hapi/hapi')
+const Boom = require('@hapi/boom')
 const ErrorHandling = require('@mojaloop/central-services-error-handling')
-const Boom = require('boom')
 const Logger = require('../logger')
 
 const {
