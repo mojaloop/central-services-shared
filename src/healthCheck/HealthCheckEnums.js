@@ -4,6 +4,7 @@ const statusEnum = {
 }
 
 const serviceName = {
+  participantEndpointService: 'participantEndpointService',
   datastore: 'datastore',
   broker: 'broker',
   sidecar: 'sidecar',
