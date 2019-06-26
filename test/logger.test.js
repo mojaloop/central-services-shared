@@ -32,7 +32,7 @@ Test('logger', function (loggerTest) {
 
   loggerTest.test('log debug level', function (assert) {
     Logger.debug('test %s', 'me')
-    assert.ok(Sinon.match('debug', 'test %s', 'me'))
+    assert.ok(Sinon.match('debug', 'test me'))
     assert.end()
   })
 
@@ -54,8 +54,7 @@ Test('logger', function (loggerTest) {
     let errorMessage = 'there was an exception'
     let ex = new Error()
     Logger.error(errorMessage, ex)
-    assert.ok(Sinon.match('error', errorMessage, ex))
-
+    assert.ok(Sinon.match('error', errorMessage))
     assert.end()
   })
 
