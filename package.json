@@ -33,7 +33,7 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "@hapi/joi": "15.0.3",
+    "@hapi/joi": "15.1.0",
     "faucet": "0.0.1",
     "istanbul": "1.1.0-alpha.1",
     "pre-commit": "1.2.2",
