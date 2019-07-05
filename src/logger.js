@@ -1,7 +1,7 @@
 'use strict'
 
 const { createLogger, format, transports } = require('winston')
-const { combine, timestamp, colorize, printf } = format
+const { combine, timestamp, colorize, printf, splat } = format
 const level = process.env.LOG_LEVEL || 'info'
 
 const customFormat = printf(({ level, message, timestamp }) => {
@@ -22,6 +22,7 @@ const Logger = createLogger({
   format: combine(
     timestamp(),
     colorize(),
+    splat(),
     customFormat
   ),
   transports: [
