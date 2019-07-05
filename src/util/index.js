@@ -65,7 +65,7 @@ const filterUndefined = (fields) => {
  * @returns {any}
  */
 const clone = (value) => {
-  return JSON.parse(JSON.stringify(value))
+  return _.cloneDeep(value)
 }
 
 /**
