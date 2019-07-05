@@ -28,7 +28,7 @@
 const ENUM = require('../enums').HTTP
 
 /**
- * @module src/domain/bulkTransfer/transformer
+ * @module src/headers/transformer
  */
 
 /**
