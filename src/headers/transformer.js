@@ -25,7 +25,7 @@
 
 'use strict'
 
-const ENUM = require('../enums').HTTP
+const ENUM = require('../enums').Http
 
 /**
  * @module src/headers/transformer

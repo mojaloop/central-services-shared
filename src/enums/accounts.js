@@ -23,8 +23,42 @@
  --------------
  ******/
 
-const transformer = require('./transformer')
+const LedgerAccountType = {
+  POSITION: 1,
+  SETTLEMENT: 2,
+  HUB_RECONCILIATION: 3,
+  HUB_MULTILATERAL_SETTLEMENT: 4,
+  HUB_FEE: 5
+}
+
+const LedgerEntryType = {
+  PRINCIPLE_VALUE: 1,
+  INTERCHANGE_FEE: 2,
+  HUB_FEE: 3,
+  POSITION_DEPOSIT: 4,
+  POSITION_WITHDRAWAL: 5,
+  SETTLEMENT_NET_RECIPIENT: 6,
+  SETTLEMENT_NET_SENDER: 7,
+  SETTLEMENT_NET_ZERO: 8,
+  SETTLEMENT_ACCOUNT_DEPOSIT: 9,
+  SETTLEMENT_ACCOUNT_WITHDRAWAL: 10
+}
+
+const ParticipantLimitType = {
+  NET_DEBIT_CAP: 1
+}
+
+const TransferParticipantRoleType = {
+  PAYER_DFSP: 1,
+  PAYEE_DFSP: 2,
+  HUB: 3,
+  DFSP_SETTLEMENT: 4,
+  DFSP_POSITION: 5
+}
 
 module.exports = {
-  transformer
+  LedgerAccountType,
+  LedgerEntryType,
+  ParticipantLimitType,
+  TransferParticipantRoleType
 }

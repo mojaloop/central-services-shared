@@ -23,8 +23,14 @@
  --------------
  ******/
 
-const transformer = require('./transformer')
+const EndpointType = {
+  ALARM_NOTIFICATION_URL: 1,
+  ALARM_NOTIFICATION_TOPIC: 2,
+  FSPIOP_CALLBACK_URL_TRANSFER_POST: 3,
+  FSPIOP_CALLBACK_URL_TRANSFER_PUT: 4,
+  FSPIOP_CALLBACK_URL_TRANSFER_ERROR: 5
+}
 
 module.exports = {
-  transformer
+  EndpointType
 }

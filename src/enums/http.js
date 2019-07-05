@@ -31,7 +31,7 @@
  ******/
 'use strict'
 
-const HEADERS = {
+const Headers = {
   FSPIOP: {
     SWITCH: {
       regex: /^switch$/i,
@@ -50,13 +50,13 @@ const HEADERS = {
   }
 }
 
-const METHODS = {
+const Methods = {
   FSPIOP_CALLBACK_URL_BULK_TRANSFER_POST: 'post',
   FSPIOP_CALLBACK_URL_BULK_TRANSFER_ERROR: 'put',
   FSPIOP_CALLBACK_URL_BULK_TRANSFER_PUT: 'put'
 }
 
-const RETURNCODES = {
+const ReturnCodes = {
   OK: {
     CODE: 200,
     DESCRIPTION: 'OK'
@@ -292,7 +292,7 @@ const RETURNCODES = {
 }
 
 module.exports = {
-  HEADERS,
-  METHODS,
-  RETURNCODES
+  Headers,
+  Methods,
+  ReturnCodes
 }
