@@ -24,7 +24,10 @@
  ******/
 
 const BulkTransferEvent = {
-  Type: {},
+  Type: {
+    BULK_PREPARE: 'bulk-prepare',
+    BULK_FULFIL: 'bulk-fulfil'
+  },
   Action: {
     BULK_PREPARE: 'bulk-prepare',
     BULK_COMMIT: 'bulk-commit'
@@ -56,23 +59,11 @@ const TransferEvent = {
     EVENT: 'event',
     FULFIL: 'fulfil',
     POSITION: 'position',
-    GET: 'get'
-  }
-}
-
-const AdminTransferEvent = {
-  Type: {},
-  Action: {
+    GET: 'get',
     RECORD_FUNDS_IN: 'recordFundsIn',
     RECORD_FUNDS_OUT_PREPARE_RESERVE: 'recordFundsOutPrepareReserve',
     RECORD_FUNDS_OUT_COMMIT: 'recordFundsOutCommit',
-    RECORD_FUNDS_OUT_ABORT: 'recordFundsOutAbort'
-  }
-}
-
-const AdminNotificationEvent = {
-  Type: {},
-  Action: {
+    RECORD_FUNDS_OUT_ABORT: 'recordFundsOutAbort',
     LIMIT_ADJUSTMENT: 'limit-adjustment'
   }
 }
@@ -103,8 +94,6 @@ const ActionLetter = {
 module.exports = {
   BulkTransferEvent,
   TransferEvent,
-  AdminTransferEvent,
-  AdminNotificationEvent,
   EventStatus,
   ActionLetter
 }
