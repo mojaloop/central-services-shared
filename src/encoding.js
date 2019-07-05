@@ -5,5 +5,5 @@ exports.toBase64 = (value) => {
 }
 
 exports.fromBase64 = (value) => {
-  return Buffer.from(value, 'base64').toString()
+  return Buffer.from(value, 'base64').toString('utf8')
 }
