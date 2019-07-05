@@ -57,14 +57,14 @@ const transformHeaders = (headers, config) => {
   var normalizedHeaders = {}
 
   // check to see if FSPIOP-Destination header has been left out of the initial request. If so then add it.
-  if (!normalizedKeys.hasOwnProperty(ENUM.HEADERS.FSPIOP.DESTINATION)) {
-    headers[ENUM.HEADERS.FSPIOP.DESTINATION] = ''
+  if (!normalizedKeys.hasOwnProperty(ENUM.Headers.FSPIOP.DESTINATION)) {
+    headers[ENUM.Headers.FSPIOP.DESTINATION] = ''
   }
 
   for (var headerKey in headers) {
     var headerValue = headers[headerKey]
     switch (headerKey.toLowerCase()) {
-      case (ENUM.HEADERS.GENERAL.DATE):
+      case (ENUM.Headers.GENERAL.DATE):
         var tempDate = {}
         if (typeof headerValue === 'object' && headerValue instanceof Date) {
           tempDate = headerValue.toUTCString()
@@ -80,21 +80,21 @@ const transformHeaders = (headers, config) => {
         }
         normalizedHeaders[headerKey] = tempDate
         break
-      case (ENUM.HEADERS.GENERAL.CONTENT_LENGTH):
+      case (ENUM.Headers.GENERAL.CONTENT_LENGTH):
         // Do nothing here, do not map. This will be inserted correctly by the Hapi framework.
         break
-      case (ENUM.HEADERS.FSPIOP.URI):
+      case (ENUM.Headers.FSPIOP.URI):
         // Check to see if we find a regex match the source header containing the switch name.
         // If so we include the uri otherwise we remove it.
 
-        if (headers[normalizedKeys[ENUM.HEADERS.FSPIOP.SOURCE]].match(ENUM.HEADERS.FSPIOP.SWITCH.regex) === null) {
+        if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
           normalizedHeaders[headerKey] = headerValue
         }
         break
-      case (ENUM.HEADERS.FSPIOP.HTTP_METHOD):
+      case (ENUM.Headers.FSPIOP.HTTP_METHOD):
         // Check to see if we find a regex match the source header containing the switch name.
         // If so we include the signature otherwise we remove it.
-        if (headers[normalizedKeys[ENUM.HEADERS.FSPIOP.SOURCE]].match(ENUM.HEADERS.FSPIOP.SWITCH.regex) === null) {
+        if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
           if (config.httpMethod.toLowerCase() === headerValue.toLowerCase()) {
             // HTTP Methods match, and thus no change is required
             normalizedHeaders[headerKey] = headerValue
@@ -112,10 +112,10 @@ const transformHeaders = (headers, config) => {
           }
         }
         break
-      case (ENUM.HEADERS.FSPIOP.SOURCE):
+      case (ENUM.Headers.FSPIOP.SOURCE):
         normalizedHeaders[headerKey] = config.sourceFsp
         break
-      case (ENUM.HEADERS.FSPIOP.DESTINATION):
+      case (ENUM.Headers.FSPIOP.DESTINATION):
         normalizedHeaders[headerKey] = config.destinationFsp
         break
       default:
@@ -123,16 +123,16 @@ const transformHeaders = (headers, config) => {
     }
   }
 
-  if (normalizedHeaders[normalizedKeys[ENUM.HEADERS.FSPIOP.SOURCE]].match(ENUM.HEADERS.FSPIOP.SWITCH.regex) !== null) {
+  if (normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) !== null) {
     // Check to see if we find a regex match the source header containing the switch name.
     // If so we remove the signature added by default.
-    delete normalizedHeaders[ENUM.HEADERS.FSPIOP.SIGNATURE]
+    delete normalizedHeaders[ENUM.Headers.FSPIOP.SIGNATURE]
     // Aslo remove FSPIOP-URI and make FSPIOP-HTTP-Method ALL-CAPS #737
-    delete normalizedHeaders[ENUM.HEADERS.FSPIOP.URI]
+    delete normalizedHeaders[ENUM.Headers.FSPIOP.URI]
   }
 
-  if (config && config.httpMethod !== ENUM.methods.FSPIOP_CALLBACK_URL_TRANSFER_POST) {
-    delete normalizedHeaders[ENUM.HEADERS.GENERAL.ACCEPT]
+  if (config && config.httpMethod !== ENUM.Methods.FSPIOP_CALLBACK_URL_TRANSFER_POST) {
+    delete normalizedHeaders[ENUM.Headers.GENERAL.ACCEPT]
   }
   return normalizedHeaders
 }

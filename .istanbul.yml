@@ -2,7 +2,8 @@ instrumentation:
   include-all-sources: true
   excludes:
     [
-      '**/examples/**'
+      '**/examples/**',
+      '**/enums/**'
     ]
 check:
   global:
