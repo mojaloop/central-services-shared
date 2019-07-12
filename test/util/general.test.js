@@ -27,9 +27,9 @@
 'use strict'
 
 const Test = require('tape')
-const Util = require('../../src/util')
+const Util = require('../../src/util').General
 
-Test('util', utilTest => {
+Test('General util', utilTest => {
   utilTest.test('formatAmount should', formatAmountTest => {
     formatAmountTest.test('format integer', test => {
       const value = parseInt('100')

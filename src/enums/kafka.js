@@ -19,22 +19,33 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
+ * Shashikant Hirugade <shashikant.hirugade@modusbox.com>
  * Miguel de Barros <miguel.debarros@modusbox.com>
  --------------
  ******/
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Events = require('./events')
-const Http = require('./http')
-const Kafka = require('./Kafka')
-const Transfers = require('./transfers')
+
+/**
+ * The Producer config required
+ *
+ * This ENUM is for config specific Kafka fields
+ */
+const Config = {
+  PRODUCER: 'PRODUCER',
+  CONSUMER: 'CONSUMER',
+  EVENT: 'event'
+}
+
+const Defaults = {
+  TOPIC_TEMPLATES: {
+    GENERAL_TOPIC_TEMPLATE: {
+      TEMPLATE: 'topic-{{functionality}}-{{action}}',
+      REGEX: 'topic-(.*)-(.*)'
+    }
+  }
+}
 
 module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Kafka,
-  Transfers
+  Config,
+  Defaults
 }
