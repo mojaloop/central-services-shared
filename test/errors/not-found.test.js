@@ -8,7 +8,7 @@ Test('NotFoundError test', notFoundTest => {
   notFoundTest.test('payload should', payloadTest => {
     payloadTest.test('set error_id to NotFoundError and message to supplied', test => {
       const message = 'some message'
-      let error = new NotFoundError(message)
+      const error = new NotFoundError(message)
       test.equal(error.category, ErrorCategory.NOT_FOUND)
       test.equal(error.payload.id, 'NotFoundError')
       test.equal(error.payload.message, message)
