@@ -29,7 +29,7 @@ const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Transformer = require('../../src/headers').transformer
 const Enum = require('../../src/enums')
-const Util = require('../../src/util')
+const Util = require('../../src/util').General
 
 const headerConfigExample = {
   httpMethod: 'PUT',
@@ -73,7 +73,7 @@ Test('Transfer Transformer tests', TransformerTest => {
       for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
-      test.equals(transformedHeaderData[Enum.Http.Headers.GENERAL.CONTENTLENGTH], undefined)
+      test.equals(transformedHeaderData[Enum.Http.Headers.GENERAL.CONTENT_LENGTH], undefined)
       test.end()
     })
 
