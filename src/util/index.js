@@ -47,7 +47,7 @@ const expand = (value) => {
 }
 
 const filterUndefined = (fields) => {
-  for (let key in fields) {
+  for (const key in fields) {
     if (fields[key] === undefined) {
       delete fields[key]
     }

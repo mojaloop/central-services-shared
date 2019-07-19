@@ -20,6 +20,7 @@
 
  * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
  * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
  ******/
 
@@ -46,7 +47,59 @@ const TransferState = {
   RESERVED: 'RESERVED'
 }
 
+const BulkProcessingState = {
+  RECEIVED: 1,
+  RECEIVED_DUPLICATE: 2,
+  RECEIVED_INVALID: 3,
+  ACCEPTED: 4,
+  PROCESSING: 5,
+  FULFIL_DUPLICATE: 6,
+  FULFIL_INVALID: 7,
+  COMPLETED: 8,
+  REJECTED: 9,
+  EXPIRED: 10
+}
+
+const BulkTransferState = {
+  ACCEPTED: 'ACCEPTED',
+  COMPLETED: 'COMPLETED',
+  INVALID: 'INVALID',
+  PENDING_FULFIL: 'PENDING_FULFIL',
+  PENDING_INVALID: 'PENDING_INVALID',
+  PENDING_PREPARE: 'PENDING_PREPARE',
+  PROCESSING: 'PROCESSING',
+  RECEIVED: 'RECEIVED',
+  REJECTED: 'REJECTED'
+}
+const BulkTransferStateEnum = {
+  ACCEPTED: 'ACCEPTED',
+  COMPLETED: 'COMPLETED',
+  INVALID: 'REJECTED',
+  PENDING_FULFIL: 'PROCESSING',
+  PENDING_INVALID: 'PENDING',
+  PENDING_PREPARE: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  RECEIVED: 'RECEIVED',
+  REJECTED: 'REJECTED'
+}
+
+const AdminTransferAction = {
+  RECORD_FUNDS_IN: 'recordFundsIn',
+  RECORD_FUNDS_OUT_PREPARE_RESERVE: 'recordFundsOutPrepareReserve',
+  RECORD_FUNDS_OUT_COMMIT: 'recordFundsOutCommit',
+  RECORD_FUNDS_OUT_ABORT: 'recordFundsOutAbort'
+}
+
+const AdminNotificationActions = {
+  LIMIT_ADJUSTMENT: 'limit-adjustment'
+}
+
 module.exports = {
   TransferInternalState,
-  TransferState
+  TransferState,
+  BulkProcessingState,
+  BulkTransferState,
+  BulkTransferStateEnum,
+  AdminTransferAction,
+  AdminNotificationActions
 }

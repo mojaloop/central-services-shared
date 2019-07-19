@@ -79,8 +79,8 @@ Test('util', utilTest => {
       const obj = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         }
       }
       const value = JSON.stringify(obj)
@@ -99,8 +99,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: undefinedMap.prop3,
         prop4: null
@@ -109,8 +109,8 @@ Test('util', utilTest => {
       const obj2 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop4: null
       }
@@ -127,8 +127,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -137,8 +137,8 @@ Test('util', utilTest => {
       const expected = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         }
       }
 
@@ -154,8 +154,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -166,8 +166,8 @@ Test('util', utilTest => {
       const expected = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         }
       }
 
@@ -183,8 +183,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop5: 99
       }
@@ -192,7 +192,7 @@ Test('util', utilTest => {
       const obj2 = {
         prop3: 'test2',
         prop4: {
-          'number': 2000
+          number: 2000
         },
         prop5: 100
       }
@@ -200,12 +200,12 @@ Test('util', utilTest => {
       const expected = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: 'test2',
         prop4: {
-          'number': 2000
+          number: 2000
         },
         prop5: 100
       }
@@ -222,8 +222,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop5: 99
       }
@@ -231,7 +231,7 @@ Test('util', utilTest => {
       const obj2 = {
         prop3: 'test2',
         prop4: {
-          'number': 2000
+          number: 2000
         },
         prop5: 100
       }
@@ -239,12 +239,12 @@ Test('util', utilTest => {
       const expected = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: 'test2',
         prop4: {
-          'number': 2000
+          number: 2000
         },
         prop5: 100
       }
@@ -261,8 +261,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop5: 99,
         prop6: null
@@ -271,7 +271,7 @@ Test('util', utilTest => {
       const obj2 = {
         prop3: 'test2',
         prop4: {
-          'number': 2000
+          number: 2000
         },
         prop5: 100,
         prop7: null
@@ -280,12 +280,12 @@ Test('util', utilTest => {
       const expected = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: 'test2',
         prop4: {
-          'number': 2000
+          number: 2000
         },
         prop5: 100
       }
@@ -338,8 +338,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -360,8 +360,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -381,8 +381,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -404,8 +404,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -423,8 +423,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -446,8 +446,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null
@@ -466,8 +466,8 @@ Test('util', utilTest => {
       const obj1 = {
         prop1: 'test',
         prop2: {
-          'date_time': new Date().toDateString(),
-          'number': 1000
+          date_time: new Date().toDateString(),
+          number: 1000
         },
         prop3: null,
         prop4: null

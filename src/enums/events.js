@@ -20,6 +20,7 @@
 
  * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
  * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
  ******/
 
@@ -34,17 +35,24 @@ const BulkTransferEvent = {
   }
 }
 
-const TransferEvent = {
+const Event = {
   Type: {
+    BULK: 'bulk',
+    BULK_TRANSFER: 'bulk-transfer',
     PREPARE: 'prepare',
     POSITION: 'position',
     TRANSFER: 'transfer',
     FULFIL: 'fulfil',
     NOTIFICATION: 'notification',
     ADMIN: 'admin',
-    GET: 'get'
+    GET: 'get',
+    EVENT: 'event'
   },
   Action: {
+    // BULK_FULFIL: 'bulk-fulfil',
+    BULK_COMMIT: 'bulk-commit',
+    BULK_PREPARE: 'bulk-prepare',
+    BULK_PROCESSING: 'bulk-processing',
     PREPARE: 'prepare',
     PREPARE_DUPLICATE: 'prepare-duplicate',
     FULFIL_DUPLICATE: 'fulfil-duplicate',
@@ -83,6 +91,9 @@ const EventStatus = {
 
 const ActionLetter = {
   abort: 'A',
+  bulkPrepare: 'BP',
+  // bulkFulfil: 'BF',
+  bulkCommit: 'BC',
   commit: 'C',
   get: 'G',
   prepare: 'P',
@@ -91,9 +102,18 @@ const ActionLetter = {
   unknown: '?'
 }
 
+const EventState = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+  FAILED: 'failed',
+  EXPIRED: 'expired',
+  CANCELLED: 'cancelled'
+}
+
 module.exports = {
   BulkTransferEvent,
-  TransferEvent,
+  Event,
   EventStatus,
-  ActionLetter
+  ActionLetter,
+  EventState
 }

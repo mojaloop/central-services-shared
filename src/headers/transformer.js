@@ -47,25 +47,25 @@ const ENUM = require('../enums').Http
 
 const transformHeaders = (headers, config) => {
   // Normalized keys
-  var normalizedKeys = Object.keys(headers).reduce(
+  const normalizedKeys = Object.keys(headers).reduce(
     function (keys, k) {
       keys[k.toLowerCase()] = k
       return keys
     }, {})
 
   // Normalized headers
-  var normalizedHeaders = {}
+  const normalizedHeaders = {}
 
   // check to see if FSPIOP-Destination header has been left out of the initial request. If so then add it.
-  if (!normalizedKeys.hasOwnProperty(ENUM.Headers.FSPIOP.DESTINATION)) {
+  if (!normalizedKeys[ENUM.Headers.FSPIOP.DESTINATION]) {
     headers[ENUM.Headers.FSPIOP.DESTINATION] = ''
   }
 
-  for (var headerKey in headers) {
-    var headerValue = headers[headerKey]
+  for (const headerKey in headers) {
+    const headerValue = headers[headerKey]
     switch (headerKey.toLowerCase()) {
       case (ENUM.Headers.GENERAL.DATE):
-        var tempDate = {}
+        let tempDate = {}
         if (typeof headerValue === 'object' && headerValue instanceof Date) {
           tempDate = headerValue.toUTCString()
         } else {

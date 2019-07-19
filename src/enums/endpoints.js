@@ -20,6 +20,7 @@
 
  * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
  * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
  ******/
 
@@ -30,7 +31,34 @@ const EndpointType = {
   FSPIOP_CALLBACK_URL_TRANSFER_PUT: 4,
   FSPIOP_CALLBACK_URL_TRANSFER_ERROR: 5
 }
+// TODO maybe look at combining FspEndpointTypes and FspEndpointTemplates into a single object inclusive of http method
+const FspEndpointTypes = {
+  FSPIOP_CALLBACK_URL_TRANSACTION: 'FSPIOP_CALLBACK_URL_TRANSACTION',
+  FSPIOP_CALLBACK_URL: 'FSPIOP_CALLBACK_URL',
+  FSPIOP_CALLBACK_URL_PARTIES_GET: 'FSPIOP_CALLBACK_URL_PARTIES_GET',
+  FSPIOP_CALLBACK_URL_PARTICIPANT_PUT: 'FSPIOP_CALLBACK_URL_PARTICIPANT_PUT',
+  FSPIOP_CALLBACK_URL_PARTICIPANT_PUT_ERROR: 'FSPIOP_CALLBACK_URL_PARTICIPANT_PUT_ERROR',
+  FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT: 'FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT',
+  FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT_ERROR: 'FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT_ERROR',
+  FSPIOP_CALLBACK_URL_PARTIES_PUT: 'FSPIOP_CALLBACK_URL_PARTIES_PUT',
+  FSPIOP_CALLBACK_URL_PARTIES_PUT_ERROR: 'FSPIOP_CALLBACK_URL_PARTIES_PUT_ERROR'
+}
+
+const FspEndpointTemplates = {
+  TRANSACTION_REQUEST_POST: '/transactionRequests',
+  TRANSACTION_REQUEST_PUT: '/transactionRequests/{{ID}}',
+  TRANSACTION_REQUEST_GET: '/transactionRequests/{{ID}}',
+  TRANSACTION_REQUEST_PUT_ERROR: '/transactionRequests/{{ID}}/error',
+  PARTICIPANT_ENDPOINTS_GET: '/participants/{{fsp}}/endpoints',
+  PARTICIPANTS_GET: '/participants/{{fsp}}',
+  PARTIES_GET: '/parties/{{fsp}}',
+  ORACLE_PARTICIPANTS_TYPE_ID: '/participants/{{partyIdType}}/{{partyIdentifier}}',
+  ORACLE_PARTICIPANTS_TYPE_ID_CURRENCY: '/participants/{{partyIdType}}/{{partyIdentifier}}?currency={{currency}}',
+  ORACLE_PARTICIPANTS_BATCH: '/participants'
+}
 
 module.exports = {
-  EndpointType
+  EndpointType,
+  FspEndpointTypes,
+  FspEndpointTemplates
 }

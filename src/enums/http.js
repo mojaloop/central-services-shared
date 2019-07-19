@@ -26,6 +26,7 @@
  * ModusBox
  - Georgi Georgiev <georgi.georgiev@modusbox.com>
  - Miguel de Barros <miguel.debarros@modusbox.com>
+ - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
 
  --------------
  ******/
@@ -46,7 +47,12 @@ const Headers = {
   GENERAL: {
     ACCEPT: 'accept',
     DATE: 'date',
-    CONTENT_LENGTH: 'content-length'
+    CONTENT_LENGTH: 'content-length',
+    HOST: 'host',
+    CONTENT_TYPE: 'content-type'
+  },
+  DEFAULT: {
+    APPLICATION_JSON: 'application/json'
   }
 }
 
@@ -54,6 +60,23 @@ const Methods = {
   FSPIOP_CALLBACK_URL_BULK_TRANSFER_POST: 'post',
   FSPIOP_CALLBACK_URL_BULK_TRANSFER_ERROR: 'put',
   FSPIOP_CALLBACK_URL_BULK_TRANSFER_PUT: 'put'
+}
+
+const RestMethods = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE'
+}
+
+const HeaderResources = {
+  PARTICIPANTS: 'participants',
+  ORACLE: 'oracle',
+  SWITCH: 'switch'
+}
+
+const ResponseTypes = {
+  JSON: 'json'
 }
 
 const ReturnCodes = {
@@ -294,5 +317,8 @@ const ReturnCodes = {
 module.exports = {
   Headers,
   Methods,
-  ReturnCodes
+  ReturnCodes,
+  RestMethods,
+  ResponseTypes,
+  HeaderResources
 }

@@ -68,9 +68,9 @@ Test('Transfer Transformer tests', TransformerTest => {
 
   TransformerTest.test('Transformer.transformHeaders() should', transformHeadersTest => {
     transformHeadersTest.test('Remove all unnecessary fields from Header', async test => {
-      let headerData = Util.clone(headerDataInputExample)
+      const headerData = Util.clone(headerDataInputExample)
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfigExample)
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.equals(transformedHeaderData[Enum.Http.Headers.GENERAL.CONTENTLENGTH], undefined)
@@ -81,13 +81,13 @@ Test('Transfer Transformer tests', TransformerTest => {
       const key = 'Date'
       const val = '2018-09-13T13:52:15.221Z'
       const date = new Date(val)
-      let headerData = Util.clone(headerDataInputExample)
+      const headerData = Util.clone(headerDataInputExample)
       headerData[key] = val
       // headerData
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfigExample)
 
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.equals(transformedHeaderData[key], date.toUTCString())
@@ -98,12 +98,12 @@ Test('Transfer Transformer tests', TransformerTest => {
       const key = 'Date'
       const date = '2018-09-13T13:52:15.221Z'
       const val = new Date(date)
-      let headerData = Util.clone(headerDataInputExample)
+      const headerData = Util.clone(headerDataInputExample)
       headerData[key] = val
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfigExample)
 
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.equals(transformedHeaderData[key], val.toUTCString())
@@ -113,12 +113,12 @@ Test('Transfer Transformer tests', TransformerTest => {
     transformHeadersTest.test('Translate Date field for badly formatted string', async test => {
       const key = 'Date'
       const val = '2018-0'
-      let headerData = Util.clone(headerDataInputExample)
+      const headerData = Util.clone(headerDataInputExample)
       headerData[key] = val
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfigExample)
 
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.equals(transformedHeaderData[key], val)
@@ -126,25 +126,25 @@ Test('Transfer Transformer tests', TransformerTest => {
     })
 
     transformHeadersTest.test('Transform the FSPIOP-HTTP-METHOD to match the HTTP operation if header is provided and does not match incoming value', async test => {
-      let headerData = Util.clone(headerDataInputExample)
-      let headerConfig = Util.clone(headerConfigExample)
+      const headerData = Util.clone(headerDataInputExample)
+      const headerConfig = Util.clone(headerConfigExample)
       headerConfig[Enum.Http.Headers.FSPIOP.HTTP_METHOD] = 'GET'
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
 
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.end()
     })
 
     transformHeadersTest.test('Transform to include the incoming signature when FSPIOP-Source does not match the switch regex', async test => {
-      let headerData = Util.clone(headerDataInputExample)
-      let headerConfig = Util.clone(headerConfigExample)
+      const headerData = Util.clone(headerDataInputExample)
+      const headerConfig = Util.clone(headerConfigExample)
       headerData[Enum.Http.Headers.FSPIOP.SOURCE] = 'randomFSP'
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.equals(transformedHeaderData[Enum.Http.Headers.FSPIOP.SIGNATURE], headerDataInputExample[Enum.Http.Headers.FSPIOP.SIGNATURE])
@@ -152,13 +152,13 @@ Test('Transfer Transformer tests', TransformerTest => {
     })
 
     transformHeadersTest.test('Transform to include the incoming signature when FSPIOP-Source does not match the switch regex with INVALID http method', async test => {
-      let headerData = Util.clone(headerDataInputExample)
-      let headerConfig = Util.clone(headerConfigExample)
+      const headerData = Util.clone(headerDataInputExample)
+      const headerConfig = Util.clone(headerConfigExample)
       headerConfig.httpMethod = 'INVALID'
       headerData[Enum.Http.Headers.FSPIOP.SOURCE] = 'randomFSP'
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
       }
       test.equals(transformedHeaderData[Enum.Http.Headers.FSPIOP.SIGNATURE], headerDataInputExample[Enum.Http.Headers.FSPIOP.SIGNATURE])
@@ -166,16 +166,16 @@ Test('Transfer Transformer tests', TransformerTest => {
     })
 
     transformHeadersTest.test('Transform to include map the destinationFsp even if the FSPIOP-Destination header was not included in the original request', async test => {
-      let headerData = Util.clone(headerDataInputExample)
+      const headerData = Util.clone(headerDataInputExample)
 
       // remove FSPIOP-Destination from the request
       Util.deleteFieldByCaseInsensitiveKey(headerData, Enum.Http.Headers.FSPIOP.DESTINATION)
 
-      let headerConfig = Util.clone(headerConfigExample)
+      const headerConfig = Util.clone(headerConfigExample)
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
 
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(Util.getValueByCaseInsensitiveKey(transformedHeaderData, headerKey), Util.getValueByCaseInsensitiveKey(headerDataTransformedExample, headerKey))
       }
       test.equals(transformedHeaderData[Enum.Http.Headers.FSPIOP.SIGNATURE], headerDataInputExample[Enum.Http.Headers.FSPIOP.SIGNATURE])
@@ -183,17 +183,17 @@ Test('Transfer Transformer tests', TransformerTest => {
     })
 
     transformHeadersTest.test('Transform to include map the destinationFsp if the FSPIOP-Destination header was included in the original request but correctly mapped based on headerConfig', async test => {
-      let headerData = Util.clone(headerDataInputExample)
+      const headerData = Util.clone(headerDataInputExample)
       headerData[Enum.Http.Headers.FSPIOP.HTTP_METHOD] = 'INVALID'
 
       // set FSPIOP-Destination from the request
       Util.setValueByCaseInsensitiveKey(headerData, Enum.Http.Headers.FSPIOP.DESTINATION, 'TESTDEST')
 
-      let headerConfig = Util.clone(headerConfigExample)
+      const headerConfig = Util.clone(headerConfigExample)
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
 
-      for (let headerKey in headerDataTransformedExample) {
+      for (const headerKey in headerDataTransformedExample) {
         test.equals(Util.getValueByCaseInsensitiveKey(transformedHeaderData, headerKey), Util.getValueByCaseInsensitiveKey(headerDataTransformedExample, headerKey))
       }
       test.equals(transformedHeaderData[Enum.Http.Headers.FSPIOP.SIGNATURE], headerDataInputExample[Enum.Http.Headers.FSPIOP.SIGNATURE])
