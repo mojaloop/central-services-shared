@@ -26,7 +26,6 @@
 const Accounts = require('./accounts')
 const EndPoints = require('./endpoints')
 const Http = require('./http')
-// const Kafka = require('./Kafka')
 const Transfers = require('./transfers')
 const Events = require('./events')
 const Kafka = require('./kafka')
