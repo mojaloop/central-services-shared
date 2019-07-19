@@ -37,22 +37,22 @@ Test('logger', function (loggerTest) {
   })
 
   loggerTest.test('log info level', function (assert) {
-    let infoMessage = 'things are happening'
+    const infoMessage = 'things are happening'
     Logger.info(infoMessage)
     assert.ok(Sinon.match('info', infoMessage))
     assert.end()
   })
 
   loggerTest.test('log warn level', function (assert) {
-    let warnMessage = 'something bad is happening'
+    const warnMessage = 'something bad is happening'
     Logger.warn(warnMessage)
     assert.ok(Sinon.match('warn', warnMessage))
     assert.end()
   })
 
   loggerTest.test('log error level', function (assert) {
-    let errorMessage = 'there was an exception'
-    let ex = new Error()
+    const errorMessage = 'there was an exception'
+    const ex = new Error()
     Logger.error(errorMessage, ex)
     assert.ok(Sinon.match('error', errorMessage))
     assert.end()
