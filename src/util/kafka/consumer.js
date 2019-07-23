@@ -31,7 +31,7 @@
  */
 
 const Consumer = require('@mojaloop/central-services-stream').Kafka.Consumer
-const Logger = require('../logger')
+const Logger = require('../../logger')
 
 const listOfConsumers = {}
 

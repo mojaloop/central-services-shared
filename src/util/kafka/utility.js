@@ -37,10 +37,10 @@
  */
 
 const Mustache = require('mustache')
-const Logger = require('../logger')
+const Logger = require('../../logger')
 const Uuid = require('uuid4')
 const Kafka = require('./index')
-const Enum = require('../enums')
+const Enum = require('../../enums')
 
 /**
  * @function ParticipantTopicTemplate

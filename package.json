@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "7.1.1",
+  "version": "7.2.0",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "test:unit": "tapes 'test/**/*.test.js'",
     "test:xunit": "npm run test:unit | tap-xunit",
     "test:coverage": "nyc --reporter=lcov --reporter=text-summary tapes -- 'test/**/*.test.js'",
-    "test:coverage-check": "npm run test:coverage && istanbul check-coverage"
+    "test:coverage-check": "npm run test:coverage && istanbul check-coverage",
     "audit:resolve": "SHELL=sh resolve-audit",
     "audit:check": "SHELL=sh check-audit"
   },
@@ -41,7 +41,7 @@
     "catbox-memory": "4.0.1",
     "debug": "4.1.1",
     "immutable": "3.8.2",
-    "lodash": "4.17.14",
+    "lodash": "4.17.15",
     "mustache": "3.0.1",
     "raw-body": "2.4.1",
     "uuid4": "1.1.4",
@@ -54,7 +54,7 @@
     "npm-audit-resolver": "1.5.0",
     "pre-commit": "1.2.2",
     "sinon": "7.3.2",
-    "standard": "13.0.2",
+    "standard": "13.1.0",
     "tap-xunit": "2.4.1",
     "tape": "4.11.0",
     "tapes": "4.1.0"

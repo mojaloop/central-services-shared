@@ -25,7 +25,7 @@
 
 const request = require('axios')
 const Logger = require('../logger')
-const Headers = require('../headers/index').transformer
+const Headers = require('./headers/transformer')
 const enums = require('../enums')
 /**
  * @function validateParticipant

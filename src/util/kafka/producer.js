@@ -34,7 +34,7 @@
  */
 
 const Producer = require('@mojaloop/central-services-stream').Kafka.Producer
-const Logger = require('../logger')
+const Logger = require('../../logger')
 
 const listOfProducers = {}
 

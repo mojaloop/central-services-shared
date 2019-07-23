@@ -25,7 +25,7 @@
 
 'use strict'
 
-const ENUM = require('../enums').Http
+const ENUM = require('../../enums').Http
 
 /**
  * @module src/headers/transformer
@@ -35,7 +35,7 @@ const ENUM = require('../enums').Http
 * @function transformHeaders
 *
 * @description This will transform the headers before sending to kafka
-* NOTE: Assumes incoming headers keys are lowercased. This is a safe
+* NOTE: Assumes incoming headers keys are lowercase. This is a safe
 * assumption only if the headers parameter comes from node default http framework.
 *
 * see https://nodejs.org/dist/latest-v10.x/docs/api/http.html#http_message_headers
