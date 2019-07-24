@@ -39,7 +39,8 @@
 const Mustache = require('mustache')
 const Logger = require('../../logger')
 const Uuid = require('uuid4')
-const Kafka = require('./index')
+const Kafka = require('../kafka')
+const Producer = require('./producer')
 const Enum = require('../../enums')
 
 /**
@@ -348,7 +349,7 @@ const createGeneralTopicConf = (template, functionality, action, key = null, par
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
-const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, message, state, key) => {
+const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, message, state, key = null) => {
   let functionalityMapped = functionality
   let actionMapped = action
   if (Enum.Kafka.TopicMap[functionality] && Enum.Kafka.TopicMap[functionality][action]) {
@@ -356,9 +357,9 @@ const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, 
     actionMapped = Enum.Kafka.TopicMap[functionality][action].action
   }
   const messageProtocol = updateMessageProtocolMetadata(message, functionality, action, state)
-  const topicConfig = createGeneralTopicConf(functionalityMapped, actionMapped, key)
+  const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
-  await Kafka.Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
+  await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
 }
 
@@ -391,9 +392,9 @@ const produceParticipantMessage = async (defaultKafkaConfig, participantName, fu
     actionMapped = Enum.Kafka.TopicMap[functionality][action].action
   }
   const messageProtocol = updateMessageProtocolMetadata(message, functionality, action, state)
-  const topicConfig = createParticipantTopicConf(defaultKafkaConfig, participantName, functionalityMapped, actionMapped)
+  const topicConfig = createParticipantTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, functionalityMapped, actionMapped)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
-  await Kafka.Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
+  await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
 }
 

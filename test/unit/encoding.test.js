@@ -1,7 +1,7 @@
 'use strict'
 
 const Test = require('tape')
-const Encoding = require('../src/util/encoding')
+const Encoding = require('../../src/util/encoding')
 
 Test('encoding test', encodingTest => {
   encodingTest.test('base64 should', base64test => {

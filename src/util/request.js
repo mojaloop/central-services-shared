@@ -44,8 +44,8 @@ const sendRequest = async (url, headers, method = enums.Http.RestMethods.GET, pa
   try {
     const transformedHeaders = Headers.transformHeaders(headers, {
       httpMethod: method,
-      sourceFsp: headers[enums.Headers.FSPIOP.SOURCE],
-      destinationFsp: headers[enums.Headers.FSPIOP.DESTINATION]
+      sourceFsp: headers[enums.Http.Headers.FSPIOP.SOURCE],
+      destinationFsp: headers[enums.Http.Headers.FSPIOP.DESTINATION]
     })
     const requestOptions = {
       url,

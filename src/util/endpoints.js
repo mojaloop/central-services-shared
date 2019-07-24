@@ -25,7 +25,7 @@
 
 'use strict'
 
-const Logger = require('../logger').Logger
+const Logger = require('../logger')
 const Catbox = require('catbox')
 const CatboxMemory = require('catbox-memory')
 const { Map } = require('immutable')
@@ -123,14 +123,14 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
   }
 }
 
-// /**
-//  * @function stopCache
-//  *
-//  * @description It stops the cache client
-//  *
-//  * @returns {boolean} - Returns the status
-//  */
-// const stopCache = async () => {
-//   Logger.info('participantEndpointCache::stopCache::Stopping the cache')
-//   return client.stop()
-// }
+/**
+ * @function stopCache
+ *
+ * @description It stops the cache client
+ *
+ * @returns {boolean} - Returns the status
+ */
+exports.stopCache = async () => {
+  Logger.info('participantEndpointCache::stopCache::Stopping the cache')
+  return client.stop()
+}

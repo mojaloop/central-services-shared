@@ -27,7 +27,7 @@
 'use strict'
 
 const Test = require('tape')
-const Util = require('../../src/util').General
+const Util = require('../../../src/util').General
 
 Test('General util', utilTest => {
   utilTest.test('formatAmount should', formatAmountTest => {
