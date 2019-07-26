@@ -280,47 +280,6 @@ const createMetadataState = (status, code, description) => {
 }
 
 /**
- * @function createTransferMessageProtocol
- *
- * @param {object} payload - The payload of the api request
- * @param {string} type - the type flow. Example: 'prepare'
- * @param {string} action - the action flow. Example: 'commit'
- * @param {object} state - the state of the message being passed.
- * Example:
- * SUCCESS: {
- *   status: 'success',
- *   code: 0,
- *   description: 'action successful'
- * }
- * @param {string} pp - this is an optional field for future functionality to send the message to a third party
- *
- * @returns {object} - Returns newly created messageProtocol
- */
-const createTransferMessageProtocol = (payload, type, action, state, pp = '') => {
-  return {
-    id: payload.transferId,
-    from: payload.payerFsp,
-    to: payload.payeeFsp,
-    type: 'application/json',
-    content: {
-      header: {},
-      payload
-    },
-    metadata: {
-      event: {
-        id: Uuid(),
-        responseTo: '',
-        type,
-        action,
-        createdAt: new Date(),
-        state
-      }
-    },
-    pp
-  }
-}
-
-/**
  * @function createParticipantTopicConfig
  *
  * @param {string} template - The template for that needs to be populated
@@ -461,7 +420,6 @@ module.exports = {
   updateMessageProtocolMetadata,
   createMetadata,
   createMetadataState,
-  createTransferMessageProtocol,
   createParticipantTopicConf,
   createGeneralTopicConf,
   produceParticipantMessage,

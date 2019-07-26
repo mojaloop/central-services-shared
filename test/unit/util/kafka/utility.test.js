@@ -241,20 +241,6 @@ Test('Utility Test', utilityTest => {
     getKafkaConfigTest.end()
   })
 
-  utilityTest.test('createTransferMessageProtocol should', createTransferMessageProtocolTest => {
-    createTransferMessageProtocolTest.test('return a new messageProtocol', test => {
-      const createdMessageProtocol = Utility.createTransferMessageProtocol(transfer, PREPARE, PREPARE, Enum.Events.EventStatus.SUCCESS)
-      messageProtocol.metadata.event.type = createdMessageProtocol.metadata.event.type
-      createdMessageProtocol.metadata.event.id = messageProtocol.metadata.event.id
-      createdMessageProtocol.metadata.event.responseTo = messageProtocol.metadata.event.responseTo
-      createdMessageProtocol.metadata.event.createdAt = messageProtocol.metadata.event.createdAt
-      test.deepEqual(createdMessageProtocol, messageProtocol)
-      test.end()
-    })
-
-    createTransferMessageProtocolTest.end()
-  })
-
   utilityTest.test('produceGeneralMessage should', produceGeneralMessageTest => {
     produceGeneralMessageTest.test('produce a general message', async (test) => {
       const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
