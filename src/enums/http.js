@@ -62,12 +62,6 @@ const Headers = {
   }
 }
 
-const Methods = {
-  FSPIOP_CALLBACK_URL_BULK_TRANSFER_POST: 'post',
-  FSPIOP_CALLBACK_URL_BULK_TRANSFER_ERROR: 'put',
-  FSPIOP_CALLBACK_URL_BULK_TRANSFER_PUT: 'put'
-}
-
 const RestMethods = {
   GET: 'GET',
   POST: 'POST',
@@ -327,7 +321,6 @@ const ReturnCodes = {
 
 module.exports = {
   Headers,
-  Methods,
   ReturnCodes,
   RestMethods,
   ResponseTypes,

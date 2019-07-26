@@ -131,7 +131,7 @@ const transformHeaders = (headers, config) => {
     delete normalizedHeaders[ENUM.Headers.FSPIOP.URI]
   }
 
-  if (config && config.httpMethod !== ENUM.Methods.FSPIOP_CALLBACK_URL_TRANSFER_POST) {
+  if (config && config.httpMethod !== ENUM.RestMethods.POST) {
     delete normalizedHeaders[ENUM.Headers.GENERAL.ACCEPT.value]
   }
   return normalizedHeaders
