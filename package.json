@@ -49,7 +49,6 @@
   },
   "devDependencies": {
     "@hapi/joi": "15.1.0",
-    "bluebird": "3.5.5",
     "faucet": "0.0.1",
     "npm-audit-resolver": "1.5.0",
     "nyc": "14.1.1",

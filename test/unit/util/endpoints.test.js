@@ -3,7 +3,6 @@
 const Test = require('tapes')(require('tape'))
 const src = '../../../src'
 const Sinon = require('sinon')
-const P = require('bluebird')
 const Cache = require(`${src}/util/endpoints`)
 const request = require(`${src}/util/request`)
 const Catbox = require('catbox')
@@ -37,7 +36,7 @@ Test('Cache Test', cacheTest => {
       const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
       await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(P.resolve(Helper.getEndPointsResponse))
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndPointsResponse))
 
       try {
         const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })

@@ -35,7 +35,6 @@ const rewire = require('rewire')
 const Test = require('tapes')(require('tape'))
 const KafkaProducer = require('@mojaloop/central-services-stream').Kafka.Producer
 const Producer = require(`${src}/util`).Kafka.Producer
-const P = require('bluebird')
 const Uuid = require('uuid4')
 
 const transfer = {
@@ -101,10 +100,10 @@ Test('Producer', producerTest => {
   producerTest.test('produceMessage should', produceMessageTest => {
     produceMessageTest.beforeEach(t => {
       sandbox = Sinon.createSandbox()
-      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'connect').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(P.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'connect').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(Promise.resolve())
       t.end()
     })
 
@@ -154,10 +153,10 @@ Test('Producer', producerTest => {
   producerTest.test('getProducer should', getProducerTest => {
     getProducerTest.beforeEach(t => {
       sandbox = Sinon.createSandbox()
-      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'connect').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(P.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'connect').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(Promise.resolve())
       t.end()
     })
 
@@ -188,10 +187,10 @@ Test('Producer', producerTest => {
   producerTest.test('disconnect should', disconnectTest => {
     disconnectTest.beforeEach(t => {
       sandbox = Sinon.createSandbox()
-      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'connect').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(P.resolve())
-      sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(P.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'connect').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(Promise.resolve())
       t.end()
     })
 
@@ -293,9 +292,9 @@ Test('Producer', producerTest => {
   producerTest.test('produceMessage failure should', produceMessageTest => {
     produceMessageTest.beforeEach(t => {
       sandbox = Sinon.createSandbox()
-      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(P.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
       sandbox.stub(KafkaProducer.prototype, 'connect').throws(new Error())
-      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(P.resolve())
+      sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
       sandbox.stub(KafkaProducer.prototype, 'disconnect').throws(new Error())
       t.end()
     })

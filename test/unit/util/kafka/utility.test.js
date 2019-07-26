@@ -37,7 +37,6 @@ const rewire = require('rewire')
 const Sinon = require('sinon')
 const Test = require('tapes')(require('tape'))
 const Mustache = require('mustache')
-const P = require('bluebird')
 const Uuid = require('uuid4')
 const KafkaProducer = require('@mojaloop/central-services-stream').Kafka.Producer
 const Proxyquire = require('proxyquire')
@@ -109,10 +108,10 @@ Test('Utility Test', utilityTest => {
 
   utilityTest.beforeEach(test => {
     sandbox = Sinon.createSandbox()
-    sandbox.stub(KafkaProducer.prototype, 'constructor').returns(P.resolve())
-    sandbox.stub(KafkaProducer.prototype, 'connect').returns(P.resolve())
-    sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(P.resolve())
-    sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(P.resolve())
+    sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
+    sandbox.stub(KafkaProducer.prototype, 'connect').returns(Promise.resolve())
+    sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
+    sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(Promise.resolve())
     participantName = 'testParticipant'
     test.end()
   })
