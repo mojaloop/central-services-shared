@@ -193,92 +193,71 @@ const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAc
 }
 
 /**
- * @function generateStreamingMessage
+ * @function createStreamingMessage
  *
- * @param {object} dataUri - The encoded payload of the message
- * @param {array} headers - headers from the request
+ * @param {string} id - the unique ID for the correlation of messages
  * @param {string} to - to whom the message is going
  * @param {string} from - from whom the message is received
- * @param {string} type - the type of message being sent Example: 'fulfil'
- * @param {string} action - the action of message being sent Example: 'commit'
+ * @param {object} metadata - The metadata for streaming
+ * @param {object} payload - The payload of the message
+ * @param {array} headers - headers from the request
  * @param {array} uriParams - the URI parameters passed in request.
  *
  * @returns {object} - Returns generated messageProtocol
  */
-const generateStreamingMessage = (dataUri, headers, to, from, type, action, uriParams = undefined) => {
+const createStreamingMessage = (id, to, from, metadata, headers, payload, uriParams = undefined) => {
   return {
-    id: Uuid(),
+    id,
     to,
     from,
     type: Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
     content: {
-      uriParams: uriParams.length > 0 ? uriParams : undefined,
+      uriParams: uriParams && uriParams.length > 0 ? uriParams : undefined,
       headers: headers,
-      payload: dataUri
+      payload: payload || {}
     },
-    metadata: {
-      event: {
-        id: Uuid(),
-        type,
-        action,
-        createdAt: new Date(),
-        state: {
-          status: Enum.Events.EventStatus.SUCCESS.status,
-          code: Enum.Events.EventStatus.SUCCESS.code
-        }
-      }
-    }
+    metadata
   }
 }
 
 /**
- * @function generateStreamingMessageFromRequest
- *
+ * @function createStreamingMessageFromRequest
+ * @param {string} id - the unique ID for the correlation of messages
  * @param {object} request - The current messageProtocol from kafka
  * @param {string} to - the action flow. Example: 'prepare'
  * @param {string} from - the state of the message being passed.
- * @param {string} type - the state of the message being passed.
- * @param {string} action - the state of the message being passed.
+ * @param {object} metadata - The metadata for streaming
  *
  * @returns {object} - Returns generated messageProtocol
  */
-const generateStreamingMessageFromRequest = (request, to, from, type, action) => {
-  return generateStreamingMessage(request.dataUri, request.headers, to, from, type, action, request.params)
+const createStreamingMessageFromRequest = (id, request, to, from, metadata) => {
+  return createStreamingMessage(id, to, from, metadata, request.headers, request.dataUri, request.params)
 }
 
 /**
- * @function createPrepareErrorStatus
+ * @function createMetadata
  *
- * @param {number} errorCode - error code for error occurred
- * @param {string} errorDescription - error description for error occurred
- * @param {object} extensionList - list of extensions
- * Example:
- * errorInformation: {
- *   errorCode: '3001',
- *   errorDescription: 'A failure has occurred',
- *   extensionList: [{
- *      extension: {
- *        key: 'key',
- *        value: 'value'
- *      }
- *   }]
- * }
+ * @param {object} correlationId - The current messageProtocol from kafka
+ * @param {string} type - the type of message being sent Example: 'fulfil'
+ * @param {string} action - the action of message being sent Example: 'commit'
+ * @param {object} state - The state object for metadata usually contains information of status
  *
- * @returns {object} - Returns errorInformation object
+ * @returns {object} - Returns generated metadata
  */
-const createPrepareErrorStatus = (errorCode, errorDescription, extensionList) => {
-  errorCode = errorCode.toString()
+const createMetadata = (correlationId, type, action, state) => {
   return {
-    errorInformation: {
-      errorCode,
-      errorDescription,
-      extensionList
+    event: {
+      correlationId,
+      type,
+      action,
+      createdAt: new Date(),
+      state
     }
   }
 }
 
 /**
- * @function createState
+ * @function createMetadataState
  *
  * @param {string} status - status of message
  * @param {number} code - error code
@@ -292,7 +271,7 @@ const createPrepareErrorStatus = (errorCode, errorDescription, extensionList) =>
  *
  * @returns {object} - Returns errorInformation object
  */
-const createState = (status, code, description) => {
+const createMetadataState = (status, code, description) => {
   return {
     status,
     code,
@@ -477,11 +456,11 @@ module.exports = {
   transformAccountToTopicName,
   transformGeneralTopicName,
   getKafkaConfig,
-  generateStreamingMessage,
-  generateStreamingMessageFromRequest,
+  createStreamingMessage,
+  createStreamingMessageFromRequest,
   updateMessageProtocolMetadata,
-  createPrepareErrorStatus,
-  createState,
+  createMetadata,
+  createMetadataState,
   createTransferMessageProtocol,
   createParticipantTopicConf,
   createGeneralTopicConf,
