@@ -46,11 +46,10 @@ const Enum = require('../../../../src').Enum
 const Config = require('../../../util/config')
 
 let participantName
-const TRANSFER = 'transfer'
-const PREPARE = 'prepare'
-const FULFIL = 'fulfil'
-// const COMMIT = 'commit'
-const CONSUMER = 'CONSUMER'
+const TRANSFER = Enum.Events.Event.Type.TRANSFER
+const PREPARE = Enum.Events.Event.Action.PREPARE
+const FULFIL = Enum.Events.Event.Action.FULFIL
+const CONSUMER = Enum.Kafka.Config.CONSUMER
 
 const participantTopic = 'topic-testParticipant-transfer-prepare'
 const generalTopic = 'topic-transfer-fulfil'
