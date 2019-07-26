@@ -193,6 +193,60 @@ const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAc
 }
 
 /**
+ * @function generateStreamingMessage
+ *
+ * @param {object} dataUri - The encoded payload of the message
+ * @param {array} headers - headers from the request
+ * @param {string} to - to whom the message is going
+ * @param {string} from - from whom the message is received
+ * @param {string} type - the type of message being sent Example: 'fulfil'
+ * @param {string} action - the action of message being sent Example: 'commit'
+ * @param {array} uriParams - the URI parameters passed in request.
+ *
+ * @returns {object} - Returns generated messageProtocol
+ */
+const generateStreamingMessage = (dataUri, headers, to, from, type, action, uriParams = undefined) => {
+  return {
+    id: Uuid(),
+    to,
+    from,
+    type: Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
+    content: {
+      uriParams: uriParams.length > 0 ? uriParams : undefined,
+      headers: headers,
+      payload: dataUri
+    },
+    metadata: {
+      event: {
+        id: Uuid(),
+        type,
+        action,
+        createdAt: new Date(),
+        state: {
+          status: Enum.Events.EventStatus.SUCCESS.status,
+          code: Enum.Events.EventStatus.SUCCESS.code
+        }
+      }
+    }
+  }
+}
+
+/**
+ * @function generateStreamingMessageFromRequest
+ *
+ * @param {object} request - The current messageProtocol from kafka
+ * @param {string} to - the action flow. Example: 'prepare'
+ * @param {string} from - the state of the message being passed.
+ * @param {string} type - the state of the message being passed.
+ * @param {string} action - the state of the message being passed.
+ *
+ * @returns {object} - Returns generated messageProtocol
+ */
+const generateStreamingMessageFromRequest = (request, to, from, type, action) => {
+  return generateStreamingMessage(request.dataUri, request.headers, to, from, type, action, request.params)
+}
+
+/**
  * @function createPrepareErrorStatus
  *
  * @param {number} errorCode - error code for error occurred
@@ -423,6 +477,8 @@ module.exports = {
   transformAccountToTopicName,
   transformGeneralTopicName,
   getKafkaConfig,
+  generateStreamingMessage,
+  generateStreamingMessageFromRequest,
   updateMessageProtocolMetadata,
   createPrepareErrorStatus,
   createState,

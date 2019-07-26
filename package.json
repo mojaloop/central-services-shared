@@ -34,10 +34,12 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
+    "@mojaloop/central-services-error-handling": "7.1.2",
     "@mojaloop/central-services-stream": "6.2.2",
     "axios": "0.19.0",
     "catbox": "10.0.6",
     "catbox-memory": "4.0.1",
+    "glob": "7.1.4",
     "immutable": "3.8.2",
     "lodash": "4.17.15",
     "mustache": "3.0.1",

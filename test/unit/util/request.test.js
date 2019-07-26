@@ -34,7 +34,7 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
-        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH))
+        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
@@ -55,7 +55,7 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
-        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH))
+        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
         test.fail('should throw error')
         test.end()
       } catch (e) {

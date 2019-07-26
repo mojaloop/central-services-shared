@@ -27,6 +27,10 @@ const request = require('axios')
 const Logger = require('../logger')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
+
+const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
+
 /**
  * @function validateParticipant
  *
@@ -35,19 +39,25 @@ const enums = require('../enums')
  * @param {string} url the endpoint for the service you require
  * @param {object} headers the http headers
  * @param {string} method http method being requested i.e. GET, POST, PUT
+ * @param {string} source id for which callback is being sent from
+ * @param {string} destination id for which callback is being sent
  * @param {object} payload the body of the request being sent
  * @param {string} responseType the type of the response object
  *
  *@return {object} The response for the request being sent or error object with response included
  */
-const sendRequest = async (url, headers, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON) => {
+const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON) => {
+  let requestOptions
+  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
+  }
   try {
     const transformedHeaders = Headers.transformHeaders(headers, {
       httpMethod: method,
-      sourceFsp: headers[enums.Http.Headers.FSPIOP.SOURCE],
-      destinationFsp: headers[enums.Http.Headers.FSPIOP.DESTINATION]
+      sourceFsp: source,
+      destinationFsp: destination
     })
-    const requestOptions = {
+    requestOptions = {
       url,
       method: method,
       headers: transformedHeaders,
@@ -58,9 +68,15 @@ const sendRequest = async (url, headers, method = enums.Http.RestMethods.GET, pa
     const response = await request(requestOptions)
     Logger.info(`Success: sendRequest::response ${JSON.stringify(response)}`)
     return response
-  } catch (e) {
-    Logger.error(e)
-    throw e
+  } catch (error) {
+    Logger.error(error)
+    throw ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [
+      { key: 'url', value: url },
+      { key: 'sourceFsp', value: source },
+      { key: 'destinationFsp', value: destination },
+      { key: 'method', value: method },
+      { key: 'request', value: JSON.stringify(requestOptions) }
+    ])
   }
 }
 

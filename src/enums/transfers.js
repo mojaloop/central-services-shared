@@ -44,7 +44,8 @@ const TransferState = {
   RECEIVED: 'RECEIVED',
   ABORTED: 'ABORTED',
   COMMITTED: 'COMMITTED',
-  RESERVED: 'RESERVED'
+  RESERVED: 'RESERVED',
+  SETTLED: 'SETTLED'
 }
 
 const BulkProcessingState = {

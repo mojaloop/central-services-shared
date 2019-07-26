@@ -5,7 +5,7 @@ const Kafka = require('./kafka')
 const Endpoints = require('./endpoints')
 const Request = require('./request')
 const Http = require('./http')
-const HapiRawPayload = require('./hapi/plugins/rawPayloadToDataUri')
+const Hapi = require('./hapi')
 const Headers = require('./headers/transformer')
 const Encoding = require('./encoding')
 
@@ -15,7 +15,7 @@ module.exports = {
   Endpoints,
   Request,
   Http,
-  HapiRawPayload,
+  Hapi,
   Headers,
   Encoding
 }

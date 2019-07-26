@@ -45,11 +45,17 @@ const Headers = {
     URI: 'fspiop-uri'
   },
   GENERAL: {
-    ACCEPT: 'accept',
+    ACCEPT: {
+      regex: /application\/vnd.interoperability[.]/,
+      value: 'accept'
+    },
     DATE: 'date',
     CONTENT_LENGTH: 'content-length',
     HOST: 'host',
-    CONTENT_TYPE: 'content-type'
+    CONTENT_TYPE: {
+      regex: /application\/vnd.interoperability[.]/,
+      value: 'content-type'
+    }
   },
   DEFAULT: {
     APPLICATION_JSON: 'application/json'
@@ -73,6 +79,11 @@ const HeaderResources = {
   PARTICIPANTS: 'participants',
   ORACLE: 'oracle',
   SWITCH: 'switch'
+}
+
+const ServiceType = {
+  API: 'api',
+  HANDLER: 'handler'
 }
 
 const ResponseTypes = {
@@ -320,5 +331,6 @@ module.exports = {
   ReturnCodes,
   RestMethods,
   ResponseTypes,
-  HeaderResources
+  HeaderResources,
+  ServiceType
 }
