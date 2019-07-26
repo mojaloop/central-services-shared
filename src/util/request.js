@@ -66,7 +66,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     }
     Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
     const response = await request(requestOptions)
-    Logger.info(`Success: sendRequest::response ${JSON.stringify(response)}`)
+    Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
     return response
   } catch (error) {
     Logger.error(error)

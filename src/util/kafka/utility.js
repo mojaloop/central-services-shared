@@ -212,7 +212,7 @@ const createStreamingMessage = (id, to, from, metadata, headers, payload, uriPar
     from,
     type: Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
     content: {
-      uriParams: uriParams && uriParams.length > 0 ? uriParams : undefined,
+      uriParams: uriParams || undefined,
       headers: headers,
       payload: payload || {}
     },
