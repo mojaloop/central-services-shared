@@ -200,8 +200,8 @@ const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAc
  * @param {string} from - from whom the message is received
  * @param {object} metadata - The metadata for streaming
  * @param {object} payload - The payload of the message
- * @param {array} headers - headers from the request
- * @param {array} uriParams - the URI parameters passed in request.
+ * @param {object} headers - headers from the request
+ * @param {object} uriParams - the URI parameters passed in request.
  *
  * @returns {object} - Returns generated messageProtocol
  */
