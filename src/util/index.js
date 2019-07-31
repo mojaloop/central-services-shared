@@ -8,6 +8,7 @@ const Http = require('./http')
 const Hapi = require('./hapi')
 const Headers = require('./headers/transformer')
 const Encoding = require('./encoding')
+const StreamingProtocol = require('./streaming/protocol')
 
 module.exports = {
   General,
@@ -17,5 +18,6 @@ module.exports = {
   Http,
   Hapi,
   Headers,
-  Encoding
+  Encoding,
+  StreamingProtocol
 }

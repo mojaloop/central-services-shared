@@ -196,28 +196,6 @@ Test('Utility Test', utilityTest => {
     createGeneralTopicConfTest.end()
   })
 
-  utilityTest.test('updateMessageProtocolMetadata should', updateMessageProtocolMetadataTest => {
-    updateMessageProtocolMetadataTest.test('return an updated metadata object in the message protocol', test => {
-      const previousEventId = messageProtocol.metadata.event.id
-      const newMessageProtocol = Utility.updateMessageProtocolMetadata(messageProtocol, TRANSFER, PREPARE, Enum.Events.EventStatus.SUCCESS)
-      test.equal(newMessageProtocol.metadata.event.state, Enum.Events.EventStatus.SUCCESS)
-      test.equal(newMessageProtocol.metadata.event.type, TRANSFER)
-      test.equal(newMessageProtocol.metadata.event.action, PREPARE)
-      test.equal(newMessageProtocol.metadata.event.responseTo, previousEventId)
-      test.end()
-    })
-
-    updateMessageProtocolMetadataTest.test('return an updated metadata object in the message protocol if metadata is not present', test => {
-      const newMessageProtocol = Utility.updateMessageProtocolMetadata({}, TRANSFER, PREPARE, Enum.Events.EventStatus.SUCCESS)
-      test.equal(newMessageProtocol.metadata.event.state, Enum.Events.EventStatus.SUCCESS)
-      test.equal(newMessageProtocol.metadata.event.type, TRANSFER)
-      test.equal(newMessageProtocol.metadata.event.action, PREPARE)
-      test.end()
-    })
-
-    updateMessageProtocolMetadataTest.end()
-  })
-
   utilityTest.test('getKafkaConfig should', getKafkaConfigTest => {
     getKafkaConfigTest.test('return the Kafka config from the default.json', test => {
       const config = Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER.toUpperCase(), PREPARE.toUpperCase())
@@ -312,21 +290,6 @@ Test('Utility Test', utilityTest => {
     })
 
     produceParticipantMessageTest.end()
-  })
-
-  utilityTest.test('createState should', createStateTest => {
-    createStateTest.test('create a state', async (test) => {
-      const state = {
-        status: 'status',
-        code: 1,
-        description: 'description'
-      }
-      const result = await Utility.createMetadataState(state.status, state.code, state.description)
-      test.deepEqual(result, state)
-      test.end()
-    })
-
-    createStateTest.end()
   })
 
   utilityTest.test('commitMessageSync should', commitMessageSyncTest => {

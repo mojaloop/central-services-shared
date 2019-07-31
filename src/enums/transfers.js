@@ -72,6 +72,7 @@ const BulkTransferState = {
   RECEIVED: 'RECEIVED',
   REJECTED: 'REJECTED'
 }
+
 const BulkTransferStateEnum = {
   ACCEPTED: 'ACCEPTED',
   COMPLETED: 'COMPLETED',

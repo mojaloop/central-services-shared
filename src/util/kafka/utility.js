@@ -38,11 +38,10 @@
 
 const Mustache = require('mustache')
 const Logger = require('../../logger')
-const Uuid = require('uuid4')
 const Kafka = require('../kafka')
 const Producer = require('./producer')
 const Enum = require('../../enums')
-
+const StreamingProtocol = require('../streaming/protocol')
 /**
  * @function ParticipantTopicTemplate
  *
@@ -157,129 +156,6 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
 }
 
 /**
- * @function updateMessageProtocolMetadata
- *
- * @param {object} messageProtocol - The current messageProtocol from kafka
- * @param {string} metadataType - the type of flow. Example: 'notification'
- * @param {string} metadataAction - the action flow. Example: 'prepare'
- * @param {object} state - the state of the message being passed.
- * Example:
- * SUCCESS: {
- *   status: 'success',
- *   code: 0,
- *   description: 'action successful'
- * }
- *
- * @returns {object} - Returns updated messageProtocol
- */
-const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAction, state) => {
-  if (!messageProtocol.metadata) {
-    messageProtocol.metadata = {
-      event: {
-        id: Uuid(),
-        type: metadataType,
-        action: metadataAction,
-        state: state
-      }
-    }
-  } else {
-    messageProtocol.metadata.event.responseTo = messageProtocol.metadata.event.id
-    messageProtocol.metadata.event.id = Uuid()
-    messageProtocol.metadata.event.type = metadataType
-    messageProtocol.metadata.event.action = metadataAction
-    messageProtocol.metadata.event.state = state
-  }
-  return messageProtocol
-}
-
-/**
- * @function createStreamingMessage
- *
- * @param {string} id - the unique ID for the correlation of messages
- * @param {string} to - to whom the message is going
- * @param {string} from - from whom the message is received
- * @param {object} metadata - The metadata for streaming
- * @param {object} payload - The payload of the message
- * @param {object} headers - headers from the request
- * @param {object} uriParams - the URI parameters passed in request.
- *
- * @returns {object} - Returns generated messageProtocol
- */
-const createStreamingMessage = (id, to, from, metadata, headers, payload, uriParams = undefined) => {
-  return {
-    id,
-    to,
-    from,
-    type: Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
-    content: {
-      uriParams: uriParams || undefined,
-      headers: headers,
-      payload: payload || {}
-    },
-    metadata
-  }
-}
-
-/**
- * @function createStreamingMessageFromRequest
- * @param {string} id - the unique ID for the correlation of messages
- * @param {object} request - The current messageProtocol from kafka
- * @param {string} to - the action flow. Example: 'prepare'
- * @param {string} from - the state of the message being passed.
- * @param {object} metadata - The metadata for streaming
- *
- * @returns {object} - Returns generated messageProtocol
- */
-const createStreamingMessageFromRequest = (id, request, to, from, metadata) => {
-  return createStreamingMessage(id, to, from, metadata, request.headers, request.dataUri, request.params)
-}
-
-/**
- * @function createMetadata
- *
- * @param {object} correlationId - The current messageProtocol from kafka
- * @param {string} type - the type of message being sent Example: 'fulfil'
- * @param {string} action - the action of message being sent Example: 'commit'
- * @param {object} state - The state object for metadata usually contains information of status
- *
- * @returns {object} - Returns generated metadata
- */
-const createMetadata = (correlationId, type, action, state) => {
-  return {
-    event: {
-      correlationId,
-      type,
-      action,
-      createdAt: new Date(),
-      state
-    }
-  }
-}
-
-/**
- * @function createMetadataState
- *
- * @param {string} status - status of message
- * @param {number} code - error code
- * @param {string} description - description of error
- * @example:
- * errorInformation: {
- *   status: 'error',
- *   code: 3100,
- *   description: 'error message'
- * }
- *
- * @returns {object} - Returns errorInformation object
- */
-const createMetadataState = (status, code, description) => {
-  return {
-    status,
-    code,
-    description
-  }
-}
-
-/**
  * @function createParticipantTopicConfig
  *
  * @param {string} template - The template for that needs to be populated
@@ -348,7 +224,7 @@ const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, 
     functionalityMapped = Enum.Kafka.TopicMap[functionality][action].functionality
     actionMapped = Enum.Kafka.TopicMap[functionality][action].action
   }
-  const messageProtocol = updateMessageProtocolMetadata(message, functionality, action, state)
+  const messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
   const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
   await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
@@ -383,7 +259,7 @@ const produceParticipantMessage = async (defaultKafkaConfig, participantName, fu
     functionalityMapped = Enum.Kafka.TopicMap[functionality][action].functionality
     actionMapped = Enum.Kafka.TopicMap[functionality][action].action
   }
-  const messageProtocol = updateMessageProtocolMetadata(message, functionality, action, state)
+  const messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
   const topicConfig = createParticipantTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, functionalityMapped, actionMapped)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
   await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
@@ -415,11 +291,6 @@ module.exports = {
   transformAccountToTopicName,
   transformGeneralTopicName,
   getKafkaConfig,
-  createStreamingMessage,
-  createStreamingMessageFromRequest,
-  updateMessageProtocolMetadata,
-  createMetadata,
-  createMetadataState,
   createParticipantTopicConf,
   createGeneralTopicConf,
   produceParticipantMessage,

@@ -56,7 +56,7 @@ const filterUndefined = (fields) => {
 }
 
 /**
- * Method to provide object clonning
+ * Method to provide object cloning
  *
  * TODO:
  *  Implement a better deep copy method

@@ -39,6 +39,7 @@ const request = require('./request')
 let client
 let policy
 let switchEndpoint
+
 /**
  * @function fetchEndpoints
  *
@@ -47,7 +48,6 @@ let switchEndpoint
  * @param {string} fsp The fsp id
  * @returns {object} endpointMap Returns the object containing the endpoints for given fsp id
  */
-
 const fetchEndpoints = async (fsp) => {
   try {
     Logger.info(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Refreshing the cache for FSP: ${fsp}`)
