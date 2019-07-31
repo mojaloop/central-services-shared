@@ -27,7 +27,7 @@
 'use strict'
 
 const Test = require('tape')
-const Util = require('../../../src/util').General
+const Util = require('../../../src/util')
 
 Test('General util', utilTest => {
   utilTest.test('formatAmount should', formatAmountTest => {
@@ -482,6 +482,53 @@ Test('General util', utilTest => {
     })
 
     setValueByCaseInsensitiveKeyTest.end()
+  })
+
+  utilTest.test('breadcrumb should', breadcrumbTest => {
+    breadcrumbTest.test('reset location method when provided by message object', (test) => {
+      const location = { module: 'Module', method: '', path: '' }
+      const message = { method: 'method' }
+      const expected = 'Module::method'
+
+      const result = Util.breadcrumb(location, message)
+      test.equal(location.method, message.method, 'method reset')
+      test.equal(result, expected, 'result matched')
+      test.end()
+    })
+
+    breadcrumbTest.test('reset location path when provided by message object', (test) => {
+      const location = { module: 'Module', method: 'method', path: '' }
+      const message = { path: 'path' }
+      const expected = 'Module::method::path'
+
+      const result = Util.breadcrumb(location, message)
+      test.equal(location.path, `${location.module}::${location.method}::${message.path}`, 'path reset')
+      test.equal(result, expected, 'result matched')
+      test.end()
+    })
+
+    breadcrumbTest.test('append location path when provided by message string', (test) => {
+      const path = 'path'
+      const location = { module: 'Module', method: 'method', path }
+      const message = 'message'
+      const expected = `${path}::${message}`
+      const result = Util.breadcrumb(location, message)
+      test.equal(location.path, `${path}::${message}`, 'path appended')
+      test.equal(result, expected, 'result matched')
+      test.end()
+    })
+
+    breadcrumbTest.test('return path unchanged when message is not provided', (test) => {
+      const path = 'path'
+      const location = { module: 'Module', method: 'method', path }
+      const expected = `${path}`
+
+      const result = Util.breadcrumb(location)
+      test.equal(result, expected, 'result matched')
+      test.end()
+    })
+
+    breadcrumbTest.end()
   })
 
   utilTest.end()

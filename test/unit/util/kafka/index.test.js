@@ -40,7 +40,7 @@ const Mustache = require('mustache')
 const Uuid = require('uuid4')
 const KafkaProducer = require('@mojaloop/central-services-stream').Kafka.Producer
 const Proxyquire = require('proxyquire')
-const Utility = require('../../../../src/util').Kafka.Utility
+const Utility = require('../../../../src/util').Kafka
 const Enum = require('../../../../src').Enum
 const Config = require('../../../util/config')
 
@@ -159,7 +159,7 @@ Test('Utility Test', utilityTest => {
     })
 
     createGeneralTopicConfTest.test('return a general topic conf object using topicMap', test => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka/utility', {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
         '../../enums': {
           topicMap: {
             transfer: {
@@ -226,7 +226,7 @@ Test('Utility Test', utilityTest => {
     })
 
     produceGeneralMessageTest.test('produce a general message using topicMap', async (test) => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka/utility', {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
         '../../enums': {
           topicMap: {
             transfer: {
@@ -263,7 +263,7 @@ Test('Utility Test', utilityTest => {
     })
 
     produceParticipantMessageTest.test('produce a participant message using topicMap', async (test) => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka/utility', {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
         '../../enums': {
           topicMap: {
             transfer: {
@@ -305,7 +305,7 @@ Test('Utility Test', utilityTest => {
           isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
         }
       }
-      const UtilityProxy = rewire(`${src}/util/kafka/utility`)
+      const UtilityProxy = rewire(`${src}/util/kafka`)
       UtilityProxy.__set__('Kafka', KakfaStub)
 
       await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
@@ -326,7 +326,7 @@ Test('Utility Test', utilityTest => {
           isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
         }
       }
-      const UtilityProxy = rewire(`${src}/util/kafka/utility`)
+      const UtilityProxy = rewire(`${src}/util/kafka`)
       UtilityProxy.__set__('Kafka', KakfaStub)
 
       await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
@@ -336,53 +336,6 @@ Test('Utility Test', utilityTest => {
     })
 
     commitMessageSyncTest.end()
-  })
-
-  utilityTest.test('breadcrumb should', breadcrumbTest => {
-    breadcrumbTest.test('reset location method when provided by message object', (test) => {
-      const location = { module: 'Module', method: '', path: '' }
-      const message = { method: 'method' }
-      const expected = 'Module::method'
-
-      const result = Utility.breadcrumb(location, message)
-      test.equal(location.method, message.method, 'method reset')
-      test.equal(result, expected, 'result matched')
-      test.end()
-    })
-
-    breadcrumbTest.test('reset location path when provided by message object', (test) => {
-      const location = { module: 'Module', method: 'method', path: '' }
-      const message = { path: 'path' }
-      const expected = 'Module::method::path'
-
-      const result = Utility.breadcrumb(location, message)
-      test.equal(location.path, `${location.module}::${location.method}::${message.path}`, 'path reset')
-      test.equal(result, expected, 'result matched')
-      test.end()
-    })
-
-    breadcrumbTest.test('append location path when provided by message string', (test) => {
-      const path = 'path'
-      const location = { module: 'Module', method: 'method', path }
-      const message = 'message'
-      const expected = `${path}::${message}`
-      const result = Utility.breadcrumb(location, message)
-      test.equal(location.path, `${path}::${message}`, 'path appended')
-      test.equal(result, expected, 'result matched')
-      test.end()
-    })
-
-    breadcrumbTest.test('return path unchanged when message is not provided', (test) => {
-      const path = 'path'
-      const location = { module: 'Module', method: 'method', path }
-      const expected = `${path}`
-
-      const result = Utility.breadcrumb(location)
-      test.equal(result, expected, 'result matched')
-      test.end()
-    })
-
-    breadcrumbTest.end()
   })
 
   utilityTest.end()
