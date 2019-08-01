@@ -3,7 +3,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Winston = require('winston')
-const Logger = require('../src/logger')
+const Logger = require('../../src/logger')
 
 Test('logger', function (loggerTest) {
   let sandbox

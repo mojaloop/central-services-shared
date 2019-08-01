@@ -43,3 +43,6 @@ jspm_packages
 **/*.iml
 
 #package-lock.json
+
+# General files to ignore
+*IGNORE*
