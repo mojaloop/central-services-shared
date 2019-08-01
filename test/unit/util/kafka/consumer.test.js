@@ -117,6 +117,23 @@ Test('Consumer', ConsumerTest => {
       test.end()
     })
 
+    createHandlerTest.test('should contain a timestamp of when it connected', async test => {
+      // Arrange
+      const ConsumerProxy = rewire(`${src}/util/kafka/consumer`)
+      const topicName = ['admin2', 'admin1']
+      const config = { rdkafkaConf: undefined }
+      // KafkaConsumer.prototype.connect.throws(new Error())
+
+      // Act
+      await ConsumerProxy.createHandler(topicName, config)
+      const result = ConsumerProxy.__get__('listOfConsumers')
+      const timestamps = Object.keys(result).map(k => result[k].connectedTimeStamp)
+
+      // Assert
+      timestamps.forEach(ts => test.ok(ts > 0, 'Timestamp should be greater than 0'))
+      test.end()
+    })
+
     createHandlerTest.end()
   })
 

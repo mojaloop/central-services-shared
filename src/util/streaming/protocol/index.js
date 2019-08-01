@@ -172,12 +172,10 @@ const createMetadataWithCorrelatedEventState = (correlationId, type, action, sta
  */
 const createEventMetadata = (type, action, state) => {
   return {
-    event: {
-      type,
-      action,
-      createdAt: new Date(),
-      state
-    }
+    type,
+    action,
+    createdAt: new Date(),
+    state
   }
 }
 
