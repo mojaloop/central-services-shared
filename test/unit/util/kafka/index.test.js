@@ -218,6 +218,15 @@ Test('Utility Test', utilityTest => {
     getKafkaConfigTest.end()
   })
 
+  utilityTest.test('transformGeneralTopicName should', getKafkaConfigTest => {
+    getKafkaConfigTest.test('return the general topic name using a template in the default.json', test => {
+      const topicName = Utility.transformGeneralTopicName(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT)
+      test.ok(topicName === 'topic-notification-event')
+      test.end()
+    })
+    getKafkaConfigTest.end()
+  })
+
   utilityTest.test('produceGeneralMessage should', produceGeneralMessageTest => {
     produceGeneralMessageTest.test('produce a general message', async (test) => {
       const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
@@ -239,6 +248,24 @@ Test('Utility Test', utilityTest => {
         }
       })
       const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      test.equal(result, true)
+      test.end()
+    })
+
+    produceGeneralMessageTest.test('produce a notification message using topicMap', async (test) => {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+        '../../enums': {
+          topicMap: {
+            transfer: {
+              prepare: {
+                functionality: 'transfer',
+                action: 'prepare'
+              }
+            }
+          }
+        }
+      })
+      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })
@@ -276,6 +303,24 @@ Test('Utility Test', utilityTest => {
         }
       })
       const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      test.equal(result, true)
+      test.end()
+    })
+
+    produceParticipantMessageTest.test('produce a notification message using topicMap', async (test) => {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+        '../../enums': {
+          topicMap: {
+            transfer: {
+              prepare: {
+                functionality: 'transfer',
+                action: 'prepare'
+              }
+            }
+          }
+        }
+      })
+      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, participantName, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })

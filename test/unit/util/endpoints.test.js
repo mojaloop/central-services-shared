@@ -11,7 +11,7 @@ const Http = require(`${src}/util`).Http
 const Enum = require(`${src}`).Enum
 const Mustache = require('mustache')
 const Helper = require('../../util/helper')
-const FSPIOP_CALLBACK_URL_TRANSFER_PUT = 'FSPIOP_CALLBACK_URL_TRANSFER_PUT'
+const FSPIOP_CALLBACK_URL_TRANSFER_PUT = Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
 Test('Cache Test', cacheTest => {
   let sandbox
@@ -45,6 +45,26 @@ Test('Cache Test', cacheTest => {
         test.end()
       } catch (err) {
         test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('return throw an error if array not returned in response object', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve({ data: {} }))
+
+      try {
+        await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error)
+        await Cache.stopCache()
         test.end()
       }
     })

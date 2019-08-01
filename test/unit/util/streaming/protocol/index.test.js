@@ -36,6 +36,7 @@ const Test = require('tapes')(require('tape'))
 const Uuid = require('uuid4')
 const StreamingProtocol = require(`${src}/util`).StreamingProtocol
 const Enum = require(`${src}`).Enum
+const Helper = require('../../../../util/helper')
 
 const TRANSFER = Enum.Events.Event.Type.TRANSFER
 const PREPARE = Enum.Events.Event.Action.PREPARE
@@ -91,23 +92,6 @@ const messageProtocol = {
 }
 
 Test('Utility Test', utilityTest => {
-  // let sandbox
-  //
-  // utilityTest.beforeEach(test => {
-  //   sandbox = Sinon.createSandbox()
-  //   sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
-  //   sandbox.stub(KafkaProducer.prototype, 'connect').returns(Promise.resolve())
-  //   sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
-  //   sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(Promise.resolve())
-  //   participantName = 'testParticipant'
-  //   test.end()
-  // })
-  //
-  // utilityTest.afterEach(test => {
-  //   sandbox.restore()
-  //   test.end()
-  // })
-
   utilityTest.test('updateMessageProtocolMetadata should', updateMessageProtocolMetadataTest => {
     updateMessageProtocolMetadataTest.test('return an updated metadata object in the message protocol', test => {
       const previousEventId = messageProtocol.metadata.event.id
@@ -130,19 +114,160 @@ Test('Utility Test', utilityTest => {
     updateMessageProtocolMetadataTest.end()
   })
 
-  utilityTest.test('createState should', createStateTest => {
-    createStateTest.test('create a state', async (test) => {
+  utilityTest.test('createEventState should', createEventStateTest => {
+    createEventStateTest.test('create a state', (test) => {
       const state = {
         status: 'status',
         code: 1,
         description: 'description'
       }
-      const result = await StreamingProtocol.createEventState(state.status, state.code, state.description)
+      const result = StreamingProtocol.createEventState(state.status, state.code, state.description)
       test.deepEqual(result, state)
       test.end()
     })
 
-    createStateTest.end()
+    createEventStateTest.end()
+  })
+
+  utilityTest.test('createEventMetadata should', createEventMetadataTest => {
+    createEventMetadataTest.test('create an event', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const result = StreamingProtocol.createEventMetadata(event.type, event.action, state)
+      test.deepEqual(result.state, state)
+      test.equal(result.action, event.action)
+      test.equal(result.type, event.type)
+      test.end()
+    })
+
+    createEventMetadataTest.end()
+  })
+
+  utilityTest.test('createMetadataWithCorrelatedEventState should', createMetadataWithCorrelatedEventStateTest => {
+    createMetadataWithCorrelatedEventStateTest.test('create a metadata object', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const correlationId = 'c74b826d-3c0b-4cfd-8ec1-08cc4343fe8c'
+      const metadata = StreamingProtocol.createMetadataWithCorrelatedEventState(correlationId, event.type, event.action, state.status, state.code, state.description)
+      test.deepEqual(metadata.event.state, state)
+      test.equal(metadata.event.action, event.action)
+      test.equal(metadata.event.type, event.type)
+      test.equal(metadata.correlationId, correlationId)
+      test.end()
+    })
+
+    createMetadataWithCorrelatedEventStateTest.end()
+  })
+
+  utilityTest.test('createMetadataWithCorrelatedEventState should', createMetadataWithCorrelatedEventTest => {
+    createMetadataWithCorrelatedEventTest.test('create a metadata object', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const correlationId = 'c74b826d-3c0b-4cfd-8ec1-08cc4343fe8c'
+      const metadata = StreamingProtocol.createMetadataWithCorrelatedEvent(correlationId, event.type, event.action, state)
+      test.deepEqual(metadata.event.state, state)
+      test.equal(metadata.event.action, event.action)
+      test.equal(metadata.event.type, event.type)
+      test.equal(metadata.correlationId, correlationId)
+      test.end()
+    })
+
+    createMetadataWithCorrelatedEventTest.end()
+  })
+
+  utilityTest.test('createMessageFromRequest should', createMessageFromRequestTest => {
+    createMessageFromRequestTest.test('create a metadata object', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const dataUri = 'data:application/json;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+      const correlationId = 'c74b826d-3c0b-4cfd-8ec1-08cc4343fe8c'
+      const metadata = StreamingProtocol.createMetadataWithCorrelatedEvent(correlationId, event.type, event.action, state)
+      const to = 'fsp1'
+      const from = 'fsp2'
+      const headers = Helper.defaultHeaders(to, 'participants', from)
+      const request = {
+        dataUri,
+        headers
+      }
+      const message = StreamingProtocol.createMessageFromRequest(correlationId, request, to, from, metadata)
+      test.deepEqual(message.metadata.event.state, state)
+      test.equal(message.metadata.event.action, event.action)
+      test.equal(message.metadata.event.type, event.type)
+      test.equal(message.metadata.correlationId, correlationId)
+      test.deepEqual(message.content.headers, headers)
+      test.equal(message.to, to)
+      test.equal(message.from, from)
+      test.equal(message.id, correlationId)
+      test.equal(message.content.payload, dataUri)
+      test.end()
+    })
+
+    createMessageFromRequestTest.end()
+  })
+
+  utilityTest.test('createMessage should', createMessageTest => {
+    createMessageTest.test('create a metadata object', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const correlationId = 'c74b826d-3c0b-4cfd-8ec1-08cc4343fe8c'
+      const metadata = StreamingProtocol.createMetadataWithCorrelatedEvent(correlationId, event.type, event.action, state)
+      const to = 'fsp1'
+      const from = 'fsp2'
+      const headers = Helper.defaultHeaders(to, 'participants', from)
+      const message = StreamingProtocol.createMessage(correlationId, to, from, metadata, headers, null)
+      test.deepEqual(message.metadata.event.state, state)
+      test.equal(message.metadata.event.action, event.action)
+      test.equal(message.metadata.event.type, event.type)
+      test.equal(message.metadata.correlationId, correlationId)
+      test.deepEqual(message.content.headers, headers)
+      test.equal(message.to, to)
+      test.equal(message.from, from)
+      test.equal(message.id, correlationId)
+      test.deepEqual(message.content.payload, {})
+      test.end()
+    })
+
+    createMessageTest.end()
   })
 
   utilityTest.end()

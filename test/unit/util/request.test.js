@@ -64,6 +64,27 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       }
     })
 
+    getEndpointTest.test('throw error', async (test) => {
+      const fsp = 'fsp1'
+
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.TRANSACTION_REQUEST_POST, { fsp }),
+        method: 'post'
+      }
+
+      request = sandbox.stub().throws(new Error())
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      try {
+        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.POST)
+        test.fail('should throw error')
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error)
+        test.end()
+      }
+    })
+
     getEndpointTest.end()
   })
 
