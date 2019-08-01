@@ -25,9 +25,9 @@ const Logger = createLogger({
     timestamp(),
     colorize({
       colors: {
-        audit: 'blue',
+        audit: 'magenta',
         trace: 'white',
-        perf: 'yellow'
+        perf: 'green'
       }
     }),
     customFormat
