@@ -1,16 +1,16 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "7.2.0",
+  "version": "7.2.3",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
     "test": "npm run test:unit | faucet",
     "pretest": "standard",
     "standard": "standard",
-    "test:unit": "tapes 'test/**/*.test.js'",
+    "test:unit": "tapes 'test/unit/**/**.test.js'",
     "test:xunit": "npm run test:unit | tap-xunit",
-    "test:coverage": "istanbul cover tapes -- 'test/**/*.test.js'",
-    "test:coverage-check": "npm run test:coverage && istanbul check-coverage",
+    "test:coverage": "nyc --reporter=lcov --reporter=text-summary tapes -- 'test/unit/**/**.test.js'",
+    "test:coverage-check": "npm run test:coverage && nyc check-coverage",
     "audit:resolve": "SHELL=sh resolve-audit",
     "audit:check": "SHELL=sh check-audit"
   },
@@ -23,25 +23,41 @@
     "central",
     "services"
   ],
-  "author": "Dwolla",
+  "author": "ModusBox",
+  "contributors": [
+    "ModusBox",
+    "Dwolla"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/mojaloop/central-services-shared/issues"
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
-    "async": "3.1.0",
-    "debug": "4.1.1",
+    "@mojaloop/central-services-error-handling": "7.2.2",
+    "@mojaloop/central-services-stream": "6.2.2",
+    "axios": "0.19.0",
+    "catbox": "10.0.6",
+    "catbox-memory": "4.0.1",
+    "glob": "7.1.4",
+    "immutable": "3.8.2",
+    "lodash": "4.17.15",
+    "mustache": "3.0.1",
+    "raw-body": "2.4.1",
+    "uuid4": "1.1.4",
     "winston": "3.2.1"
   },
   "devDependencies": {
     "@hapi/joi": "15.1.0",
     "faucet": "0.0.1",
     "npm-audit-resolver": "1.5.0",
-    "istanbul": "1.1.0-alpha.1",
+    "nyc": "14.1.1",
     "pre-commit": "1.2.2",
+    "proxyquire": "2.1.1",
+    "rc": "1.2.8",
+    "rewire": "4.0.1",
     "sinon": "7.3.2",
-    "standard": "13.0.2",
+    "standard": "13.1.0",
     "tap-xunit": "2.4.1",
     "tape": "4.11.0",
     "tapes": "4.1.0"
