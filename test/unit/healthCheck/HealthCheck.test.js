@@ -3,7 +3,7 @@
 const Test = require('tape')
 const Joi = require('@hapi/joi')
 
-const HealthCheck = require('../../src/healthCheck').HealthCheck
+const HealthCheck = require('../../../src/healthCheck').HealthCheck
 
 Test('HealthCheck test', healthCheckTest => {
   healthCheckTest.test('getHealth', getHealthTest => {
