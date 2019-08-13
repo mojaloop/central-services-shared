@@ -32,7 +32,7 @@
 /**
  * @module src/handlers/lib/kafka
  */
-
+const decodePayload = require('@mojaloop/central-services-stream').Kafka.Protocol.decodePayload
 const Consumer = require('./consumer')
 const Mustache = require('mustache')
 const Logger = require('../../logger')
@@ -271,6 +271,36 @@ const commitMessageSync = async (kafkaTopic, consumer, message) => {
   }
 }
 
+const proceed = async (defaultKafkaConfig, params, opts) => {
+  const { message, kafkaTopic, consumer } = params
+  const { consumerCommit, fspiopError, producer, fromSwitch, toDestination } = opts
+  let metadataState
+
+  if (consumerCommit) {
+    await commitMessageSync(kafkaTopic, consumer, message)
+  }
+  if (fspiopError) {
+    if (!message.value.content.uriParams || !message.value.content.uriParams.id) {
+      message.value.content.uriParams = { id: decodePayload(params.message.value.content.payload).transferId }
+    }
+
+    message.value.content.payload = fspiopError
+    metadataState = StreamingProtocol.createEventState(Enum.Events.EventStatus.FAILURE.status, fspiopError.errorInformation.errorCode, fspiopError.errorInformation.errorDescription)
+  } else {
+    metadataState = Enum.Events.EventStatus.SUCCESS
+  }
+  if (fromSwitch) {
+    message.value.to = message.value.from
+    message.value.from = Enum.Http.Headers.FSPIOP.SWITCH.value
+  }
+  if (producer) {
+    const p = producer
+    const key = toDestination && message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
+    await produceGeneralMessage(defaultKafkaConfig, p.functionality, p.action, message.value, metadataState, key)
+  }
+  return true
+}
+
 module.exports = {
   Producer,
   Consumer,
@@ -281,5 +311,6 @@ module.exports = {
   createGeneralTopicConf,
   produceParticipantMessage,
   produceGeneralMessage,
-  commitMessageSync
+  commitMessageSync,
+  proceed
 }

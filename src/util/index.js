@@ -33,6 +33,7 @@ const Hapi = require('./hapi')
 const Headers = require('./headers/transformer')
 const Encoding = require('./encoding')
 const StreamingProtocol = require('./streaming/protocol')
+const Time = require('./time')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -196,5 +197,6 @@ module.exports = {
   Hapi,
   Headers,
   Encoding,
-  StreamingProtocol
+  StreamingProtocol,
+  Time
 }
