@@ -40,6 +40,7 @@ const Kafka = require('../kafka')
 const Producer = require('./producer')
 const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 /**
  * @function ParticipantTopicTemplate
@@ -60,9 +61,9 @@ const participantTopicTemplate = (template, participantName, functionality, acti
       functionality,
       action
     })
-  } catch (e) {
-    Logger.error(e)
-    throw e
+  } catch (err) {
+    Logger.error(err)
+    throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 
@@ -80,9 +81,9 @@ const participantTopicTemplate = (template, participantName, functionality, acti
 const generalTopicTemplate = (template, functionality, action) => {
   try {
     return Mustache.render(template, { functionality, action })
-  } catch (e) {
-    Logger.error(e)
-    throw e
+  } catch (err) {
+    Logger.error(err)
+    throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 
@@ -105,7 +106,7 @@ const transformGeneralTopicName = (template, functionality, action) => {
     return generalTopicTemplate(template, functionality, action)
   } catch (err) {
     Logger.error(err)
-    throw err
+    throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 
@@ -126,7 +127,7 @@ const transformAccountToTopicName = (template, participantName, functionality, a
     return participantTopicTemplate(template, participantName, functionality, action)
   } catch (err) {
     Logger.error(err)
-    throw err
+    throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 
@@ -149,8 +150,8 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
     const actionObject = functionalityObject[action]
     actionObject.config.logger = Logger
     return actionObject.config
-  } catch (e) {
-    throw new Error(`No config found for flow='${flow}', functionality='${functionality}', action='${action}'`)
+  } catch (err) {
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`No config found for flow='${flow}', functionality='${functionality}', action='${action}'`, err)
   }
 }
 

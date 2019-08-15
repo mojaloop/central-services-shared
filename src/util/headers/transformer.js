@@ -26,6 +26,7 @@
 'use strict'
 
 const ENUM = require('../../enums').Http
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 /**
  * @module src/headers/transformer
@@ -72,7 +73,7 @@ const transformHeaders = (headers, config) => {
           try {
             tempDate = (new Date(headerValue)).toUTCString()
             if (tempDate === 'Invalid Date') {
-              throw new Error('Invalid Date')
+              throw ErrorHandler.Factory.createInternalServerFSPIOPError('Invalid Date')
             }
           } catch (err) {
             tempDate = headerValue
