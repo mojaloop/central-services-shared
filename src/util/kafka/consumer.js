@@ -32,6 +32,7 @@
 
 const Consumer = require('@mojaloop/central-services-stream').Kafka.Consumer
 const Logger = require('../../logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const listOfConsumers = {}
 
@@ -97,7 +98,7 @@ const getConsumer = (topicName) => {
   if (listOfConsumers[topicName]) {
     return listOfConsumers[topicName].consumer
   } else {
-    throw Error(`No consumer found for topic ${topicName}`)
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`No consumer found for topic ${topicName}`)
   }
 }
 
@@ -115,7 +116,7 @@ const isConsumerAutoCommitEnabled = (topicName) => {
   if (listOfConsumers[topicName]) {
     return listOfConsumers[topicName].autoCommitEnabled
   } else {
-    throw Error(`No consumer found for topic ${topicName}`)
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`No consumer found for topic ${topicName}`)
   }
 }
 
@@ -162,7 +163,7 @@ const isConnected = async topicName => {
   const foundTopics = metadata.topics.map(topic => topic.name)
   if (foundTopics.indexOf(topicName) === -1) {
     Logger.debug(`Connected to consumer, but ${topicName} not found.`)
-    throw new Error(`Connected to consumer, but ${topicName} not found.`)
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`Connected to consumer, but ${topicName} not found.`)
   }
   return true
 }
