@@ -158,5 +158,19 @@ Test('Time', async (timeTest) => {
     }
   })
 
+  await timeTest.test('getUTCString should return a UTC string of the date', async (test) => {
+    try {
+      const expectedResult = '1995-12-04 00:12:00.000'
+      const setDate = new Date(Date.parse('04 Dec 1995 00:12:00 GMT'))
+      const result = await Model.getUTCString(setDate)
+      test.equal(result, expectedResult, 'return current UTC time in milliseconds')
+      test.end()
+    } catch (err) {
+      Logger.error(`msToday failed with error - ${err}`)
+      test.fail()
+      test.end()
+    }
+  })
+
   await timeTest.end()
 })
