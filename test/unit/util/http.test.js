@@ -50,9 +50,9 @@ Test('Http tests', HttpTest => {
         'fspiop-source': 'fsp1'
       }
       const headersResponse = Http.SwitchDefaultHeaders(header['fspiop-destination'], resource, header['fspiop-source'])
-      test.equal(headersResponse['accept'], header.accept)
-      test.equal(headersResponse['fspiop-destination'], header['fspiop-destination'])
-      test.equal(headersResponse['fspiop-source'], header['fspiop-source'])
+      test.equal(headersResponse['Accept'], header.accept)
+      test.equal(headersResponse['FSPIOP-Destination'], header['fspiop-destination'])
+      test.equal(headersResponse['FSPIOP-Source'], header['fspiop-source'])
       test.end()
     })
 
@@ -69,9 +69,9 @@ Test('Http tests', HttpTest => {
         'fspiop-source': 'fsp1'
       }
       const headersResponse = Http.SwitchDefaultHeaders(undefined, resource, header['fspiop-source'])
-      test.equal(headersResponse['accept'], header.accept)
-      test.equal(headersResponse['fspiop-destination'], '')
-      test.equal(headersResponse['fspiop-source'], header['fspiop-source'])
+      test.equal(headersResponse['Accept'], header.accept)
+      test.equal(headersResponse['FSPIOP-Destination'], '')
+      test.equal(headersResponse['FSPIOP-Source'], header['fspiop-source'])
       test.end()
     })
 

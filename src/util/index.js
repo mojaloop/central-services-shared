@@ -174,6 +174,14 @@ const breadcrumb = (location, message) => {
   return location.path
 }
 
+const transpose = function (obj) {
+  const transposed = new Map()
+  for (const prop in obj) {
+    transposed[obj[prop]] = prop
+  }
+  return transposed
+}
+
 module.exports = {
   assign,
   expand,
@@ -190,6 +198,7 @@ module.exports = {
   getValueByCaseInsensitiveKey,
   setValueByCaseInsensitiveKey,
   breadcrumb,
+  transpose,
   Kafka,
   Endpoints,
   Request,
