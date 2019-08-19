@@ -70,15 +70,16 @@ const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAc
  * @param {object} payload - The payload of the message
  * @param {object} headers - headers from the request
  * @param {object} uriParams - the URI parameters passed in request.
+ * @param {string} type - the message type for the LIME message, defaults to 'application/json'
  *
  * @returns {object} - Returns generated messageProtocol
  */
-const createMessage = (id, to, from, metadata, headers, payload, uriParams = undefined) => {
+const createMessage = (id, to, from, metadata, headers, payload, uriParams = undefined, type = undefined) => {
   return {
     id,
     to,
     from,
-    type: Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
+    type: type || Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
     content: {
       uriParams: uriParams || undefined,
       headers: headers,
