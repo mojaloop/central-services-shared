@@ -407,7 +407,7 @@ Test('Utility Test', utilityTest => {
     const transferId = Uuid()
     const kafkaTopic = 'kafkaTopic'
     const consumer = 'consumer'
-    const params = { message, transferId, kafkaTopic, consumer }
+    const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload }
     const producer = { functionality: 'functionality', action: 'action' }
     const UtilityProxy = rewire(`${src}/util/kafka/index`)
     UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)

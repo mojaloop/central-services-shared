@@ -32,7 +32,6 @@
 /**
  * @module src/handlers/lib/kafka
  */
-const decodePayload = require('@mojaloop/central-services-stream').Kafka.Protocol.decodePayload
 const Consumer = require('./consumer')
 const Mustache = require('mustache')
 const Logger = require('../../logger')
@@ -273,7 +272,7 @@ const commitMessageSync = async (kafkaTopic, consumer, message) => {
 }
 
 const proceed = async (defaultKafkaConfig, params, opts) => {
-  const { message, kafkaTopic, consumer } = params
+  const { message, kafkaTopic, consumer, decodedPayload } = params
   const { consumerCommit, fspiopError, producer, fromSwitch, toDestination } = opts
   let metadataState
 
@@ -282,7 +281,7 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   }
   if (fspiopError) {
     if (!message.value.content.uriParams || !message.value.content.uriParams.id) {
-      message.value.content.uriParams = { id: decodePayload(params.message.value.content.payload).transferId }
+      message.value.content.uriParams = { id: decodedPayload.transferId }
     }
 
     message.value.content.payload = fspiopError
