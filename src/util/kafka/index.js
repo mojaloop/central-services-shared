@@ -35,7 +35,6 @@
 const Consumer = require('./consumer')
 const Mustache = require('mustache')
 const Logger = require('../../logger')
-const Kafka = require('../kafka')
 const Producer = require('./producer')
 const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
@@ -266,7 +265,7 @@ const produceParticipantMessage = async (defaultKafkaConfig, participantName, fu
 }
 
 const commitMessageSync = async (kafkaTopic, consumer, message) => {
-  if (!Kafka.Consumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
+  if (!Consumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
     await consumer.commitMessageSync(message)
   }
 }

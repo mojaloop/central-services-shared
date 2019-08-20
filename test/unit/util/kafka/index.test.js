@@ -347,16 +347,14 @@ Test('Utility Test', utilityTest => {
       const consumerStub = {
         commitMessageSync: commitMessageSyncStub
       }
-      const KakfaStub = {
-        Consumer: {
-          isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
-        }
+      const ConsumerStub = {
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
       }
       const UtilityProxy = rewire(`${src}/util/kafka`)
-      UtilityProxy.__set__('Kafka', KakfaStub)
+      UtilityProxy.__set__('Consumer', ConsumerStub)
 
       await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
-      test.ok(KakfaStub.Consumer.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
+      test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.ok(commitMessageSyncStub.withArgs(message).calledOnce, 'commitMessageSyncStub called once')
       test.end()
     })
@@ -368,16 +366,15 @@ Test('Utility Test', utilityTest => {
       const consumerStub = {
         commitMessageSync: commitMessageSyncStub
       }
-      const KakfaStub = {
-        Consumer: {
-          isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
-        }
+      const ConsumerStub = {
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
       }
+
       const UtilityProxy = rewire(`${src}/util/kafka`)
-      UtilityProxy.__set__('Kafka', KakfaStub)
+      UtilityProxy.__set__('Consumer', ConsumerStub)
 
       await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
-      test.ok(KakfaStub.Consumer.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
+      test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.equal(commitMessageSyncStub.withArgs(message).callCount, 0, 'commitMessageSyncStub not called')
       test.end()
     })
