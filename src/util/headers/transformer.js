@@ -64,9 +64,9 @@ const transformHeaders = (headers, config) => {
 
   for (const headerKey in headers) {
     const headerValue = headers[headerKey]
+    let tempDate
     switch (headerKey.toLowerCase()) {
       case (ENUM.Headers.GENERAL.DATE):
-        let tempDate = {}
         if (typeof headerValue === 'object' && headerValue instanceof Date) {
           tempDate = headerValue.toUTCString()
         } else {
