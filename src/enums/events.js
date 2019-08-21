@@ -24,21 +24,11 @@
  --------------
  ******/
 
-const BulkTransferEvent = {
-  Type: {
-    BULK_PREPARE: 'bulk-prepare',
-    BULK_FULFIL: 'bulk-fulfil'
-  },
-  Action: {
-    BULK_PREPARE: 'bulk-prepare',
-    BULK_COMMIT: 'bulk-commit'
-  }
-}
-
 const Event = {
   Type: {
     BULK: 'bulk',
     BULK_TRANSFER: 'bulk-transfer',
+    BULK_PROCESSING: 'bulk-processing',
     PREPARE: 'prepare',
     POSITION: 'position',
     TRANSFER: 'transfer',
@@ -49,10 +39,11 @@ const Event = {
     EVENT: 'event'
   },
   Action: {
-    // BULK_FULFIL: 'bulk-fulfil',
+    BULK_FULFIL: 'bulk-fulfil',
     BULK_COMMIT: 'bulk-commit',
     BULK_PREPARE: 'bulk-prepare',
     BULK_PROCESSING: 'bulk-processing',
+    PROCESSING: 'processing',
     PREPARE: 'prepare',
     PREPARE_DUPLICATE: 'prepare-duplicate',
     FULFIL_DUPLICATE: 'fulfil-duplicate',
@@ -92,7 +83,7 @@ const EventStatus = {
 const ActionLetter = {
   abort: 'A',
   bulkPrepare: 'BP',
-  // bulkFulfil: 'BF',
+  bulkFulfil: 'BF',
   bulkCommit: 'BC',
   commit: 'C',
   get: 'G',
@@ -111,7 +102,6 @@ const EventState = {
 }
 
 module.exports = {
-  BulkTransferEvent,
   Event,
   EventStatus,
   ActionLetter,

@@ -34,6 +34,7 @@
 const getRawBody = require('raw-body')
 const encodePayload = require('@mojaloop/central-services-stream/src/kafka/protocol').encodePayload
 const Logger = require('../../../logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const requestRawPayloadTransform = (request, payloadBuffer) => {
   try {
@@ -44,7 +45,7 @@ const requestRawPayloadTransform = (request, payloadBuffer) => {
     })
   } catch (err) {
     Logger.error(err)
-    throw err
+    throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 

@@ -72,7 +72,8 @@ const RestMethods = {
 const HeaderResources = {
   PARTICIPANTS: 'participants',
   ORACLE: 'oracle',
-  SWITCH: 'switch'
+  SWITCH: 'switch',
+  TRANSFERS: 'transfers'
 }
 
 const ServiceType = {

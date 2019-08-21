@@ -44,15 +44,15 @@ Test('Http tests', HttpTest => {
     switchDefaultHeadersTest.test('create a metadata object', (test) => {
       const resource = 'participants'
       const header = {
-        accept: `application/vnd.interoperability.${resource}+json;version=1.0`,
-        'fspiop-destination': 'fsp2',
-        'content-type': `application/vnd.interoperability.${resource}+json;version=1.0`,
-        'fspiop-source': 'fsp1'
+        Accept: `application/vnd.interoperability.${resource}+json;version=1.0`,
+        'FSPIOP-Destination': 'fsp2',
+        'Content-Type': `application/vnd.interoperability.${resource}+json;version=1.0`,
+        'FSPIOP-Source': 'fsp1'
       }
-      const headersResponse = Http.SwitchDefaultHeaders(header['fspiop-destination'], resource, header['fspiop-source'])
-      test.equal(headersResponse['accept'], header.accept)
-      test.equal(headersResponse['fspiop-destination'], header['fspiop-destination'])
-      test.equal(headersResponse['fspiop-source'], header['fspiop-source'])
+      const headersResponse = Http.SwitchDefaultHeaders(header['FSPIOP-Destination'], resource, header['FSPIOP-Source'])
+      test.equal(headersResponse.Accept, header.Accept)
+      test.equal(headersResponse['FSPIOP-Destination'], header['FSPIOP-Destination'])
+      test.equal(headersResponse['FSPIOP-Source'], header['FSPIOP-Source'])
       test.end()
     })
 
@@ -63,15 +63,15 @@ Test('Http tests', HttpTest => {
     switchDefaultHeadersTest.test('create a metadata object', (test) => {
       const resource = 'participants'
       const header = {
-        accept: `application/vnd.interoperability.${resource}+json;version=1.0`,
-        'fspiop-destination': 'fsp2',
-        'content-type': `application/vnd.interoperability.${resource}+json;version=1.0`,
-        'fspiop-source': 'fsp1'
+        Accept: `application/vnd.interoperability.${resource}+json;version=1.0`,
+        'FSPIOP-Destination': 'fsp2',
+        'Content-Type': `application/vnd.interoperability.${resource}+json;version=1.0`,
+        'FSPIOP-Source': 'fsp1'
       }
-      const headersResponse = Http.SwitchDefaultHeaders(undefined, resource, header['fspiop-source'])
-      test.equal(headersResponse['accept'], header.accept)
-      test.equal(headersResponse['fspiop-destination'], '')
-      test.equal(headersResponse['fspiop-source'], header['fspiop-source'])
+      const headersResponse = Http.SwitchDefaultHeaders(undefined, resource, header['FSPIOP-Source'])
+      test.equal(headersResponse.Accept, header.Accept)
+      test.equal(headersResponse['FSPIOP-Destination'], '')
+      test.equal(headersResponse['FSPIOP-Source'], header['FSPIOP-Source'])
       test.end()
     })
 
