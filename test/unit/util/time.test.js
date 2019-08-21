@@ -172,5 +172,19 @@ Test('Time', async (timeTest) => {
     }
   })
 
+  await timeTest.test('getYMDString should return a YYYYMMDD string of the date', async (test) => {
+    try {
+      const expectedResult = '19951204'
+      const setDate = new Date(Date.parse('04 Dec 1995 00:12:00 GMT'))
+      const result = await Model.getYMDString(setDate)
+      test.equal(result, expectedResult, 'return YYYYMMDD string')
+      test.end()
+    } catch (err) {
+      Logger.error(`msToday failed with error - ${err}`)
+      test.fail()
+      test.end()
+    }
+  })
+
   await timeTest.end()
 })
