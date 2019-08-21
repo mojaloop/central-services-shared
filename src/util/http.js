@@ -48,11 +48,11 @@ const SwitchDefaultHeaders = (destination, resource, source, version = '1.0') =>
   // TODO: See API section 3.2.1; what should we do about X-Forwarded-For? Also, should we
   // add/append to this field in all 'queueResponse' calls?
   return {
-    accept: `application/vnd.interoperability.${resource}+json;version=${version}`,
-    'fspiop-destination': destination || '',
-    'content-type': `application/vnd.interoperability.${resource}+json;version=${version}`,
-    date: (new Date()).toUTCString(),
-    'fspiop-source': source
+    Accept: `application/vnd.interoperability.${resource}+json;version=${version}`,
+    'FSPIOP-Destination': destination || '',
+    'Content-Type': `application/vnd.interoperability.${resource}+json;version=${version}`,
+    Date: (new Date()).toUTCString(),
+    'FSPIOP-Source': source
   }
 }
 

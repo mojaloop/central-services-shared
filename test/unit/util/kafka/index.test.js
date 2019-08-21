@@ -39,7 +39,9 @@ const Test = require('tapes')(require('tape'))
 const Mustache = require('mustache')
 const Uuid = require('uuid4')
 const KafkaProducer = require('@mojaloop/central-services-stream').Kafka.Producer
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Proxyquire = require('proxyquire')
+const MainUtil = require('../../../../src/util')
 const Utility = require('../../../../src/util').Kafka
 const Enum = require('../../../../src').Enum
 const Config = require('../../../util/config')
@@ -345,16 +347,14 @@ Test('Utility Test', utilityTest => {
       const consumerStub = {
         commitMessageSync: commitMessageSyncStub
       }
-      const KakfaStub = {
-        Consumer: {
-          isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
-        }
+      const ConsumerStub = {
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
       }
       const UtilityProxy = rewire(`${src}/util/kafka`)
-      UtilityProxy.__set__('Kafka', KakfaStub)
+      UtilityProxy.__set__('Consumer', ConsumerStub)
 
       await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
-      test.ok(KakfaStub.Consumer.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
+      test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.ok(commitMessageSyncStub.withArgs(message).calledOnce, 'commitMessageSyncStub called once')
       test.end()
     })
@@ -366,21 +366,112 @@ Test('Utility Test', utilityTest => {
       const consumerStub = {
         commitMessageSync: commitMessageSyncStub
       }
-      const KakfaStub = {
-        Consumer: {
-          isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
-        }
+      const ConsumerStub = {
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
       }
+
       const UtilityProxy = rewire(`${src}/util/kafka`)
-      UtilityProxy.__set__('Kafka', KakfaStub)
+      UtilityProxy.__set__('Consumer', ConsumerStub)
 
       await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
-      test.ok(KakfaStub.Consumer.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
+      test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.equal(commitMessageSyncStub.withArgs(message).callCount, 0, 'commitMessageSyncStub not called')
       test.end()
     })
 
     commitMessageSyncTest.end()
+  })
+
+  utilityTest.test('proceed should', async proceedTest => {
+    const commitMessageSyncStub = sandbox.stub().returns(Promise.resolve())
+    const produceGeneralMessageStub = sandbox.stub().returns(Promise.resolve())
+    const successState = Enum.Events.EventStatus.SUCCESS
+    const from = 'from'
+    const extList = []
+    const message = {
+      value: {
+        content: {
+          payload: {
+            extensionList: extList
+          },
+          headers: {
+            'fspiop-destination': 'dfsp'
+          }
+        },
+        from
+      }
+    }
+    const transferId = Uuid()
+    const kafkaTopic = 'kafkaTopic'
+    const consumer = 'consumer'
+    const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload }
+    const producer = { functionality: 'functionality', action: 'action' }
+    const UtilityProxy = rewire(`${src}/util/kafka/index`)
+    UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)
+    UtilityProxy.__set__('produceGeneralMessage', produceGeneralMessageStub)
+
+    proceedTest.test('commitMessageSync when consumerCommit and produce toDestination', async test => {
+      const opts = { consumerCommit: true, producer, toDestination: true }
+      try {
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+        const p = producer
+        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub called once')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, p.functionality, p.action, message.value, successState).calledOnce, 'produceGeneralMessageStub called once')
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.test('produce fromSwitch and do not stop timer', async test => {
+      const opts = { fromSwitch: true, producer }
+      try {
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+        const p = producer
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, p.functionality, p.action, message.value, successState).calledTwice, 'produceGeneralMessageStub called twice')
+        test.equal(message.value.to, from, 'message destination set to sender')
+        test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.test('create error status and end timer', async test => {
+      const desc = 'desc'
+      const fspiopError = ErrorHandler.Factory.createInternalServerFSPIOPError(desc).toApiErrorObject()
+      const opts = { fspiopError }
+      try {
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.test('create error status and end timer with uriParams', async test => {
+      const desc = 'desc'
+      const fspiopError = ErrorHandler.Factory.createInternalServerFSPIOPError(desc).toApiErrorObject()
+      const opts = { fspiopError }
+      try {
+        const localParams = MainUtil.clone(params)
+        localParams.message.value.content.uriParams = { id: Uuid() }
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.end()
   })
 
   utilityTest.end()

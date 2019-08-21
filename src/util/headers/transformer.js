@@ -26,6 +26,7 @@
 'use strict'
 
 const ENUM = require('../../enums').Http
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 /**
  * @module src/headers/transformer
@@ -63,16 +64,16 @@ const transformHeaders = (headers, config) => {
 
   for (const headerKey in headers) {
     const headerValue = headers[headerKey]
+    let tempDate
     switch (headerKey.toLowerCase()) {
       case (ENUM.Headers.GENERAL.DATE):
-        let tempDate = {}
         if (typeof headerValue === 'object' && headerValue instanceof Date) {
           tempDate = headerValue.toUTCString()
         } else {
           try {
             tempDate = (new Date(headerValue)).toUTCString()
             if (tempDate === 'Invalid Date') {
-              throw new Error('Invalid Date')
+              throw ErrorHandler.Factory.createInternalServerFSPIOPError('Invalid Date')
             }
           } catch (err) {
             tempDate = headerValue
@@ -80,16 +81,8 @@ const transformHeaders = (headers, config) => {
         }
         normalizedHeaders[headerKey] = tempDate
         break
-      case (ENUM.Headers.GENERAL.CONTENT_LENGTH):
-        // Do nothing here, do not map. This will be inserted correctly by the Hapi framework.
-        break
-      case (ENUM.Headers.FSPIOP.URI):
-        // Check to see if we find a regex match the source header containing the switch name.
-        // If so we include the uri otherwise we remove it.
-
-        if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
-          normalizedHeaders[headerKey] = headerValue
-        }
+      case (ENUM.Headers.GENERAL.CONTENT_LENGTH || ENUM.Headers.GENERAL.HOST):
+        // Do nothing here, do not map. This will be inserted correctly by the Axios library
         break
       case (ENUM.Headers.FSPIOP.HTTP_METHOD):
         // Check to see if we find a regex match the source header containing the switch name.
@@ -97,10 +90,10 @@ const transformHeaders = (headers, config) => {
         if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
           if (config.httpMethod.toLowerCase() === headerValue.toLowerCase()) {
             // HTTP Methods match, and thus no change is required
-            normalizedHeaders[headerKey] = headerValue
+            normalizedHeaders[headerKey] = headerValue.toUpperCase()
           } else {
             // HTTP Methods DO NOT match, and thus a change is required for target HTTP Method
-            normalizedHeaders[headerKey] = config.httpMethod
+            normalizedHeaders[headerKey] = config.httpMethod.toUpperCase()
           }
         } else {
           if (config.httpMethod.toLowerCase() === headerValue.toLowerCase()) {

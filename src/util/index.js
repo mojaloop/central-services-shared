@@ -33,6 +33,7 @@ const Hapi = require('./hapi')
 const Headers = require('./headers/transformer')
 const Encoding = require('./encoding')
 const StreamingProtocol = require('./streaming/protocol')
+const Time = require('./time')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -173,6 +174,14 @@ const breadcrumb = (location, message) => {
   return location.path
 }
 
+const transpose = function (obj) {
+  const transposed = new Map()
+  for (const prop in obj) {
+    transposed[obj[prop]] = prop
+  }
+  return transposed
+}
+
 module.exports = {
   assign,
   expand,
@@ -189,6 +198,7 @@ module.exports = {
   getValueByCaseInsensitiveKey,
   setValueByCaseInsensitiveKey,
   breadcrumb,
+  transpose,
   Kafka,
   Endpoints,
   Request,
@@ -196,5 +206,6 @@ module.exports = {
   Hapi,
   Headers,
   Encoding,
-  StreamingProtocol
+  StreamingProtocol,
+  Time
 }

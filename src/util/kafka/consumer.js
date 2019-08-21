@@ -32,6 +32,7 @@
 
 const Consumer = require('@mojaloop/central-services-stream').Kafka.Consumer
 const Logger = require('../../logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const listOfConsumers = {}
 
@@ -48,7 +49,7 @@ const listOfConsumers = {}
  * @throws {Error} -  if failure occurs
  */
 const createHandler = async (topicName, config, command) => {
-  Logger.info(`CreateHandle::connect - creating Consumer for topics: [${topicName}]`)
+  Logger.info(`CreateHandler::connect - creating Consumer for topics: [${topicName}]`)
   let topicNameArray
   if (Array.isArray(topicName)) {
     topicNameArray = topicName
@@ -66,12 +67,12 @@ const createHandler = async (topicName, config, command) => {
   let connectedTimeStamp = 0
   try {
     await consumer.connect()
-    Logger.info(`CreateHandle::connect - successfully connected to topics: [${topicNameArray}]`)
+    Logger.info(`CreateHandler::connect - successfully connected to topics: [${topicNameArray}]`)
     connectedTimeStamp = (new Date()).valueOf()
     await consumer.consume(command)
   } catch (e) {
     // Don't throw the error, still keep track of the topic we tried to connect to
-    Logger.warn(`CreateHandle::connect - error: ${e}`)
+    Logger.warn(`CreateHandler::connect - error: ${e}`)
   }
 
   topicNameArray.forEach(topicName => {
@@ -97,7 +98,7 @@ const getConsumer = (topicName) => {
   if (listOfConsumers[topicName]) {
     return listOfConsumers[topicName].consumer
   } else {
-    throw Error(`No consumer found for topic ${topicName}`)
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`No consumer found for topic ${topicName}`)
   }
 }
 
@@ -115,7 +116,7 @@ const isConsumerAutoCommitEnabled = (topicName) => {
   if (listOfConsumers[topicName]) {
     return listOfConsumers[topicName].autoCommitEnabled
   } else {
-    throw Error(`No consumer found for topic ${topicName}`)
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`No consumer found for topic ${topicName}`)
   }
 }
 
@@ -162,12 +163,13 @@ const isConnected = async topicName => {
   const foundTopics = metadata.topics.map(topic => topic.name)
   if (foundTopics.indexOf(topicName) === -1) {
     Logger.debug(`Connected to consumer, but ${topicName} not found.`)
-    throw new Error(`Connected to consumer, but ${topicName} not found.`)
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`Connected to consumer, but ${topicName} not found.`)
   }
   return true
 }
 
 module.exports = {
+  Consumer,
   createHandler,
   getConsumer,
   getListOfTopics,
