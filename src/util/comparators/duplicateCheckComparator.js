@@ -28,7 +28,7 @@
  ******/
 'use strict'
 
-const Util = require('../lib/util')
+const Util = require('../index')
 
 const duplicateCheckComparator = async (id, object, getDuplicateDataFuncOverride, saveHashFuncOverride) => {
   let hasDuplicateId = false
