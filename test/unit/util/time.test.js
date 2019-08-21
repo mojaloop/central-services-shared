@@ -152,7 +152,7 @@ Test('Time', async (timeTest) => {
       test.equal(result, expectedResult, 'return current UTC time in milliseconds')
       test.end()
     } catch (err) {
-      Logger.error(`msToday failed with error - ${err}`)
+      Logger.error(`getCurrentUTCTimeInMilliseconds failed with error - ${err}`)
       test.fail()
       test.end()
     }
@@ -166,7 +166,7 @@ Test('Time', async (timeTest) => {
       test.equal(result, expectedResult, 'return current UTC time in milliseconds')
       test.end()
     } catch (err) {
-      Logger.error(`msToday failed with error - ${err}`)
+      Logger.error(`getUTCString failed with error - ${err}`)
       test.fail()
       test.end()
     }
@@ -180,7 +180,7 @@ Test('Time', async (timeTest) => {
       test.equal(result, expectedResult, 'return YYYYMMDD string')
       test.end()
     } catch (err) {
-      Logger.error(`msToday failed with error - ${err}`)
+      Logger.error(`getYMDString failed with error - ${err}`)
       test.fail()
       test.end()
     }
