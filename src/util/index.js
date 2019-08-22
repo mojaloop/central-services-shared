@@ -18,6 +18,7 @@
  * Gates Foundation
  * Name Surname <name.surname@gatesfoundation.com>
 
+ * Georgi Georgiev <georgi.georgiev@modusbox.com>
  * Miguel de Barros <miguel.debarros@modusbox.com>
  * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
@@ -25,6 +26,7 @@
 'use strict'
 
 const _ = require('lodash')
+const Crypto = require('crypto')
 const Kafka = require('./kafka')
 const Endpoints = require('./endpoints')
 const Request = require('./request')
@@ -34,6 +36,7 @@ const Headers = require('./headers/transformer')
 const Encoding = require('./encoding')
 const StreamingProtocol = require('./streaming/protocol')
 const Time = require('./time')
+const Comparators = require('./comparators/index')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -182,6 +185,15 @@ const transpose = function (obj) {
   return transposed
 }
 
+const generateHash = (object) => {
+  const hashSha256 = Crypto.createHash('sha256')
+  let hash = JSON.stringify(object)
+  hash = hashSha256.update(hash)
+  // remove trailing '=' as per specification
+  hash = hashSha256.digest(hash).toString('base64').slice(0, -1)
+  return hash
+}
+
 module.exports = {
   assign,
   expand,
@@ -199,6 +211,7 @@ module.exports = {
   setValueByCaseInsensitiveKey,
   breadcrumb,
   transpose,
+  generateHash,
   Kafka,
   Endpoints,
   Request,
@@ -207,5 +220,6 @@ module.exports = {
   Headers,
   Encoding,
   StreamingProtocol,
-  Time
+  Time,
+  Comparators
 }
