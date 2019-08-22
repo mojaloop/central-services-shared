@@ -531,5 +531,47 @@ Test('General util', utilTest => {
     breadcrumbTest.end()
   })
 
+  utilTest.test('transpose should', transposeTest => {
+    transposeTest.test('return hash for a given object', test => {
+      const obj1 = {
+        prop1: 'test',
+        prop2: 2,
+        prop3: null,
+        prop4: null
+      }
+
+      const expected = new Map()
+      expected.test = 'prop1'
+      expected['2'] = 'prop2'
+      expected.null = 'prop4'
+
+      const result = Util.transpose(obj1)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+    transposeTest.end()
+  })
+
+  utilTest.test('generateHash should', generateHashTest => {
+    generateHashTest.test('return hash for a given object', test => {
+      const obj1 = {
+        prop1: 'test',
+        prop2: {
+          date_time: 'Thu Aug 22 2019"',
+          number: 1000
+        },
+        prop3: null,
+        prop4: null
+      }
+
+      const expected = 'NLI18feAfVIGLKjz8Lq5VH66t89cVgkYDMedHBEev88'
+
+      const result = Util.generateHash(obj1)
+      test.equal(result, expected)
+      test.end()
+    })
+    generateHashTest.end()
+  })
+
   utilTest.end()
 })
