@@ -47,8 +47,8 @@ Test('Duplicate check comparator', dccTest => {
       try {
         const hash = 'helper.hash'
         const duplicateCheckComparator = Proxyquire('../../../../src/util/comparators/duplicateCheckComparator', {
-          '../index': {
-            generateHash: sandbox.stub().returns(hash)
+          '../hash': {
+            generateSha256: sandbox.stub().returns(hash)
           }
         })
         const id = 1
@@ -74,8 +74,8 @@ Test('Duplicate check comparator', dccTest => {
       try {
         const hash = 'helper.hash'
         const duplicateCheckComparator = Proxyquire('../../../../src/util/comparators/duplicateCheckComparator', {
-          '../index': {
-            generateHash: sandbox.stub().returns(hash)
+          '../hash': {
+            generateSha256: sandbox.stub().returns(hash)
           }
         })
         const id = 1
