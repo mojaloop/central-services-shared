@@ -49,7 +49,7 @@ Test('Event plugin test', async (pluginTest) => {
     test.end()
   })
 
-  await pluginTest.test('create a finish a span for a route with the sampled tag', async assert => {
+  await pluginTest.test('create and finish a span for a route with the sampled tag', async assert => {
     try {
       let span
       server.route({
@@ -74,6 +74,43 @@ Test('Event plugin test', async (pluginTest) => {
       assert.ok(span)
       assert.ok(span.spanContext.finishTimestamp)
       assert.equal(span.spanContext.service, 'test_route')
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
+
+  await pluginTest.test('create and finish a child span with http context headers', async assert => {
+    try {
+      let span
+      server.route({
+        method: 'POST',
+        path: '/',
+        handler: (request, h) => {
+          span = request.span
+          return 'testing'
+        },
+        options: {
+          id: 'test_route',
+          tags: ['sampled']
+        }
+      })
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/',
+        headers: {
+          traceparent: '00-9732ca939fbd9f755b5bc07c227c4cd5-acd6fbed1e66219c-00'
+        }
+      })
+
+      assert.equal(response.statusCode, 200, 'status code is correct')
+      assert.ok(span)
+      assert.ok(span.spanContext.finishTimestamp)
+      assert.equal(span.spanContext.service, 'test_route')
+      assert.equal(span.spanContext.traceId, '9732ca939fbd9f755b5bc07c227c4cd5')
+      assert.equal(span.spanContext.parentSpanId, 'acd6fbed1e66219c')
       assert.end()
     } catch (e) {
       assert.fail()

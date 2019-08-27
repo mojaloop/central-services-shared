@@ -32,9 +32,15 @@ const Enums = {
 
 const onPreAuth = (request, reply) => {
   if (request && request.route && request.route.settings && request.route.settings.tags && request.route.settings.tags.includes(Enums.SAMPLED_TAG)) {
+    const context = EventSdk.Tracer.extractContextFromHttpRequest(request)
     const spanName = request.route.settings.id
-    Logger.debug(`Starting parent span ${spanName}`)
-    const span = EventSdk.Tracer.createSpan(spanName)
+    let span
+    if (context) {
+      span = EventSdk.Tracer.createChildSpanFromContext(spanName, context)
+    } else {
+      Logger.debug(`Starting parent span ${spanName}`)
+      span = EventSdk.Tracer.createSpan(spanName)
+    }
     reply.request.span = span
   }
   return reply.continue
@@ -45,7 +51,8 @@ const onPreResponse = (request, reply) => {
   const response = request.response
   if (span) {
     if (response instanceof Error || response.isBoom) {
-      span.error(response)
+      const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed)
+      span.error(response, state)
     }
     Logger.debug(`Finishing parent span ${span.spanContext.service}`)
     span.finish()

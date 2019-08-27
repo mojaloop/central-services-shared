@@ -23,6 +23,7 @@
  ******/
 'use strict'
 
+const EventSdk = require('@mojaloop/event-sdk')
 const request = require('axios')
 const Logger = require('../logger')
 const Headers = require('./headers/transformer')
@@ -43,10 +44,11 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
  * @param {string} destination id for which callback is being sent
  * @param {object} payload the body of the request being sent
  * @param {string} responseType the type of the response object
+ * @param {object} span a span for event logging if this request is within a span
  *
  *@return {object} The response for the request being sent or error object with response included
  */
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON) => {
+const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
   let requestOptions
   if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
@@ -63,6 +65,10 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       headers: transformedHeaders,
       data: payload,
       responseType
+    }
+    if (span) {
+      requestOptions = span.injectContextToHttpRequest(requestOptions)
+      span.audit(requestOptions, EventSdk.AuditEventAction.egress)
     }
     Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
     const response = await request(requestOptions)

@@ -1,5 +1,6 @@
 'use strict'
 
+const EventSdk = require('@mojaloop/event-sdk')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Config = require('../../util/config')
@@ -35,6 +36,29 @@ Test('ParticipantEndpoint Model Test', modelTest => {
 
       try {
         const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
+        test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('handle a span and add traceparent header', async (test) => {
+      const fsp = 'fsp'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+      const requestFunction = (request) => {
+        test.ok(request.headers['traceparent'])
+        return Helper.getEndPointsResponse
+      }
+      const span = EventSdk.Tracer.createSpan('test-span')
+      Model = proxyquire('../../../src/util/request', { axios: requestFunction })
+
+      try {
+        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span)
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
