@@ -51,7 +51,7 @@ Test('ParticipantEndpoint Model Test', modelTest => {
         method: 'get'
       }
       const requestFunction = (request) => {
-        test.ok(request.headers['traceparent'])
+        test.ok(request.headers.traceparent)
         return Helper.getEndPointsResponse
       }
       const span = EventSdk.Tracer.createSpan('test-span')

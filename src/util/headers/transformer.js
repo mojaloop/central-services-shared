@@ -64,9 +64,9 @@ const transformHeaders = (headers, config) => {
 
   for (const headerKey in headers) {
     const headerValue = headers[headerKey]
+    let tempDate
     switch (headerKey.toLowerCase()) {
       case (ENUM.Headers.GENERAL.DATE):
-        let tempDate = {}
         if (typeof headerValue === 'object' && headerValue instanceof Date) {
           tempDate = headerValue.toUTCString()
         } else {
@@ -82,15 +82,10 @@ const transformHeaders = (headers, config) => {
         normalizedHeaders[headerKey] = tempDate
         break
       case (ENUM.Headers.GENERAL.CONTENT_LENGTH):
-        // Do nothing here, do not map. This will be inserted correctly by the Hapi framework.
+        // Do nothing here, do not map. This will be inserted correctly by the Axios library
         break
-      case (ENUM.Headers.FSPIOP.URI):
-        // Check to see if we find a regex match the source header containing the switch name.
-        // If so we include the uri otherwise we remove it.
-
-        if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
-          normalizedHeaders[headerKey] = headerValue
-        }
+      case (ENUM.Headers.GENERAL.HOST):
+        // Do nothing here, do not map. This will be inserted correctly by the Axios library
         break
       case (ENUM.Headers.FSPIOP.HTTP_METHOD):
         // Check to see if we find a regex match the source header containing the switch name.

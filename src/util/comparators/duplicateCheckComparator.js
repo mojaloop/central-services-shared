@@ -1,5 +1,4 @@
 /*****
- * @file This registers all handlers for the central-ledger API
  License
  --------------
  Copyright © 2017 Bill & Melinda Gates Foundation
@@ -23,39 +22,41 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * ModusBox
- - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
-
+ * Georgi Georgiev <georgi.georgiev@modusbox.com>
+ * Miguel de Barros <miguel.debarros@modusbox.com>
  --------------
  ******/
 'use strict'
 
-/**
- * @function defaultHeaders
- *
- * @description This returns a set of default headers used for requests
- *
- * see https://nodejs.org/dist/latest-v10.x/docs/api/http.html#http_message_headers
- *
- * @param {string} destination - to who the request is being sent
- * @param {string} resource - the flow that is being requested i.e. participants
- * @param {string} source - from who the request is made
- * @param {string} version - the version for the accept and content-type headers
- *
- * @returns {object} Returns the default headers
- */
-const SwitchDefaultHeaders = (destination, resource, source, version = '1.0') => {
-  // TODO: See API section 3.2.1; what should we do about X-Forwarded-For? Also, should we
-  // add/append to this field in all 'queueResponse' calls?
+const Hash = require('../hash')
+
+const duplicateCheckComparator = async (id, object, getDuplicateDataFuncOverride, saveHashFuncOverride) => {
+  let hasDuplicateId = false
+  let hasDuplicateHash = false
+  const generatedHash = Hash.generateSha256(object)
+  let duplicateHashRecord
+
+  const compareById = async () => {
+    duplicateHashRecord = await getDuplicateDataFuncOverride(id)
+    hasDuplicateId = duplicateHashRecord !== null
+    return hasDuplicateId
+  }
+
+  const compareByHash = () => {
+    hasDuplicateHash = duplicateHashRecord.hash === generatedHash
+    return hasDuplicateHash
+  }
+
+  if (await compareById()) {
+    compareByHash()
+  } else {
+    await saveHashFuncOverride(id, generatedHash)
+  }
+
   return {
-    Accept: `application/vnd.interoperability.${resource}+json;version=${version}`,
-    'FSPIOP-Destination': destination || '',
-    'Content-Type': `application/vnd.interoperability.${resource}+json;version=${version}`,
-    Date: (new Date()).toUTCString(),
-    'FSPIOP-Source': source
+    hasDuplicateId,
+    hasDuplicateHash
   }
 }
 
-module.exports = {
-  SwitchDefaultHeaders
-}
+module.exports = duplicateCheckComparator
