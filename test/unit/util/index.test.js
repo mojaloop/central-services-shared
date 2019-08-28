@@ -531,5 +531,26 @@ Test('General util', utilTest => {
     breadcrumbTest.end()
   })
 
+  utilTest.test('transpose should', transposeTest => {
+    transposeTest.test('return hash for a given object', test => {
+      const obj1 = {
+        prop1: 'test',
+        prop2: 2,
+        prop3: null,
+        prop4: null
+      }
+
+      const expected = new Map()
+      expected.test = 'prop1'
+      expected['2'] = 'prop2'
+      expected.null = 'prop4'
+
+      const result = Util.transpose(obj1)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+    transposeTest.end()
+  })
+
   utilTest.end()
 })

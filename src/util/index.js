@@ -18,6 +18,7 @@
  * Gates Foundation
  * Name Surname <name.surname@gatesfoundation.com>
 
+ * Georgi Georgiev <georgi.georgiev@modusbox.com>
  * Miguel de Barros <miguel.debarros@modusbox.com>
  * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
@@ -34,6 +35,8 @@ const Headers = require('./headers/transformer')
 const Encoding = require('./encoding')
 const StreamingProtocol = require('./streaming/protocol')
 const Time = require('./time')
+const Hash = require('./hash')
+const Comparators = require('./comparators/index')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -207,5 +210,7 @@ module.exports = {
   Headers,
   Encoding,
   StreamingProtocol,
-  Time
+  Time,
+  Hash,
+  Comparators
 }

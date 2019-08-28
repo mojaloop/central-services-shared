@@ -282,7 +282,6 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
     if (!message.value.content.uriParams || !message.value.content.uriParams.id) {
       message.value.content.uriParams = { id: decodedPayload.transferId }
     }
-
     message.value.content.payload = fspiopError
     metadataState = StreamingProtocol.createEventState(Enum.Events.EventStatus.FAILURE.status, fspiopError.errorInformation.errorCode, fspiopError.errorInformation.errorDescription)
   } else {
@@ -291,10 +290,17 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   if (fromSwitch) {
     message.value.to = message.value.from
     message.value.from = Enum.Http.Headers.FSPIOP.SWITCH.value
+    message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = message.value.to
+  }
+  let key
+  if (typeof toDestination === 'string') {
+    message.value.to = toDestination
+    message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
+  } else if (toDestination === true) {
+    key = message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
   }
   if (producer) {
     const p = producer
-    const key = toDestination && message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
     await produceGeneralMessage(defaultKafkaConfig, p.functionality, p.action, message.value, metadataState, key)
   }
   return true
