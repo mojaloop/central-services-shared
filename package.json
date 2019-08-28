@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "7.4.4",
+  "version": "7.4.5",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
-    "@mojaloop/central-services-error-handling": "7.3.0",
+    "@mojaloop/central-services-error-handling": "7.4.0",
     "@mojaloop/central-services-stream": "6.2.2",
     "axios": "0.19.0",
     "catbox": "10.0.6",
