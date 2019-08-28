@@ -73,7 +73,8 @@ const HeaderResources = {
   PARTICIPANTS: 'participants',
   ORACLE: 'oracle',
   SWITCH: 'switch',
-  TRANSFERS: 'transfers'
+  TRANSFERS: 'transfers',
+  QUOTES: 'quotes'
 }
 
 const ServiceType = {
