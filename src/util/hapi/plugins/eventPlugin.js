@@ -51,11 +51,18 @@ const onPreResponse = (request, reply) => {
   const response = request.response
   if (span) {
     if (response instanceof Error || response.isBoom) {
-      const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed)
+      let state
+      if (response.output.payload.errorInformation && response.output.payload.errorInformation.errorCode) {
+        state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, response.output.payload.errorInformation.errorCode, response.output.payload.errorInformation.errorDescription)
+      } else {
+        state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, response.output.statusCode, response.message)
+      }
       span.error(response, state)
+      span.finish(response.message, state)
+    } else {
+      Logger.debug(`Finishing parent span ${span.spanContext.service}`)
+      span.finish()
     }
-    Logger.debug(`Finishing parent span ${span.spanContext.service}`)
-    span.finish()
   }
   return reply.continue
 }

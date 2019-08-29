@@ -72,7 +72,7 @@ Test('Event plugin test', async (pluginTest) => {
 
       assert.equal(response.statusCode, 200, 'status code is correct')
       assert.ok(span)
-      assert.ok(span.spanContext.finishTimestamp)
+      assert.ok(span.isFinished)
       assert.equal(span.spanContext.service, 'test_route')
       assert.end()
     } catch (e) {
@@ -107,7 +107,7 @@ Test('Event plugin test', async (pluginTest) => {
 
       assert.equal(response.statusCode, 200, 'status code is correct')
       assert.ok(span)
-      assert.ok(span.spanContext.finishTimestamp)
+      assert.ok(span.isFinished)
       assert.equal(span.spanContext.service, 'test_route')
       assert.equal(span.spanContext.traceId, '9732ca939fbd9f755b5bc07c227c4cd5')
       assert.equal(span.spanContext.parentSpanId, 'acd6fbed1e66219c')
@@ -170,7 +170,7 @@ Test('Event plugin test', async (pluginTest) => {
 
       assert.equal(response.statusCode, 500, 'status code is correct')
       assert.ok(span)
-      assert.ok(span.spanContext.finishTimestamp)
+      assert.ok(span.isFinished)
       assert.equal(span.spanContext.service, 'test_route')
       assert.end()
     } catch (e) {
