@@ -1,0 +1,3 @@
+# The tests store failures in a file for easier inspection- this is because test failures for
+# fuzzing can be large
+testfail*/
