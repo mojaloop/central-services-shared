@@ -25,13 +25,10 @@
 
 const EventSdk = require('@mojaloop/event-sdk')
 const Logger = require('../../../logger')
-
-const Enums = {
-  SAMPLED_TAG: 'sampled'
-}
+const Enum = require('../../../enums')
 
 const onPreAuth = (request, reply) => {
-  if (request && request.route && request.route.settings && request.route.settings.tags && request.route.settings.tags.includes(Enums.SAMPLED_TAG)) {
+  if (request && request.route && request.route.settings && request.route.settings.tags && request.route.settings.tags.includes(Enum.Tags.RouteTags.SAMPLED)) {
     const context = EventSdk.Tracer.extractContextFromHttpRequest(request)
     const spanName = request.route.settings.id
     let span
@@ -79,5 +76,3 @@ module.exports.plugin = {
     server.ext('onPreResponse', onPreResponse)
   }
 }
-
-module.exports.Enums = Enums
