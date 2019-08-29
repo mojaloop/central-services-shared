@@ -24,6 +24,7 @@
 'use strict'
 
 const Hapi = require('@hapi/hapi')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Test = require('tapes')(require('tape'))
 
 Test('Event plugin test', async (pluginTest) => {
@@ -36,6 +37,7 @@ Test('Event plugin test', async (pluginTest) => {
     })
 
     await server.register([
+      ErrorHandler,
       { plugin: require('../../../../../src/util/hapi/plugins/eventPlugin') }
     ])
 
@@ -148,6 +150,38 @@ Test('Event plugin test', async (pluginTest) => {
   })
 
   await pluginTest.test('log an error if the response is an error', async assert => {
+    try {
+      let span
+      server.route({
+        method: 'POST',
+        path: '/',
+        handler: (request, h) => {
+          span = request.span
+          throw Error('testing')
+        },
+        options: {
+          id: 'test_route',
+          tags: ['sampled']
+        }
+      })
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/'
+      })
+
+      assert.equal(response.statusCode, 500, 'status code is correct')
+      assert.ok(span)
+      assert.ok(span.isFinished)
+      assert.equal(span.spanContext.service, 'test_route')
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
+
+  await pluginTest.test('handle an fspiop error', async assert => {
     try {
       let span
       server.route({
