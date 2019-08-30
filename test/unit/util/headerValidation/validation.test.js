@@ -7,7 +7,12 @@ const RESOURCE = 'parties'
 const test = require('tapes')(require('tape'))
 const fs = require('fs')
 const path = require('path')
-const { generateAcceptRegex, generateContentTypeRegex } = require('../../../../src/util/headerValidation/index')
+const {
+  generateAcceptRegex,
+  generateContentTypeRegex,
+  parseContentTypeHeader,
+  parseAcceptHeader
+} = require('../../../../src/util/headerValidation/index')
 const {
   generateAcceptHeader,
   generateAcceptVersions,
@@ -119,5 +124,11 @@ test('Run positive content-type header fuzz', t => {
     const fname = saveToTempFile('\'' + failures.join('\'\n\'') + '\'', 'positivefuzz')
     return t.fail(`Positive fuzz failed. Failures saved to: ${fname}.`)
   }
+  t.end()
+})
+
+test('Rejects undefined header value', t => {
+  t.deepEqual({ valid: false }, parseContentTypeHeader('whatever', undefined))
+  t.deepEqual({ valid: false }, parseAcceptHeader('whatever', undefined))
   t.end()
 })
