@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "7.4.7",
+  "version": "7.4.8",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -51,6 +51,7 @@
   "devDependencies": {
     "@hapi/hapi": "18.3.2",
     "@hapi/joi": "15.1.1",
+    "chance": "1.0.18",
     "faucet": "0.0.1",
     "npm-audit-resolver": "1.5.0",
     "nyc": "14.1.1",
