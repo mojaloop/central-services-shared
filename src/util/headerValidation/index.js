@@ -1,5 +1,7 @@
 'use strict'
 
+const assert = require('assert').strict
+
 const protocolVersions = {
   anyVersion: Symbol('Any version'),
   ONE: ['1', '1.0']
@@ -17,9 +19,11 @@ const generateSingleAcceptRegexStr = resource =>
   `application/vnd\\.interoperability\\.${resource}\\+json(;version=\\d+(\\.\\d+)?)?`
 
 const parseContentTypeHeader = (resource, header) => {
-  if (typeof header !== 'string') {
-    throw new Error('Header type invalid')
+  if (header === undefined) {
+    return { valid: false }
   }
+
+  assert(typeof header === 'string')
 
   // Create the validation regex
   const r = generateContentTypeRegex(resource)
@@ -37,9 +41,11 @@ const parseContentTypeHeader = (resource, header) => {
 }
 
 const parseAcceptHeader = (resource, header) => {
-  if (typeof header !== 'string') {
-    throw new Error('Header type invalid')
+  if (header === undefined) {
+    return { valid: false }
   }
+
+  assert(typeof header === 'string')
 
   // Create the validation regex
   const r = generateAcceptRegex(resource)

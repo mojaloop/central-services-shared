@@ -37,7 +37,7 @@ const errorMessages = {
  * @param {buffer} rawPayload the raw payload
  */
 
-module.exports.plugin = {
+const plugin = {
   name: 'fspiop-api-protocol-version-header-validator',
   register: function (server, /* options: */ {
     resources = defaultProtocolResources,
@@ -88,4 +88,10 @@ module.exports.plugin = {
       return h.continue
     })
   }
+}
+
+module.exports = {
+  plugin,
+  errorMessages,
+  defaultProtocolVersions
 }
