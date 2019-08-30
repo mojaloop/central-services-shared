@@ -212,19 +212,23 @@ const createGeneralTopicConf = (template, functionality, action, key = null, par
  * @param {object} message - a list of messages to consume for the relevant topic
  * @param {object} state - state of the message being produced
  * @param {string} key - optional key that allows partitioning it occur
+ * @param {object} span - the span for event logging
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
-const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, message, state, key = null) => {
+const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, message, state, key = null, span = null) => {
   let functionalityMapped = functionality
   let actionMapped = action
   if (Enum.Kafka.TopicMap[functionality] && Enum.Kafka.TopicMap[functionality][action]) {
     functionalityMapped = Enum.Kafka.TopicMap[functionality][action].functionality
     actionMapped = Enum.Kafka.TopicMap[functionality][action].action
   }
-  const messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
+  let messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
   const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
+  if (span) {
+    messageProtocol = await span.injectContextToMessage(messageProtocol)
+  }
   await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
 }
@@ -271,7 +275,7 @@ const commitMessageSync = async (kafkaTopic, consumer, message) => {
 }
 
 const proceed = async (defaultKafkaConfig, params, opts) => {
-  const { message, kafkaTopic, consumer, decodedPayload } = params
+  const { message, kafkaTopic, consumer, decodedPayload, span } = params
   const { consumerCommit, fspiopError, producer, fromSwitch, toDestination } = opts
   let metadataState
 
@@ -301,7 +305,7 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   }
   if (producer) {
     const p = producer
-    await produceGeneralMessage(defaultKafkaConfig, p.functionality, p.action, message.value, metadataState, key)
+    await produceGeneralMessage(defaultKafkaConfig, p.functionality, p.action, message.value, metadataState, key, span)
   }
   return true
 }

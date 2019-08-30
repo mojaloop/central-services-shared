@@ -40,6 +40,7 @@ const Mustache = require('mustache')
 const Uuid = require('uuid4')
 const KafkaProducer = require('@mojaloop/central-services-stream').Kafka.Producer
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const EventSdk = require('@mojaloop/event-sdk')
 const Proxyquire = require('proxyquire')
 const MainUtil = require('../../../../src/util')
 const Utility = require('../../../../src/util').Kafka
@@ -231,7 +232,8 @@ Test('Utility Test', utilityTest => {
 
   utilityTest.test('produceGeneralMessage should', produceGeneralMessageTest => {
     produceGeneralMessageTest.test('produce a general message', async (test) => {
-      const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      const span = EventSdk.Tracer.createSpan('test_span')
+      const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS, undefined, span)
       test.equal(result, true)
       test.end()
     })
