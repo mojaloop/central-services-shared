@@ -32,9 +32,12 @@ const errorMessages = {
 /**
  * HAPI plugin to validate request headers per FSPIOP-API spec 1.0
  *
- * @param {string} payload payload to string for validation purposes. Prior the handler is executed the payload is changed to dataURI value
- * @param {string} dataURI base64 encoded string
- * @param {buffer} rawPayload the raw payload
+ * @param {[Object]} supportedProtocolVersions - an array of numerical protocol version strings
+ *                       supported by your implementation of the FSPIOP API e.g. ['1', '1.1']. Can
+ *                       also contain the anyVersion symbol: ['1', '1.1', anyVersion] found
+ *                       elsewhere in this module
+ * @param {[string]} resources - the API resources you wish to be validated. See
+ *                       defaultProtocolResources for an example.
  */
 
 const plugin = {
