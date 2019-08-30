@@ -83,7 +83,7 @@ const ServiceType = {
 }
 
 const ResponseTypes = {
-  JSON: 'json'
+  JSON: 'application/json'
 }
 
 const ReturnCodes = {

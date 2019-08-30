@@ -58,7 +58,7 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: requestFunction })
 
       try {
-        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.Headers.DEFAULT.APPLICATION_JSON, span)
+        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span)
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
