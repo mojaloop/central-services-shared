@@ -18,25 +18,14 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Neal Donnan <neal.donnan@modusbox.com>
  --------------
  ******/
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
+const RouteTags = {
+  SAMPLED: 'sampled'
+}
 
 module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Transfers,
-  Kafka,
-  Tags
+  RouteTags
 }
