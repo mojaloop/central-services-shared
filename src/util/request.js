@@ -48,7 +48,7 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
  *
  *@return {object} The response for the request being sent or error object with response included
  */
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
+const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.Headers.DEFAULT.APPLICATION_JSON, span = undefined) => {
   let requestOptions
   if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)

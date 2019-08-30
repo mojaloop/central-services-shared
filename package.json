@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "7.4.7",
+  "version": "7.4.8",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -59,7 +59,7 @@
     "rc": "1.2.8",
     "rewire": "4.0.1",
     "sinon": "7.4.1",
-    "standard": "14.0.0",
+    "standard": "14.1.0",
     "tap-xunit": "2.4.1",
     "tape": "4.11.0",
     "tapes": "4.1.0"
