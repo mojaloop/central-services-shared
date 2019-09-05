@@ -8,7 +8,7 @@
 Shared code for central services
 
 ## Usage
-### Logger 
+### Logger
 To use the shared Logger class, you only need to require it in the file you want to perform logging in:
 
 ```

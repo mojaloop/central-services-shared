@@ -127,7 +127,8 @@ const transformHeaders = (headers, config) => {
     delete normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.URI]]
   }
 
-  if (config && config.httpMethod !== ENUM.RestMethods.POST) {
+  // Per the FSPIOP API spec, remove the Accept header on all PUT requests
+  if (config && config.httpMethod === ENUM.RestMethods.PUT) {
     delete normalizedHeaders[ENUM.Headers.GENERAL.ACCEPT.value]
   }
   return normalizedHeaders
