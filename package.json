@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
+    "@modusbox/mojaloop-sdk-standard-components": "0.0.39",
     "@mojaloop/central-services-error-handling": "7.4.5",
     "@mojaloop/central-services-stream": "7.4.2",
     "axios": "0.19.0",
