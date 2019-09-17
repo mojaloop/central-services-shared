@@ -17,8 +17,8 @@
     "dep:update": "npx ncu -u"
   },
   "pre-commit": [
-    "standard",
     "dep:check",
+    "standard",
     "test"
   ],
   "repository": {
