@@ -20,9 +20,9 @@ const init = async (options) => {
     },
     options: {
       validate: {
-        payload: {
+        payload: Joi.object({
           errorInformation: Joi.object()
-        }
+        })
       }
     }
   })

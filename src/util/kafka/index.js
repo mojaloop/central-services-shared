@@ -34,11 +34,12 @@
  */
 const Consumer = require('./consumer')
 const Mustache = require('mustache')
-const Logger = require('../../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Producer = require('./producer')
 const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const EventSdk = require('@mojaloop/event-sdk')
 
 /**
  * @function ParticipantTopicTemplate
@@ -228,6 +229,7 @@ const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, 
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
   if (span) {
     messageProtocol = await span.injectContextToMessage(messageProtocol)
+    span.audit(messageProtocol, EventSdk.AuditEventAction.egress)
   }
   await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
