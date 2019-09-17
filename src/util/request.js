@@ -25,7 +25,7 @@
 
 const EventSdk = require('@mojaloop/event-sdk')
 const request = require('axios')
-const Logger = require('../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')

@@ -34,7 +34,7 @@
  */
 const Consumer = require('./consumer')
 const Mustache = require('mustache')
-const Logger = require('../../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Producer = require('./producer')
 const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')

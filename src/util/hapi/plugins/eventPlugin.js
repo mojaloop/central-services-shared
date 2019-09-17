@@ -24,7 +24,7 @@
 'use strict'
 
 const EventSdk = require('@mojaloop/event-sdk')
-const Logger = require('../../../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Enum = require('../../../enums')
 
 const onPreAuth = (request, reply) => {

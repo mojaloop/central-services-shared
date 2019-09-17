@@ -25,7 +25,7 @@
 
 'use strict'
 
-const Logger = require('../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Catbox = require('catbox')
 const CatboxMemory = require('catbox-memory')
 const { Map } = require('immutable')
