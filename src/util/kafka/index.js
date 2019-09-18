@@ -146,7 +146,7 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
   try {
     const flowObject = kafkaConfig[flow]
     const functionalityObject = flowObject[functionality]
-    const actionObject = functionalityObject[action]
+    const actionObject = action ? functionalityObject[action] : functionalityObject
     actionObject.config.logger = Logger
     return actionObject.config
   } catch (err) {
