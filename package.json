@@ -45,19 +45,20 @@
     "@hapi/catbox-memory": "4.1.1",
     "@mojaloop/central-services-error-handling": "7.5.0",
     "@mojaloop/central-services-logger": "8.1.1",
-    "@mojaloop/central-services-stream": "8.1.0",
     "@mojaloop/event-sdk": "8.1.0",
     "axios": "0.19.0",
+    "base64url": "3.0.1",
+    "clone": "2.1.2",
+    "data-urls": "1.1.0",
     "glob": "7.1.4",
     "immutable": "3.8.2",
     "lodash": "4.17.15",
     "mustache": "3.1.0",
-    "raw-body": "2.4.1",
-    "uuid4": "1.1.4"
+    "raw-body": "2.4.1"
   },
   "devDependencies": {
     "@hapi/hapi": "18.4.0",
-    "@hapi/joi": "16.1.1",
+    "@hapi/joi": "16.1.4",
     "chance": "1.1.0",
     "faucet": "0.0.1",
     "npm-audit-resolver": "1.5.0",
@@ -68,10 +69,11 @@
     "rc": "1.2.8",
     "rewire": "4.0.1",
     "sinon": "7.4.2",
-    "standard": "14.3.0",
+    "standard": "14.3.1",
     "tap-xunit": "2.4.1",
     "tape": "4.11.0",
-    "tapes": "4.1.0"
+    "tapes": "4.1.0",
+    "uuid4": "1.1.4"
   },
   "standard": {
     "ignore": []

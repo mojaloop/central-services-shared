@@ -32,7 +32,7 @@
 'use strict'
 
 const getRawBody = require('raw-body')
-const encodePayload = require('@mojaloop/central-services-stream/src/kafka/protocol').encodePayload
+const encodePayload = require('../../streaming/protocol').encodePayload
 const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 

@@ -32,10 +32,8 @@
 /**
  * @module src/handlers/lib/kafka
  */
-const Consumer = require('./consumer')
 const Mustache = require('mustache')
 const Logger = require('@mojaloop/central-services-logger')
-const Producer = require('./producer')
 const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
@@ -196,6 +194,16 @@ const createGeneralTopicConf = (template, functionality, action, key = null, par
   }
 }
 
+const getFunctionalityAction = (functionality, action) => {
+  let functionalityMapped = functionality
+  let actionMapped = action
+  if (Enum.Kafka.TopicMap[functionality] && Enum.Kafka.TopicMap[functionality][action]) {
+    functionalityMapped = Enum.Kafka.TopicMap[functionality][action].functionality
+    actionMapped = Enum.Kafka.TopicMap[functionality][action].action
+  }
+  return { functionalityMapped, actionMapped }
+}
+
 /**
  * @function produceGeneralMessage
  *
@@ -208,6 +216,7 @@ const createGeneralTopicConf = (template, functionality, action, key = null, par
  * Utility.getKafkaConfig called dynamically gets Kafka configuration
  *
  * @param {string} defaultKafkaConfig - This is the Kafka config set in the default.json in you API
+ * @param {Producer} kafkaProducer - This is the Kafka Producer
  * @param {string} functionality - the functionality flow. Example: 'transfer' ie: note the case of text
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
  * @param {object} message - a list of messages to consume for the relevant topic
@@ -217,13 +226,8 @@ const createGeneralTopicConf = (template, functionality, action, key = null, par
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
-const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, message, state, key = null, span = null) => {
-  let functionalityMapped = functionality
-  let actionMapped = action
-  if (Enum.Kafka.TopicMap[functionality] && Enum.Kafka.TopicMap[functionality][action]) {
-    functionalityMapped = Enum.Kafka.TopicMap[functionality][action].functionality
-    actionMapped = Enum.Kafka.TopicMap[functionality][action].action
-  }
+const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, functionality, action, message, state, key = null, span = null) => {
+  const { functionalityMapped, actionMapped } = getFunctionalityAction(functionality, action)
   let messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
   const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
@@ -231,7 +235,7 @@ const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, 
     messageProtocol = await span.injectContextToMessage(messageProtocol)
     span.audit(messageProtocol, EventSdk.AuditEventAction.egress)
   }
-  await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
+  await kafkaProducer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
 }
 
@@ -248,6 +252,7 @@ const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, 
  * Utility.getKafkaConfig called dynamically gets Kafka configuration
  *
  * @param {string} defaultKafkaConfig - This is the Kafka config set in the default.json in you API
+ * @param {Producer} kafkaProducer - This is the Kafka Producer
  * @param {string} participantName - the name of the participant for topic creation
  * @param {string} functionality - the functionality flow. Example: 'transfer' ie: note the case of text
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
@@ -256,27 +261,22 @@ const produceGeneralMessage = async (defaultKafkaConfig, functionality, action, 
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
-const produceParticipantMessage = async (defaultKafkaConfig, participantName, functionality, action, message, state) => {
-  let functionalityMapped = functionality
-  let actionMapped = action
-  if (Enum.Kafka.TopicMap[functionality] && Enum.Kafka.TopicMap[functionality][action]) {
-    functionalityMapped = Enum.Kafka.TopicMap[functionality][action].functionality
-    actionMapped = Enum.Kafka.TopicMap[functionality][action].action
-  }
+const produceParticipantMessage = async (defaultKafkaConfig, kafkaProducer, participantName, functionality, action, message, state) => {
+  const { functionalityMapped, actionMapped } = getFunctionalityAction(functionality, action)
   const messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
   const topicConfig = createParticipantTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, functionalityMapped, actionMapped)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
-  await Producer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
+  await kafkaProducer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
 }
 
-const commitMessageSync = async (kafkaTopic, consumer, message) => {
-  if (!Consumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
+const commitMessageSync = async (kafkaConsumer, kafkaTopic, consumer, message) => {
+  if (!kafkaConsumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
     await consumer.commitMessageSync(message)
   }
 }
 
-const proceed = async (defaultKafkaConfig, params, opts) => {
+const proceed = async (defaultKafkaConfig, params, opts, kafkaProducer) => {
   const { message, kafkaTopic, consumer, decodedPayload, span } = params
   const { consumerCommit, fspiopError, producer, fromSwitch, toDestination } = opts
   let metadataState
@@ -305,16 +305,14 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   } else if (toDestination === true) {
     key = message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
   }
-  if (producer) {
+  if (producer && kafkaProducer) {
     const p = producer
-    await produceGeneralMessage(defaultKafkaConfig, p.functionality, p.action, message.value, metadataState, key, span)
+    await produceGeneralMessage(defaultKafkaConfig, kafkaProducer, p.functionality, p.action, message.value, metadataState, key, span)
   }
   return true
 }
 
 module.exports = {
-  Producer,
-  Consumer,
   transformAccountToTopicName,
   transformGeneralTopicName,
   getKafkaConfig,
