@@ -43,6 +43,7 @@ const Event = {
     BULK_PROCESSING: 'bulk-processing',
     BULK_TIMEOUT_RECEIVED: 'bulk-timeout-received',
     BULK_TIMEOUT_RESERVED: 'bulk-timeout-reserved',
+    BULK_ABORT: 'bulk-abort',
     PROCESSING: 'processing',
     PREPARE: 'prepare',
     PREPARE_DUPLICATE: 'prepare-duplicate',
