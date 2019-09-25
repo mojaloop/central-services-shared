@@ -27,7 +27,6 @@
 const Event = {
   Type: {
     BULK: 'bulk',
-    BULK_TRANSFER: 'bulk-transfer',
     BULK_PROCESSING: 'bulk-processing',
     PREPARE: 'prepare',
     POSITION: 'position',
@@ -39,10 +38,12 @@ const Event = {
     EVENT: 'event'
   },
   Action: {
-    BULK_FULFIL: 'bulk-fulfil',
     BULK_COMMIT: 'bulk-commit',
     BULK_PREPARE: 'bulk-prepare',
     BULK_PROCESSING: 'bulk-processing',
+    BULK_TIMEOUT_RECEIVED: 'bulk-timeout-received',
+    BULK_TIMEOUT_RESERVED: 'bulk-timeout-reserved',
+    BULK_ABORT: 'bulk-abort',
     PROCESSING: 'processing',
     PREPARE: 'prepare',
     PREPARE_DUPLICATE: 'prepare-duplicate',
@@ -85,6 +86,8 @@ const ActionLetter = {
   bulkPrepare: 'BP',
   bulkFulfil: 'BF',
   bulkCommit: 'BC',
+  bulkTimeoutReceived: 'BTRc',
+  bulkTimeoutReserved: 'BTRs',
   commit: 'C',
   get: 'G',
   prepare: 'P',
