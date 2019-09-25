@@ -23,8 +23,9 @@
  ******/
 'use strict'
 
+const EventSdk = require('@mojaloop/event-sdk')
 const request = require('axios')
-const Logger = require('../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
@@ -43,10 +44,11 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
  * @param {string} destination id for which callback is being sent
  * @param {object} payload the body of the request being sent
  * @param {string} responseType the type of the response object
+ * @param {object} span a span for event logging if this request is within a span
  *
  *@return {object} The response for the request being sent or error object with response included
  */
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON) => {
+const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
   let requestOptions
   if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
@@ -64,6 +66,10 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       data: payload,
       responseType
     }
+    if (span) {
+      requestOptions = span.injectContextToHttpRequest(requestOptions)
+      span.audit(requestOptions, EventSdk.AuditEventAction.egress)
+    }
     Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
     const response = await request(requestOptions)
     Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
@@ -75,7 +81,9 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
       { key: 'method', value: method },
-      { key: 'request', value: JSON.stringify(requestOptions) }
+      { key: 'request', value: JSON.stringify(requestOptions) },
+      { key: 'status', value: error.response.status },
+      { key: 'response', value: error.response.data }
     ])
   }
 }

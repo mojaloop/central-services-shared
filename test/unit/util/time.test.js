@@ -26,7 +26,7 @@
 
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Logger = require('../../../src/logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Model = require('../../../src/util/time')
 
 const execDelayCoef = 1.5
@@ -152,7 +152,7 @@ Test('Time', async (timeTest) => {
       test.equal(result, expectedResult, 'return current UTC time in milliseconds')
       test.end()
     } catch (err) {
-      Logger.error(`msToday failed with error - ${err}`)
+      Logger.error(`getCurrentUTCTimeInMilliseconds failed with error - ${err}`)
       test.fail()
       test.end()
     }
@@ -166,7 +166,21 @@ Test('Time', async (timeTest) => {
       test.equal(result, expectedResult, 'return current UTC time in milliseconds')
       test.end()
     } catch (err) {
-      Logger.error(`msToday failed with error - ${err}`)
+      Logger.error(`getUTCString failed with error - ${err}`)
+      test.fail()
+      test.end()
+    }
+  })
+
+  await timeTest.test('getYMDString should return a YYYYMMDD string of the date', async (test) => {
+    try {
+      const expectedResult = '19951204'
+      const setDate = new Date(Date.parse('04 Dec 1995 00:12:00 GMT'))
+      const result = await Model.getYMDString(setDate)
+      test.equal(result, expectedResult, 'return YYYYMMDD string')
+      test.end()
+    } catch (err) {
+      Logger.error(`getYMDString failed with error - ${err}`)
       test.fail()
       test.end()
     }

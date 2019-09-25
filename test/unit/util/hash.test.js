@@ -18,25 +18,36 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Georgi Georgiev <georgi.georgiev@modusbox.com>
  --------------
  ******/
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
+'use strict'
 
-module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Transfers,
-  Kafka,
-  Tags
-}
+const Test = require('tape')
+const Hash = require('../../../src/util/hash')
+
+Test('Hash util', hashTest => {
+  hashTest.test('generateSha256 should', generateSha256Test => {
+    generateSha256Test.test('return hash for a given object', test => {
+      const obj1 = {
+        prop1: 'test',
+        prop2: {
+          date_time: 'Thu Aug 22 2019"',
+          number: 1000
+        },
+        prop3: null,
+        prop4: null
+      }
+
+      const expected = 'NLI18feAfVIGLKjz8Lq5VH66t89cVgkYDMedHBEev88'
+
+      const result = Hash.generateSha256(obj1)
+      test.equal(result, expected)
+      test.end()
+    })
+    generateSha256Test.end()
+  })
+
+  hashTest.end()
+})

@@ -81,7 +81,10 @@ const transformHeaders = (headers, config) => {
         }
         normalizedHeaders[headerKey] = tempDate
         break
-      case (ENUM.Headers.GENERAL.CONTENT_LENGTH || ENUM.Headers.GENERAL.HOST):
+      case (ENUM.Headers.GENERAL.CONTENT_LENGTH):
+        // Do nothing here, do not map. This will be inserted correctly by the Axios library
+        break
+      case (ENUM.Headers.GENERAL.HOST):
         // Do nothing here, do not map. This will be inserted correctly by the Axios library
         break
       case (ENUM.Headers.FSPIOP.HTTP_METHOD):
@@ -90,10 +93,10 @@ const transformHeaders = (headers, config) => {
         if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
           if (config.httpMethod.toLowerCase() === headerValue.toLowerCase()) {
             // HTTP Methods match, and thus no change is required
-            normalizedHeaders[headerKey] = headerValue.toUpperCase()
+            normalizedHeaders[headerKey] = headerValue
           } else {
             // HTTP Methods DO NOT match, and thus a change is required for target HTTP Method
-            normalizedHeaders[headerKey] = config.httpMethod.toUpperCase()
+            normalizedHeaders[headerKey] = config.httpMethod
           }
         } else {
           if (config.httpMethod.toLowerCase() === headerValue.toLowerCase()) {
@@ -124,7 +127,8 @@ const transformHeaders = (headers, config) => {
     delete normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.URI]]
   }
 
-  if (config && config.httpMethod !== ENUM.RestMethods.POST) {
+  // Per the FSPIOP API spec, remove the Accept header on all PUT requests
+  if (config && config.httpMethod === ENUM.RestMethods.PUT) {
     delete normalizedHeaders[ENUM.Headers.GENERAL.ACCEPT.value]
   }
   return normalizedHeaders
