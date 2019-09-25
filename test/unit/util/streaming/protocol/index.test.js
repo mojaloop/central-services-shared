@@ -91,6 +91,78 @@ const messageProtocol = {
   pp: ''
 }
 
+const purePayload = '{"errorInformation":{"errorCode":"5200","errorDescription":"Generic limit error, amount \u0026 payments threshold."}}'
+const rawPayload = Buffer.from(purePayload)
+
+const plainTextDataUri = 'data:text/plain;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+const plainTextDataUriErrorMimeType = 'data:tet/plain;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+
+const encodedMessage = {
+  value: {
+    id: 'f2f038cc-b749-464d-a364-c24acad58ef0',
+    to: 'mockfsp02',
+    from: 'mockfsp01',
+    type: 'application/json',
+    content: {
+      headers: {
+        accept: 'application/vnd.interoperability.transfers+json;version=1',
+        'content-type': 'application/vnd.interoperability.transfers+json;version=1',
+        date: '2019-01-22T21:27:55.000Z',
+        'fspiop-source': 'mockfsp01',
+        'fspiop-destination': 'mockfsp02',
+        'content-length': 437
+      },
+      payload: 'data:application/json;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+    },
+    metadata: {
+      event: {
+        id: '25240fa4-da6a-4f18-8b42-e391fde70817',
+        type: 'prepare',
+        action: 'prepare',
+        createdAt: '2019-05-06T08:53:16.996Z',
+        state: {
+          status: 'success',
+          code: 0
+        }
+      }
+    }
+  }
+}
+
+const decodedMessage = {
+  value: {
+    id: 'f2f038cc-b749-464d-a364-c24acad58ef0',
+    to: 'mockfsp02',
+    from: 'mockfsp01',
+    type: 'application/json',
+    content: {
+      headers: {
+        accept: 'application/vnd.interoperability.transfers+json;version=1',
+        'content-type': 'application/vnd.interoperability.transfers+json;version=1',
+        date: '2019-01-22T21:27:55.000Z',
+        'fspiop-source': 'mockfsp01',
+        'fspiop-destination': 'mockfsp02',
+        'content-length': 437
+      },
+      payload: JSON.parse(purePayload)
+    },
+    metadata: {
+      event: {
+        id: '25240fa4-da6a-4f18-8b42-e391fde70817',
+        type: 'prepare',
+        action: 'prepare',
+        createdAt: '2019-05-06T08:53:16.996Z',
+        state: {
+          status: 'success',
+          code: 0
+        }
+      }
+    }
+  }
+}
+
+const messages = [encodedMessage]
+
 Test('Utility Test', utilityTest => {
   utilityTest.test('updateMessageProtocolMetadata should', updateMessageProtocolMetadataTest => {
     updateMessageProtocolMetadataTest.test('return an updated metadata object in the message protocol', test => {
@@ -268,6 +340,95 @@ Test('Utility Test', utilityTest => {
     })
 
     createMessageTest.end()
+  })
+
+  utilityTest.test('Protocol::encodePayload should encode raw data as json', function (assert) {
+    const test = StreamingProtocol.encodePayload(rawPayload, 'application/json')
+    assert.deepEqual(test, encodedMessage.value.content.payload)
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::encodePayload should encode string', function (assert) {
+    const test = StreamingProtocol.encodePayload(purePayload, 'text/plain')
+    assert.equal(test, plainTextDataUri)
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::encodePayload should throw error if mime type is not correct', function (assert) {
+    try {
+      StreamingProtocol.encodePayload(purePayload, 'tex/plain')
+      assert.fail('should throw error')
+      assert.end()
+    } catch (e) {
+      assert.ok(e instanceof Error)
+      assert.end()
+    }
+  })
+
+  utilityTest.test('Protocol::decodePayload should decode the payload from base64 encoded JSON as dataURI to JSON', function (assert) {
+    const test = StreamingProtocol.decodePayload(encodedMessage.value.content.payload)
+    assert.deepEqual(test, JSON.parse(purePayload))
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodePayload should decode the payload from base64 encoded JSON to object with pure data and mimeType properties', function (assert) {
+    const test = StreamingProtocol.decodePayload(encodedMessage.value.content.payload, { asParsed: false })
+    const expectedResults = { mimeType: 'application/json', body: Buffer.from(purePayload) }
+    assert.equal(test.mimeType.toString(), expectedResults.mimeType.toString())
+    assert.equal(test.body.toString(), expectedResults.body.toString())
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodePayload should decode the payload from base64 encoded plain text as dataURI to JSON', function (assert) {
+    const test = StreamingProtocol.decodePayload(plainTextDataUri)
+    assert.deepEqual(JSON.stringify(test), JSON.stringify(purePayload))
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodePayload should decode the payload from normal string to JSON', function (assert) {
+    const test = StreamingProtocol.decodePayload(purePayload)
+    assert.deepEqual(test, JSON.parse(purePayload))
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodePayload should throw if mime type is not allowed', function (assert) {
+    try {
+      StreamingProtocol.decodePayload(plainTextDataUriErrorMimeType)
+      assert.fail('should have thrown error')
+      assert.end()
+    } catch (e) {
+      assert.ok(e instanceof Error)
+      assert.end()
+    }
+  })
+
+  utilityTest.test('Protocol::decodePayload should throw if input is not dataURI nor string', function (assert) {
+    try {
+      StreamingProtocol.decodePayload(3)
+      assert.fail('should have thrown error')
+      assert.end()
+    } catch (e) {
+      assert.ok(e instanceof Error)
+      assert.end()
+    }
+  })
+
+  utilityTest.test('Protocol::decodePayload should decode the payload from normal string to object with mimeType and the string itself ', function (assert) {
+    const test = StreamingProtocol.decodePayload(purePayload, { asParsed: false })
+    assert.deepEqual(JSON.stringify(test), JSON.stringify({ mimeType: 'text/plain', body: purePayload }))
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodeMessages should decode message as single message ', function (assert) {
+    const test = StreamingProtocol.decodeMessages(JSON.parse(JSON.stringify(encodedMessage)))
+    assert.deepEqual(test, decodedMessage)
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodeMessages should decode message as single message ', function (assert) {
+    const test = StreamingProtocol.decodeMessages(messages)
+    assert.deepEqual(test, [decodedMessage])
+    assert.end()
   })
 
   utilityTest.end()
