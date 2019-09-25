@@ -349,11 +349,12 @@ Test('Utility Test', utilityTest => {
         commitMessageSync: commitMessageSyncStub
       }
       const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
+        getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
       }
       const UtilityProxy = rewire(`${src}/util/kafka`)
 
-      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, consumerStub, message)
+      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
       test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.ok(commitMessageSyncStub.withArgs(message).calledOnce, 'commitMessageSyncStub called once')
       test.end()
@@ -367,15 +368,35 @@ Test('Utility Test', utilityTest => {
         commitMessageSync: commitMessageSyncStub
       }
       const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true),
+        getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
       }
 
       const UtilityProxy = rewire(`${src}/util/kafka`)
 
-      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, consumerStub, message)
+      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
       test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.equal(commitMessageSyncStub.withArgs(message).callCount, 0, 'commitMessageSyncStub not called')
       test.end()
+    })
+
+    commitMessageSyncTest.test('skip committing message when auto commit is enabled', async (test) => {
+      const kafkaTopic = 'fail-topic'
+      const message = 'message'
+      const ConsumerStub = {
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
+        getConsumer: sandbox.stub().withArgs(kafkaTopic).throwsException(new Error('No Consumer'))
+      }
+
+      const UtilityProxy = rewire(`${src}/util/kafka`)
+      try {
+        await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
+        test.fail('No error thrown')
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        test.end()
+      }
     })
 
     commitMessageSyncTest.end()

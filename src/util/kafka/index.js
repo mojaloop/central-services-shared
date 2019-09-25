@@ -270,9 +270,16 @@ const produceParticipantMessage = async (defaultKafkaConfig, kafkaProducer, part
   return true
 }
 
-const commitMessageSync = async (kafkaConsumer, kafkaTopic, consumer, message) => {
+const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
   if (!kafkaConsumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
-    await consumer.commitMessageSync(message)
+    try {
+      const consumer = kafkaConsumer.getConsumer(kafkaTopic)
+      await consumer.commitMessageSync(message)
+    } catch (err) {
+      Logger.info(`No consumer found for topic ${kafkaTopic}`)
+      Logger.error(err)
+      throw err
+    }
   }
 }
 
