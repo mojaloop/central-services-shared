@@ -49,6 +49,14 @@ const TopicMap = {
     'bulk-prepare': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
+    },
+    'bulk-timeout-received': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
+    'bulk-timeout-reserved': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
     }
   },
   notification: {
@@ -57,6 +65,10 @@ const TopicMap = {
       action: transferEventAction.EVENT
     },
     'abort-duplicate': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
+    'bulk-abort': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
@@ -115,6 +127,14 @@ const TopicMap = {
       action: transferEventAction.POSITION
     },
     'bulk-prepare': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'bulk-timeout-received': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'bulk-timeout-reserved': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },

@@ -25,9 +25,9 @@
 
 'use strict'
 
-const Logger = require('../logger')
-const Catbox = require('catbox')
-const CatboxMemory = require('catbox-memory')
+const Logger = require('@mojaloop/central-services-logger')
+const Catbox = require('@hapi/catbox')
+const CatboxMemory = require('@hapi/catbox-memory')
 const { Map } = require('immutable')
 const Http = require('./http')
 const Enum = require('../enums')

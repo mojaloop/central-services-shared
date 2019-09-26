@@ -1,6 +1,6 @@
 const Hapi = require('@hapi/hapi')
+const ErrorHandling = require('@mojaloop/central-services-error-handling')
 const Test = require('tapes')(require('tape'))
-const codes = require('@modusbox/mojaloop-sdk-standard-components').Errors.MojaloopApiErrorCodes
 const { plugin, errorMessages } = require('../../../../../src/util/hapi/plugins/headerValidation')
 const {
   generateAcceptHeader,
@@ -74,7 +74,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('accept validation is performed on get requests without an accept header', async t => {
-    const fspiopCode = codes.MALFORMED_SYNTAX
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX
     const res = await server.inject({
       method: 'get',
       url: `/${resource}`,
@@ -104,7 +104,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('MALFORMED_SYNTAX/INVALID_ACCEPT_HEADER', async t => {
-    const fspiopCode = codes.MALFORMED_SYNTAX
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX
     const res = await server.inject({
       method: 'get',
       url: `/${resource}`,
@@ -121,7 +121,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('UNACCEPTABLE_VERSION/REQUESTED_VERSION_NOT_SUPPORTED', async t => {
-    const fspiopCode = codes.UNACCEPTABLE_VERSION
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION
     const res = await server.inject({
       method: 'put',
       url: `/${resource}`,
@@ -138,7 +138,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('MALFORMED_SYNTAX/INVALID_CONTENT_TYPE_HEADER', async t => {
-    const fspiopCode = codes.MALFORMED_SYNTAX
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX
     const res = await server.inject({
       method: 'put',
       url: `/${resource}`,
@@ -155,7 +155,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('UNACCEPTABLE_VERSION/SUPPLIED_VERSION_NOT_SUPPORTED', async t => {
-    const fspiopCode = codes.UNACCEPTABLE_VERSION
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION
     const res = await server.inject({
       method: 'put',
       url: `/${resource}`,
@@ -185,7 +185,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('correctly invalidates longer routes', async t => {
-    const fspiopCode = codes.UNACCEPTABLE_VERSION
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION
     const res = await server.inject({
       method: 'put',
       url: `/${resource}/MSISDN/12346`,
