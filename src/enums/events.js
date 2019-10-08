@@ -84,7 +84,9 @@ const EventStatus = {
 const ActionLetter = {
   abort: 'A',
   bulkPrepare: 'BP',
+  bulkPrepareDuplicate: 'BPD',
   bulkFulfil: 'BF',
+  bulkFulfilDuplicate: 'BFD',
   bulkCommit: 'BC',
   bulkTimeoutReceived: 'BTRc',
   bulkTimeoutReserved: 'BTRs',
