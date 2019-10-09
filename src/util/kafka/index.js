@@ -283,13 +283,13 @@ const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
   }
 }
 
-const proceed = async (defaultKafkaConfig, params, opts, kafkaProducer) => {
-  const { message, kafkaTopic, consumer, decodedPayload, span } = params
-  const { consumerCommit, fspiopError, producer, fromSwitch, toDestination } = opts
+const proceed = async (defaultKafkaConfig, params, opts) => {
+  const { message, kafkaTopic, consumer, decodedPayload, span, producer } = params
+  const { consumerCommit, fspiopError, eventDetail, fromSwitch, toDestination } = opts
   let metadataState
 
   if (consumerCommit) {
-    await commitMessageSync(kafkaTopic, consumer, message)
+    await commitMessageSync(consumer, kafkaTopic, message)
   }
   if (fspiopError) {
     if (!message.value.content.uriParams || !message.value.content.uriParams.id) {
@@ -312,9 +312,8 @@ const proceed = async (defaultKafkaConfig, params, opts, kafkaProducer) => {
   } else if (toDestination === true) {
     key = message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
   }
-  if (producer && kafkaProducer) {
-    const p = producer
-    await produceGeneralMessage(defaultKafkaConfig, kafkaProducer, p.functionality, p.action, message.value, metadataState, key, span)
+  if (eventDetail && producer) {
+    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, key, span)
   }
   return true
 }
