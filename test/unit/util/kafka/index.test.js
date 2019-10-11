@@ -38,7 +38,6 @@ const Sinon = require('sinon')
 const Test = require('tapes')(require('tape'))
 const Mustache = require('mustache')
 const Uuid = require('uuid4')
-const KafkaProducer = require('@mojaloop/central-services-stream').Kafka.Producer
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const EventSdk = require('@mojaloop/event-sdk')
 const Proxyquire = require('proxyquire')
@@ -105,17 +104,17 @@ const messageProtocol = {
   },
   pp: ''
 }
+let KafkaProducer
 
 Test('Utility Test', utilityTest => {
   let sandbox
 
   utilityTest.beforeEach(test => {
     sandbox = Sinon.createSandbox()
-    sandbox.stub(KafkaProducer.prototype, 'constructor').returns(Promise.resolve())
-    sandbox.stub(KafkaProducer.prototype, 'connect').returns(Promise.resolve())
-    sandbox.stub(KafkaProducer.prototype, 'sendMessage').returns(Promise.resolve())
-    sandbox.stub(KafkaProducer.prototype, 'disconnect').returns(Promise.resolve())
     participantName = 'testParticipant'
+    KafkaProducer = {
+      produceMessage: sandbox.stub()
+    }
     test.end()
   })
 
@@ -233,7 +232,7 @@ Test('Utility Test', utilityTest => {
   utilityTest.test('produceGeneralMessage should', produceGeneralMessageTest => {
     produceGeneralMessageTest.test('produce a general message', async (test) => {
       const span = EventSdk.Tracer.createSpan('test_span')
-      const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS, undefined, span)
+      const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS, undefined, span)
       test.equal(result, true)
       test.end()
     })
@@ -251,7 +250,7 @@ Test('Utility Test', utilityTest => {
           }
         }
       })
-      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })
@@ -269,14 +268,14 @@ Test('Utility Test', utilityTest => {
           }
         }
       })
-      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })
 
     produceGeneralMessageTest.test('produce a general message', async (test) => {
       try {
-        await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
+        await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
       } catch (e) {
         test.ok(e instanceof Error)
       }
@@ -288,7 +287,7 @@ Test('Utility Test', utilityTest => {
 
   utilityTest.test('produceParticipantMessage should', produceParticipantMessageTest => {
     produceParticipantMessageTest.test('produce a participant message', async (test) => {
-      const result = await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      const result = await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })
@@ -306,7 +305,7 @@ Test('Utility Test', utilityTest => {
           }
         }
       })
-      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })
@@ -324,14 +323,14 @@ Test('Utility Test', utilityTest => {
           }
         }
       })
-      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, participantName, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
       test.equal(result, true)
       test.end()
     })
 
     produceParticipantMessageTest.test('produce a participant message', async (test) => {
       try {
-        await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, participantName, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
+        await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
       } catch (e) {
         test.ok(e instanceof Error)
       }
@@ -350,12 +349,12 @@ Test('Utility Test', utilityTest => {
         commitMessageSync: commitMessageSyncStub
       }
       const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false)
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
+        getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
       }
       const UtilityProxy = rewire(`${src}/util/kafka`)
-      UtilityProxy.__set__('Consumer', ConsumerStub)
 
-      await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
+      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
       test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.ok(commitMessageSyncStub.withArgs(message).calledOnce, 'commitMessageSyncStub called once')
       test.end()
@@ -369,16 +368,35 @@ Test('Utility Test', utilityTest => {
         commitMessageSync: commitMessageSyncStub
       }
       const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true)
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true),
+        getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
       }
 
       const UtilityProxy = rewire(`${src}/util/kafka`)
-      UtilityProxy.__set__('Consumer', ConsumerStub)
 
-      await UtilityProxy.commitMessageSync(kafkaTopic, consumerStub, message)
+      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
       test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
       test.equal(commitMessageSyncStub.withArgs(message).callCount, 0, 'commitMessageSyncStub not called')
       test.end()
+    })
+
+    commitMessageSyncTest.test('skip committing message when auto commit is enabled', async (test) => {
+      const kafkaTopic = 'fail-topic'
+      const message = 'message'
+      const ConsumerStub = {
+        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
+        getConsumer: sandbox.stub().withArgs(kafkaTopic).throwsException(new Error('No Consumer'))
+      }
+
+      const UtilityProxy = rewire(`${src}/util/kafka`)
+      try {
+        await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
+        test.fail('No error thrown')
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        test.end()
+      }
     })
 
     commitMessageSyncTest.end()
@@ -406,19 +424,19 @@ Test('Utility Test', utilityTest => {
     const transferId = Uuid()
     const kafkaTopic = 'kafkaTopic'
     const consumer = 'consumer'
-    const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload }
-    const producer = { functionality: 'functionality', action: 'action' }
+    const producer = 'producer'
+    const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload, producer }
+    const eventDetail = { functionality: 'functionality', action: 'action' }
     const UtilityProxy = rewire(`${src}/util/kafka/index`)
     UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)
     UtilityProxy.__set__('produceGeneralMessage', produceGeneralMessageStub)
 
     proceedTest.test('commitMessageSync when consumerCommit and produce toDestination', async test => {
-      const opts = { consumerCommit: true, producer, toDestination: true }
+      const opts = { consumerCommit: true, eventDetail, toDestination: true }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        const p = producer
         test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub called once')
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, p.functionality, p.action, message.value, successState).calledOnce, 'produceGeneralMessageStub called once')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub called once')
         test.equal(result, true, 'result returned')
       } catch (err) {
         test.fail(err.message)
@@ -428,11 +446,10 @@ Test('Utility Test', utilityTest => {
     })
 
     proceedTest.test('produce fromSwitch and do not stop timer', async test => {
-      const opts = { fromSwitch: true, producer }
+      const opts = { fromSwitch: true, eventDetail }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        const p = producer
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, p.functionality, p.action, message.value, successState).calledTwice, 'produceGeneralMessageStub called twice')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledTwice, 'produceGeneralMessageStub called twice')
         test.equal(message.value.to, from, 'message destination set to sender')
         test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
         test.equal(result, true, 'result returned')

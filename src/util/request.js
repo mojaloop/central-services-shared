@@ -25,7 +25,7 @@
 
 const EventSdk = require('@mojaloop/event-sdk')
 const request = require('axios')
-const Logger = require('../logger')
+const Logger = require('@mojaloop/central-services-logger')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
@@ -81,7 +81,9 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
       { key: 'method', value: method },
-      { key: 'request', value: JSON.stringify(requestOptions) }
+      { key: 'request', value: JSON.stringify(requestOptions) },
+      { key: 'status', value: error.response.status },
+      { key: 'response', value: error.response.data }
     ])
   }
 }

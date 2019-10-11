@@ -65,7 +65,7 @@ const FspEndpointTemplates = {
   PARTICIPANT_ENDPOINTS_GET: '/participants/{{fsp}}/endpoints',
   PARTICIPANTS_GET: '/participants/{{fsp}}',
   PARTIES_GET: '/parties/{{fsp}}',
-  PARTIES_PUT_ERROR: '/parties/{{partyIdType}}/{{partyIdentifier}}',
+  PARTIES_PUT_ERROR: '/parties/{{partyIdType}}/{{partyIdentifier}}/error',
   ORACLE_PARTICIPANTS_TYPE_ID: '/participants/{{partyIdType}}/{{partyIdentifier}}',
   ORACLE_PARTICIPANTS_TYPE_ID_CURRENCY: '/participants/{{partyIdType}}/{{partyIdentifier}}?currency={{currency}}',
   ORACLE_PARTICIPANTS_BATCH: '/participants'
