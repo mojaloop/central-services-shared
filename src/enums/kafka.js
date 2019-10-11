@@ -57,6 +57,14 @@ const TopicMap = {
     'bulk-timeout-reserved': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
+    },
+    'fulfil-duplicate': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
+    'prepare-duplicate': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
     }
   },
   notification: {
