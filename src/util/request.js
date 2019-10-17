@@ -32,6 +32,10 @@ const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
+// Delete the default headers that the `axios` module inserts as they can brake our conventions.
+// By default it would insert `"Accept":"application/json, text/plain, */*"`.
+delete request.defaults.headers.common.Accept;
+
 /**
  * @function validateParticipant
  *
