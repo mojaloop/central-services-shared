@@ -34,7 +34,7 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
 // Delete the default headers that the `axios` module inserts as they can brake our conventions.
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
-delete request.defaults.headers.common.Accept;
+delete request.defaults.headers.common.Accept
 
 /**
  * @function validateParticipant
