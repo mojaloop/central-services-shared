@@ -1,34 +1,16 @@
 {
-  "1065|winston>async>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
+  "decisions": {
+    "1184|npm-check-updates>pacote>make-fetch-happen>https-proxy-agent": {
+      "decision": "ignore",
+      "madeAt": 1571673977012,
+      "expiresAt": 1574265966283
+    },
+    "1184|npm-check-updates>pacote>npm-registry-fetch>make-fetch-happen>https-proxy-agent": {
+      "decision": "ignore",
+      "madeAt": 1571673977012,
+      "expiresAt": 1574265966283
+    }
   },
-  "1065|sinon>@sinonjs/formatio>@sinonjs/samsam>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  },
-  "1065|sinon>@sinonjs/samsam>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  },
-  "1065|sinon>nise>@sinonjs/formatio>@sinonjs/samsam>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  },
-  "1065|standard>eslint>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  },
-  "1065|standard>eslint-plugin-import>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  },
-  "1065|tap-xunit>xmlbuilder>lodash": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  },
-  "1164|nyc>istanbul-reports>handlebars": {
-    "decision": "fix",
-    "madeAt": 1569387065534
-  }
+  "rules": {},
+  "version": 1
 }

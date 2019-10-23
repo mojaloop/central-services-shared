@@ -552,5 +552,27 @@ Test('General util', utilTest => {
     transposeTest.end()
   })
 
+  utilTest.test('JSON.stringify() with a replacer function getCircularReplacer should', transposeTest => {
+    transposeTest.test('return stringified value for a primitive', test => {
+      const primitive = '0'
+      const expected = '"0"'
+
+      const result = JSON.stringify(primitive, Util.getCircularReplacer())
+      test.equal(result, expected)
+      test.end()
+    })
+    transposeTest.test('return an object of primitives while removing circular references', test => {
+      const obj = { primitive: '0' }
+      obj.circular = obj
+      const expected = '{"primitive":"0"}'
+
+      const result = JSON.stringify(obj, Util.getCircularReplacer())
+      test.equal(result, expected)
+      test.end()
+    })
+
+    transposeTest.end()
+  })
+
   utilTest.end()
 })

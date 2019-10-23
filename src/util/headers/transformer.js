@@ -123,8 +123,6 @@ const transformHeaders = (headers, config) => {
     // Check to see if we find a regex match the source header containing the switch name.
     // If so we remove the signature added by default.
     delete normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.SIGNATURE]]
-    // Also remove FSPIOP-URI and make FSPIOP-HTTP-Method ALL-CAPS #737
-    delete normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.URI]]
   }
 
   // Per the FSPIOP API spec, remove the Accept header on all PUT requests
