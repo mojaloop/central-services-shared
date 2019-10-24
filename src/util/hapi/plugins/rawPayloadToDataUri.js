@@ -77,7 +77,9 @@ module.exports.plugin = {
         method: async (request, h) => {
           return getRawBody(request.payload)
             .then(rawBuffer => {
-              request = requestRawPayloadTransform(request, rawBuffer)
+              if (Buffer.byteLength(rawBuffer) !== 0) {
+                request = requestRawPayloadTransform(request, rawBuffer)
+              }
               return h.continue
             }).catch(e => {
               return h.continue
