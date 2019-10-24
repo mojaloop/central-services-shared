@@ -59,10 +59,6 @@ Test('rawPayloadToDataUri plugin test', async (pluginTest) => {
       const server = await init(okOptions)
 
       await server.inject(requestOptions)
-      // const response = await server.inject(requestOptions)
-      // const parsedPayloadRequest = JSON.parse(response.payload)
-      // assert.equal(response.statusCode, 200, 'status code is correct')
-      // assert.deepEqual(parsedPayloadRequest.payload, requestOptions.payload)
       await server.stop()
       assert.end()
     } catch (e) {
