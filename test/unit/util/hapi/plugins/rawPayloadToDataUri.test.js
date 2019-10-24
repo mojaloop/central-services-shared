@@ -48,6 +48,30 @@ Test('rawPayloadToDataUri plugin test', async (pluginTest) => {
     port: 8800
   }
 
+  await pluginTest.test('send request with 0 size payload to test condition checking for rawBuffer length ', async assert => {
+    try {
+      const requestOptions = {
+        method: 'POST',
+        url: '/',
+        payload: null
+      }
+
+      const server = await init(okOptions)
+
+      await server.inject(requestOptions)
+      // const response = await server.inject(requestOptions)
+      // const parsedPayloadRequest = JSON.parse(response.payload)
+      // assert.equal(response.statusCode, 200, 'status code is correct')
+      // assert.deepEqual(parsedPayloadRequest.payload, requestOptions.payload)
+      await server.stop()
+      assert.end()
+    } catch (e) {
+      console.log(e)
+      assert.fail()
+      assert.end()
+    }
+  })
+
   await pluginTest.test('send request and get raw data back', async assert => {
     try {
       const requestOptions = {
