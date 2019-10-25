@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "8.3.3",
+  "version": "8.3.4",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
-    "@mojaloop/central-services-stream": "8.1.1",
+    "@mojaloop/central-services-stream": "8.3.0",
     "@hapi/catbox": "10.2.3",
     "@hapi/catbox-memory": "4.1.1",
     "@mojaloop/central-services-error-handling": "8.3.0",
