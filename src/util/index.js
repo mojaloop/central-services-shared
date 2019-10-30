@@ -198,6 +198,24 @@ const getCircularReplacer = () => {
   }
 }
 
+const filterExtensions = (extensionsArray, exclKeysArray, exclValuesArray) => {
+  const extensions = extensionsArray != null && typeof extensionsArray[Symbol.iterator] === 'function' ? extensionsArray : []
+  const exclKeys = exclKeysArray != null && typeof exclKeysArray[Symbol.iterator] === 'function' ? exclKeysArray : []
+  const exclValues = exclValuesArray != null && typeof exclValuesArray[Symbol.iterator] === 'function' ? exclValuesArray : []
+  return extensions.filter(ext => {
+    let match = false
+    for (const key of exclKeys) {
+      match = ext.key && (ext.key.search(key) + 1)
+      if (match) return false
+    }
+    for (const value of exclValues) {
+      match = ext.value && (ext.value.search(value) + 1)
+      if (match) return false
+    }
+    return true
+  })
+}
+
 module.exports = {
   assign,
   expand,
@@ -216,6 +234,7 @@ module.exports = {
   breadcrumb,
   transpose,
   getCircularReplacer,
+  filterExtensions,
   Kafka,
   Endpoints,
   Request,
