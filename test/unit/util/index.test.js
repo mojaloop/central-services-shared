@@ -552,8 +552,8 @@ Test('General util', utilTest => {
     transposeTest.end()
   })
 
-  utilTest.test('JSON.stringify() with a replacer function getCircularReplacer should', transposeTest => {
-    transposeTest.test('return stringified value for a primitive', test => {
+  utilTest.test('JSON.stringify() with a replacer function getCircularReplacer should', circularTest => {
+    circularTest.test('return stringified value for a primitive', test => {
       const primitive = '0'
       const expected = '"0"'
 
@@ -561,7 +561,7 @@ Test('General util', utilTest => {
       test.equal(result, expected)
       test.end()
     })
-    transposeTest.test('return an object of primitives while removing circular references', test => {
+    circularTest.test('return an object of primitives while removing circular references', test => {
       const obj = { primitive: '0' }
       obj.circular = obj
       const expected = '{"primitive":"0"}'
@@ -571,7 +571,39 @@ Test('General util', utilTest => {
       test.end()
     })
 
-    transposeTest.end()
+    circularTest.end()
+  })
+
+  utilTest.test('filterExtensions should', filterTest => {
+    const extensions = [
+      { key: 'url', value: 'fullUrl' },
+      { key: 'sourceFsp', value: 'fspiopSource' },
+      { key: 'destinationFsp', value: 'fspiopDest' },
+      { key: 'method', value: 'httpMethod' },
+      { key: 'request', value: 'possible sensitive content' },
+      { key: 'response', value: 'Password: 1234' }
+    ]
+    filterTest.test('filter extensions using predefined list of exact or regex matches for keys and values', test => {
+      const exclKeysArray = ['request', /regex/i]
+      const exclValuesArray = ['specific value', /password/i]
+      const expected = [
+        { key: 'url', value: 'fullUrl' },
+        { key: 'sourceFsp', value: 'fspiopSource' },
+        { key: 'destinationFsp', value: 'fspiopDest' },
+        { key: 'method', value: 'httpMethod' }
+      ]
+
+      const result = Util.filterExtensions(extensions, exclKeysArray, exclValuesArray)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+    filterTest.test('return empty array when called with no arguments', test => {
+      const result = Util.filterExtensions()
+      test.deepEqual(result, [])
+      test.end()
+    })
+
+    filterTest.end()
   })
 
   utilTest.end()
