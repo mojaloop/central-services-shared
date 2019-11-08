@@ -37,7 +37,7 @@ const _ = require('lodash')
  * @returns tags object to be applied to a span
  */
 
-const getSpanTags = ({ payload, headers, params }, transactionType, transactionAction) => {
+const getTransferSpanTags = ({ payload, headers, params }, transactionType, transactionAction) => {
   const headersLowerCase = _.mapKeys(headers, function (v, k) { return k.toLowerCase() })
   const tags = {
     transactionType,
@@ -57,4 +57,4 @@ const getSpanTags = ({ payload, headers, params }, transactionType, transactionA
   }
 }
 
-module.exports = { getSpanTags }
+module.exports = { getTransferSpanTags }

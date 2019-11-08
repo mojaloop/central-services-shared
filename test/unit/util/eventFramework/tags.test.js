@@ -55,7 +55,7 @@ Test('Get tags tests', test => {
       payeeFsp: 'payeeFsp'
     }
 
-    const result = Util.EventFramework.getSpanTags({ payload, headers, params }, transactionType, transactionAction)
+    const result = Util.EventFramework.getTransferSpanTags({ payload, headers, params }, transactionType, transactionAction)
     assert.deepEqual(result, expectations, 'tags match')
     assert.end()
   })
@@ -75,7 +75,7 @@ Test('Get tags tests', test => {
       destination: 'destination'
     }
 
-    const result = Util.EventFramework.getSpanTags({ payload, headers, params }, transactionType, transactionAction)
+    const result = Util.EventFramework.getTransferSpanTags({ payload, headers, params }, transactionType, transactionAction)
     assert.deepEqual(result, expectations, 'tags match')
     assert.end()
   })
