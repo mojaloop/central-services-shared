@@ -26,6 +26,6 @@
 const Tags = require('./tags')
 
 module.exports = {
-  getSpanTags: Tags.getSpanTags,
+  getTransferSpanTags: Tags.getTransferSpanTags,
   Tags
 }
