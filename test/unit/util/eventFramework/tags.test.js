@@ -37,7 +37,6 @@ const transactionAction = 'prepare'
 
 Test('Get tags tests', test => {
   test.test('should get tags', assert => {
-
     const params = {}
 
     const payload = {
@@ -62,7 +61,6 @@ Test('Get tags tests', test => {
   })
 
   test.test('should get tags', assert => {
-
     const params = {
       id: 'transferId'
     }
