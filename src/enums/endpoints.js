@@ -68,6 +68,8 @@ const FspEndpointTemplates = {
   PARTIES_PUT_ERROR: '/parties/{{partyIdType}}/{{partyIdentifier}}/error',
   ORACLE_PARTICIPANTS_TYPE_ID: '/participants/{{partyIdType}}/{{partyIdentifier}}',
   ORACLE_PARTICIPANTS_TYPE_ID_CURRENCY: '/participants/{{partyIdType}}/{{partyIdentifier}}?currency={{currency}}',
+  ORACLE_PARTICIPANTS_TYPE_ID_SUB_ID: '/participants/{{partyIdType}}/{{partyIdentifier}}?partySubIdOrType={{partySubIdOrType}}',
+  ORACLE_PARTICIPANTS_TYPE_ID_CURRENCY_SUB_ID: '/participants/{{partyIdType}}/{{partyIdentifier}}?currency={{currency}}&partySubIdOrType={{partySubIdOrType}}',
   ORACLE_PARTICIPANTS_BATCH: '/participants',
   TRANSFERS_POST: '/transfers',
   TRANSFERS_PUT: '/{{fsp}}/transfers/{{ID}}',
