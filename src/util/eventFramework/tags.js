@@ -57,13 +57,13 @@ const getTransferSpanTags = ({ payload, headers, params }, transactionType, tran
   }
 }
 
-const getSpanTags = (transactionType, transactionAction, transactionId, source, destination = undefined) => {
+const getSpanTags = (transactionType, transactionAction, transactionId, source, destination) => {
   return {
     transactionType,
     transactionAction,
     transactionId,
     source,
-    destination: destination || undefined
+    destination
   }
 }
 
