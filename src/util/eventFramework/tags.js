@@ -57,4 +57,17 @@ const getTransferSpanTags = ({ payload, headers, params }, transactionType, tran
   }
 }
 
-module.exports = { getTransferSpanTags }
+const getSpanTags = (transactionType, transactionAction, transactionId, source, destination = undefined) => {
+  return {
+    transactionType,
+    transactionAction,
+    transactionId,
+    source,
+    destination: destination || undefined
+  }
+}
+
+module.exports = {
+  getTransferSpanTags,
+  getSpanTags
+}
