@@ -57,6 +57,16 @@ const getTransferSpanTags = ({ payload, headers, params }, transactionType, tran
   }
 }
 
+/**
+ * Method to get generic span tags
+ *
+ * @param transactionType type of the transaction
+ * @param transactionAction transaction type action
+ * @param transactionId a unique transaction identifier
+ * @param source fsp/api for the event
+ * @param destination fsp/api for the event
+ * @returns tags object to be applied to a span
+ */
 const getSpanTags = (transactionType, transactionAction, transactionId, source, destination) => {
   return {
     transactionType,
