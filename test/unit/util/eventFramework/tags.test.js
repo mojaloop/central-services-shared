@@ -60,7 +60,7 @@ Test('Get tags tests', test => {
     assert.end()
   })
 
-  test.test('should get tags', assert => {
+  test.test('should get transfer tags', assert => {
     const params = {
       id: 'transferId'
     }
@@ -76,6 +76,20 @@ Test('Get tags tests', test => {
     }
 
     const result = Util.EventFramework.getTransferSpanTags({ payload, headers, params }, transactionType, transactionAction)
+    assert.deepEqual(result, expectations, 'tags match')
+    assert.end()
+  })
+
+  test.test('should get tags', assert => {
+    const expectations = {
+      transactionType: 'transfer',
+      transactionAction: 'prepare',
+      transactionId: 'transferId',
+      source: 'source',
+      destination: 'destination'
+    }
+
+    const result = Util.EventFramework.getSpanTags(transactionType, transactionAction, expectations.transactionId, expectations.source, expectations.destination)
     assert.deepEqual(result, expectations, 'tags match')
     assert.end()
   })
