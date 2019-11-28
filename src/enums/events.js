@@ -37,7 +37,8 @@ const Event = {
     PREPARE: 'prepare',
     QUOTE: 'quote',
     TRANSFER: 'transfer',
-    PARTY: 'party'
+    PARTY: 'party',
+    PARTICIPANT: 'participant'
   },
   Action: {
     ABORT: 'abort',
@@ -71,7 +72,9 @@ const Event = {
     REQUEST: 'request',
     TIMEOUT_RECEIVED: 'timeout-received',
     TIMEOUT_RESERVED: 'timeout-reserved',
-    TRANSFER: 'transfer'
+    TRANSFER: 'transfer',
+    PUT: 'put',
+    POST: 'post'
   }
 }
 
