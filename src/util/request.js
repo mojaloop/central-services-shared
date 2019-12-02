@@ -85,7 +85,8 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
       { key: 'method', value: method },
-      { key: 'request', value: JSON.stringify(requestOptions) }
+      { key: 'request', value: JSON.stringify(requestOptions) },
+      { key: 'cause', value: error.message }
     ]
     if (error.response) {
       extenstionArray.push({ key: 'status', value: error.response && error.response.status })
