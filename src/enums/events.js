@@ -36,23 +36,28 @@ const Event = {
     POSITION: 'position',
     PREPARE: 'prepare',
     QUOTE: 'quote',
-    TRANSFER: 'transfer'
+    TRANSFER: 'transfer',
+    PARTY: 'party',
+    PARTICIPANT: 'participant'
   },
   Action: {
     ABORT: 'abort',
     ABORT_DUPLICATE: 'abort-duplicate',
+    ACCEPT: 'accept',
     BULK_ABORT: 'bulk-abort',
     BULK_COMMIT: 'bulk-commit',
     BULK_PREPARE: 'bulk-prepare',
     BULK_PROCESSING: 'bulk-processing',
     BULK_TIMEOUT_RECEIVED: 'bulk-timeout-received',
     BULK_TIMEOUT_RESERVED: 'bulk-timeout-reserved',
+    CREATE: 'create',
     COMMIT: 'commit',
     EVENT: 'event',
     FAIL: 'fail',
     FULFIL: 'fulfil',
     FULFIL_DUPLICATE: 'fulfil-duplicate',
     GET: 'get',
+    INITIATE: 'initiate',
     LIMIT_ADJUSTMENT: 'limit-adjustment',
     POSITION: 'position',
     PREPARE: 'prepare',
@@ -63,9 +68,13 @@ const Event = {
     RECORD_FUNDS_OUT_COMMIT: 'recordFundsOutCommit',
     RECORD_FUNDS_OUT_PREPARE_RESERVE: 'recordFundsOutPrepareReserve',
     REJECT: 'reject',
+    RESOLVE: 'resolve',
+    REQUEST: 'request',
     TIMEOUT_RECEIVED: 'timeout-received',
     TIMEOUT_RESERVED: 'timeout-reserved',
-    TRANSFER: 'transfer'
+    TRANSFER: 'transfer',
+    PUT: 'put',
+    POST: 'post'
   }
 }
 

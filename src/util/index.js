@@ -245,5 +245,6 @@ module.exports = {
   StreamingProtocol,
   Time,
   Hash,
-  Comparators
+  Comparators,
+  EventFramework: require('./eventFramework')
 }

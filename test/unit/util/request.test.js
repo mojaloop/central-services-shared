@@ -88,7 +88,33 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       }
     })
 
-    getEndpointTest.test('throw error', async (test) => {
+    getEndpointTest.test('throw error when error contains response property', async (test) => {
+      const fsp = 'fsp1'
+
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+
+      const customError = new Error()
+      customError.response = {
+        status: 'status',
+        data: 'data'
+      }
+      request = sandbox.stub().throws(customError)
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      try {
+        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
+        test.fail('should throw error')
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('throw error when required parameter is missing', async (test) => {
       const fsp = 'fsp1'
 
       const requestOptions = {
