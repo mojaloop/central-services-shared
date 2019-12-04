@@ -85,13 +85,14 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
       { key: 'method', value: method },
-      { key: 'request', value: JSON.stringify(requestOptions) }
+      { key: 'request', value: JSON.stringify(requestOptions) },
+      { key: 'errorMessage', value: error.message }
     ]
     if (error.response) {
       extensionArray.push({ key: 'status', value: error.response && error.response.status })
       extensionArray.push({ key: 'response', value: error.response && error.response.data })
     }
-    const cause = JSON.stringify(extensionArray) + error.message
+    const cause = JSON.stringify(extensionArray)
     throw ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [{ key: 'cause', value: cause }])
   }
 }
