@@ -80,7 +80,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     return response
   } catch (error) {
     Logger.error(error)
-    const extenstionArray = [
+    const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
@@ -88,10 +88,11 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       { key: 'request', value: JSON.stringify(requestOptions) }
     ]
     if (error.response) {
-      extenstionArray.push({ key: 'status', value: error.response && error.response.status })
-      extenstionArray.push({ key: 'response', value: error.response && error.response.data })
+      extensionArray.push({ key: 'status', value: error.response && error.response.status })
+      extensionArray.push({ key: 'response', value: error.response && error.response.data })
     }
-    throw ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, extenstionArray)
+    const cause = JSON.stringify(extensionArray)
+    throw ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [{ key: 'cause', value: cause }])
   }
 }
 
