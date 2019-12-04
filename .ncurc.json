@@ -1,4 +1,5 @@
 {
   "reject": [
+    "@mojaloop/event-sdk"
   ]
 }
