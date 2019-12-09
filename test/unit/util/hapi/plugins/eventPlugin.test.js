@@ -103,6 +103,7 @@ Test('Event plugin test', async (pluginTest) => {
         method: 'POST',
         url: '/',
         headers: {
+          tracestate: 'acmevendor=12312312', 
           traceparent: '00-9732ca939fbd9f755b5bc07c227c4cd5-acd6fbed1e66219c-00'
         }
       })
@@ -113,6 +114,7 @@ Test('Event plugin test', async (pluginTest) => {
       assert.equal(span.spanContext.service, 'test_route')
       assert.equal(span.spanContext.traceId, '9732ca939fbd9f755b5bc07c227c4cd5')
       assert.equal(span.spanContext.parentSpanId, 'acd6fbed1e66219c')
+
       assert.end()
     } catch (e) {
       assert.fail()
