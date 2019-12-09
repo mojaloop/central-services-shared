@@ -51,37 +51,37 @@ Test('Event plugin test', async (pluginTest) => {
     test.end()
   })
 
-  // await pluginTest.test('create and finish a span for a route with the sampled tag', async assert => {
-  //   try {
-  //     let span
-  //     server.route({
-  //       method: 'POST',
-  //       path: '/',
-  //       handler: (request, h) => {
-  //         span = request.span
-  //         return 'testing'
-  //       },
-  //       options: {
-  //         id: 'test_route',
-  //         tags: ['sampled']
-  //       }
-  //     })
+  await pluginTest.test('create and finish a span for a route with the sampled tag', async assert => {
+    try {
+      let span
+      server.route({
+        method: 'POST',
+        path: '/',
+        handler: (request, h) => {
+          span = request.span
+          return 'testing'
+        },
+        options: {
+          id: 'test_route',
+          tags: ['sampled']
+        }
+      })
 
-  //     const response = await server.inject({
-  //       method: 'POST',
-  //       url: '/'
-  //     })
+      const response = await server.inject({
+        method: 'POST',
+        url: '/'
+      })
 
-  //     assert.equal(response.statusCode, 200, 'status code is correct')
-  //     assert.ok(span)
-  //     assert.ok(span.isFinished)
-  //     assert.equal(span.spanContext.service, 'test_route')
-  //     assert.end()
-  //   } catch (e) {
-  //     assert.fail()
-  //     assert.end()
-  //   }
-  // })
+      assert.equal(response.statusCode, 200, 'status code is correct')
+      assert.ok(span)
+      assert.ok(span.isFinished)
+      assert.equal(span.spanContext.service, 'test_route')
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
 
   await pluginTest.test('create and finish a child span with http context headers', async assert => {
     try {
@@ -113,9 +113,7 @@ Test('Event plugin test', async (pluginTest) => {
       assert.ok(span.isFinished)
       assert.equal(span.spanContext.service, 'test_route')
       assert.equal(span.spanContext.traceId, '9732ca939fbd9f755b5bc07c227c4cd5')
-
       assert.equal(span.spanContext.parentSpanId, 'acd6fbed1e66219c')
-
 
       assert.end()
     } catch (e) {
@@ -124,98 +122,98 @@ Test('Event plugin test', async (pluginTest) => {
     }
   })
 
-  // await pluginTest.test('do not create a span for a route without the sampled tag', async assert => {
-  //   try {
-  //     let span
-  //     server.route({
-  //       method: 'POST',
-  //       path: '/',
-  //       handler: (request, h) => {
-  //         span = request.span
-  //         return 'testing'
-  //       },
-  //       options: {
-  //         id: 'test_route'
-  //       }
-  //     })
+  await pluginTest.test('do not create a span for a route without the sampled tag', async assert => {
+    try {
+      let span
+      server.route({
+        method: 'POST',
+        path: '/',
+        handler: (request, h) => {
+          span = request.span
+          return 'testing'
+        },
+        options: {
+          id: 'test_route'
+        }
+      })
 
-  //     const response = await server.inject({
-  //       method: 'POST',
-  //       url: '/'
-  //     })
+      const response = await server.inject({
+        method: 'POST',
+        url: '/'
+      })
 
-  //     assert.equal(response.statusCode, 200, 'status code is correct')
-  //     assert.notOk(span)
-  //     assert.end()
-  //   } catch (e) {
-  //     assert.fail()
-  //     assert.end()
-  //   }
-  // })
+      assert.equal(response.statusCode, 200, 'status code is correct')
+      assert.notOk(span)
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
 
-  // await pluginTest.test('log an error if the response is an error', async assert => {
-  //   try {
-  //     let span
-  //     server.route({
-  //       method: 'POST',
-  //       path: '/',
-  //       handler: (request, h) => {
-  //         span = request.span
-  //         throw Error('testing')
-  //       },
-  //       options: {
-  //         id: 'test_route',
-  //         tags: ['sampled']
-  //       }
-  //     })
+  await pluginTest.test('log an error if the response is an error', async assert => {
+    try {
+      let span
+      server.route({
+        method: 'POST',
+        path: '/',
+        handler: (request, h) => {
+          span = request.span
+          throw Error('testing')
+        },
+        options: {
+          id: 'test_route',
+          tags: ['sampled']
+        }
+      })
 
-  //     const response = await server.inject({
-  //       method: 'POST',
-  //       url: '/'
-  //     })
+      const response = await server.inject({
+        method: 'POST',
+        url: '/'
+      })
 
-  //     assert.equal(response.statusCode, 500, 'status code is correct')
-  //     assert.ok(span)
-  //     assert.ok(span.isFinished)
-  //     assert.equal(span.spanContext.service, 'test_route')
-  //     assert.end()
-  //   } catch (e) {
-  //     assert.fail()
-  //     assert.end()
-  //   }
-  // })
+      assert.equal(response.statusCode, 500, 'status code is correct')
+      assert.ok(span)
+      assert.ok(span.isFinished)
+      assert.equal(span.spanContext.service, 'test_route')
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
 
-  // await pluginTest.test('handle an fspiop error', async assert => {
-  //   try {
-  //     let span
-  //     server.route({
-  //       method: 'POST',
-  //       path: '/',
-  //       handler: (request, h) => {
-  //         span = request.span
-  //         throw Error('testing')
-  //       },
-  //       options: {
-  //         id: 'test_route',
-  //         tags: ['sampled']
-  //       }
-  //     })
+  await pluginTest.test('handle an fspiop error', async assert => {
+    try {
+      let span
+      server.route({
+        method: 'POST',
+        path: '/',
+        handler: (request, h) => {
+          span = request.span
+          throw Error('testing')
+        },
+        options: {
+          id: 'test_route',
+          tags: ['sampled']
+        }
+      })
 
-  //     const response = await server.inject({
-  //       method: 'POST',
-  //       url: '/'
-  //     })
+      const response = await server.inject({
+        method: 'POST',
+        url: '/'
+      })
 
-  //     assert.equal(response.statusCode, 500, 'status code is correct')
-  //     assert.ok(span)
-  //     assert.ok(span.isFinished)
-  //     assert.equal(span.spanContext.service, 'test_route')
-  //     assert.end()
-  //   } catch (e) {
-  //     assert.fail()
-  //     assert.end()
-  //   }
-  // })
+      assert.equal(response.statusCode, 500, 'status code is correct')
+      assert.ok(span)
+      assert.ok(span.isFinished)
+      assert.equal(span.spanContext.service, 'test_route')
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
 
   await pluginTest.end()
 })
