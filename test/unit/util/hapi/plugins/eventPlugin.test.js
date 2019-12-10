@@ -98,12 +98,14 @@ Test('Event plugin test', async (pluginTest) => {
           tags: ['sampled']
         }
       })
-
+      const traceId = '9732ca939fbd9f755b5bc07c227c4cd5'
+      const spanId = '74c6557725f1f0e1'
       const response = await server.inject({
         method: 'POST',
         url: '/',
         headers: {
-          traceparent: '00-9732ca939fbd9f755b5bc07c227c4cd5-acd6fbed1e66219c-00'
+          tracestate: `acmevendor=${spanId}`,
+          traceparent: `00-${traceId}-${spanId}-00`
         }
       })
 
@@ -112,7 +114,8 @@ Test('Event plugin test', async (pluginTest) => {
       assert.ok(span.isFinished)
       assert.equal(span.spanContext.service, 'test_route')
       assert.equal(span.spanContext.traceId, '9732ca939fbd9f755b5bc07c227c4cd5')
-      assert.equal(span.spanContext.parentSpanId, 'acd6fbed1e66219c')
+      assert.equal(span.spanContext.parentSpanId, spanId)
+
       assert.end()
     } catch (e) {
       assert.fail()
