@@ -1,8 +1,8 @@
 'use strict'
 
-const sleep = (milliseconds = 10, debug = false, caller = null, reason = null) => {
+const sleep = (milliseconds = 10) => {
   const start = new Date().getTime()
-  while (1) {
+  while (true) {
     if ((new Date().getTime() - start) > milliseconds) {
       break
     }

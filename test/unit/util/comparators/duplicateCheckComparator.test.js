@@ -80,7 +80,7 @@ Test('Duplicate check comparator', dccTest => {
         })
         const id = 1
         const object = { key: 'value' }
-        const getDuplicateDataFuncOverride = async (id) => { return Promise.resolve(null) }
+        const getDuplicateDataFuncOverride = async () => { return Promise.resolve(null) }
         const saveHashFuncOverride = async () => { return true }
 
         const expected = {
