@@ -1,10 +1,10 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "8.6.5",
+  "version": "8.7.0",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
-    "test": "npm run test:unit | faucet",
+    "test": "npm run test:unit | npx faucet",
     "pretest": "standard",
     "standard": "standard",
     "test:unit": "tapes 'test/unit/**/**.test.js'",
@@ -46,7 +46,7 @@
     "@hapi/catbox-memory": "4.1.1",
     "@mojaloop/central-services-error-handling": "8.6.2",
     "@mojaloop/central-services-logger": "8.6.0",
-    "@mojaloop/event-sdk": "8.6.1",
+    "@mojaloop/event-sdk": "8.6.2",
     "axios": "0.19.0",
     "base64url": "3.0.1",
     "clone": "2.1.2",
