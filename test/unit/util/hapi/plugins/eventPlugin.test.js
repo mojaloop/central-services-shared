@@ -57,7 +57,7 @@ Test('Event plugin test', async (pluginTest) => {
       server.route({
         method: 'POST',
         path: '/',
-        handler: (request, h) => {
+        handler: (request) => {
           span = request.span
           return 'testing'
         },
@@ -89,7 +89,7 @@ Test('Event plugin test', async (pluginTest) => {
       server.route({
         method: 'POST',
         path: '/',
-        handler: (request, h) => {
+        handler: (request) => {
           span = request.span
           return 'testing'
         },
@@ -129,7 +129,7 @@ Test('Event plugin test', async (pluginTest) => {
       server.route({
         method: 'POST',
         path: '/',
-        handler: (request, h) => {
+        handler: (request) => {
           span = request.span
           return 'testing'
         },
@@ -158,7 +158,7 @@ Test('Event plugin test', async (pluginTest) => {
       server.route({
         method: 'POST',
         path: '/',
-        handler: (request, h) => {
+        handler: (request) => {
           span = request.span
           throw Error('testing')
         },
@@ -190,7 +190,7 @@ Test('Event plugin test', async (pluginTest) => {
       server.route({
         method: 'POST',
         path: '/',
-        handler: (request, h) => {
+        handler: (request) => {
           span = request.span
           throw Error('testing')
         },
