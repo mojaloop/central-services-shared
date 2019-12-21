@@ -38,6 +38,7 @@ const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const EventSdk = require('@mojaloop/event-sdk')
+const Uuid = require('uuid4')
 
 /**
  * @function ParticipantTopicTemplate
@@ -221,12 +222,12 @@ const getFunctionalityAction = (functionality, action) => {
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
  * @param {object} message - a list of messages to consume for the relevant topic
  * @param {object} state - state of the message being produced
- * @param {string} key - optional key that allows partitioning it occur
  * @param {object} span - the span for event logging
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
-const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, functionality, action, message, state, key = null, span = null) => {
+const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, functionality, action, message, state, span = null) => {
+  const key = Uuid()
   const { functionalityMapped, actionMapped } = getFunctionalityAction(functionality, action)
   let messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
   const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key)
@@ -262,9 +263,10 @@ const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, function
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
 const produceParticipantMessage = async (defaultKafkaConfig, kafkaProducer, participantName, functionality, action, message, state) => {
+  const key = Uuid()
   const { functionalityMapped, actionMapped } = getFunctionalityAction(functionality, action)
   const messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
-  const topicConfig = createParticipantTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, functionalityMapped, actionMapped)
+  const topicConfig = createParticipantTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, functionalityMapped, actionMapped, key)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
   await kafkaProducer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
@@ -305,15 +307,12 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
     message.value.from = Enum.Http.Headers.FSPIOP.SWITCH.value
     message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = message.value.to
   }
-  let key
   if (typeof toDestination === 'string') {
     message.value.to = toDestination
     message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
-  } else if (toDestination === true) {
-    key = message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
   }
   if (eventDetail && producer) {
-    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, key, span)
+    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, span)
   }
   return true
 }
