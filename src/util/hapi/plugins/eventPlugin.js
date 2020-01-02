@@ -43,7 +43,7 @@ const onPreAuth = (request, reply) => {
   return reply.continue
 }
 
-const onPreResponse = (request, reply) => {
+const onPreResponse = async (request, reply) => {
   const span = request.span
   const response = request.response
   if (span) {
@@ -55,11 +55,15 @@ const onPreResponse = (request, reply) => {
         state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, response.output.statusCode, response.message)
       }
       span.error(response, state)
-      span.finish(response.message, state)
+      await span.finish(response.message, state)
     } else {
       Logger.debug(`Finishing parent span ${span.spanContext.service}`)
-      span.finish()
+      await span.finish()
     }
+    let rpl = { headers: {} }
+    rpl = span.injectContextToHttpRequest(rpl)
+    response.header('tracestate', rpl.headers.tracestate)
+    response.header('traceparent', rpl.headers.traceparent)
   }
   return reply.continue
 }
