@@ -62,8 +62,8 @@ const onPreResponse = async (request, reply) => {
     }
     let rpl = { headers: {} }
     rpl = span.injectContextToHttpRequest(rpl)
-    response.header('tracestate', rpl.headers.tracestate)
-    response.header('traceparent', rpl.headers.traceparent)
+    !!rpl.headers.tracestate && response.header('tracestate', rpl.headers.tracestate)
+    !!rpl.headers.traceparent && response.header('traceparent', rpl.headers.traceparent)
   }
   return reply.continue
 }
