@@ -40,7 +40,8 @@ const Event = {
     QUOTE: 'quote',
     TRANSFER: 'transfer',
     PARTY: 'party',
-    PARTICIPANT: 'participant'
+    PARTICIPANT: 'participant',
+    SETTLEMENT_WINDOW: 'settlementwindow'
   },
   Action: {
     ABORT: 'abort',
@@ -52,8 +53,9 @@ const Event = {
     BULK_PROCESSING: 'bulk-processing',
     BULK_TIMEOUT_RECEIVED: 'bulk-timeout-received',
     BULK_TIMEOUT_RESERVED: 'bulk-timeout-reserved',
-    CREATE: 'create',
+    CLOSE: 'close',
     COMMIT: 'commit',
+    CREATE: 'create',
     DELETE: 'delete',
     EVENT: 'event',
     FAIL: 'fail',

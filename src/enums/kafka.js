@@ -67,6 +67,12 @@ const TopicMap = {
       action: transferEventAction.PROCESSING
     }
   },
+  fulfil: {
+    'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
+    }
+  },
   notification: {
     abort: {
       functionality: transferEventType.NOTIFICATION,
@@ -172,13 +178,13 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.PREPARE
     }
-  },
-  fulfil: {
-    'bulk-commit': {
-      functionality: transferEventType.TRANSFER,
-      action: transferEventAction.FULFIL
-    }
-  }
+  }// ,
+  // 'settlement-window': {
+  //   close: {
+  //     functionality: transferEventType.SETTLEMENT_WINDOW,
+  //     action: transferEventAction.CLOSE
+  //   }
+  // }
 }
 
 module.exports = {
