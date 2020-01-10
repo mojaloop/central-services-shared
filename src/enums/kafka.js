@@ -130,6 +130,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'settlement-window': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'timeout-received': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT

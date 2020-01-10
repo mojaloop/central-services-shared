@@ -303,14 +303,14 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   if (fromSwitch) {
     message.value.to = message.value.from
     message.value.from = Enum.Http.Headers.FSPIOP.SWITCH.value
-    message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = message.value.to
+    if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = message.value.to
   }
   let key
   if (typeof toDestination === 'string') {
     message.value.to = toDestination
-    message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
+    if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
   } else if (toDestination === true) {
-    key = message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
+    key = message.value.content.headers && message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
   }
   if (eventDetail && producer) {
     await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, key, span)
