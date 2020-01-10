@@ -60,10 +60,6 @@ const onPreResponse = async (request, reply) => {
       Logger.debug(`Finishing parent span ${span.spanContext.service}`)
       await span.finish()
     }
-    let rpl = { headers: {} }
-    rpl = span.injectContextToHttpRequest(rpl)
-    !!rpl.headers.tracestate && response.header('tracestate', rpl.headers.tracestate)
-    !!rpl.headers.traceparent && response.header('traceparent', rpl.headers.traceparent)
   }
   return reply.continue
 }
