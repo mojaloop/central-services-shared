@@ -182,13 +182,7 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.PREPARE
     }
-  }// ,
-  // 'settlement-window': {
-  //   close: {
-  //     functionality: transferEventType.SETTLEMENT_WINDOW,
-  //     action: transferEventAction.CLOSE
-  //   }
-  // }
+  }
 }
 
 module.exports = {
