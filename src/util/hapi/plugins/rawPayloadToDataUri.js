@@ -81,7 +81,7 @@ module.exports.plugin = {
                 request = requestRawPayloadTransform(request, rawBuffer)
               }
               return h.continue
-            }).catch(e => {
+            }).catch(() => {
               return h.continue
             })
         }

@@ -45,6 +45,7 @@ const MainUtil = require('../../../../src/util')
 const Utility = require('../../../../src/util').Kafka
 const Enum = require('../../../../src').Enum
 const Config = require('../../../util/config')
+const clone = require('../../../../src/util').clone
 
 let participantName
 const TRANSFER = Enum.Events.Event.Type.TRANSFER
@@ -449,6 +450,23 @@ Test('Utility Test', utilityTest => {
       const opts = { fromSwitch: true, eventDetail }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledTwice, 'produceGeneralMessageStub called twice')
+        test.equal(message.value.to, from, 'message destination set to sender')
+        test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.test('produce fromSwitch without headers', async test => {
+      const opts = { fromSwitch: true, eventDetail }
+      try {
+        const localParams = clone(params)
+        delete localParams.message.value.content.headers
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
         test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledTwice, 'produceGeneralMessageStub called twice')
         test.equal(message.value.to, from, 'message destination set to sender')
         test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')

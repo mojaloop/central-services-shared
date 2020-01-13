@@ -11,7 +11,7 @@ const init = async (options) => {
   server.route({
     method: 'POST',
     path: '/',
-    handler: (request, h) => {
+    handler: (request) => {
       return {
         payload: request.payload,
         dataUri: request.dataUri,
