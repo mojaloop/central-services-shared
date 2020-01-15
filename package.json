@@ -45,7 +45,7 @@
     "@hapi/catbox-memory": "5.0.0",
     "@mojaloop/central-services-error-handling": "8.7.0",
     "@mojaloop/central-services-logger": "8.6.0",
-    "@mojaloop/event-sdk": "8.7.0",
+    "@mojaloop/event-sdk": "8.8.1-snapshot.2",
     "axios": "0.19.1",
     "base64url": "3.0.1",
     "clone": "2.1.2",
