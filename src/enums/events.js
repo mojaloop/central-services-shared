@@ -38,10 +38,11 @@ const Event = {
     POSITION: 'position',
     PREPARE: 'prepare',
     QUOTE: 'quote',
+    SETTLEMENT: 'settlement',
+    SETTLEMENT_WINDOW: 'settlementwindow',
     TRANSFER: 'transfer',
     PARTY: 'party',
-    PARTICIPANT: 'participant',
-    SETTLEMENT_WINDOW: 'settlementwindow'
+    PARTICIPANT: 'participant'
   },
   Action: {
     ABORT: 'abort',
