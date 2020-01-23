@@ -18,27 +18,17 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
  --------------
  ******/
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Settlements = require('./settlements')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
+const SettlementWindowState = {
+  OPEN: 'OPEN',
+  PROCESSING: 'PROCESSING',
+  CLOSED: 'CLOSED'
+}
 
 module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Settlements,
-  Transfers,
-  Kafka,
-  Tags
+  SettlementWindowState
 }

@@ -67,6 +67,12 @@ const TopicMap = {
       action: transferEventAction.PROCESSING
     }
   },
+  fulfil: {
+    'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
+    }
+  },
   notification: {
     abort: {
       functionality: transferEventType.NOTIFICATION,
@@ -124,6 +130,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'settlement-window': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'timeout-received': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
@@ -171,12 +181,6 @@ const TopicMap = {
     'bulk-prepare': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.PREPARE
-    }
-  },
-  fulfil: {
-    'bulk-commit': {
-      functionality: transferEventType.TRANSFER,
-      action: transferEventAction.FULFIL
     }
   }
 }
