@@ -1,6 +1,7 @@
 {
   "reject": [
     "@hapi/catbox",
-    "@hapi/joi"
+    "@hapi/joi",
+    "@hapi/hapi"
   ]
 }

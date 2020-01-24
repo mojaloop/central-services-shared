@@ -8,11 +8,26 @@ const Mustache = require('mustache')
 const proxyquire = require('proxyquire')
 const Enum = require('../../../src/enums')
 const Helper = require('../../util/helper')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 Test('ParticipantEndpoint Model Test', modelTest => {
   let sandbox
   let request
   let Model
+  Metrics.setup({
+    INSTRUMENTATION: {
+      METRICS: {
+        DISABLED: false,
+        config: {
+          timeout: 5000,
+          prefix: 'moja_ml_',
+          defaultLabels: {
+            serviceName: 'ml-service'
+          }
+        }
+      }
+    }
+  })
 
   modelTest.beforeEach(test => {
     sandbox = Sinon.createSandbox()
