@@ -63,7 +63,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
   let sendRequestSpan
   if (span) {
     sendRequestSpan = span.getChild(`${span.getContext().service}_sendRequest`)
-    sendRequestSpan.setTags({ source, destination, method, url, caller })
+    sendRequestSpan.setTags({ source, destination, method, url })
   }
   let requestOptions
   if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
