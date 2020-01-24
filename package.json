@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "8.8.2",
+  "version": "8.8.3",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -45,6 +45,7 @@
     "@hapi/catbox-memory": "5.0.0",
     "@mojaloop/central-services-error-handling": "8.7.0",
     "@mojaloop/central-services-logger": "8.6.0",
+    "@mojaloop/central-services-metrics": "8.8.0",
     "@mojaloop/event-sdk": "8.8.1-snapshot.2",
     "axios": "0.19.1",
     "base64url": "3.0.1",

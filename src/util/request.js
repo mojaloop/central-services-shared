@@ -26,9 +26,10 @@
 const EventSdk = require('@mojaloop/event-sdk')
 const request = require('axios')
 const Logger = require('@mojaloop/central-services-logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const Metrics = require('@mojaloop/central-services-metrics')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
-const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -52,7 +53,18 @@ delete request.defaults.headers.common.Accept
  *
  *@return {object} The response for the request being sent or error object with response included
  */
+
 const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
+  const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
+    'sendRequest',
+    `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
+    ['success', 'source', 'destination', 'method']
+  ).startTimer()
+  let sendRequestSpan
+  if (span) {
+    sendRequestSpan = span.getChild(`${span.getContext().service}_sendRequest`)
+    sendRequestSpan.setTags({ source, destination, method, url, caller })
+  }
   let requestOptions
   if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
@@ -77,6 +89,8 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
     const response = await request(requestOptions)
     Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
+    !!sendRequestSpan && await sendRequestSpan.finish()
+    !!histTimerEnd && histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
     Logger.error(error)
@@ -93,7 +107,14 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       extensionArray.push({ key: 'response', value: error.response && error.response.data })
     }
     const cause = JSON.stringify(extensionArray)
-    throw ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [{ key: 'cause', value: cause }])
+    const fspiopError = ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [{ key: 'cause', value: cause }])
+    if (sendRequestSpan) {
+      const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, fspiopError.apiErrorCode.code, fspiopError.apiErrorCode.message)
+      await sendRequestSpan.error(fspiopError, state)
+      await sendRequestSpan.finish(fspiopError.message, state)
+    }
+    !!histTimerEnd && histTimerEnd({ success: false, source, destination, method })
+    throw fspiopError
   }
 }
 
