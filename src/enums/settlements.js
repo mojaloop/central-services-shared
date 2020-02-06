@@ -20,6 +20,7 @@
 
  * ModusBox
  - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Lazola Lucas <lazola.lucas@modusbox.com>
  --------------
  ******/
 
@@ -28,7 +29,22 @@ const SettlementWindowState = {
   PROCESSING: 'PROCESSING',
   CLOSED: 'CLOSED'
 }
+const SettlementDelay = {
+  IMMEDIATE: 1,
+  DEFERRED: 2
+}
+const SettlementGranularity = {
+  GROSS: 1,
+  NET: 2
+}
+const SettlementInterchange = {
+  BILATERAL: 1,
+  MULTILATERAL: 2
+}
 
 module.exports = {
-  SettlementWindowState
+  SettlementWindowState,
+  SettlementDelay,
+  SettlementGranularity,
+  SettlementInterchange
 }
