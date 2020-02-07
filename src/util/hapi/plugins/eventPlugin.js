@@ -45,6 +45,9 @@ const onPreAuth = (request, reply) => {
 
 const onPreResponse = async (request, reply) => {
   const span = request.span
+  if (span && span.isFinished) {
+    return reply.continue
+  }
   const response = request.response
   if (span) {
     if (response instanceof Error || response.isBoom) {
