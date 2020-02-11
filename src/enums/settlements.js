@@ -31,15 +31,21 @@ const SettlementWindowState = {
 }
 const SettlementDelay = {
   IMMEDIATE: 1,
-  DEFERRED: 2
+  DEFERRED: 2,
+  1: 'IMMEDIATE',
+  2: 'DEFERRED'
 }
 const SettlementGranularity = {
   GROSS: 1,
-  NET: 2
+  NET: 2,
+  1: 'GROSS',
+  2: 'NET'
 }
 const SettlementInterchange = {
   BILATERAL: 1,
-  MULTILATERAL: 2
+  MULTILATERAL: 2,
+  1: 'BILATERAL',
+  2: 'MULTILATERAL'
 }
 
 module.exports = {
