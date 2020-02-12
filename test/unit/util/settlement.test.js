@@ -26,13 +26,15 @@
 
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Settlement = require('../../../src/util/settlement')
+const Proxyquire = require('proxyquire')
 
 Test('Settlement util', settlementTest => {
   let sandbox
+  let Settlement
 
   settlementTest.beforeEach(test => {
     sandbox = Sinon.createSandbox()
+    Settlement = Proxyquire('../../../src/util/settlement', {})
     test.end()
   })
 
@@ -42,7 +44,7 @@ Test('Settlement util', settlementTest => {
   })
 
   settlementTest.test('validateSettlementModel should', validateSettlementModelTest => {
-    validateSettlementModelTest.test('return settlement for a given object', test => {
+    validateSettlementModelTest.test('return isValid=true for a valid model', test => {
       const delay = 'IMMEDIATE'
       const granularity = 'GROSS'
       const interchange = 'BILATERAL'
@@ -53,6 +55,38 @@ Test('Settlement util', settlementTest => {
       test.deepEqual(result, expected)
       test.end()
     })
+
+    validateSettlementModelTest.test('return isValid=false for invalid model using values', test => {
+      const delay = 1
+      const granularity = 1
+      const interchange = 2
+
+      const expected = { isValid: false, reasons: ['Invalid settlement model definition - delay-granularity-interchange combination is not supported'] }
+
+      const result = Settlement.validateSettlementModel(delay, granularity, interchange)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+
+    validateSettlementModelTest.test('return isValid=false for invalid input', test => {
+      const delay = 'INVALID'
+      const granularity = 'INVALID'
+      const interchange = 'INVALID'
+
+      const expected = {
+        isValid: false,
+        reasons: [
+          'Invalid settlement delay value',
+          'Invalid settlement granularity value',
+          'Invalid settlement interchange value'
+        ]
+      }
+
+      const result = Settlement.validateSettlementModel(delay, granularity, interchange)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+
     validateSettlementModelTest.end()
   })
 

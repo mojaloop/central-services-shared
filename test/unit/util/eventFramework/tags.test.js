@@ -18,13 +18,15 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Valentin Genev <valentin.genev@modusbox.com>
-
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Valentin Genev <valentin.genev@modusbox.com>
  --------------
  ******/
 'use strict'
 
 const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 const Util = require('../../../../src/util')
 
 const headers = {
@@ -36,6 +38,18 @@ const transactionType = 'transfer'
 const transactionAction = 'prepare'
 
 Test('Get tags tests', test => {
+  let sandbox
+
+  test.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    t.end()
+  })
+
+  test.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
   test.test('should get tags', assert => {
     const params = {}
 
