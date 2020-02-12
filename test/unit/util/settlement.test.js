@@ -18,28 +18,30 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
  --------------
  ******/
 'use strict'
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Settlements = require('./settlements')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
+const Test = require('tape')
+const Settlement = require('../../../src/util/settlement')
 
-module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Settlements,
-  Transfers,
-  Kafka,
-  Tags
-}
+Test('Settlement util', settlementTest => {
+  settlementTest.test('validateSettlementModel should', validateSettlementModelTest => {
+    validateSettlementModelTest.test('return settlement for a given object', test => {
+      const delay = 'IMMEDIATE'
+      const granularity = 'GROSS'
+      const interchange = 'BILATERAL'
+
+      const expected = { isValid: true, reasons: [] }
+
+      const result = Settlement.validateSettlementModel(delay, granularity, interchange)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+    validateSettlementModelTest.end()
+  })
+
+  settlementTest.end()
+})
