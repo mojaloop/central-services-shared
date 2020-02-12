@@ -25,7 +25,7 @@
 'use strict'
 
 const SettlementEnum = require('../../src/enums/settlements')
-const transpose = require('../../src/util').transpose
+const Util = require('../../src/util/index')
 
 const reasons = []
 
@@ -35,9 +35,9 @@ const validateSettlementModel = (delay, granularity, interchange) => {
   let settlementGranularity
   let settlementInterchange
 
-  const SettlementDelayTransposed = transpose(SettlementEnum.SettlementDelay)
-  const SettlementGranularityTransposed = transpose(SettlementEnum.SettlementGranularity)
-  const SettlementInterchangeTransposed = transpose(SettlementEnum.SettlementInterchange)
+  const SettlementDelayTransposed = Util.transpose(SettlementEnum.SettlementDelay)
+  const SettlementGranularityTransposed = Util.transpose(SettlementEnum.SettlementGranularity)
+  const SettlementInterchangeTransposed = Util.transpose(SettlementEnum.SettlementInterchange)
 
   if (SettlementEnum.SettlementDelay[delay]) {
     settlementDelay = delay

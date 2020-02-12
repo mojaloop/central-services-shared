@@ -24,10 +24,23 @@
  ******/
 'use strict'
 
-const Test = require('tape')
+const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 const Settlement = require('../../../src/util/settlement')
 
 Test('Settlement util', settlementTest => {
+  let sandbox
+
+  settlementTest.beforeEach(test => {
+    sandbox = Sinon.createSandbox()
+    test.end()
+  })
+
+  settlementTest.afterEach(test => {
+    sandbox.restore()
+    test.end()
+  })
+
   settlementTest.test('validateSettlementModel should', validateSettlementModelTest => {
     validateSettlementModelTest.test('return settlement for a given object', test => {
       const delay = 'IMMEDIATE'
