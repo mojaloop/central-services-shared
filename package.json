@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
-    "@hapi/catbox": "^11.0.1",
+    "@hapi/catbox": "11.0.1",
     "@hapi/catbox-memory": "5.0.0",
     "@mojaloop/central-services-error-handling": "9.1.0",
     "@mojaloop/central-services-logger": "9.1.0",
