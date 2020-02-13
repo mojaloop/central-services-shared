@@ -49,11 +49,21 @@ const ValidSettlementModels = [
   { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'BILATERAL' },
   { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'MULTILATERAL' }
 ]
+const isActiveText = {
+  activated: 'activated',
+  disabled: 'disabled'
+}
+const booleanType = {
+  0: false,
+  1: true
+}
 
 module.exports = {
   SettlementWindowState,
   SettlementDelay,
   SettlementGranularity,
   SettlementInterchange,
-  ValidSettlementModels
+  ValidSettlementModels,
+  isActiveText,
+  booleanType
 }
