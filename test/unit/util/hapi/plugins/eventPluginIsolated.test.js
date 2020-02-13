@@ -16,20 +16,25 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- * Name Surname <name.surname@gatesfoundation.com>
+ - Name Surname <name.surname@gatesfoundation.com>
 
- * Neal Donnan <neal.donnan@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Neal Donnan <neal.donnan@modusbox.com>
  --------------
  ******/
 'use strict'
 
 const Hapi = require('@hapi/hapi')
 const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 
 Test('Event plugin test', async (pluginTest) => {
   let server
+  let sandbox
 
   pluginTest.beforeEach(async test => {
+    sandbox = Sinon.createSandbox()
     server = await new Hapi.Server({
       host: 'localhost',
       port: 8800
@@ -46,6 +51,7 @@ Test('Event plugin test', async (pluginTest) => {
 
   pluginTest.afterEach(async test => {
     await server.stop()
+    sandbox.restore()
     test.end()
   })
 

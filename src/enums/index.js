@@ -22,6 +22,7 @@
  * Miguel de Barros <miguel.debarros@modusbox.com>
  --------------
  ******/
+'use strict'
 
 const Accounts = require('./accounts')
 const EndPoints = require('./endpoints')
