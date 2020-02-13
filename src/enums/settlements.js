@@ -42,9 +42,20 @@ const SettlementInterchange = {
   MULTILATERAL: 2
 }
 
+const isActiveText = {
+  activated: 'activated',
+  disabled: 'disabled'
+}
+const booleanType = {
+  0: false,
+  1: true
+}
+
 module.exports = {
   SettlementWindowState,
   SettlementDelay,
   SettlementGranularity,
-  SettlementInterchange
+  SettlementInterchange,
+  isActiveText,
+  booleanType
 }
