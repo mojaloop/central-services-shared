@@ -1,6 +1,5 @@
 {
   "reject": [
-    "@hapi/joi",
-    "@hapi/hapi"
+
   ]
 }
