@@ -26,15 +26,13 @@
 
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Proxyquire = require('proxyquire')
+const Settlement = require('../../../src/util/settlement')
 
 Test('Settlement util', settlementTest => {
   let sandbox
-  let Settlement
 
   settlementTest.beforeEach(test => {
     sandbox = Sinon.createSandbox()
-    Settlement = Proxyquire('../../../src/util/settlement', {})
     test.end()
   })
 
