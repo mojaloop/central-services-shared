@@ -31,26 +31,31 @@ const SettlementWindowState = {
 }
 const SettlementDelay = {
   IMMEDIATE: 1,
-  DEFERRED: 2,
-  1: 'IMMEDIATE',
-  2: 'DEFERRED'
+  DEFERRED: 2
 }
 const SettlementGranularity = {
   GROSS: 1,
-  NET: 2,
-  1: 'GROSS',
-  2: 'NET'
+  NET: 2
 }
 const SettlementInterchange = {
   BILATERAL: 1,
-  MULTILATERAL: 2,
-  1: 'BILATERAL',
-  2: 'MULTILATERAL'
+  MULTILATERAL: 2
+}
+
+const isActiveText = {
+  activated: 'activated',
+  disabled: 'disabled'
+}
+const booleanType = {
+  0: false,
+  1: true
 }
 
 module.exports = {
   SettlementWindowState,
   SettlementDelay,
   SettlementGranularity,
-  SettlementInterchange
+  SettlementInterchange,
+  isActiveText,
+  booleanType
 }
