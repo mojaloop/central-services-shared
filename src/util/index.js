@@ -177,7 +177,7 @@ const breadcrumb = (location, message) => {
   return location.path
 }
 
-const transpose = function (obj) {
+const transpose = (obj) => {
   const transposed = new Map()
   for (const prop in obj) {
     transposed[obj[prop]] = prop
@@ -246,5 +246,6 @@ module.exports = {
   Time,
   Hash,
   Comparators,
-  EventFramework: require('./eventFramework')
+  EventFramework: require('./eventFramework'),
+  Settlement: require('./settlement')
 }

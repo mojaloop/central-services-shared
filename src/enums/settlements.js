@@ -23,6 +23,7 @@
  - Lazola Lucas <lazola.lucas@modusbox.com>
  --------------
  ******/
+'use strict'
 
 const SettlementWindowState = {
   OPEN: 'OPEN',
@@ -42,9 +43,27 @@ const SettlementInterchange = {
   MULTILATERAL: 2
 }
 
+const ValidSettlementModels = [
+  { settlementDelay: 'IMMEDIATE', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'BILATERAL' },
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'MULTILATERAL' }
+]
+const isActiveText = {
+  activated: 'activated',
+  disabled: 'disabled'
+}
+const booleanType = {
+  0: false,
+  1: true
+}
+
 module.exports = {
   SettlementWindowState,
   SettlementDelay,
   SettlementGranularity,
-  SettlementInterchange
+  SettlementInterchange,
+  ValidSettlementModels,
+  isActiveText,
+  booleanType
 }

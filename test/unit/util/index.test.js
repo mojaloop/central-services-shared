@@ -18,18 +18,31 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com>
- * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+ - Miguel de Barros <miguel.debarros@modusbox.com>
  --------------
  ******/
-
 'use strict'
 
-const Test = require('tape')
+const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 const Util = require('../../../src/util')
 
 Test('General util', utilTest => {
+  let sandbox
+
+  utilTest.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    t.end()
+  })
+
+  utilTest.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
   utilTest.test('formatAmount should', formatAmountTest => {
     formatAmountTest.test('format integer', test => {
       const value = parseInt('100')
