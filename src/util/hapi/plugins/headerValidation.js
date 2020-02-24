@@ -14,7 +14,8 @@ const defaultProtocolResources = [
   'parties',
   'participants',
   'quotes',
-  'transfers'
+  'transfers',
+  'transactionRequests'
 ]
 
 const defaultProtocolVersions = [
