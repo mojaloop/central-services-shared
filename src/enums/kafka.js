@@ -164,6 +164,14 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION_FULFIL
     },
+    'position-prepare': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION_PREPARE
+    },
+    'position-fulfil': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION_FULFIL
+    },
     'timeout-reserved': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION

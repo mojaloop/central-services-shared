@@ -54,7 +54,8 @@
     "immutable": "3.8.2",
     "lodash": "4.17.15",
     "mustache": "4.0.0",
-    "raw-body": "2.4.1"
+    "raw-body": "2.4.1",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@hapi/hapi": "19.1.1",
