@@ -142,11 +142,11 @@ const TopicMap = {
   position: {
     'bulk-commit': {
       functionality: transferEventType.TRANSFER,
-      action: transferEventAction.POSITION
+      action: transferEventAction.POSITION_FULFIL
     },
     'bulk-prepare': {
       functionality: transferEventType.TRANSFER,
-      action: transferEventAction.POSITION
+      action: transferEventAction.POSITION_PREPARE
     },
     'bulk-timeout-received': {
       functionality: transferEventType.TRANSFER,
@@ -158,11 +158,19 @@ const TopicMap = {
     },
     prepare: {
       functionality: transferEventType.TRANSFER,
-      action: transferEventAction.POSITION
+      action: transferEventAction.POSITION_PREPARE
     },
     commit: {
       functionality: transferEventType.TRANSFER,
-      action: transferEventAction.POSITION
+      action: transferEventAction.POSITION_FULFIL
+    },
+    'position-prepare': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION_PREPARE
+    },
+    'position-fulfil': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION_FULFIL
     },
     'timeout-reserved': {
       functionality: transferEventType.TRANSFER,

@@ -67,6 +67,8 @@ const Event = {
     LIMIT_ADJUSTMENT: 'limit-adjustment',
     LOOKUP: 'lookup',
     POSITION: 'position',
+    POSITION_PREPARE: 'position-prepare',
+    POSITION_FULFIL: 'position-fulfil',
     PREPARE: 'prepare',
     PREPARE_DUPLICATE: 'prepare-duplicate',
     PROCESSING: 'processing',
