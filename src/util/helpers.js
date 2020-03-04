@@ -16,30 +16,22 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
+ * Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
  --------------
  ******/
 'use strict'
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Settlements = require('./settlements')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
+const transpose = (obj) => {
+  const transposed = new Map()
+  for (const prop in obj) {
+    transposed[obj[prop]] = prop
+  }
+  return transposed
+}
 
 module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Settlements,
-  Transfers,
-  Kafka,
-  Tags
+  transpose
 }

@@ -20,15 +20,50 @@
 
  * ModusBox
  - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Lazola Lucas <lazola.lucas@modusbox.com>
  --------------
  ******/
+'use strict'
 
 const SettlementWindowState = {
   OPEN: 'OPEN',
   PROCESSING: 'PROCESSING',
   CLOSED: 'CLOSED'
 }
+const SettlementDelay = {
+  IMMEDIATE: 1,
+  DEFERRED: 2
+}
+const SettlementGranularity = {
+  GROSS: 1,
+  NET: 2
+}
+const SettlementInterchange = {
+  BILATERAL: 1,
+  MULTILATERAL: 2
+}
+
+const ValidSettlementModels = [
+  { settlementDelay: 'IMMEDIATE', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'BILATERAL' },
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'MULTILATERAL' }
+]
+const isActiveText = {
+  activated: 'activated',
+  disabled: 'disabled'
+}
+const booleanType = {
+  0: false,
+  1: true
+}
 
 module.exports = {
-  SettlementWindowState
+  SettlementWindowState,
+  SettlementDelay,
+  SettlementGranularity,
+  SettlementInterchange,
+  ValidSettlementModels,
+  isActiveText,
+  booleanType
 }

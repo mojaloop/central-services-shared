@@ -18,16 +18,29 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
  --------------
  ******/
-
 'use strict'
 
-const Test = require('tape')
+const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 const Hash = require('../../../src/util/hash')
 
 Test('Hash util', hashTest => {
+  let sandbox
+
+  hashTest.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    t.end()
+  })
+
+  hashTest.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
   hashTest.test('generateSha256 should', generateSha256Test => {
     generateSha256Test.test('return hash for a given object', test => {
       const obj1 = {
