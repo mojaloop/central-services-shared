@@ -29,7 +29,7 @@ const base64url = require('base64url')
 const parseDataURL = require('data-urls')
 const clone = require('clone')
 const allowedRegexForMimeTypes = /(text\/plain)|(application\/json)|(application\/vnd.interoperability[.])/
-
+const Metrics = require('@mojaloop/central-services-metrics')
 /**
  * @function updateMessageProtocolMetadata
  *
@@ -213,11 +213,20 @@ const createEventState = (status, code, description) => {
  */
 
 const encodePayload = (input, mimeType) => {
+  const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
+    'encodePayload',
+    'Metrics for encodePayload function',
+    ['success']
+  ).startTimer()
+
   if (allowedRegexForMimeTypes.test(mimeType)) {
-    return (input instanceof Buffer)
+    const result = (input instanceof Buffer)
       ? `data:${mimeType};base64,${base64url(input, 'utf8')}`
       : `data:${mimeType};base64,${base64url(Buffer.from(input), 'utf8')}`
+    histTimerEnd({ success: true })
+    return result
   } else {
+    histTimerEnd({ success: false })
     throw new Error(`mime type should match the following regex:${allowedRegexForMimeTypes.toString()}`)
   }
 }
@@ -242,6 +251,12 @@ const isDataUri = (input) => {
  */
 
 const decodePayload = (input, { asParsed = true } = {}) => {
+  const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
+    'decodePayload',
+    'Metrics for decodePayload function',
+    ['success']
+  ).startTimer()
+
   const parseDecodedDataToJson = (decodedData) => {
     const isAllowedMimeTypes = allowedRegexForMimeTypes.test(decodedData.mimeType.toString())
     if (isAllowedMimeTypes && decodedData.mimeType.toString() !== 'text/plain') return JSON.parse(decodedData.body.toString())
@@ -250,14 +265,18 @@ const decodePayload = (input, { asParsed = true } = {}) => {
   }
   if (isDataUri(input)) {
     const parsedDataUrl = parseDataURL(input)
+    histTimerEnd({ success: true })
     return asParsed
       ? parseDecodedDataToJson(parsedDataUrl)
       : parsedDataUrl
   } else if (typeof input === 'string') {
+    histTimerEnd({ success: true })
     return asParsed ? JSON.parse(input) : { mimeType: 'text/plain', body: input }
   } else if (typeof input === 'object') {
+    histTimerEnd({ success: true })
     return asParsed ? input : { mimeType: 'application/json', body: JSON.stringify(input) }
   } else {
+    histTimerEnd({ success: false })
     throw new Error('input should be Buffer or String')
   }
 }
