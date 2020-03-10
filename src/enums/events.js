@@ -40,6 +40,7 @@ const Event = {
     QUOTE: 'quote',
     SETTLEMENT: 'settlement',
     SETTLEMENT_WINDOW: 'settlementwindow',
+    TRANSACTION_REQUEST: 'transaction-request',
     TRANSFER: 'transfer',
     PARTY: 'party',
     PARTICIPANT: 'participant'

@@ -1,0 +1,11 @@
+{
+  "decisions": {
+    "1488|rewire>eslint>espree>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583842363928,
+      "expiresAt": 1584447147826
+    }
+  },
+  "rules": {},
+  "version": 1
+}
