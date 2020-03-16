@@ -102,12 +102,15 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       { key: 'request', value: JSON.stringify(requestOptions) },
       { key: 'errorMessage', value: error.message }
     ]
+    const extensions = []
     if (error.response) {
       extensionArray.push({ key: 'status', value: error.response && error.response.status })
       extensionArray.push({ key: 'response', value: error.response && error.response.data })
+      extensions.push({ key: 'status', value: error.response && error.response.status })
     }
     const cause = JSON.stringify(extensionArray)
-    const fspiopError = ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [{ key: 'cause', value: cause }])
+    extensions.push({ key: 'cause', value: cause })
+    const fspiopError = ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, extensions)
     if (sendRequestSpan) {
       const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, fspiopError.apiErrorCode.code, fspiopError.apiErrorCode.message)
       await sendRequestSpan.error(fspiopError, state)
