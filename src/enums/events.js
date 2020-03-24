@@ -27,6 +27,7 @@
 const Event = {
   Type: {
     ADMIN: 'admin',
+    AUTHORIZATION: 'authorization',
     BULK: 'bulk',
     BULK_PROCESSING: 'bulk-processing',
     ENDPOINTCACHE: 'endpointcache',
@@ -40,6 +41,7 @@ const Event = {
     QUOTE: 'quote',
     SETTLEMENT: 'settlement',
     SETTLEMENT_WINDOW: 'settlementwindow',
+    TRANSACTION_REQUEST: 'transaction-request',
     TRANSFER: 'transfer',
     PARTY: 'party',
     PARTICIPANT: 'participant'
@@ -67,6 +69,8 @@ const Event = {
     LIMIT_ADJUSTMENT: 'limit-adjustment',
     LOOKUP: 'lookup',
     POSITION: 'position',
+    POSITION_PREPARE: 'position-prepare',
+    POSITION_FULFIL: 'position-fulfil',
     PREPARE: 'prepare',
     PREPARE_DUPLICATE: 'prepare-duplicate',
     PROCESSING: 'processing',
