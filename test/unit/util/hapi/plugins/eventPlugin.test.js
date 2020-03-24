@@ -110,7 +110,7 @@ Test('Event plugin test', async (pluginTest) => {
         method: 'POST',
         url: '/',
         headers: {
-          tracestate: `acmevendor=${spanId}`,
+          tracestate: `acmevendor=spanId:${spanId}`,
           traceparent: `00-${traceId}-${spanId}-00`
         }
       })
