@@ -37,6 +37,7 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
 delete request.defaults.headers.common.Accept
 
+
 /**
  * @function validateParticipant
  *
@@ -75,6 +76,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       sourceFsp: source,
       destinationFsp: destination
     })
+  
     requestOptions = {
       url,
       method: method,
@@ -82,6 +84,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       data: payload,
       responseType
     }
+
     if (span) {
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
@@ -118,6 +121,125 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
   }
 }
 
+
+
+/** 
+ * Class: HTTPRequestHandler 
+ * Implementation that allows config options to be injected into underying Axios.
+ * See https://github.com/axios/axios#request-config for configuration options.
+ * TODO: 
+ * - Productionise code below, and also create unit tests, etc.
+ * - Consider replacing all sendRequest using the implementation below
+*/
+
+// const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
+//  const httpRequestHandler = new HTTPRequestHandler()
+//  return await httpRequestHandler.sendRequest(url, headers, source, destination, method = enums.Http.RestMethods.GET, payload, responseType = enums.Http.ResponseTypes.JSON, span)
+// }
+
+const http = require('http')
+const axios = require('axios')
+class HTTPRequestHandler {
+  constructor(opts) {
+    if (opts) {
+      this._opts = opts
+    } else {
+      // Set config defaults when creating the instance
+      this._opts = {
+        httpAgent: new http.Agent({
+          "keepAlive": true
+        })
+      }
+    }
+
+    this._requestInstance = axios.create(opts)
+  }
+
+  /**
+   * @method validateParticipant
+   *
+   * @description sends a request to url
+   *
+   * @param {string} url the endpoint for the service you require
+   * @param {object} headers the http headers
+   * @param {string} method http method being requested i.e. GET, POST, PUT
+   * @param {string} source id for which callback is being sent from
+   * @param {string} destination id for which callback is being sent
+   * @param {object} payload the body of the request being sent
+   * @param {string} responseType the type of the response object
+   * @param {object} span a span for event logging if this request is within a span
+   *
+   *@return {object} The response for the request being sent or error object with response included
+  */
+  sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
+    const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
+      'sendRequest',
+      `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
+      ['success', 'source', 'destination', 'method']
+    ).startTimer()
+    let sendRequestSpan
+    if (span) {
+      sendRequestSpan = span.getChild(`${span.getContext().service}_sendRequest`)
+      sendRequestSpan.setTags({ source, destination, method, url })
+    }
+    let requestOptions
+    if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
+      throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
+    }
+    try {
+      const transformedHeaders = Headers.transformHeaders(headers, {
+        httpMethod: method,
+        sourceFsp: source,
+        destinationFsp: destination
+      })
+    
+      requestOptions = {
+        url,
+        method: method,
+        headers: transformedHeaders,
+        data: payload,
+        responseType
+      }
+  
+      if (span) {
+        requestOptions = span.injectContextToHttpRequest(requestOptions)
+        span.audit(requestOptions, EventSdk.AuditEventAction.egress)
+      }
+      Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
+      const response = await this._requestInstance.request(requestOptions)
+
+      Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
+      !!sendRequestSpan && await sendRequestSpan.finish()
+      !!histTimerEnd && histTimerEnd({ success: true, source, destination, method })
+      return response
+    } catch (error) {
+      Logger.error(error)
+      const extensionArray = [
+        { key: 'url', value: url },
+        { key: 'sourceFsp', value: source },
+        { key: 'destinationFsp', value: destination },
+        { key: 'method', value: method },
+        { key: 'request', value: JSON.stringify(requestOptions) },
+        { key: 'errorMessage', value: error.message }
+      ]
+      if (error.response) {
+        extensionArray.push({ key: 'status', value: error.response && error.response.status })
+        extensionArray.push({ key: 'response', value: error.response && error.response.data })
+      }
+      const cause = JSON.stringify(extensionArray)
+      const fspiopError = ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, [{ key: 'cause', value: cause }])
+      if (sendRequestSpan) {
+        const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, fspiopError.apiErrorCode.code, fspiopError.apiErrorCode.message)
+        await sendRequestSpan.error(fspiopError, state)
+        await sendRequestSpan.finish(fspiopError.message, state)
+      }
+      !!histTimerEnd && histTimerEnd({ success: false, source, destination, method })
+      throw fspiopError
+    }
+  }
+}
+
 module.exports = {
-  sendRequest
+  sendRequest,
+  HTTPRequestHandler
 }
