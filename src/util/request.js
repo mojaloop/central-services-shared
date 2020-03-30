@@ -39,7 +39,7 @@ delete request.defaults.headers.common.Accept
 
 
 /**
- * @function validateParticipant
+ * @function sendRequest
  *
  * @description sends a request to url
  *
@@ -156,7 +156,7 @@ class HTTPRequestHandler {
   }
 
   /**
-   * @method validateParticipant
+   * @method sendRequest
    *
    * @description sends a request to url
    *
