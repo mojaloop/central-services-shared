@@ -233,7 +233,7 @@ const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, function
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
   if (span) {
     messageProtocol = await span.injectContextToMessage(messageProtocol)
-    span.audit(messageProtocol, EventSdk.AuditEventAction.egress)
+    await span.audit(messageProtocol, EventSdk.AuditEventAction.egress)
   }
   await kafkaProducer.produceMessage(messageProtocol, topicConfig, kafkaConfig)
   return true
