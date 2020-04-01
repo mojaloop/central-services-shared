@@ -47,7 +47,7 @@ const plugin = {
     resources = defaultProtocolResources,
     supportedProtocolVersions = defaultProtocolVersions
   }) {
-    server.ext('onPreHandler', (request, h) => {
+    server.ext('onPostAuth', (request, h) => {
       // First, extract the resource type from the path
       const resource = request.path.replace(/^\//, '').split('/')[0]
 
