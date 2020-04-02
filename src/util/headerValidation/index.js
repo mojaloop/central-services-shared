@@ -19,10 +19,6 @@ const generateSingleAcceptRegexStr = resource =>
   `application/vnd\\.interoperability\\.${resource}\\+json(;version=\\d+(\\.\\d+)?)?`
 
 const parseContentTypeHeader = (resource, header) => {
-  if (header === undefined) {
-    return { valid: false }
-  }
-
   assert(typeof header === 'string')
 
   // Create the validation regex
@@ -41,10 +37,6 @@ const parseContentTypeHeader = (resource, header) => {
 }
 
 const parseAcceptHeader = (resource, header) => {
-  if (header === undefined) {
-    return { valid: false }
-  }
-
   assert(typeof header === 'string')
 
   // Create the validation regex

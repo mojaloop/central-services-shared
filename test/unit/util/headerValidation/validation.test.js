@@ -9,9 +9,7 @@ const fs = require('fs')
 const path = require('path')
 const {
   generateAcceptRegex,
-  generateContentTypeRegex,
-  parseContentTypeHeader,
-  parseAcceptHeader
+  generateContentTypeRegex
 } = require('../../../../src/util/headerValidation/index')
 const {
   generateAcceptHeader,
@@ -124,11 +122,5 @@ test('Run positive content-type header fuzz', t => {
     const fname = saveToTempFile('\'' + failures.join('\'\n\'') + '\'', 'positivefuzz')
     return t.fail(`Positive fuzz failed. Failures saved to: ${fname}.`)
   }
-  t.end()
-})
-
-test('Rejects undefined header value', t => {
-  t.deepEqual({ valid: false }, parseContentTypeHeader('whatever', undefined))
-  t.deepEqual({ valid: false }, parseAcceptHeader('whatever', undefined))
   t.end()
 })
