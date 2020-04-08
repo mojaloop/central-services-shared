@@ -1,9 +1,92 @@
 {
   "decisions": {
-    "1488|rewire>eslint>espree>acorn": {
+    "1179|@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|@mojaloop/event-sdk>@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|@mojaloop/event-sdk>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|npm-check-updates>requireg>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|npm-check-updates>update-notifier>latest-version>package-json>registry-auth-token>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|npm-check-updates>update-notifier>latest-version>package-json>registry-url>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|npm-check-updates>rc-config-loader>json5>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736650
+    },
+    "1179|nyc>istanbul-lib-instrument>@babel/core>json5>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736651
+    },
+    "1179|standard>standard-engine>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736651
+    },
+    "1179|tap-xunit>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736651
+    },
+    "1179|tape>minimist": {
+      "decision": "fix",
+      "madeAt": 1585740736651
+    },
+    "1179|@mojaloop/event-sdk>grpc>node-pre-gyp>mkdirp>minimist": {
       "decision": "ignore",
-      "madeAt": 1583842363928,
-      "expiresAt": 1584447147826
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|@mojaloop/event-sdk>grpc>node-pre-gyp>tar>mkdirp>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|@mojaloop/event-sdk>grpc>node-pre-gyp>rc>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|faucet>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|rewire>eslint>file-entry-cache>flat-cache>write>mkdirp>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|standard>eslint>file-entry-cache>flat-cache>write>mkdirp>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|rewire>eslint>mkdirp>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
+    },
+    "1179|standard>eslint>mkdirp>minimist": {
+      "decision": "ignore",
+      "madeAt": 1585740855928,
+      "expiresAt": 1586345436765
     }
   },
   "rules": {},

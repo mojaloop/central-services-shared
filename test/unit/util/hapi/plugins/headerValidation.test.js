@@ -113,7 +113,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('accept validation is performed on get requests without an accept header', async t => {
-    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MISSING_ELEMENT
     const res = await server.inject({
       method: 'get',
       url: `/${resource}`,
@@ -247,6 +247,20 @@ Test('headerValidation plugin test', async (pluginTest) => {
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
         accept: generateAcceptHeader(resource, [1])
+      }
+    })
+    t.is(res.payload, '')
+    t.is(res.statusCode, 202)
+    t.end()
+  })
+
+  pluginTest.test('accepts valid accept header without version', async t => {
+    const res = await server.inject({
+      method: 'get',
+      url: `/${resource}`,
+      headers: {
+        'content-type': generateContentTypeHeader(resource, 1),
+        accept: `application/vnd.interoperability.${resource}+json`
       }
     })
     t.is(res.payload, '')
