@@ -11,6 +11,7 @@ const Http = require(`${src}/util`).Http
 const Enum = require(`${src}`).Enum
 const Mustache = require('mustache')
 const Helper = require('../../util/helper')
+const Logger = require('@mojaloop/central-services-logger')
 const FSPIOP_CALLBACK_URL_TRANSFER_PUT = Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
 Test('Cache Test', cacheTest => {
@@ -20,6 +21,9 @@ Test('Cache Test', cacheTest => {
     sandbox = Sinon.createSandbox()
     sandbox.stub(request, 'sendRequest')
     sandbox.stub(Http, 'SwitchDefaultHeaders').returns(Helper.defaultHeaders())
+    sandbox.stub(Logger, 'isErrorEnabled').value(true)
+    sandbox.stub(Logger, 'isInfoEnabled').value(true)
+    sandbox.stub(Logger, 'isDebugEnabled').value(true)
     test.end()
   })
 

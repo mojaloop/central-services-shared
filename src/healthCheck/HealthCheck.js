@@ -106,7 +106,7 @@ class HealthCheck {
         services
       }
     } catch (err) {
-      Logger.error(`HealthCheck.getSubServiceHealth failed with error: ${err.message}`)
+      Logger.isErrorEnabled && Logger.error(`HealthCheck.getSubServiceHealth failed with error: ${err.message}`)
       isHealthy = false
     }
 

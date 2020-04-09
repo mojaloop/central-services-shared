@@ -44,7 +44,7 @@ const requestRawPayloadTransform = (request, payloadBuffer) => {
       rawPayload: payloadBuffer
     })
   } catch (err) {
-    Logger.error(err)
+    Logger.isErrorEnabled && Logger.error(err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }

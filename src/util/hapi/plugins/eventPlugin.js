@@ -35,7 +35,7 @@ const onPreAuth = (request, reply) => {
     if (context) {
       span = EventSdk.Tracer.createChildSpanFromContext(spanName, context)
     } else {
-      Logger.debug(`Starting parent span ${spanName}`)
+      Logger.isDebugEnabled && Logger.debug(`Starting parent span ${spanName}`)
       span = EventSdk.Tracer.createSpan(spanName)
     }
     reply.request.span = span
@@ -60,7 +60,7 @@ const onPreResponse = async (request, reply) => {
       span.error(response, state)
       await span.finish(response.message, state)
     } else {
-      Logger.debug(`Finishing parent span ${span.spanContext.service}`)
+      Logger.isDebugEnabled && Logger.debug(`Finishing parent span ${span.spanContext.service}`)
       await span.finish()
     }
   }

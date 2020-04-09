@@ -51,12 +51,12 @@ let switchEndpoint
  */
 const fetchEndpoints = async (fsp) => {
   try {
-    Logger.info(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Refreshing the cache for FSP: ${fsp}`)
+    Logger.isInfoEnabled && Logger.info(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Refreshing the cache for FSP: ${fsp}`)
     const defaultHeaders = Http.SwitchDefaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH)
     const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
-    Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := URL for FSP: ${url}`)
+    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := URL for FSP: ${url}`)
     const response = await request.sendRequest(url, defaultHeaders, Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
-    Logger.debug(`[fsp=${fsp}] ~ Model::participantEndpoint::fetchEndpoints := successful with body: ${JSON.stringify(response.data)}`)
+    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ Model::participantEndpoint::fetchEndpoints := successful with body: ${JSON.stringify(response.data)}`)
     const endpoints = response.data
     const endpointMap = {}
     if (Array.isArray(endpoints)) {
@@ -65,10 +65,10 @@ const fetchEndpoints = async (fsp) => {
         endpointMap[item.type] = item.value
       })
     }
-    Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Returning the endpoints: ${JSON.stringify(endpointMap)}`)
+    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Returning the endpoints: ${JSON.stringify(endpointMap)}`)
     return endpointMap
   } catch (e) {
-    Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
+    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
   }
 }
 
@@ -86,16 +86,16 @@ const fetchEndpoints = async (fsp) => {
  */
 exports.initializeCache = async (policyOptions) => {
   try {
-    Logger.info(`participantEndpointCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
+    Logger.isInfoEnabled && Logger.info(`participantEndpointCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
     policyOptions.generateFunc = fetchEndpoints
-    Logger.info(`participantEndpointCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
+    Logger.isInfoEnabled && Logger.info(`participantEndpointCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
     policy = new Catbox.Policy(policyOptions, client, partition)
-    Logger.info('participantEndpointCache::initializeCache::Cache initialized successfully')
+    Logger.isInfoEnabled && Logger.info('participantEndpointCache::initializeCache::Cache initialized successfully')
     return true
   } catch (err) {
-    Logger.error(`participantEndpointCache::Cache error:: ERROR:'${err}'`)
+    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::Cache error:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -114,12 +114,12 @@ exports.initializeCache = async (policyOptions) => {
  */
 exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
   switchEndpoint = switchUrl
-  Logger.info(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
+  Logger.isInfoEnabled && Logger.info(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
   try {
     const endpoints = await policy.get(fsp)
     return Mustache.render(new Map(endpoints).get(endpointType), options)
   } catch (err) {
-    Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
+    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -132,6 +132,6 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
  * @returns {boolean} - Returns the status
  */
 exports.stopCache = async () => {
-  Logger.info('participantEndpointCache::stopCache::Stopping the cache')
+  Logger.isInfoEnabled && Logger.info('participantEndpointCache::stopCache::Stopping the cache')
   return client.stop()
 }
