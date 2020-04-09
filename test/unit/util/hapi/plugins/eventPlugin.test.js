@@ -29,6 +29,7 @@ const Hapi = require('@hapi/hapi')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
+const Logger = require('@mojaloop/central-services-logger')
 
 Test('Event plugin test', async (pluginTest) => {
   let server
@@ -36,6 +37,7 @@ Test('Event plugin test', async (pluginTest) => {
 
   pluginTest.beforeEach(async test => {
     sandbox = Sinon.createSandbox()
+    sandbox.stub(Logger, 'isDebugEnabled').value(true)
     server = await new Hapi.Server({
       host: 'localhost',
       port: 8800
