@@ -86,14 +86,14 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
     }
-    Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
+    Logger.isInfoEnabled && Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
     const response = await request(requestOptions)
-    Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
+    Logger.isInfoEnabled && Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
     !!sendRequestSpan && await sendRequestSpan.finish()
     !!histTimerEnd && histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    Logger.error(error)
+    Logger.isErrorEnabled && Logger.error(error)
     const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },
