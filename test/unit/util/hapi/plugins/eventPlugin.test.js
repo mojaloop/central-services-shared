@@ -112,7 +112,7 @@ Test('Event plugin test', async (pluginTest) => {
         method: 'POST',
         url: '/',
         headers: {
-          tracestate: `acmevendor=spanId:${spanId}`,
+          tracestate: `acmevendor=${Buffer.from(JSON.stringify({ spanId })).toString('base64')}`,
           traceparent: `00-${traceId}-${spanId}-00`
         }
       })
