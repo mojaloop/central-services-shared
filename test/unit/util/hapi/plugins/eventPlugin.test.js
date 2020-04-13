@@ -108,11 +108,12 @@ Test('Event plugin test', async (pluginTest) => {
       })
       const traceId = '9732ca939fbd9f755b5bc07c227c4cd5'
       const spanId = '74c6557725f1f0e1'
+      const ts = Buffer.from(JSON.stringify({ spanId })).toString('base64')
       const response = await server.inject({
         method: 'POST',
         url: '/',
         headers: {
-          tracestate: `acmevendor=spanId:${spanId}`,
+          tracestate: `acmevendor=${ts}`,
           traceparent: `00-${traceId}-${spanId}-00`
         }
       })
