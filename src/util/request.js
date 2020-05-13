@@ -86,7 +86,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     }
     // if jwsSigner is passed then sign the request
     if (jwsSigner != null && typeof (jwsSigner) === 'object') {
-      jwsSigner.sign(requestOptions)
+      requestOptions.headers['fspiop-signature'] = jwsSigner.getSignature(requestOptions)
     }
 
     if (span) {
