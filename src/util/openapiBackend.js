@@ -29,6 +29,9 @@ const Ajv = require('ajv')
 const schemaValidator = require('./schema').OpenapiSchemaValidator
 
 const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coerceTypes: true }, regexFlags = 'u') => {
+  if (ajvOpts.coerceTypes === undefined) {
+    ajvOpts.coerceTypes = true
+  }
   const ajv = new Ajv(ajvOpts)
   await require('ajv-keywords')(ajv)
   const api = new OpenAPIBackend({
