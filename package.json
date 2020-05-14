@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "10.1.2",
+  "version": "10.2.0-snapshot",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -47,6 +47,8 @@
     "@mojaloop/central-services-logger": "9.5.1",
     "@mojaloop/central-services-metrics": "9.5.0",
     "@mojaloop/event-sdk": "9.5.2",
+    "ajv": "6.12.2",
+    "ajv-keywords": "3.4.1",
     "axios": "0.19.2",
     "base64url": "3.0.1",
     "clone": "2.1.2",
@@ -54,12 +56,13 @@
     "immutable": "3.8.2",
     "lodash": "4.17.15",
     "mustache": "4.0.1",
+    "openapi-backend": "3.4.2",
     "raw-body": "2.4.1"
   },
   "devDependencies": {
     "@hapi/hapi": "19.1.1",
     "@hapi/joi": "17.1.1",
-    "@mojaloop/sdk-standard-components": "10.1.0",
+    "@mojaloop/sdk-standard-components": "10.2.1",
     "chance": "1.1.5",
     "faucet": "0.0.1",
     "npm-audit-resolver": "2.2.0",

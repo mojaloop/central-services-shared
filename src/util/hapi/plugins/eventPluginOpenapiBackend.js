@@ -18,7 +18,7 @@
  * Gates Foundation
  * Name Surname <name.surname@gatesfoundation.com>
 
- * Neal Donnan <neal.donnan@modusbox.com>
+ * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
  ******/
 'use strict'
@@ -26,42 +26,39 @@
 const EventSdk = require('@mojaloop/event-sdk')
 const Logger = require('@mojaloop/central-services-logger')
 const Enum = require('../../../enums')
+const onPreResponse = require('./eventPlugin').onPreResponse
 
 const onPreAuth = (request, reply) => {
-  if (request && request.route && request.route.settings && request.route.settings.tags && request.route.settings.tags.includes(Enum.Tags.RouteTags.SAMPLED)) {
-    const context = EventSdk.Tracer.extractContextFromHttpRequest(request)
-    const spanName = request.route.settings.id
-    let span
-    if (context) {
-      span = EventSdk.Tracer.createChildSpanFromContext(spanName, context)
-    } else {
-      Logger.isDebugEnabled && Logger.debug(`Starting parent span ${spanName}`)
-      span = EventSdk.Tracer.createSpan(spanName)
-    }
-    reply.request.span = span
-  }
-  return reply.continue
-}
+  if (request) {
+    const operation = request.server.plugins.openapi.openapi.matchOperation({
+      method: request.method,
+      path: request.path,
+      body: request.payload,
+      query: request.query,
+      headers: request.headers
+    })
 
-const onPreResponse = async (request, reply) => {
-  const span = request.span
-  if (span && span.isFinished) {
-    return reply.continue
-  }
-  const response = request.response
-  if (span) {
-    if (response instanceof Error || response.isBoom) {
-      let state
-      if (response.output.payload.errorInformation && response.output.payload.errorInformation.errorCode) {
-        state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, response.output.payload.errorInformation.errorCode, response.output.payload.errorInformation.errorDescription)
-      } else {
-        state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, response.output.statusCode, response.message)
+    if (operation && operation.operationId) {
+      if (operation.tags && operation.tags.includes(Enum.Tags.RouteTags.SAMPLED)) {
+        const context = EventSdk.Tracer.extractContextFromHttpRequest(request)
+        const spanName = operation.operationId
+        let span
+        if (context) {
+          span = EventSdk.Tracer.createChildSpanFromContext(spanName, context)
+        } else {
+          Logger.isDebugEnabled && Logger.debug(`Starting parent span ${spanName}`)
+          span = EventSdk.Tracer.createSpan(spanName)
+        }
+        reply.request.span = span
       }
-      span.error(response, state)
-      await span.finish(response.message, state)
-    } else {
-      Logger.isDebugEnabled && Logger.debug(`Finishing parent span ${span.spanContext.service}`)
-      await span.finish()
+      const parsedRequest = request.server.plugins.openapi.openapi.router.parseRequest({
+        method: request.method,
+        path: request.path,
+        body: request.payload,
+        query: request.query,
+        headers: request.headers
+      }, request.server.plugins.openapi.openapi.getOperation(operation.operationId))
+      reply.request.params = parsedRequest.params || {}
     }
   }
   return reply.continue
@@ -79,5 +76,3 @@ module.exports.plugin = {
     server.ext('onPreResponse', onPreResponse)
   }
 }
-
-module.exports.onPreResponse = onPreResponse
