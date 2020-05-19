@@ -79,5 +79,3 @@ module.exports.plugin = {
     server.ext('onPreResponse', onPreResponse)
   }
 }
-
-module.exports.onPreResponse = onPreResponse

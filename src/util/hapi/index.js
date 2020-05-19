@@ -2,12 +2,12 @@
 
 const HapiRawPayload = require('./plugins/rawPayloadToDataUri')
 const HapiEventPlugin = require('./plugins/eventPlugin')
-const HapiOpenapiEventPlugin = require('./plugins/eventPluginOpenapiBackend')
+const OpenapiBackendValidator = require('./plugins/openapiBackendValidator')
 const FSPIOPHeaderValidation = require('./plugins/headerValidation')
 
 module.exports = {
   HapiRawPayload,
   HapiEventPlugin,
-  HapiOpenapiEventPlugin,
+  OpenapiBackendValidator,
   FSPIOPHeaderValidation
 }

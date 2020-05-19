@@ -23,10 +23,7 @@
  ******/
 'use strict'
 
-const EventSdk = require('@mojaloop/event-sdk')
-const Logger = require('@mojaloop/central-services-logger')
 const Enum = require('../../../enums')
-const onPreResponse = require('./eventPlugin').onPreResponse
 
 const onPreAuth = (request, reply) => {
   if (request) {
@@ -40,16 +37,8 @@ const onPreAuth = (request, reply) => {
 
     if (operation && operation.operationId) {
       if (operation.tags && operation.tags.includes(Enum.Tags.RouteTags.SAMPLED)) {
-        const context = EventSdk.Tracer.extractContextFromHttpRequest(request)
-        const spanName = operation.operationId
-        let span
-        if (context) {
-          span = EventSdk.Tracer.createChildSpanFromContext(spanName, context)
-        } else {
-          Logger.isDebugEnabled && Logger.debug(`Starting parent span ${spanName}`)
-          span = EventSdk.Tracer.createSpan(spanName)
-        }
-        reply.request.span = span
+        request.route.settings.tags = operation.tags
+        request.route.settings.id = operation.operationId
       }
       const parsedRequest = request.server.plugins.openapi.openapi.router.parseRequest({
         method: request.method,
@@ -70,9 +59,8 @@ const onPreAuth = (request, reply) => {
  * applied to the route
  */
 module.exports.plugin = {
-  name: 'eventPlugin',
+  name: 'openapiBackendValidator',
   register: function (server) {
     server.ext('onPreAuth', onPreAuth)
-    server.ext('onPreResponse', onPreResponse)
   }
 }

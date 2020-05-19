@@ -62,11 +62,11 @@
   "devDependencies": {
     "@hapi/hapi": "19.1.1",
     "@hapi/joi": "17.1.1",
-    "@mojaloop/sdk-standard-components": "10.2.1",
+    "@mojaloop/sdk-standard-components": "10.2.3",
     "chance": "1.1.5",
     "faucet": "0.0.1",
     "npm-audit-resolver": "2.2.0",
-    "npm-check-updates": "5.0.0",
+    "npm-check-updates": "6.0.1",
     "nyc": "15.0.1",
     "pre-commit": "1.2.2",
     "proxyquire": "2.1.3",
