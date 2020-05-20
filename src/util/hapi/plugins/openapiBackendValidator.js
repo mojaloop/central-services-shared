@@ -26,30 +26,26 @@
 const Enum = require('../../../enums')
 
 const onPreAuth = (request, reply) => {
-  if (request) {
-    const operation = request.server.plugins.openapi.openapi.matchOperation({
-      method: request.method,
-      path: request.path,
-      body: request.payload,
-      query: request.query,
-      headers: request.headers
-    })
+  const operation = request.server.plugins.openapi.openapi.matchOperation({
+    method: request.method,
+    path: request.path,
+    body: request.payload,
+    query: request.query,
+    headers: request.headers
+  })
 
-    if (operation && operation.operationId) {
-      if (operation.tags && operation.tags.includes(Enum.Tags.RouteTags.SAMPLED)) {
-        request.route.settings.tags = operation.tags
-        request.route.settings.id = operation.operationId
-      }
-      const parsedRequest = request.server.plugins.openapi.openapi.router.parseRequest({
-        method: request.method,
-        path: request.path,
-        body: request.payload,
-        query: request.query,
-        headers: request.headers
-      }, request.server.plugins.openapi.openapi.getOperation(operation.operationId))
-      reply.request.params = parsedRequest.params || {}
-    }
+  if (operation.tags && operation.tags.includes(Enum.Tags.RouteTags.SAMPLED)) {
+    request.route.settings.tags = operation.tags
+    request.route.settings.id = operation.operationId
   }
+  const parsedRequest = request.server.plugins.openapi.openapi.router.parseRequest({
+    method: request.method,
+    path: request.path,
+    body: request.payload,
+    query: request.query,
+    headers: request.headers
+  }, request.server.plugins.openapi.openapi.getOperation(operation.operationId))
+  reply.request.params = parsedRequest.params
   return reply.continue
 }
 

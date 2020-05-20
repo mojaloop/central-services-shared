@@ -16,40 +16,23 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- * Name Surname <name.surname@gatesfoundation.com>
 
- * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+ * ModusBox
+ - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+
  --------------
  ******/
+
 'use strict'
 
-function updateDefinition (obj, key, regexFlags) {
-  let objects = []
-  for (const i in obj) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (obj.hasOwnProperty(i)) {
-      if (typeof obj[i] === 'object') {
-        objects = objects.concat(updateDefinition(obj[i], key, regexFlags))
-      } else if (i === key) {
-        if (!obj.regexp && !obj.flags) {
-          obj.regexp = {
-            pattern: obj[i],
-            flags: regexFlags
-          }
-          delete obj.pattern
-        }
-      }
-    }
-  }
-}
-
-function generateNewDefinition (originalDefinition, regexFlags) {
-  const key = 'pattern'
-  const clonedDefinition = Object.assign({}, originalDefinition)
-  updateDefinition(clonedDefinition, key, regexFlags)
-  return clonedDefinition
-}
-
 module.exports = {
-  generateNewDefinition
+  HealthGet: async (context, request, h) => {
+    return h.response().code(200)
+  },
+  FakeHealth: async (context, request, h) => {
+    return h.response().code(200)
+  },
+  TransactionRequests: async (context, request, h) => {
+    return h.response().code(202)
+  }
 }
