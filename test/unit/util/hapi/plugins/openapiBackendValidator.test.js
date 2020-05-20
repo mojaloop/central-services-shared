@@ -19,8 +19,8 @@
  - Name Surname <name.surname@gatesfoundation.com>
 
  * ModusBox
- - Georgi Georgiev <georgi.georgiev@modusbox.com>
- - Neal Donnan <neal.donnan@modusbox.com>
+ - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+
  --------------
  ******/
 'use strict'
