@@ -124,5 +124,20 @@ Test('Openapi Backend Validator plugin test should', async (pluginTest) => {
     }
   })
 
+  await pluginTest.test('not update the request object with the operationId, tags just continue processing', async assert => {
+    try {
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/health'
+      })
+      assert.equal(response.statusCode, 400, 'status code is correct')
+      assert.equal(response.result.errorInformation.errorCode, '3000')
+      assert.end()
+    } catch (e) {
+      assert.fail()
+      assert.end()
+    }
+  })
+
   await pluginTest.end()
 })
