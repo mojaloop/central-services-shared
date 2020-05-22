@@ -23,6 +23,8 @@
  ******/
 'use strict'
 
+const Logger = require('@mojaloop/central-services-logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const OpenAPIBackend = require('openapi-backend').default
 const OpenAPIValidator = require('openapi-backend').OpenAPIValidator
 const Ajv = require('ajv')
@@ -56,6 +58,51 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
   return api
 }
 
+/**
+ * Default method to handle validation errors for OpenAPI Backend.
+ *
+ * @param context {Object} - the OpenAPI backend context
+ * @throws {FSPIOPError}
+ */
+const validationFail = async (context) => {
+  Logger.info('Validation Error')
+  const fspiopError = ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(context.validation.errors[0])
+  Logger.error(fspiopError)
+  throw fspiopError
+}
+
+/**
+ * Default method to handle not found URI errors for OpenAPI Backend.
+ *
+ * @param context {Object} - the OpenAPI backend context
+ * @throws {FSPIOPError}
+ */
+const notFound = async (context) => {
+  const error = {
+    keyword: 'notFound',
+    dataPath: context.request.method + ' ' + context.request.path,
+    message: context.request.method + ' ' + context.request.path
+  }
+  throw ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(error)
+}
+
+/**
+ * Default method to handle method not allowed errors for OpenAPI Backend.
+ *
+ * @param context {Object} - the OpenAPI backend context
+ * @throws {FSPIOPError}
+ */
+const methodNotAllowed = async (context) => {
+  const error = {
+    keyword: 'methodNotAllowed',
+    dataPath: context.request.method + ' ' + context.request.path
+  }
+  throw ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(error)
+}
+
 module.exports = {
-  initialise
+  initialise,
+  validationFail,
+  notFound,
+  methodNotAllowed
 }
