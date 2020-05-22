@@ -95,8 +95,7 @@ const notFound = async (context) => {
 const methodNotAllowed = async (context) => {
   const error = {
     keyword: 'methodNotAllowed',
-    dataPath: context.request.method + ' ' + context.request.path,
-    message: 'Method not allowed'
+    dataPath: context.request.method + ' ' + context.request.path
   }
   throw ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(error)
 }

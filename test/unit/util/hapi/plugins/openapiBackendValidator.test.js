@@ -124,7 +124,7 @@ Test('Openapi Backend Validator plugin test should', async (pluginTest) => {
     }
   })
 
-  await pluginTest.test('not update the request object with the operationId, should thorw 400', async assert => {
+  await pluginTest.test('not update the request object with the operationId, should thrown 400', async assert => {
     try {
       const response = await server.inject({
         method: 'PUT',
