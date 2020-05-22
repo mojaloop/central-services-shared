@@ -68,5 +68,32 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
     initializeTest.end()
   })
 
+  OpenapiBackendTest.test('validationFail should', async (validationFailTest) => {
+    validationFailTest.test('throw a FSPIOP error', async (test) => {
+      const context = {
+        validation: {
+          errors: [{
+            keyword: 'additionalProperties',
+            dataPath: '.requestBody.payee.partyIdInfo',
+            schemaPath: '#/properties/requestBody/properties/payee/properties/partyIdInfo/additionalProperties',
+            params: {
+              additionalProperty: 'fake'
+            },
+            message: 'should NOT have additional properties'
+          }]
+        }
+      }
+      try {
+        await OpenapiBackend.validationFail(context)
+      } catch (e) {
+        test.equal(e.httpStatusCode, 400, 'statusCode 400 thrown')
+        test.equal(e.toApiErrorObject().errorInformation.errorCode, '3103', 'errorCode returned 3103')
+        test.end()
+      }
+    })
+
+    validationFailTest.end()
+  })
+
   OpenapiBackendTest.end()
 })

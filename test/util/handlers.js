@@ -25,7 +25,7 @@
 
 'use strict'
 
-const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const OpenapiBackend = require('../../src/util/openapiBackend')
 
 module.exports = {
   HealthGet: async (context, request, h) => {
@@ -37,23 +37,7 @@ module.exports = {
   TransactionRequests: async (context, request, h) => {
     return h.response().code(202)
   },
-  validationFail: async (context, request, h) => {
-    throw ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(context.validation.errors[0])
-  },
-  notFound: async (context, request, h) => {
-    const error = {
-      keyword: 'notFound',
-      dataPath: context.request.method + ' ' + context.request.path,
-      message: context.request.method + ' ' + context.request.path
-    }
-    throw ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(error)
-  },
-  methodNotAllowed: async (context, request, h) => {
-    const error = {
-      keyword: 'methodNotAllowed',
-      dataPath: context.request.method + ' ' + context.request.path,
-      message: 'Method not allowed'
-    }
-    throw ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(error)
-  }
+  validationFail: OpenapiBackend.validationFail,
+  notFound: OpenapiBackend.notFound,
+  methodNotAllowed: OpenapiBackend.methodNotAllowed
 }
