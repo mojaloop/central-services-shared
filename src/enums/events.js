@@ -110,6 +110,7 @@ const ActionLetter = {
   bulkFulfil: 'BF',
   bulkFulfilDuplicate: 'BFD',
   bulkCommit: 'BC',
+  bulkAbort: 'BA',
   bulkTimeoutReceived: 'BTRc',
   bulkTimeoutReserved: 'BTRs',
   commit: 'C',
