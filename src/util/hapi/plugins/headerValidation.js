@@ -6,7 +6,7 @@
 // accuracy of this statement has not been thoroughly tested.
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
-const { parseAcceptHeader, parseContentTypeHeader, protocolVersions } = require('../../headerValidation')
+const { parseAcceptHeader, parseContentTypeHeader, protocolVersions, protocolVersionsMap } = require('../../headerValidation')
 
 // Some defaults
 
@@ -94,7 +94,10 @@ const plugin = {
       if (!supportedProtocolVersions.includes(contentType.version)) {
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
-          errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED
+          errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED,
+          null,
+          null,
+          protocolVersionsMap
         )
       }
 
