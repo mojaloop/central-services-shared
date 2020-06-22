@@ -137,6 +137,10 @@ const TopicMap = {
     'timeout-received': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
+    },
+    'timeout-reserved': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
     }
   },
   position: {

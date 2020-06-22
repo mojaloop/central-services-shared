@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+ * Shashikant Hirugade <shashikant.hirugade@modusbox.com>
 
  --------------
  ******/
@@ -38,7 +39,7 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 delete request.defaults.headers.common.Accept
 
 /**
- * @function validateParticipant
+ * @function sendRequest
  *
  * @description sends a request to url
  *
@@ -50,11 +51,12 @@ delete request.defaults.headers.common.Accept
  * @param {object} payload the body of the request being sent
  * @param {string} responseType the type of the response object
  * @param {object} span a span for event logging if this request is within a span
+ * @param {object} jwsSigner the jws signer for signing the requests
  *
  *@return {object} The response for the request being sent or error object with response included
  */
 
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined) => {
+const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined, jwsSigner = undefined) => {
   const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -82,6 +84,11 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       data: payload,
       responseType
     }
+    // if jwsSigner is passed then sign the request
+    if (jwsSigner != null && typeof (jwsSigner) === 'object') {
+      requestOptions.headers['fspiop-signature'] = jwsSigner.getSignature(requestOptions)
+    }
+
     if (span) {
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
