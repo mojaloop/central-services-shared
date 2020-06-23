@@ -46,6 +46,10 @@ const TopicMap = {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
     },
+    'bulk-abort': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
     'bulk-prepare': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
