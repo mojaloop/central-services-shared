@@ -71,6 +71,10 @@ const TopicMap = {
     'bulk-commit': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.FULFIL
+    },
+    'bulk-abort': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
     }
   },
   notification: {
@@ -145,6 +149,10 @@ const TopicMap = {
   },
   position: {
     'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'bulk-abort': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
