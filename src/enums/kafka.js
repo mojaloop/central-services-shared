@@ -138,6 +138,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    reserve: {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'settlement-window': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
@@ -185,6 +189,10 @@ const TopicMap = {
       action: transferEventAction.POSITION
     },
     reject: {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    reserve: {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },

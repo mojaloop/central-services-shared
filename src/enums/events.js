@@ -119,6 +119,7 @@ const ActionLetter = {
   get: 'G',
   prepare: 'P',
   reject: 'R',
+  reserve: 'Rs',
   timeout: 'T',
   unknown: '?'
 }
