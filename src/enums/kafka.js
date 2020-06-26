@@ -46,6 +46,10 @@ const TopicMap = {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
     },
+    'bulk-abort': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
     'bulk-prepare': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
@@ -69,6 +73,10 @@ const TopicMap = {
   },
   fulfil: {
     'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
+    },
+    'bulk-abort': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.FULFIL
     }
@@ -149,6 +157,10 @@ const TopicMap = {
   },
   position: {
     'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'bulk-abort': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
