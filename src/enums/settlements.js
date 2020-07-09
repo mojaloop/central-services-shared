@@ -32,7 +32,8 @@ const SettlementWindowState = {
 }
 const SettlementDelay = {
   IMMEDIATE: 1,
-  DEFERRED: 2
+  DEFERRED: 2,
+  CONTINUAL: 3
 }
 const SettlementGranularity = {
   GROSS: 1,
@@ -47,7 +48,9 @@ const ValidSettlementModels = [
   { settlementDelay: 'IMMEDIATE', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
   { settlementDelay: 'DEFERRED', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
   { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'BILATERAL' },
-  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'MULTILATERAL' }
+  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'MULTILATERAL' },
+  { settlementDelay: 'CONTINUAL', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' }
+
 ]
 const isActiveText = {
   activated: 'activated',
