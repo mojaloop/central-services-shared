@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "10.5.3",
+  "version": "10.6.0",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -43,18 +43,18 @@
   "dependencies": {
     "@hapi/catbox": "11.1.0",
     "@hapi/catbox-memory": "5.0.0",
-    "@mojaloop/central-services-error-handling": "10.4.1",
-    "@mojaloop/central-services-logger": "10.4.0",
+    "@mojaloop/central-services-error-handling": "10.6.0",
+    "@mojaloop/central-services-logger": "10.6.0",
     "@mojaloop/central-services-metrics": "9.5.0",
-    "@mojaloop/event-sdk": "10.4.0",
-    "ajv": "6.12.2",
-    "ajv-keywords": "3.5.0",
+    "@mojaloop/event-sdk": "10.6.0",
+    "ajv": "6.12.3",
+    "ajv-keywords": "3.5.1",
     "axios": "0.19.2",
     "base64url": "3.0.1",
     "clone": "2.1.2",
     "data-urls": "2.0.0",
     "immutable": "3.8.2",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "mustache": "4.0.1",
     "openapi-backend": "3.5.1",
     "raw-body": "2.4.1"
