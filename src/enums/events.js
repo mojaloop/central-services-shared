@@ -29,6 +29,7 @@ const Event = {
     ADMIN: 'admin',
     AUTHORIZATION: 'authorization',
     BULK: 'bulk',
+    BULK_QUOTE: 'bulkquote',
     BULK_PROCESSING: 'bulk-processing',
     ENDPOINTCACHE: 'endpointcache',
     EVENT: 'event',
