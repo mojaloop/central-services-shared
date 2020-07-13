@@ -53,6 +53,17 @@ Test('Settlement util', settlementTest => {
       test.deepEqual(result, expected)
       test.end()
     })
+    validateSettlementModelTest.test('return isValid=true for a valid model', test => {
+      const delay = 'CONTINUAL'
+      const granularity = 'GROSS'
+      const interchange = 'BILATERAL'
+
+      const expected = { isValid: true, reasons: [] }
+
+      const result = Settlement.validateSettlementModel(delay, granularity, interchange)
+      test.deepEqual(result, expected)
+      test.end()
+    })
 
     validateSettlementModelTest.test('return isValid=false for invalid model using values', test => {
       const delay = 1
