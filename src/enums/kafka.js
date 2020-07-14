@@ -118,6 +118,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'bulk-get': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'limit-adjustment': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
