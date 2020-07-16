@@ -57,7 +57,8 @@
     "lodash": "4.17.19",
     "mustache": "4.0.1",
     "openapi-backend": "3.5.1",
-    "raw-body": "2.4.1"
+    "raw-body": "2.4.1",
+    "uuid4": "2.0.2"
   },
   "devDependencies": {
     "@hapi/hapi": "19.1.1",
@@ -76,8 +77,7 @@
     "standard": "14.3.4",
     "tap-xunit": "2.4.1",
     "tape": "5.0.1",
-    "tapes": "4.1.0",
-    "uuid4": "2.0.2"
+    "tapes": "4.1.0"
   },
   "standard": {
     "ignore": []
