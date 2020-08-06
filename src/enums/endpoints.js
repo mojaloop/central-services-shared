@@ -77,7 +77,7 @@ const FspEndpointTypes = {
   THIRDPARTY_CALLBACK_URL_CONSENT_POST: 'THIRDPARTY_CALLBACK_URL_CONSENT_POST',
   THIRDPARTY_CALLBACK_URL_CONSENT_GET: 'THIRDPARTY_CALLBACK_URL_CONSENT_GET',
   THIRDPARTY_CALLBACK_URL_CONSENT_PUT: 'THIRDPARTY_CALLBACK_URL_CONSENT_PUT',
-  THIRDPARTY_CALLBACK_URL_CONSENT_PUT_ERROR: 'THIRDPARTY_CALLBACK_URL_CONSENT_PUT_ERROR',
+  THIRDPARTY_CALLBACK_URL_CONSENT_PUT_ERROR: 'THIRDPARTY_CALLBACK_URL_CONSENT_PUT_ERROR'
 }
 
 const FspEndpointTemplates = {
@@ -104,13 +104,13 @@ const FspEndpointTemplates = {
   BULK_QUOTES_POST: '/bulkQuotes',
   BULK_QUOTES_ERROR_PUT: '/bulkQuotes/{{bulkQuoteId}}/error',
   THIRDPARTY_TRANSACTION_REQUEST_POST: '/thirdpartyRequests/transactions',
-  THIRDPARTY_TRANSACTION_REQUEST_PUT: '/thirdpartyRequests/transactions/{{ID}}'
-  THIRDPARTY_TRANSACTION_REQUEST_PUT_ERROR: '/thirdpartyRequests/transactions/{{ID}}/error'
-  THIRDPARTY_AUTHORIZATIONS_POST: '/authorizations'
-  THIRDPARTY_AUTHORIZATIONS_PUT: '/authorizations/{{id}}'
-  THIRDPARTY_TRANSACTION_REQUEST_AUTHORIZATIONS_POST: '/thirdpartyRequests/transactions/{{ID}}/authorizations'
-  THIRDPARTY_TRANSACTION_REQUEST_AUTHORIZATIONS_PUT: '/thirdpartyRequests/transactions/{{ID}}/authorizations'
-  THIRDPARTY_TRANSACTION_REQUEST_AUTHORIZATIONS_PUT_ERROR: '/thirdpartyRequests/transactions/{{ID}}/authorizations/error'
+  THIRDPARTY_TRANSACTION_REQUEST_PUT: '/thirdpartyRequests/transactions/{{ID}}',
+  THIRDPARTY_TRANSACTION_REQUEST_PUT_ERROR: '/thirdpartyRequests/transactions/{{ID}}/error',
+  THIRDPARTY_AUTHORIZATIONS_POST: '/authorizations',
+  THIRDPARTY_AUTHORIZATIONS_PUT: '/authorizations/{{id}}',
+  THIRDPARTY_TRANSACTION_REQUEST_AUTHORIZATIONS_POST: '/thirdpartyRequests/transactions/{{ID}}/authorizations',
+  THIRDPARTY_TRANSACTION_REQUEST_AUTHORIZATIONS_PUT: '/thirdpartyRequests/transactions/{{ID}}/authorizations',
+  THIRDPARTY_TRANSACTION_REQUEST_AUTHORIZATIONS_PUT_ERROR: '/thirdpartyRequests/transactions/{{ID}}/authorizations/error',
   THIRDPARTY_CONSENT_REQUEST_POST: '/consentRequests',
   THIRDPARTY_CONSENT_REQUEST_PUT: '/consentRequests/{{ID}}',
   THIRDPARTY_CONSENT_REQUEST_PUT_ERROR: '/consentRequests/{{ID}}/error',
@@ -118,7 +118,7 @@ const FspEndpointTemplates = {
   THIRDPARTY_CONSENT_POST: '/consents',
   THIRDPARTY_CONSENT_GET: '/consents/{{ID}}',
   THIRDPARTY_CONSENT_PUT: '/consents/{{ID}}',
-  THIRDPARTY_CONSENT_PUT_ERROR: '/consents/{{ID}}/error',
+  THIRDPARTY_CONSENT_PUT_ERROR: '/consents/{{ID}}/error'
 }
 
 module.exports = {
