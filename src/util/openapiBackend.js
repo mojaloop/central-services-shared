@@ -23,7 +23,6 @@
  ******/
 'use strict'
 
-const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const OpenAPIBackend = require('openapi-backend').default
 const OpenAPIValidator = require('openapi-backend').OpenAPIValidator
@@ -65,9 +64,7 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
  * @throws {FSPIOPError}
  */
 const validationFail = async (context) => {
-  Logger.info('Validation Error')
   const fspiopError = ErrorHandler.Factory.createFSPIOPErrorFromOpenapiError(context.validation.errors[0])
-  Logger.error(fspiopError)
   throw fspiopError
 }
 
