@@ -38,7 +38,7 @@ const headerConfigExample = {
 }
 
 const headerDataInputExample = {
-  'Content-Type': 'application/vnd.interoperability.transfers+json;version=1.0',
+  'Content-Type': 'application/vnd.interoperability.transfers+json;version=1.1',
   'Content-Length': '1234',
   Host: 'localhost:4000',
   'FSPIOP-Source': headerConfigExample.sourceFsp,

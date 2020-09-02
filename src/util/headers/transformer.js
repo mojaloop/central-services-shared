@@ -28,6 +28,31 @@
 const ENUM = require('../../enums').Http
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
+require('dotenv').config()
+const env = require('env-var')
+const resourceVersions = env.get('RESOURCES_VERSIONS').default('').asString()
+
+let apiVersions = {}
+
+const regexForContentAndAcceptHeaders = /(application\/vnd.interoperability.)(\w*)+(\+json;version=)(.*)/
+
+const _getVersionFromConfig = () => {
+  const resourceVersionMap = {}
+  if (resourceVersions) {
+    resourceVersions.split(',')
+      .forEach(e => e.split('=')
+        .reduce((p, c) => {
+          resourceVersionMap[p] = {
+            contentVersion: c,
+            acceptVersion: c.split('.')[0]
+          }
+        }))
+    return resourceVersionMap
+  } else {
+    return null
+  }
+}
+
 /**
  * @module src/headers/transformer
  */
@@ -57,9 +82,20 @@ const transformHeaders = (headers, config) => {
   // Normalized headers
   const normalizedHeaders = {}
 
+  // resource type for content-type and accept headers
+  const getResourceFromHeader = (headerValue) => regexForContentAndAcceptHeaders.exec(headerValue)[2]
+  let resourceType
+
   // check to see if FSPIOP-Destination header has been left out of the initial request. If so then add it.
   if (!normalizedKeys[ENUM.Headers.FSPIOP.DESTINATION]) {
     headers[ENUM.Headers.FSPIOP.DESTINATION] = ''
+  }
+
+  if (Object.keys(apiVersions).length === 0) {
+    apiVersions = {
+      ...ENUM.Headers.DEFAULT_API_VERSIONS,
+      ..._getVersionFromConfig()
+    }
   }
 
   for (const headerKey in headers) {
@@ -113,6 +149,14 @@ const transformHeaders = (headers, config) => {
         break
       case (ENUM.Headers.FSPIOP.DESTINATION):
         normalizedHeaders[headerKey] = config.destinationFsp
+        break
+      case (ENUM.Headers.GENERAL.ACCEPT.value):
+        if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${apiVersions[resourceType].acceptVersion}`
+        break
+      case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
+        if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${apiVersions[resourceType].contentVersion}`
         break
       default:
         normalizedHeaders[headerKey] = headerValue

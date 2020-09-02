@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "11.2.1",
+  "version": "11.3.0",
   "description": "Shared code for central services",
   "main": "src/index.js",
   "scripts": {
@@ -53,6 +53,8 @@
     "base64url": "3.0.1",
     "clone": "2.1.2",
     "data-urls": "2.0.0",
+    "dotenv": "8.2.0",
+    "env-var": "6.3.0",
     "immutable": "3.8.2",
     "lodash": "4.17.20",
     "mustache": "4.0.1",
