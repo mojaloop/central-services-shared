@@ -28,30 +28,29 @@
 const ENUM = require('../../enums').Http
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
-require('dotenv').config()
-const env = require('env-var')
-const resourceVersions = env.get('RESOURCES_VERSIONS').default('').asString()
-
-let apiVersions = {}
+const apiVersions = {
+  ...ENUM.Headers.DEFAULT_API_VERSIONS,
+  ...require('../helpers').resourceVersions
+}
 
 const regexForContentAndAcceptHeaders = /(application\/vnd.interoperability.)(\w*)+(\+json;version=)(.*)/
 
-const _getVersionFromConfig = () => {
-  const resourceVersionMap = {}
-  if (resourceVersions) {
-    resourceVersions.split(',')
-      .forEach(e => e.split('=')
-        .reduce((p, c) => {
-          resourceVersionMap[p] = {
-            contentVersion: c,
-            acceptVersion: c.split('.')[0]
-          }
-        }))
-    return resourceVersionMap
-  } else {
-    return null
-  }
-}
+// const _getVersionFromConfig = () => {
+//   const resourceVersionMap = {}
+//   if (resourceVersions) {
+//     resourceVersions.split(',')
+//       .forEach(e => e.split('=')
+//         .reduce((p, c) => {
+//           resourceVersionMap[p] = {
+//             contentVersion: c,
+//             acceptVersion: c.split('.')[0]
+//           }
+//         }))
+//     return resourceVersionMap
+//   } else {
+//     return null
+//   }
+// }
 
 /**
  * @module src/headers/transformer
@@ -91,12 +90,11 @@ const transformHeaders = (headers, config) => {
     headers[ENUM.Headers.FSPIOP.DESTINATION] = ''
   }
 
-  if (Object.keys(apiVersions).length === 0) {
-    apiVersions = {
-      ...ENUM.Headers.DEFAULT_API_VERSIONS,
-      ..._getVersionFromConfig()
-    }
-  }
+  // if (Object.keys(apiVersions).length === 0) {
+  //   apiVersions = {
+  //     ..._getVersionFromConfig()
+  //   }
+  // }
 
   for (const headerKey in headers) {
     const headerValue = headers[headerKey]

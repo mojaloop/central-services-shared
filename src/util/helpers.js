@@ -24,6 +24,43 @@
  ******/
 'use strict'
 
+require('dotenv').config()
+const { from } = require('env-var');
+
+/**
+     * Gets Resources versions from enviromental variable RESOURCES_VERSIONS
+     * should be string in format: "resouceOneName=1.0,resourceTwoName=1.1"
+     */
+const getVersionFromConfig = (resourceString) => {
+  const resourceVersionMap = {};
+  resourceString
+    .split(',')
+    .forEach(e => e.split('=')
+      .reduce((p, c) => {
+        resourceVersionMap[p] = {
+          contentVersion: c,
+          acceptVersion: c.split('.')[0]
+        }
+      }))
+  return resourceVersionMap
+}
+
+const parseResourceVersions = (resourceString) => {
+  if (!resourceString) return {}
+  const resourceFormatRegex = /(([A-Za-z])\w*)=([0-9]+).([0-9]+)([^;:|],*)/g
+  const noSpResources = resourceString.replace(/\s/g, '')
+  if (!resourceFormatRegex.test(noSpResources)) {
+    throw new Error('Resource versions format should be in format: "resouceOneName=1.0,resourceTwoName=1.1"')
+  }
+  return getVersionFromConfig(noSpResources)
+}
+
+const env = from(process.env, {
+  asResourceVersions: (resourceString) => parseResourceVersions(resourceString)
+})
+
+const resourceVersions = env.get('RESOURCE_VERSIONS').default('').asResourceVersions()
+
 const transpose = (obj) => {
   const transposed = new Map()
   for (const prop in obj) {
@@ -33,5 +70,7 @@ const transpose = (obj) => {
 }
 
 module.exports = {
-  transpose
+  transpose,
+  resourceVersions,
+  __parseResourceVersions: parseResourceVersions
 }

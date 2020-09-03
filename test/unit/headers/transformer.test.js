@@ -28,7 +28,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 
-process.env.RESOURCES_VERSIONS = 'transfers=1.1,participants=1.1'
+process.env.RESOURCE_VERSIONS = 'transfers=1.1,participants=1.1'
 
 const Transformer = require('../../../src/util').Headers
 const Enum = require('../../../src/enums')
