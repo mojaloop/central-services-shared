@@ -27,9 +27,7 @@ const Test = require('tapes')(require('tape'))
 const parseResourceVersion = require('../../../src/util/helpers').__parseResourceVersions
 
 Test('Http tests', helperTest => {
-
   helperTest.test('parseResourceVersions should parse setting correctl', parseResourveVersions => {
-
     parseResourveVersions.test('create resourceVersions object', (test) => {
       try {
         const resourceVersions = {

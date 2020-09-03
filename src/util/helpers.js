@@ -25,14 +25,14 @@
 'use strict'
 
 require('dotenv').config()
-const { from } = require('env-var');
+const { from } = require('env-var')
 
 /**
      * Gets Resources versions from enviromental variable RESOURCES_VERSIONS
      * should be string in format: "resouceOneName=1.0,resourceTwoName=1.1"
      */
 const getVersionFromConfig = (resourceString) => {
-  const resourceVersionMap = {};
+  const resourceVersionMap = {}
   resourceString
     .split(',')
     .forEach(e => e.split('=')
