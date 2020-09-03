@@ -38,7 +38,7 @@ const headerConfigExample = {
 }
 
 const headerDataInputExample = {
-  'Content-Type': 'application/vnd.interoperability.transfers+json;version=1.1',
+  'Content-Type': 'application/vnd.interoperability.transfers+json;version=1.0',
   'Content-Length': '1234',
   Host: 'localhost:4000',
   'FSPIOP-Source': headerConfigExample.sourceFsp,
@@ -59,6 +59,7 @@ Test('Transfer Transformer tests', TransformerTest => {
 
   TransformerTest.beforeEach(t => {
     sandbox = Sinon.createSandbox()
+    // process.env.LIB_RESOURCE_VERSIONS = 'transfers=1.0,quotes=1.1'
     t.end()
   })
 

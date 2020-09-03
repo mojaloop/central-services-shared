@@ -28,8 +28,6 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 
-process.env.RESOURCE_VERSIONS = 'transfers=1.1,participants=1.1'
-
 const Transformer = require('../../../src/util').Headers
 const Enum = require('../../../src/enums')
 const Util = require('../../../src/util')
@@ -41,7 +39,7 @@ const headerConfigExample = {
 }
 
 const headerDataInputExample = {
-  'Content-Type': 'application/vnd.interoperability.transfers+json;version=1.1',
+  'Content-Type': 'application/vnd.interoperability.transfers+json;version=1.0',
   'Content-Length': '1234',
   'FSPIOP-Source': headerConfigExample.sourceFsp,
   'FSPIOP-Destination': headerConfigExample.destinationFsp,

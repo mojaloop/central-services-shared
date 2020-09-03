@@ -28,29 +28,9 @@
 const ENUM = require('../../enums').Http
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
-const apiVersions = {
-  ...ENUM.Headers.DEFAULT_API_VERSIONS,
-  ...require('../helpers').resourceVersions
-}
+const resourceVersions = require('../helpers').resourceVersions
 
 const regexForContentAndAcceptHeaders = /(application\/vnd.interoperability.)(\w*)+(\+json;version=)(.*)/
-
-// const _getVersionFromConfig = () => {
-//   const resourceVersionMap = {}
-//   if (resourceVersions) {
-//     resourceVersions.split(',')
-//       .forEach(e => e.split('=')
-//         .reduce((p, c) => {
-//           resourceVersionMap[p] = {
-//             contentVersion: c,
-//             acceptVersion: c.split('.')[0]
-//           }
-//         }))
-//     return resourceVersionMap
-//   } else {
-//     return null
-//   }
-// }
 
 /**
  * @module src/headers/transformer
@@ -89,12 +69,6 @@ const transformHeaders = (headers, config) => {
   if (!normalizedKeys[ENUM.Headers.FSPIOP.DESTINATION]) {
     headers[ENUM.Headers.FSPIOP.DESTINATION] = ''
   }
-
-  // if (Object.keys(apiVersions).length === 0) {
-  //   apiVersions = {
-  //     ..._getVersionFromConfig()
-  //   }
-  // }
 
   for (const headerKey in headers) {
     const headerValue = headers[headerKey]
@@ -150,11 +124,11 @@ const transformHeaders = (headers, config) => {
         break
       case (ENUM.Headers.GENERAL.ACCEPT.value):
         if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
-        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${apiVersions[resourceType].acceptVersion}`
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].acceptVersion}`
         break
       case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
         if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
-        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${apiVersions[resourceType].contentVersion}`
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].contentVersion}`
         break
       default:
         normalizedHeaders[headerKey] = headerValue

@@ -20,17 +20,14 @@
 
  * ModusBox
  - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Valentin Genev <valentin.genev@modusbox.com>
  --------------
  ******/
 'use strict'
 
-require('dotenv').config()
-const { from } = require('env-var')
+const RC = require('rc')('LIB')
+const defaultVersions = require('../enums/http').Headers.DEFAULT_API_VERSIONS
 
-/**
-     * Gets Resources versions from enviromental variable RESOURCES_VERSIONS
-     * should be string in format: "resouceOneName=1.0,resourceTwoName=1.1"
-     */
 const getVersionFromConfig = (resourceString) => {
   const resourceVersionMap = {}
   resourceString
@@ -45,6 +42,10 @@ const getVersionFromConfig = (resourceString) => {
   return resourceVersionMap
 }
 
+/**
+ * Parses resource version string to resource version map
+ * @param {*} resourceString string in format: "resouceOneName=1.0,resourceTwoName=1.1"
+ */
 const parseResourceVersions = (resourceString) => {
   if (!resourceString) return {}
   const resourceFormatRegex = /(([A-Za-z])\w*)=([0-9]+).([0-9]+)([^;:|],*)/g
@@ -55,11 +56,10 @@ const parseResourceVersions = (resourceString) => {
   return getVersionFromConfig(noSpResources)
 }
 
-const env = from(process.env, {
-  asResourceVersions: (resourceString) => parseResourceVersions(resourceString)
-})
-
-const resourceVersions = env.get('RESOURCE_VERSIONS').default('').asResourceVersions()
+const resourceVersions = {
+  ...defaultVersions,
+  ...parseResourceVersions(RC.RESOURCE_VERSIONS)
+}
 
 const transpose = (obj) => {
   const transposed = new Map()
