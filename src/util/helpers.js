@@ -25,7 +25,7 @@
  ******/
 'use strict'
 
-const RC = require('rc')('LIB')
+const RC = require('parse-strings-in-object')(require('rc')('LIB'))
 const defaultVersions = require('../enums/http').Headers.DEFAULT_API_VERSIONS
 
 const getVersionFromConfig = (resourceString) => {
