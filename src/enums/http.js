@@ -59,6 +59,48 @@ const Headers = {
   },
   DEFAULT: {
     APPLICATION_JSON: 'application/json'
+  },
+  DEFAULT_API_VERSIONS: {
+    parties: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    participants: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    quotes: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    bulkQuotes: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    bulkTransfers: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    transactionRequests: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    authorizations: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    transfers: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    custom: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    },
+    thirdparty: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
+    }
   }
 }
 

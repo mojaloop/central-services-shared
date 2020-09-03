@@ -20,9 +20,46 @@
 
  * ModusBox
  - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Valentin Genev <valentin.genev@modusbox.com>
  --------------
  ******/
 'use strict'
+
+const RC = require('parse-strings-in-object')(require('rc')('LIB'))
+const defaultVersions = require('../enums/http').Headers.DEFAULT_API_VERSIONS
+
+const getVersionFromConfig = (resourceString) => {
+  const resourceVersionMap = {}
+  resourceString
+    .split(',')
+    .forEach(e => e.split('=')
+      .reduce((p, c) => {
+        resourceVersionMap[p] = {
+          contentVersion: c,
+          acceptVersion: c.split('.')[0]
+        }
+      }))
+  return resourceVersionMap
+}
+
+/**
+ * Parses resource version string to resource version map
+ * @param {*} resourceString string in format: "resouceOneName=1.0,resourceTwoName=1.1"
+ */
+const parseResourceVersions = (resourceString) => {
+  if (!resourceString) return {}
+  const resourceFormatRegex = /(([A-Za-z])\w*)=([0-9]+).([0-9]+)([^;:|],*)/g
+  const noSpResources = resourceString.replace(/\s/g, '')
+  if (!resourceFormatRegex.test(noSpResources)) {
+    throw new Error('Resource versions format should be in format: "resouceOneName=1.0,resourceTwoName=1.1"')
+  }
+  return getVersionFromConfig(noSpResources)
+}
+
+const resourceVersions = {
+  ...defaultVersions,
+  ...parseResourceVersions(RC.RESOURCE_VERSIONS)
+}
 
 const transpose = (obj) => {
   const transposed = new Map()
@@ -33,5 +70,7 @@ const transpose = (obj) => {
 }
 
 module.exports = {
-  transpose
+  transpose,
+  resourceVersions,
+  __parseResourceVersions: parseResourceVersions
 }

@@ -27,6 +27,7 @@
 
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
+
 const Transformer = require('../../../src/util').Headers
 const Enum = require('../../../src/enums')
 const Util = require('../../../src/util')
