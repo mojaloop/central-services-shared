@@ -48,9 +48,10 @@ const getVersionFromConfig = (resourceString) => {
  */
 const parseResourceVersions = (resourceString) => {
   if (!resourceString) return {}
-  const resourceFormatRegex = /(([A-Za-z])\w*)=([0-9]+).([0-9]+)([^;:|],*)/g
+  const resourceFormatRegex = /((([A-Za-z])\w*)=([0-9]+)([. 0-9]*)(,?))+/
+  const match = resourceString.match(resourceFormatRegex)
   const noSpResources = resourceString.replace(/\s/g, '')
-  if (!resourceFormatRegex.test(noSpResources)) {
+  if (!(match && resourceString === match[0])) {
     throw new Error('Resource versions format should be in format: "resouceOneName=1.0,resourceTwoName=1.1"')
   }
   return getVersionFromConfig(noSpResources)
