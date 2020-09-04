@@ -48,7 +48,7 @@ const getVersionFromConfig = (resourceString) => {
  */
 const parseResourceVersions = (resourceString) => {
   if (!resourceString) return {}
-  const resourceFormatRegex = /((([A-Za-z])\w*)=([0-9]+)([. 0-9]*)(,?))+/
+  const resourceFormatRegex = /((([A-Za-z])+)=([0-9]+)([. 0-9]*)(,?))+/
   const match = resourceString.match(resourceFormatRegex)
   const noSpResources = resourceString.replace(/\s/g, '')
   if (!(match && resourceString === match[0])) {
