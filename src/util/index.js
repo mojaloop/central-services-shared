@@ -247,5 +247,6 @@ module.exports = {
   EventFramework,
   Settlement,
   Schema,
-  OpenapiBackend
+  OpenapiBackend,
+  resourceVersions: Helpers.resourceVersions
 }
