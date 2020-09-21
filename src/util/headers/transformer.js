@@ -122,11 +122,11 @@ const transformHeaders = (headers, config) => {
       case (ENUM.Headers.FSPIOP.DESTINATION):
         normalizedHeaders[headerKey] = config.destinationFsp
         break
-      case (ENUM.Headers.GENERAL.ACCEPT.value):
+      case (ENUM.Headers.GENERAL.ACCEPT.value && config.sourceFsp.match(ENUM.Headers.FSPIOP.SWITCH.regex)):
         if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
         normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].acceptVersion}`
         break
-      case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
+      case (ENUM.Headers.GENERAL.CONTENT_TYPE.value && config.sourceFsp.match(ENUM.Headers.FSPIOP.SWITCH.regex)):
         if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
         normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].contentVersion}`
         break
