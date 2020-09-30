@@ -125,6 +125,33 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
 }
 
 /**
+ * @function getEndpointAndRender
+ *
+ * @description It returns the rendered endpoint for a given fsp and type from the cache if the cache is still valid, otherwise it will refresh the cache and return the value
+ *
+ * @param {string} switchUrl the endpoint for the switch
+ * @param {string} fsp - the id of the fsp
+ * @param {string} endpointType - the type of the endpoint
+ * @param {string} path - callback endpoint path
+ * @param {object} options - contains the options for the mustache template function
+ *
+ * @returns {string} - Returns the rendered endpoint, throws error if failure occurs
+ */
+exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', options) => {
+  switchEndpoint = switchUrl
+  Logger.isInfoEnabled && Logger.info(`participantEndpointCache::getEndpointAndRender::endpointType - ${endpointType}`)
+  try {
+    const endpoints = await policy.get(fsp)
+    const endpoint = new Map(endpoints).get(endpointType)
+    const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + path
+    return Mustache.render(renderedEndpoint, options)
+  } catch (err) {
+    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpointAndRender:: ERROR:'${err}'`)
+    throw ErrorHandler.Factory.reformatFSPIOPError(err)
+  }
+}
+
+/**
  * @function stopCache
  *
  * @description It stops the cache client
