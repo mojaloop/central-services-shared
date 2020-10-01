@@ -1,5 +1,5 @@
-declare module '@mojaloop/central-services-shared' {
-  import { Util as HapiUtil } from '@hapi/hapi'
+import { Util as HapiUtil } from '@hapi/hapi'
+declare namespace CentralServicesShared {
   interface ReturnCode {
     CODE: number;
     DESCRIPTION: string;
@@ -370,3 +370,5 @@ declare module '@mojaloop/central-services-shared' {
   const Util: Util
   const HealthCheck: any
 }
+
+export = CentralServicesShared
