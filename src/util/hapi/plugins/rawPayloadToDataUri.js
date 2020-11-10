@@ -44,7 +44,7 @@ const requestRawPayloadTransform = (request, payloadBuffer) => {
       rawPayload: payloadBuffer
     })
   } catch (err) {
-    Logger.error(err)
+    Logger.isErrorEnabled && Logger.error(err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -77,9 +77,11 @@ module.exports.plugin = {
         method: async (request, h) => {
           return getRawBody(request.payload)
             .then(rawBuffer => {
-              request = requestRawPayloadTransform(request, rawBuffer)
+              if (Buffer.byteLength(rawBuffer) !== 0) {
+                request = requestRawPayloadTransform(request, rawBuffer)
+              }
               return h.continue
-            }).catch(e => {
+            }).catch(() => {
               return h.continue
             })
         }

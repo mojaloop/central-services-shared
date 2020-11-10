@@ -18,18 +18,31 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com>
- * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+ - Miguel de Barros <miguel.debarros@modusbox.com>
  --------------
  ******/
-
 'use strict'
 
-const Test = require('tape')
+const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 const Util = require('../../../src/util')
 
 Test('General util', utilTest => {
+  let sandbox
+
+  utilTest.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    t.end()
+  })
+
+  utilTest.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
   utilTest.test('formatAmount should', formatAmountTest => {
     formatAmountTest.test('format integer', test => {
       const value = parseInt('100')
@@ -550,6 +563,60 @@ Test('General util', utilTest => {
       test.end()
     })
     transposeTest.end()
+  })
+
+  utilTest.test('JSON.stringify() with a replacer function getCircularReplacer should', circularTest => {
+    circularTest.test('return stringified value for a primitive', test => {
+      const primitive = '0'
+      const expected = '"0"'
+
+      const result = JSON.stringify(primitive, Util.getCircularReplacer())
+      test.equal(result, expected)
+      test.end()
+    })
+    circularTest.test('return an object of primitives while removing circular references', test => {
+      const obj = { primitive: '0' }
+      obj.circular = obj
+      const expected = '{"primitive":"0"}'
+
+      const result = JSON.stringify(obj, Util.getCircularReplacer())
+      test.equal(result, expected)
+      test.end()
+    })
+
+    circularTest.end()
+  })
+
+  utilTest.test('filterExtensions should', filterTest => {
+    const extensions = [
+      { key: 'url', value: 'fullUrl' },
+      { key: 'sourceFsp', value: 'fspiopSource' },
+      { key: 'destinationFsp', value: 'fspiopDest' },
+      { key: 'method', value: 'httpMethod' },
+      { key: 'request', value: 'possible sensitive content' },
+      { key: 'response', value: 'Password: 1234' }
+    ]
+    filterTest.test('filter extensions using predefined list of exact or regex matches for keys and values', test => {
+      const exclKeysArray = ['request', /regex/i]
+      const exclValuesArray = ['specific value', /password/i]
+      const expected = [
+        { key: 'url', value: 'fullUrl' },
+        { key: 'sourceFsp', value: 'fspiopSource' },
+        { key: 'destinationFsp', value: 'fspiopDest' },
+        { key: 'method', value: 'httpMethod' }
+      ]
+
+      const result = Util.filterExtensions(extensions, exclKeysArray, exclValuesArray)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+    filterTest.test('return empty array when called with no arguments', test => {
+      const result = Util.filterExtensions()
+      test.deepEqual(result, [])
+      test.end()
+    })
+
+    filterTest.end()
   })
 
   utilTest.end()

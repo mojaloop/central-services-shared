@@ -18,9 +18,10 @@
  * Gates Foundation
  * Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com>
- * Miguel de Barros <miguel.debarros@modusbox.com>
- * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ - Miguel de Barros <miguel.debarros@modusbox.com>
+ - Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  --------------
  ******/
 'use strict'
@@ -37,6 +38,11 @@ const StreamingProtocol = require('./streaming/protocol')
 const Time = require('./time')
 const Hash = require('./hash')
 const Comparators = require('./comparators/index')
+const Helpers = require('./helpers') // prevent circular module require
+const Settlement = require('./settlement')
+const EventFramework = require('./eventFramework')
+const Schema = require('./schema')
+const OpenapiBackend = require('./openapiBackend')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -177,12 +183,35 @@ const breadcrumb = (location, message) => {
   return location.path
 }
 
-const transpose = function (obj) {
-  const transposed = new Map()
-  for (const prop in obj) {
-    transposed[obj[prop]] = prop
+const getCircularReplacer = () => {
+  const seen = new WeakSet()
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return
+      }
+      seen.add(value)
+    }
+    return value
   }
-  return transposed
+}
+
+const filterExtensions = (extensionsArray, exclKeysArray, exclValuesArray) => {
+  const extensions = extensionsArray != null && typeof extensionsArray[Symbol.iterator] === 'function' ? extensionsArray : []
+  const exclKeys = exclKeysArray != null && typeof exclKeysArray[Symbol.iterator] === 'function' ? exclKeysArray : []
+  const exclValues = exclValuesArray != null && typeof exclValuesArray[Symbol.iterator] === 'function' ? exclValuesArray : []
+  return extensions.filter(ext => {
+    let match = false
+    for (const key of exclKeys) {
+      match = ext.key && (ext.key.search(key) + 1)
+      if (match) return false
+    }
+    for (const value of exclValues) {
+      match = ext.value && (ext.value.search(value) + 1)
+      if (match) return false
+    }
+    return true
+  })
 }
 
 module.exports = {
@@ -201,7 +230,9 @@ module.exports = {
   getValueByCaseInsensitiveKey,
   setValueByCaseInsensitiveKey,
   breadcrumb,
-  transpose,
+  transpose: Helpers.transpose,
+  getCircularReplacer,
+  filterExtensions,
   Kafka,
   Endpoints,
   Request,
@@ -212,5 +243,10 @@ module.exports = {
   StreamingProtocol,
   Time,
   Hash,
-  Comparators
+  Comparators,
+  EventFramework,
+  Settlement,
+  Schema,
+  OpenapiBackend,
+  resourceVersions: Helpers.resourceVersions
 }

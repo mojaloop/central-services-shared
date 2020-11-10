@@ -11,6 +11,7 @@ const Http = require(`${src}/util`).Http
 const Enum = require(`${src}`).Enum
 const Mustache = require('mustache')
 const Helper = require('../../util/helper')
+const Logger = require('@mojaloop/central-services-logger')
 const FSPIOP_CALLBACK_URL_TRANSFER_PUT = Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
 Test('Cache Test', cacheTest => {
@@ -20,6 +21,9 @@ Test('Cache Test', cacheTest => {
     sandbox = Sinon.createSandbox()
     sandbox.stub(request, 'sendRequest')
     sandbox.stub(Http, 'SwitchDefaultHeaders').returns(Helper.defaultHeaders())
+    sandbox.stub(Logger, 'isErrorEnabled').value(true)
+    sandbox.stub(Logger, 'isInfoEnabled').value(true)
+    sandbox.stub(Logger, 'isDebugEnabled').value(true)
     test.end()
   })
 
@@ -89,6 +93,79 @@ Test('Cache Test', cacheTest => {
     })
 
     await getEndpointTest.end()
+  })
+
+  cacheTest.test('getEndpointAndRender should', async (getEndpointAndRenderTest) => {
+    getEndpointAndRenderTest.test('return the rendered endpoint', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+      const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
+
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndpointAndRenderResponse))
+
+      try {
+        const result = await Cache.getEndpointAndRender(
+          Config.ENDPOINT_SOURCE_URL,
+          fsp,
+          endpointType,
+          'transfers/{{transferId}}',
+          { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.equal(result, expected, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointAndRenderTest.test('return throw an error if array not returned in response object', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve({ data: {} }))
+
+      try {
+        await Cache.getEndpointAndRender(
+          Config.ENDPOINT_SOURCE_URL,
+          fsp,
+          endpointType,
+          'transfers/{{transferId}}',
+          { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
+    getEndpointAndRenderTest.test('throw error', async (test) => {
+      const fsp = 'fsp1'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).throws(new Error())
+      try {
+        await Cache.getEndpointAndRender(Config.ENDPOINT_SOURCE_URL, fsp, endpointType)
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
+    await getEndpointAndRenderTest.end()
   })
 
   cacheTest.test('initializeCache should', async (initializeCacheTest) => {

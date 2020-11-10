@@ -46,6 +46,10 @@ const TopicMap = {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
     },
+    'bulk-abort': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
     'bulk-prepare': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
@@ -57,6 +61,24 @@ const TopicMap = {
     'bulk-timeout-reserved': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
+    },
+    'fulfil-duplicate': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
+    'prepare-duplicate': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    }
+  },
+  fulfil: {
+    'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
+    },
+    'bulk-abort': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
     }
   },
   notification: {
@@ -96,6 +118,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'bulk-get': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'limit-adjustment': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
@@ -116,13 +142,29 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    reserve: {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
+    'settlement-window': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'timeout-received': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
+    'timeout-reserved': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     }
   },
   position: {
     'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'bulk-abort': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
@@ -154,6 +196,10 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
+    reserve: {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
     abort: {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
@@ -163,12 +209,6 @@ const TopicMap = {
     'bulk-prepare': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.PREPARE
-    }
-  },
-  fulfil: {
-    'bulk-commit': {
-      functionality: transferEventType.TRANSFER,
-      action: transferEventAction.FULFIL
     }
   }
 }

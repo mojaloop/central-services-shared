@@ -1,7 +1,35 @@
+/*****
+ License
+ --------------
+ Copyright © 2017 Bill & Melinda Gates Foundation
+ The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ Contributors
+ --------------
+ This is the official list of the Mojaloop project contributors for this file.
+ Names of the original copyright holders (individuals or organizations)
+ should be listed with a '*' in the first column. People who have
+ contributed from an organization can be listed under the organization
+ that actually holds the copyright for their contributions (see the
+ Gates Foundation organization for an example). Those individuals should have
+ their names indented and be marked with a '-'. Email address can be added
+ optionally within square brackets <email>.
+ * Gates Foundation
+ - Name Surname <name.surname@gatesfoundation.com>
+
+ * ModusBox
+ - Georgi Georgiev <georgi.georgiev@modusbox.com>
+ --------------
+ ******/
+'use strict'
+
 const Hapi = require('@hapi/hapi')
 const ErrorHandling = require('@mojaloop/central-services-error-handling')
 const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
 const { plugin, errorMessages } = require('../../../../../src/util/hapi/plugins/headerValidation')
+const { protocolVersionsMap } = require('../../../../../src/util/headerValidation')
 const {
   generateAcceptHeader,
   generateContentTypeHeader
@@ -19,8 +47,8 @@ const init = async () => {
   // makes validation errors easier to inspect in server responses
   server.ext('onPreResponse', (req, h) => {
     if (req.response.name === 'FSPIOPError') {
-      const { message, apiErrorCode } = req.response
-      return h.response({ message, apiErrorCode }).code(apiErrorCode.httpStatusCode)
+      const { message, apiErrorCode, extensions } = req.response
+      return h.response({ message, apiErrorCode, extensions }).code(apiErrorCode.httpStatusCode)
     }
     return h.continue
   })
@@ -58,6 +86,18 @@ const init = async () => {
 }
 
 Test('headerValidation plugin test', async (pluginTest) => {
+  let sandbox
+
+  pluginTest.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    t.end()
+  })
+
+  pluginTest.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
   const server = await init()
 
   pluginTest.test('validation is not performed on unconfigured resources', async t => {
@@ -74,7 +114,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
   })
 
   pluginTest.test('accept validation is performed on get requests without an accept header', async t => {
-    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MISSING_ELEMENT
     const res = await server.inject({
       method: 'get',
       url: `/${resource}`,
@@ -134,6 +174,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
     const payload = JSON.parse(res.payload)
     t.is(payload.apiErrorCode.code, fspiopCode.code)
     t.is(payload.message, errorMessages.REQUESTED_VERSION_NOT_SUPPORTED)
+    t.deepEqual(payload.extensions, protocolVersionsMap)
     t.end()
   })
 
@@ -168,6 +209,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
     const payload = JSON.parse(res.payload)
     t.is(payload.apiErrorCode.code, fspiopCode.code)
     t.is(payload.message, errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED)
+    t.deepEqual(payload.extensions, protocolVersionsMap)
     t.end()
   })
 
@@ -208,6 +250,20 @@ Test('headerValidation plugin test', async (pluginTest) => {
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
         accept: generateAcceptHeader(resource, [1])
+      }
+    })
+    t.is(res.payload, '')
+    t.is(res.statusCode, 202)
+    t.end()
+  })
+
+  pluginTest.test('accepts valid accept header without version', async t => {
+    const res = await server.inject({
+      method: 'get',
+      url: `/${resource}`,
+      headers: {
+        'content-type': generateContentTypeHeader(resource, 1),
+        accept: `application/vnd.interoperability.${resource}+json`
       }
     })
     t.is(res.payload, '')

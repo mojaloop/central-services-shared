@@ -6,7 +6,7 @@
 // accuracy of this statement has not been thoroughly tested.
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
-const { parseAcceptHeader, parseContentTypeHeader, protocolVersions } = require('../../headerValidation')
+const { parseAcceptHeader, parseContentTypeHeader, protocolVersions, protocolVersionsMap } = require('../../headerValidation')
 
 // Some defaults
 
@@ -14,7 +14,9 @@ const defaultProtocolResources = [
   'parties',
   'participants',
   'quotes',
-  'transfers'
+  'transfers',
+  'transactionRequests',
+  'authorizations'
 ]
 
 const defaultProtocolVersions = [
@@ -23,9 +25,11 @@ const defaultProtocolVersions = [
 ]
 
 const errorMessages = {
-  REQUESTED_VERSION_NOT_SUPPORTED: 'Client requested to use a protocol version which is not supported by the server',
+  REQUESTED_VERSION_NOT_SUPPORTED: 'The Client requested an unsupported version, see extension list for supported version(s).',
   INVALID_ACCEPT_HEADER: 'Invalid accept header',
   INVALID_CONTENT_TYPE_HEADER: 'Invalid content-type header',
+  REQUIRE_ACCEPT_HEADER: 'Accept is required',
+  REQUIRE_CONTENT_TYPE_HEADER: 'Content-type is required',
   SUPPLIED_VERSION_NOT_SUPPORTED: 'Client supplied a protocol version which is not supported by the server'
 }
 
@@ -46,7 +50,7 @@ const plugin = {
     resources = defaultProtocolResources,
     supportedProtocolVersions = defaultProtocolVersions
   }) {
-    server.ext('onPreHandler', (request, h) => {
+    server.ext('onPostAuth', (request, h) => {
       // First, extract the resource type from the path
       const resource = request.path.replace(/^\//, '').split('/')[0]
 
@@ -58,6 +62,9 @@ const plugin = {
       // Always validate the accept header for a get request, or optionally if it has been
       // supplied
       if (request.method.toLowerCase() === 'get' || request.headers.accept) {
+        if (request.headers.accept === undefined) {
+          throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_ACCEPT_HEADER)
+        }
         const accept = parseAcceptHeader(resource, request.headers.accept)
         if (!accept.valid) {
           throw createFSPIOPError(
@@ -68,12 +75,18 @@ const plugin = {
         if (!supportedProtocolVersions.some(supportedVer => accept.versions.has(supportedVer))) {
           throw createFSPIOPError(
             Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
-            errorMessages.REQUESTED_VERSION_NOT_SUPPORTED
+            errorMessages.REQUESTED_VERSION_NOT_SUPPORTED,
+            null,
+            null,
+            protocolVersionsMap
           )
         }
       }
 
       // Always validate the content-type header
+      if (request.headers['content-type'] === undefined) {
+        throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_CONTENT_TYPE_HEADER)
+      }
       const contentType = parseContentTypeHeader(resource, request.headers['content-type'])
       if (!contentType.valid) {
         throw createFSPIOPError(
@@ -84,7 +97,10 @@ const plugin = {
       if (!supportedProtocolVersions.includes(contentType.version)) {
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
-          errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED
+          errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED,
+          null,
+          null,
+          protocolVersionsMap
         )
       }
 

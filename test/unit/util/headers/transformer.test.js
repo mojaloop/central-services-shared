@@ -201,6 +201,36 @@ Test('Transfer Transformer tests', TransformerTest => {
       test.end()
     })
 
+    transformHeadersTest.test('Transform change the resource version in accept and content-type headers', async test => {
+      const headerData = Util.clone(headerDataInputExample)
+      const headerConfig = Util.clone(headerConfigExample)
+      headerConfig.httpMethod = 'POST'
+      headerConfig.sourceFsp = 'switch'
+      headerData[Enum.Http.Headers.FSPIOP.SOURCE] = 'switch'
+
+      const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
+      for (const headerKey in headerDataTransformedExample) {
+        test.equals(transformedHeaderData[headerKey], headerDataTransformedExample[headerKey])
+      }
+      test.end()
+    })
+
+    transformHeadersTest.test('Transform change the resource version in accept and content-type headers', async test => {
+      const headerData = Util.clone(headerDataInputExample)
+      const headerConfig = Util.clone(headerConfigExample)
+      const cHeaderDataTransformedExample = Util.clone(headerDataTransformedExample)
+      headerConfig.httpMethod = 'POST'
+      headerConfig.sourceFsp = 'falsesource'
+      headerData[Enum.Http.Headers.FSPIOP.SOURCE] = 'falsesource'
+      headerData['FSPIOP-Source'] = 'falsesource'
+      cHeaderDataTransformedExample['FSPIOP-Source'] = 'falsesource'
+      const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
+      for (const headerKey in cHeaderDataTransformedExample) {
+        test.equals(transformedHeaderData[headerKey], cHeaderDataTransformedExample[headerKey])
+      }
+      test.end()
+    })
+
     transformHeadersTest.end()
   })
   TransformerTest.end()
