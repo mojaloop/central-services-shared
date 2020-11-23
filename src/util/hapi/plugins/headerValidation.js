@@ -15,6 +15,7 @@ const defaultProtocolResources = [
   'participants',
   'quotes',
   'transfers',
+  'bulkTransfers',
   'transactionRequests',
   'authorizations'
 ]
