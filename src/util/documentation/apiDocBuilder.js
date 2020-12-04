@@ -29,7 +29,7 @@ const YAML = require('yaml')
 const shins = require('shins')
 const widdershins = require('widdershins')
 
-const widdershinsOptions = {
+const defaultWiddershinsOptions = {
   codeSamples: true,
   httpsnippet: false,
   theme: 'darkula',
@@ -42,7 +42,7 @@ const widdershinsOptions = {
   yaml: false
 }
 
-const shinsOptions = {
+const defaultShinsOptions = {
   cli: false,
   minify: true,
   customCss: false,
@@ -56,12 +56,26 @@ const shinsOptions = {
 /**
  * Generate API documentation from OpenAPI specification document (.yaml or .json)
  *
- * @param {object} options  - options.documentPath - Full path to the OpenAPI (fka Swagger) document (JSON or YAML). Mutually exclusive to `document` option.
- *                            options.document - OpenAPI document as string. Mutually exclusive to `documentPath` option.
+ * @param {object} options  - options.documentPath {string} - Full path to the OpenAPI (fka Swagger) document (JSON or YAML). Mutually exclusive to `document` option.
+ *                            options.document - {object} OpenAPI document as string. Mutually exclusive to `documentPath` option.
+ *                            options.widdershinsOptions - {object} Custom settings for Widdershins
+ *                            options.shinsOptions  - {object} Custom settings for Shins
  * @returns {string}        - API documentation in HTML format
  */
 const generateDocumentation = async (options) => {
-  return _build(_getOpenAPISpec(options))
+  const _options = _getOptions(options)
+  return _build(_getOpenAPISpec(_options), _options)
+}
+
+/**
+ * Return OpenAPI specification document as JSON.
+ *
+ * @param {object} options  - options.documentPath - Full path to the OpenAPI (fka Swagger) document (JSON or YAML). Mutually exclusive to `document` option.
+ *                            options.document     - OpenAPI document as string. Mutually exclusive to `documentPath` option.
+ * @returns {string}        - API spec in JSON format
+ */
+const swaggerJSON = (options) => {
+  return JSON.stringify(_getOpenAPISpec(_getOptions(options)))
 }
 
 /**
@@ -96,13 +110,15 @@ const _getOpenAPISpec = (options) => {
  * generated from API spec document.
  *
  * @param {object} apiSpecObj
+ * @param {object} options - options.widdershinsOptions
+ *                         - options.shinsOptions
  *
  * @returns {string} API documentation in HTML format
  */
-const _build = async (apiSpecObj) => {
-  const md = await widdershins.convert(apiSpecObj, widdershinsOptions)
+const _build = async (apiSpecObj, options) => {
+  const md = await widdershins.convert(apiSpecObj, options.widdershinsOptions)
   const htmlPromise = new Promise((resolve, reject) => {
-    shins.render(md, shinsOptions, (err, html) => {
+    shins.render(md, options.shinsOptions, (err, html) => {
       if (err !== null) reject(err)
       else resolve(html)
     })
@@ -112,14 +128,20 @@ const _build = async (apiSpecObj) => {
 }
 
 /**
- * Return OpenAPI specification document as JSON.
+ * Merge custom options with default options
  *
- * @param {object} options  - options.documentPath - Full path to the OpenAPI (fka Swagger) document (JSON or YAML). Mutually exclusive to `document` option.
- *                            options.document     - OpenAPI document as string. Mutually exclusive to `documentPath` option.
- * @returns {string}        - API spec in JSON format
+ * @param {object} customOptions
+ *
+ * @returns {object} Merged options
  */
-const swaggerJSON = (options) => {
-  return JSON.stringify(_getOpenAPISpec(options))
+const _getOptions = (customOptions) => {
+  const options = {}
+  options.widdershinsOptions = (customOptions.widdershinsOptions) ? { ...defaultWiddershinsOptions, ...customOptions.widdershinsOptions } : defaultWiddershinsOptions
+  options.shinsOptions = (customOptions.shinsOptions) ? { ...defaultShinsOptions, ...customOptions.shinsOptions } : defaultShinsOptions
+  options.document = customOptions.document || null
+  options.documentPath = customOptions.documentPath || null
+
+  return options
 }
 
 module.exports = {
