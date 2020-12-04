@@ -75,13 +75,11 @@ const _getOpenAPISpec = (options) => {
   let docObj
 
   if (options.documentPath) {
-    if (!fs.existsSync(options.documentPath)) {
-      throw new Error('API specification document was not be found.')
-    }
+    if (!fs.existsSync(options.documentPath)) throw new Error('API specification document was not be found.')
 
     const ext = path.extname(options.documentPath)
 
-    if (!['.yaml', '.json'].includes(ext.toLowerCase())) { throw new Error('API documentation document has unsupported file extension.') }
+    if (!['.yaml', '.json'].includes(ext.toLowerCase())) throw new Error('API documentation document has unsupported file extension.')
 
     docObj = (ext === '.yaml')
       ? YAML.parse(fs.readFileSync(options.documentPath, 'utf8'))
