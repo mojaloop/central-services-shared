@@ -39,7 +39,7 @@ const plugin = {
   register: function (server, options) {
     _options = { ...options }
 
-    if (!_options.documentPath && !_options.document) { throw new Error('API documentation plugin requires `options.documentPath` or `options.document` to be set.') }
+    if (!_options.documentPath && !_options.document) throw new Error('API documentation plugin requires `options.documentPath` or `options.document` to be set.')
 
     server.route([
       {

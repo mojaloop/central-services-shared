@@ -30,27 +30,15 @@ const shins = require('shins')
 const widdershins = require('widdershins')
 
 const defaultWiddershinsOptions = {
-  codeSamples: true,
-  httpsnippet: false,
-  theme: 'darkula',
-  search: true,
-  sample: true,
-  discovery: false,
-  shallowSchemas: false,
-  tocSummary: false,
-  headings: 2,
-  yaml: false
+  codeSamples: true
 }
 
 const defaultShinsOptions = {
   cli: false,
   minify: true,
-  customCss: false,
   inline: true,
-  unsafe: false
-  // ['no-links']: false,
-  // logo: './my-custom-logo.png',
-  // ['logo-url']: 'https://www.example.com'
+  unsafe: false,
+  logo: path.resolve(__dirname, './images/default.png')
 }
 
 /**
