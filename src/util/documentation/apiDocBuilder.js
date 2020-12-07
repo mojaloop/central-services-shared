@@ -30,7 +30,8 @@ const shins = require('shins')
 const widdershins = require('widdershins')
 
 const defaultWiddershinsOptions = {
-  codeSamples: true
+  codeSamples: false,
+  language_tabs: []
 }
 
 const defaultShinsOptions = {
@@ -75,6 +76,8 @@ const swaggerJSON = (options) => {
  */
 const _getOpenAPISpec = (options) => {
   let docObj
+
+  if (!options.documentPath && !options.document) throw new Error('`option.documentPath` or `option.document` is required for API documentation generation.')
 
   if (options.documentPath) {
     if (!fs.existsSync(options.documentPath)) throw new Error('API specification document was not be found.')
