@@ -30,8 +30,7 @@ const shins = require('shins')
 const widdershins = require('widdershins')
 
 const defaultWiddershinsOptions = {
-  codeSamples: false,
-  language_tabs: []
+  codeSamples: true
 }
 
 const defaultShinsOptions = {

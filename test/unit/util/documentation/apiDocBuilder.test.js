@@ -50,7 +50,7 @@ Test('APIDocBuilder tests', APIDocBuilderTest => {
       const options = {}
       try {
         await APIDocBuilder.generateDocumentation(options)
-        test.notok('Error should be thrown')
+        test.notOk('Error should be thrown')
       } catch (err) {
         test.ok('error thrown')
       }
@@ -58,8 +58,41 @@ Test('APIDocBuilder tests', APIDocBuilderTest => {
       test.end()
     })
 
-    generateDocumentationTest.test('generate documentation based on option.documentPath', async (test) => {
+    generateDocumentationTest.test('throw if option.documentPath does not exist', async (test) => {
+      const options = { documentPath: 'invalid path' }
+      try {
+        await APIDocBuilder.generateDocumentation(options)
+        test.notOk('Error should be thrown')
+      } catch (err) {
+        test.ok('error thrown')
+      }
+
+      test.end()
+    })
+
+    generateDocumentationTest.test('throw if unsupported file type is used', async (test) => {
+      const options = { documentPath: Path.resolve(__dirname, '../../../resources/interface/swagger.txt') }
+      try {
+        await APIDocBuilder.generateDocumentation(options)
+        test.notOk('Error should be thrown')
+      } catch (err) {
+        test.ok('error thrown')
+      }
+
+      test.end()
+    })
+
+    generateDocumentationTest.test('generate documentation based on option.documentPath (yaml)', async (test) => {
       const options = { documentPath: TestAPISwaggerPath }
+      const apiDoc = await APIDocBuilder.generateDocumentation(options)
+      test.ok(apiDoc, 'api documentation generated')
+      test.ok(apiDoc.indexOf('<html ') >= 0, 'documentation format is HTML')
+      test.ok(apiDoc.indexOf('Transaction Requests') >= 0, 'documentation content valid')
+      test.end()
+    })
+
+    generateDocumentationTest.test('generate documentation based on option.documentPath (json)', async (test) => {
+      const options = { documentPath: Path.resolve(__dirname, '../../../resources/interface/swagger.json') }
       const apiDoc = await APIDocBuilder.generateDocumentation(options)
       test.ok(apiDoc, 'api documentation generated')
       test.ok(apiDoc.indexOf('<html ') >= 0, 'documentation format is HTML')
@@ -97,18 +130,6 @@ Test('APIDocBuilder tests', APIDocBuilderTest => {
   })
 
   APIDocBuilderTest.test('swaggerJSON should', async (swaggerJSONTest) => {
-    swaggerJSONTest.test('throw if both option.documentPath and options.document are absent', async (test) => {
-      const options = {}
-      try {
-        await APIDocBuilder.swaggerJSON(options)
-        test.notok('Error should be thrown')
-      } catch (err) {
-        test.ok('error thrown')
-      }
-
-      test.end()
-    })
-
     swaggerJSONTest.test('return swagger in JSON format based on option.documentPath', async (test) => {
       const options = { documentPath: TestAPISwaggerPath }
       const jsonStr = await APIDocBuilder.swaggerJSON(options)
