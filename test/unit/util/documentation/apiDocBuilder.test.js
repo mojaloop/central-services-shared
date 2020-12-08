@@ -24,7 +24,6 @@
  ******/
 'use strict'
 const Test = require('tapes')(require('tape'))
-const Sinon = require('sinon')
 const Path = require('path')
 const fs = require('fs')
 const YAML = require('yaml')
@@ -33,18 +32,6 @@ const APIDocBuilder = require('../../../../src/util/documentation').APIDocBuilde
 const TestAPISwaggerPath = Path.resolve(__dirname, '../../../resources/interface/swagger.yaml')
 
 Test('APIDocBuilder tests', APIDocBuilderTest => {
-  let sandbox
-
-  APIDocBuilderTest.beforeEach(t => {
-    sandbox = Sinon.createSandbox()
-    t.end()
-  })
-
-  APIDocBuilderTest.afterEach(t => {
-    sandbox.restore()
-    t.end()
-  })
-
   APIDocBuilderTest.test('generateDocumentation should', async (generateDocumentationTest) => {
     generateDocumentationTest.test('throw if both option.documentPath and options.document are absent', async (test) => {
       const options = {}

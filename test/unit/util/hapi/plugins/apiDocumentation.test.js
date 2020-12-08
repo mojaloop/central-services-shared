@@ -27,7 +27,6 @@
 
 const Hapi = require('@hapi/hapi')
 const Test = require('tapes')(require('tape'))
-const Sinon = require('sinon')
 const Path = require('path')
 
 const APIDocPlugin = require('../../../../../src/util/hapi/plugins/apiDocumentation')
@@ -35,10 +34,8 @@ const OpenAPIDocPath = Path.resolve(__dirname, '../../../../resources/interface/
 
 Test('API Documentation plugin should', async (pluginTest) => {
   let server
-  let sandbox
 
   pluginTest.beforeEach(async test => {
-    sandbox = Sinon.createSandbox()
     server = await new Hapi.Server({
       host: 'localhost',
       port: 8800
@@ -49,7 +46,6 @@ Test('API Documentation plugin should', async (pluginTest) => {
 
   pluginTest.afterEach(async test => {
     await server.stop()
-    sandbox.restore()
     test.end()
   })
 
