@@ -41,7 +41,6 @@ Test('APIDocBuilder tests', APIDocBuilderTest => {
       } catch (err) {
         test.ok('error thrown')
       }
-
       test.end()
     })
 
@@ -53,7 +52,6 @@ Test('APIDocBuilder tests', APIDocBuilderTest => {
       } catch (err) {
         test.ok('error thrown')
       }
-
       test.end()
     })
 
@@ -65,7 +63,6 @@ Test('APIDocBuilder tests', APIDocBuilderTest => {
       } catch (err) {
         test.ok('error thrown')
       }
-
       test.end()
     })
 

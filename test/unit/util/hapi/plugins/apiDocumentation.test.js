@@ -40,7 +40,6 @@ Test('API Documentation plugin should', async (pluginTest) => {
       host: 'localhost',
       port: 8800
     })
-
     test.end()
   })
 
