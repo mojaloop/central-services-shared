@@ -25,8 +25,6 @@
 
 const APIDocBuilder = require('../../documentation').APIDocBuilder
 
-let _options
-
 /**
  * Hapi plugin to add '/swagger.json' and '/documentation' endpoints.
  * It generates API documenation from supplied OpenAPI spec (json or yaml).
@@ -37,9 +35,7 @@ let _options
 const plugin = {
   name: 'apiDocumentation',
   register: function (server, options) {
-    _options = { ...options }
-
-    if (!_options.documentPath && !_options.document) throw new Error('API documentation plugin requires `options.documentPath` or `options.document` to be set.')
+    if (!options.documentPath && !options.document) throw new Error('API documentation plugin requires `options.documentPath` or `options.document` to be set.')
 
     server.route([
       {
@@ -69,12 +65,12 @@ const plugin = {
 }
 
 const documentationHandler = async (_, h) => {
-  return h.response(await APIDocBuilder.generateDocumentation(_options))
+  return h.response(await APIDocBuilder.generateDocumentation(h.realm.pluginOptions))
 }
 
 const swaggerJSONHandler = (_, h) => {
   return h
-    .response(APIDocBuilder.swaggerJSON(_options))
+    .response(APIDocBuilder.swaggerJSON(h.realm.pluginOptions))
     .header('content-type', 'application/json')
 }
 
