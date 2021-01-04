@@ -50,7 +50,7 @@
     "@mojaloop/event-sdk": "10.6.0",
     "ajv": "6.12.6",
     "ajv-keywords": "3.5.2",
-    "axios": "0.21.0",
+    "axios": "0.21.1",
     "base64url": "3.0.1",
     "clone": "2.1.2",
     "data-urls": "2.0.0",
