@@ -46,6 +46,10 @@ const TopicMap = {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
     },
+    'bulk-abort': {
+      functionality: transferEventType.BULK,
+      action: transferEventAction.PROCESSING
+    },
     'bulk-prepare': {
       functionality: transferEventType.BULK,
       action: transferEventAction.PROCESSING
@@ -69,6 +73,10 @@ const TopicMap = {
   },
   fulfil: {
     'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.FULFIL
+    },
+    'bulk-abort': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.FULFIL
     }
@@ -110,6 +118,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'bulk-get': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'limit-adjustment': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
@@ -130,6 +142,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    reserve: {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'settlement-window': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
@@ -137,10 +153,18 @@ const TopicMap = {
     'timeout-received': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
+    },
+    'timeout-reserved': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
     }
   },
   position: {
     'bulk-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'bulk-abort': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
@@ -169,6 +193,10 @@ const TopicMap = {
       action: transferEventAction.POSITION
     },
     reject: {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    reserve: {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },

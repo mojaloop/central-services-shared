@@ -41,6 +41,8 @@ const Comparators = require('./comparators/index')
 const Helpers = require('./helpers') // prevent circular module require
 const Settlement = require('./settlement')
 const EventFramework = require('./eventFramework')
+const Schema = require('./schema')
+const OpenapiBackend = require('./openapiBackend')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -243,5 +245,8 @@ module.exports = {
   Hash,
   Comparators,
   EventFramework,
-  Settlement
+  Settlement,
+  Schema,
+  OpenapiBackend,
+  resourceVersions: Helpers.resourceVersions
 }
