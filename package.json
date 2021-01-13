@@ -48,6 +48,8 @@
     "@mojaloop/central-services-logger": "10.6.0",
     "@mojaloop/central-services-metrics": "9.5.0",
     "@mojaloop/event-sdk": "10.6.0",
+    "ajv": "7.0.3",
+    "ajv-keywords": "4.0.0",
     "axios": "0.21.1",
     "base64url": "3.0.1",
     "clone": "2.1.2",
@@ -58,12 +60,18 @@
     "immutable": "3.8.2",
     "lodash": "4.17.20",
     "mustache": "4.1.0",
-    "raw-body": "2.4.1"
+    "openapi-backend": "3.6.3",
+    "raw-body": "2.4.1",
+    "rc": "1.2.8",
+    "shins": "2.6.0",
+    "uuid4": "2.0.2",
+    "widdershins": "4.0.1",
+    "yaml": "1.10.0"
   },
   "devDependencies": {
     "@hapi/hapi": "20.0.3",
     "@hapi/joi": "17.1.1",
-    "@mojaloop/sdk-standard-components": "13.3.1",
+    "@mojaloop/sdk-standard-components": "10.3.2",
     "chance": "1.1.7",
     "faucet": "0.0.1",
     "npm-audit-resolver": "2.2.1",
@@ -76,8 +84,7 @@
     "standard": "16.0.3",
     "tap-xunit": "2.4.1",
     "tape": "5.1.1",
-    "tapes": "4.1.0",
-    "uuid4": "2.0.2"
+    "tapes": "4.1.0"
   },
   "standard": {
     "ignore": []

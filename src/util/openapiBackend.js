@@ -26,7 +26,7 @@
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const OpenAPIBackend = require('openapi-backend').default
 const OpenAPIValidator = require('openapi-backend').OpenAPIValidator
-const Ajv = require('ajv')
+const Ajv = require('ajv').default
 const schemaValidator = require('./schema').OpenapiSchemaValidator
 
 const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coerceTypes: true }, regexFlags = 'u') => {
