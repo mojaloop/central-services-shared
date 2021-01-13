@@ -118,7 +118,7 @@ const clone = (value) => {
  * @param key Key to be deleted from the target Object
  */
 const deleteFieldByCaseInsensitiveKey = (obj, key) => {
-  for (var objKey in obj) {
+  for (const objKey in obj) {
     switch (objKey.toLowerCase()) {
       case (key.toLowerCase()):
         delete obj[objKey]
@@ -155,7 +155,7 @@ const getValueByCaseInsensitiveKey = (obj, key) => {
  * @returns value from case insensitive comparison search
  */
 const setValueByCaseInsensitiveKey = (obj, key, value) => {
-  for (var objKey in obj) {
+  for (const objKey in obj) {
     switch (objKey.toLowerCase()) {
       case (key.toLowerCase()):
         obj[objKey] = value
