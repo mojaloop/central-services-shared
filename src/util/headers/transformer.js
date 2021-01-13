@@ -28,6 +28,10 @@
 const ENUM = require('../../enums').Http
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
+const resourceVersions = require('../helpers').resourceVersions
+
+const regexForContentAndAcceptHeaders = /(application\/vnd.interoperability.)(\w*)+(\+json;version=)(.*)/
+
 /**
  * @module src/headers/transformer
  */
@@ -56,6 +60,10 @@ const transformHeaders = (headers, config) => {
 
   // Normalized headers
   const normalizedHeaders = {}
+
+  // resource type for content-type and accept headers
+  const getResourceFromHeader = (headerValue) => regexForContentAndAcceptHeaders.exec(headerValue)[2]
+  let resourceType
 
   // check to see if FSPIOP-Destination header has been left out of the initial request. If so then add it.
   if (!normalizedKeys[ENUM.Headers.FSPIOP.DESTINATION]) {
@@ -113,6 +121,22 @@ const transformHeaders = (headers, config) => {
         break
       case (ENUM.Headers.FSPIOP.DESTINATION):
         normalizedHeaders[headerKey] = config.destinationFsp
+        break
+      case (ENUM.Headers.GENERAL.ACCEPT.value):
+        if (!ENUM.Headers.FSPIOP.SWITCH.regex.test(config.sourceFsp)) {
+          normalizedHeaders[headerKey] = headerValue
+          break
+        }
+        if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].acceptVersion}`
+        break
+      case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
+        if (!ENUM.Headers.FSPIOP.SWITCH.regex.test(config.sourceFsp)) {
+          normalizedHeaders[headerKey] = headerValue
+          break
+        }
+        if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].contentVersion}`
         break
       default:
         normalizedHeaders[headerKey] = headerValue

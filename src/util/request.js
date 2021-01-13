@@ -68,7 +68,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     sendRequestSpan.setTags({ source, destination, method, url })
   }
   let requestOptions
-  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && !payload) || !source || !destination) {
+  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !destination) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
   try {

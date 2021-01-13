@@ -4,8 +4,13 @@ const assert = require('assert').strict
 
 const protocolVersions = {
   anyVersion: Symbol('Any version'),
-  ONE: ['1', '1.0']
+  ONE: ['1', '1.0', '1.1']
 }
+
+const protocolVersionsMap = [
+  { key: '1', value: '0' },
+  { key: '1', value: '1' }
+]
 
 // Some convenience functions for generating regexes for header matching
 
@@ -62,6 +67,7 @@ const parseAcceptHeader = (resource, header) => {
 
 module.exports = {
   protocolVersions,
+  protocolVersionsMap,
   generateAcceptRegex,
   generateContentTypeRegex,
   parseAcceptHeader,

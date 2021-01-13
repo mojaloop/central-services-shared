@@ -29,6 +29,7 @@ const ErrorHandling = require('@mojaloop/central-services-error-handling')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const { plugin, errorMessages } = require('../../../../../src/util/hapi/plugins/headerValidation')
+const { protocolVersionsMap } = require('../../../../../src/util/headerValidation')
 const {
   generateAcceptHeader,
   generateContentTypeHeader
@@ -46,8 +47,8 @@ const init = async () => {
   // makes validation errors easier to inspect in server responses
   server.ext('onPreResponse', (req, h) => {
     if (req.response.name === 'FSPIOPError') {
-      const { message, apiErrorCode } = req.response
-      return h.response({ message, apiErrorCode }).code(apiErrorCode.httpStatusCode)
+      const { message, apiErrorCode, extensions } = req.response
+      return h.response({ message, apiErrorCode, extensions }).code(apiErrorCode.httpStatusCode)
     }
     return h.continue
   })
@@ -173,6 +174,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
     const payload = JSON.parse(res.payload)
     t.is(payload.apiErrorCode.code, fspiopCode.code)
     t.is(payload.message, errorMessages.REQUESTED_VERSION_NOT_SUPPORTED)
+    t.deepEqual(payload.extensions, protocolVersionsMap)
     t.end()
   })
 
@@ -207,6 +209,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
     const payload = JSON.parse(res.payload)
     t.is(payload.apiErrorCode.code, fspiopCode.code)
     t.is(payload.message, errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED)
+    t.deepEqual(payload.extensions, protocolVersionsMap)
     t.end()
   })
 

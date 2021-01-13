@@ -55,7 +55,25 @@ const getEndPointsResponse = {
   ]
 }
 
+const getEndpointAndRenderResponse = {
+  data: [
+    {
+      type: Enums.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_POST,
+      value: 'http://localhost:1080/'
+    },
+    {
+      type: Enums.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT,
+      value: 'http://localhost:1080/'
+    },
+    {
+      type: Enums.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_ERROR,
+      value: 'http://localhost:1080/'
+    }
+  ]
+}
+
 module.exports = {
   defaultHeaders,
-  getEndPointsResponse
+  getEndPointsResponse,
+  getEndpointAndRenderResponse
 }

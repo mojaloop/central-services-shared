@@ -6,7 +6,7 @@
 // accuracy of this statement has not been thoroughly tested.
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
-const { parseAcceptHeader, parseContentTypeHeader, protocolVersions } = require('../../headerValidation')
+const { parseAcceptHeader, parseContentTypeHeader, protocolVersions, protocolVersionsMap } = require('../../headerValidation')
 
 // Some defaults
 
@@ -15,6 +15,7 @@ const defaultProtocolResources = [
   'participants',
   'quotes',
   'transfers',
+  'bulkTransfers',
   'transactionRequests',
   'authorizations'
 ]
@@ -25,7 +26,7 @@ const defaultProtocolVersions = [
 ]
 
 const errorMessages = {
-  REQUESTED_VERSION_NOT_SUPPORTED: 'Client requested to use a protocol version which is not supported by the server',
+  REQUESTED_VERSION_NOT_SUPPORTED: 'The Client requested an unsupported version, see extension list for supported version(s).',
   INVALID_ACCEPT_HEADER: 'Invalid accept header',
   INVALID_CONTENT_TYPE_HEADER: 'Invalid content-type header',
   REQUIRE_ACCEPT_HEADER: 'Accept is required',
@@ -75,7 +76,10 @@ const plugin = {
         if (!supportedProtocolVersions.some(supportedVer => accept.versions.has(supportedVer))) {
           throw createFSPIOPError(
             Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
-            errorMessages.REQUESTED_VERSION_NOT_SUPPORTED
+            errorMessages.REQUESTED_VERSION_NOT_SUPPORTED,
+            null,
+            null,
+            protocolVersionsMap
           )
         }
       }
@@ -94,7 +98,10 @@ const plugin = {
       if (!supportedProtocolVersions.includes(contentType.version)) {
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
-          errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED
+          errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED,
+          null,
+          null,
+          protocolVersionsMap
         )
       }
 
