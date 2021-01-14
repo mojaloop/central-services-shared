@@ -83,7 +83,7 @@
     "sinon": "9.2.1",
     "standard": "16.0.3",
     "tap-xunit": "2.4.1",
-    "tape": "5.0.1",
+    "tape": "5.1.1",
     "tapes": "4.1.0"
   },
   "standard": {
