@@ -44,7 +44,7 @@
   "dependencies": {
     "@hapi/catbox": "11.1.1",
     "@hapi/catbox-memory": "5.0.0",
-    "@mojaloop/central-services-error-handling": "10.6.0",
+    "@mojaloop/central-services-error-handling": "11.0.0",
     "@mojaloop/central-services-logger": "10.6.0",
     "@mojaloop/central-services-metrics": "9.5.0",
     "@mojaloop/event-sdk": "10.6.0",
