@@ -1002,7 +1002,9 @@
           "DEVICE",
           "ACCOUNT_ID",
           "IBAN",
-          "ALIAS"
+          "ALIAS",
+          "CONSENT",
+          "THIRD_PARTY_LINK"
         ],
         "type": "string"
       },
