@@ -87,7 +87,10 @@ declare namespace CentralServicesShared {
     TP_CB_URL_CONSENT_PUT = 'TP_CB_URL_CONSENT_PUT',
     TP_CB_URL_CONSENT_PUT_ERROR = 'TP_CB_URL_CONSENT_PUT_ERROR',
     TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST',
-    TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR'
+    TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR',
+    TP_CB_URL_ACCOUNTS_GET = 'TP_CB_URL_ACCOUNTS_GET',
+    TP_CB_URL_ACCOUNTS_PUT = 'TP_CB_URL_ACCOUNTS_PUT',
+    TP_CB_URL_ACCOUNTS_PUT_ERROR = 'TP_CB_URL_ACCOUNTS_PUT_ERROR'
   }
   interface EndPointsEnum {
     EndpointType: {
@@ -145,6 +148,9 @@ declare namespace CentralServicesShared {
       TP_CB_URL_CONSENT_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_CONSENT_PUT_ERROR;
       TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST: FspEndpointTypesEnum.TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST;
       TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR;
+      TP_CB_URL_ACCOUNTS_GET: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_GET;
+      TP_CB_URL_ACCOUNTS_PUT: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_PUT;
+      TP_CB_URL_ACCOUNTS_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_PUT_ERROR;
     };
     FspEndpointTemplates: {
       TRANSACTION_REQUEST_POST: string;
@@ -187,6 +193,9 @@ declare namespace CentralServicesShared {
       TP_CONSENT_PUT_ERROR: string;
       TP_CONSENT_GENERATE_CHALLENGE_POST: string;
       TP_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: string;
+      TP_ACCOUNTS_GET: string;
+      TP_ACCOUNTS_PUT: string;
+      TP_ACCOUNTS_PUT_ERROR: string;
     };
   }
 
@@ -198,6 +207,7 @@ declare namespace CentralServicesShared {
   enum EventTypeEnum {
     ADMIN = 'admin',
     AUTHORIZATION = 'authorization',
+    ACCOUNT = 'account',
     BULK = 'bulk',
     BULK_QUOTE = 'bulkquote',
     BULK_PROCESSING = 'bulk-processing',
@@ -323,6 +333,7 @@ declare namespace CentralServicesShared {
         Type: {
           ADMIN: EventTypeEnum.ADMIN;
           AUTHORIZATION: EventTypeEnum.AUTHORIZATION;
+          ACCOUNT: EventTypeEnum.ACCOUNT;
           BULK: EventTypeEnum.BULK;
           BULK_QUOTE: EventTypeEnum.BULK_QUOTE;
           BULK_PROCESSING: EventTypeEnum.BULK_PROCESSING;

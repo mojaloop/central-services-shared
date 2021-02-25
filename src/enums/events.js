@@ -28,6 +28,7 @@ const Event = {
   Type: {
     ADMIN: 'admin',
     AUTHORIZATION: 'authorization',
+    ACCOUNT: 'account',
     BULK: 'bulk',
     BULK_QUOTE: 'bulkquote',
     BULK_PROCESSING: 'bulk-processing',
