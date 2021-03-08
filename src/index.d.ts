@@ -226,6 +226,7 @@ declare namespace CentralServicesShared {
     QUOTE = 'quote',
     SETTLEMENT = 'settlement',
     SETTLEMENT_WINDOW = 'settlementwindow',
+    THIRDPARTY = 'thirdparty',
     TRANSACTION_REQUEST = 'transaction-request',
     TRANSFER = 'transfer',
     PARTY = 'party',
