@@ -213,6 +213,8 @@ declare namespace CentralServicesShared {
     BULK_PROCESSING = 'bulk-processing',
     BULK_PREPARE = 'bulk-prepare',
     BULK_FULFIL = 'bulk-fulfil',
+    CONSENT = 'consent',
+    CONSENT_REQUEST = 'consent-request',
     ENDPOINTCACHE = 'endpointcache',
     EVENT = 'event',
     FULFIL = 'fulfil',
@@ -271,6 +273,7 @@ declare namespace CentralServicesShared {
     TIMEOUT_RECEIVED = 'timeout-received',
     TIMEOUT_RESERVED = 'timeout-reserved',
     TRANSFER = 'transfer',
+    PATCH = 'patch',
     PUT = 'put',
     POST = 'post'
   }
