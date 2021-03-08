@@ -1,5 +1,4 @@
 import { Util as HapiUtil } from '@hapi/hapi'
-
 declare namespace CentralServicesShared {
   interface ReturnCode {
     CODE: number;
