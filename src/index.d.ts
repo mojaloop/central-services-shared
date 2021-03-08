@@ -331,6 +331,7 @@ declare namespace CentralServicesShared {
           TIMEOUT_RECEIVED: EventActionEnum.TIMEOUT_RECEIVED;
           TIMEOUT_RESERVED: EventActionEnum.TIMEOUT_RESERVED;
           TRANSFER: EventActionEnum.TRANSFER;
+          PATCH: EventActionEnum.PATCH;
           PUT: EventActionEnum.PUT;
           POST: EventActionEnum.POST;
         };
@@ -343,6 +344,8 @@ declare namespace CentralServicesShared {
           BULK_PROCESSING: EventTypeEnum.BULK_PROCESSING;
           BULK_PREPARE: EventTypeEnum.BULK_PREPARE;
           BULK_FULFIL: EventTypeEnum.BULK_FULFIL;
+          CONSENT: EventTypeEnum.CONSENT;
+          CONSENT_REQUEST: EventTypeEnum.CONSENT_REQUEST;
           ENDPOINTCACHE: EventTypeEnum.ENDPOINTCACHE;
           EVENT: EventTypeEnum.EVENT;
           FULFIL: EventTypeEnum.FULFIL;
@@ -354,6 +357,7 @@ declare namespace CentralServicesShared {
           QUOTE: EventTypeEnum.QUOTE;
           SETTLEMENT: EventTypeEnum.SETTLEMENT;
           SETTLEMENT_WINDOW: EventTypeEnum.SETTLEMENT_WINDOW;
+          THIRDPARTY: EventTypeEnum.THIRDPARTY;
           TRANSACTION_REQUEST: EventTypeEnum.TRANSACTION_REQUEST;
           TRANSFER: EventTypeEnum.TRANSFER;
           PARTY: EventTypeEnum.PARTY;
