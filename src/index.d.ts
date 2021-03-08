@@ -1,5 +1,5 @@
 import { Util as HapiUtil } from '@hapi/hapi'
-import { EventTypeEnum } from '@mojaloop/central-services-shared';
+
 declare namespace CentralServicesShared {
   interface ReturnCode {
     CODE: number;
