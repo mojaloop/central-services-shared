@@ -1,0 +1,15 @@
+{
+  "decisions": {
+    "1500|widdershins>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1614191740046,
+      "expiresAt": 1616783718821
+    },
+    "1640|widdershins>urijs": {
+      "decision": "fix",
+      "madeAt": 1615187901100
+    }
+  },
+  "rules": {},
+  "version": 1
+}
