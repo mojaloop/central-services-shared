@@ -51,7 +51,9 @@ const Event = {
     TRANSACTION_REQUEST: 'transaction-request',
     TRANSFER: 'transfer',
     PARTY: 'party',
-    PARTICIPANT: 'participant'
+    PARTICIPANT: 'participant',
+    DEFERRED_SETTLEMENT: 'deferredsettlement',
+    GROSS_SETTLEMENT: 'transfersettlement'
   },
   Action: {
     ABORT: 'abort',
