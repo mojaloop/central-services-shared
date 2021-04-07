@@ -38,6 +38,7 @@ const getVersionFromConfig = (resourceString) => {
           contentVersion: c,
           acceptVersion: c.split('.')[0]
         }
+        return null
       }))
   return resourceVersionMap
 }

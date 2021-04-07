@@ -78,6 +78,7 @@ declare namespace CentralServicesShared {
     TP_CB_URL_TRANSACTION_REQUEST_AUTH_POST = 'TP_CB_URL_TRANSACTION_REQUEST_AUTH_POST',
     TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT = 'TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT',
     TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT_ERROR = 'TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT_ERROR',
+    TP_CB_URL_CONSENT_REQUEST_PATCH = 'TP_CB_URL_CONSENT_REQUEST_PATCH',
     TP_CB_URL_CONSENT_REQUEST_POST = 'TP_CB_URL_CONSENT_REQUEST_POST',
     TP_CB_URL_CONSENT_REQUEST_PUT = 'TP_CB_URL_CONSENT_REQUEST_PUT',
     TP_CB_URL_CONSENT_REQUEST_PUT_ERROR = 'TP_CB_URL_CONSENT_REQUEST_PUT_ERROR',
@@ -87,7 +88,10 @@ declare namespace CentralServicesShared {
     TP_CB_URL_CONSENT_PUT = 'TP_CB_URL_CONSENT_PUT',
     TP_CB_URL_CONSENT_PUT_ERROR = 'TP_CB_URL_CONSENT_PUT_ERROR',
     TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST',
-    TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR'
+    TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR',
+    TP_CB_URL_ACCOUNTS_GET = 'TP_CB_URL_ACCOUNTS_GET',
+    TP_CB_URL_ACCOUNTS_PUT = 'TP_CB_URL_ACCOUNTS_PUT',
+    TP_CB_URL_ACCOUNTS_PUT_ERROR = 'TP_CB_URL_ACCOUNTS_PUT_ERROR'
   }
   interface EndPointsEnum {
     EndpointType: {
@@ -135,6 +139,7 @@ declare namespace CentralServicesShared {
       TP_CB_URL_TRANSACTION_REQUEST_AUTH_POST: FspEndpointTypesEnum.TP_CB_URL_TRANSACTION_REQUEST_AUTH_POST;
       TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT: FspEndpointTypesEnum.TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT;
       TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_TRANSACTION_REQUEST_AUTH_PUT_ERROR;
+      TP_CB_URL_CONSENT_REQUEST_PATCH: FspEndpointTypesEnum.TP_CB_URL_CONSENT_REQUEST_PATCH;
       TP_CB_URL_CONSENT_REQUEST_POST: FspEndpointTypesEnum.TP_CB_URL_CONSENT_REQUEST_POST;
       TP_CB_URL_CONSENT_REQUEST_PUT: FspEndpointTypesEnum.TP_CB_URL_CONSENT_REQUEST_PUT;
       TP_CB_URL_CONSENT_REQUEST_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_CONSENT_REQUEST_PUT_ERROR;
@@ -145,6 +150,9 @@ declare namespace CentralServicesShared {
       TP_CB_URL_CONSENT_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_CONSENT_PUT_ERROR;
       TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST: FspEndpointTypesEnum.TP_CB_URL_CONSENT_GENERATE_CHALLENGE_POST;
       TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR;
+      TP_CB_URL_ACCOUNTS_GET: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_GET;
+      TP_CB_URL_ACCOUNTS_PUT: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_PUT;
+      TP_CB_URL_ACCOUNTS_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_PUT_ERROR;
     };
     FspEndpointTemplates: {
       TRANSACTION_REQUEST_POST: string;
@@ -177,6 +185,7 @@ declare namespace CentralServicesShared {
       TP_TRANSACTION_REQUEST_AUTHORIZATIONS_POST: string;
       TP_TRANSACTION_REQUEST_AUTHORIZATIONS_PUT: string;
       TP_TRANSACTION_REQUEST_AUTHORIZATIONS_PUT_ERROR: string;
+      TP_CONSENT_REQUEST_PATCH: string;
       TP_CONSENT_REQUEST_POST: string;
       TP_CONSENT_REQUEST_PUT: string;
       TP_CONSENT_REQUEST_PUT_ERROR: string;
@@ -187,6 +196,9 @@ declare namespace CentralServicesShared {
       TP_CONSENT_PUT_ERROR: string;
       TP_CONSENT_GENERATE_CHALLENGE_POST: string;
       TP_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: string;
+      TP_ACCOUNTS_GET: string;
+      TP_ACCOUNTS_PUT: string;
+      TP_ACCOUNTS_PUT_ERROR: string;
     };
   }
 
@@ -198,11 +210,14 @@ declare namespace CentralServicesShared {
   enum EventTypeEnum {
     ADMIN = 'admin',
     AUTHORIZATION = 'authorization',
+    ACCOUNT = 'account',
     BULK = 'bulk',
     BULK_QUOTE = 'bulkquote',
     BULK_PROCESSING = 'bulk-processing',
     BULK_PREPARE = 'bulk-prepare',
     BULK_FULFIL = 'bulk-fulfil',
+    CONSENT = 'consent',
+    CONSENT_REQUEST = 'consent-request',
     ENDPOINTCACHE = 'endpointcache',
     EVENT = 'event',
     FULFIL = 'fulfil',
@@ -214,6 +229,7 @@ declare namespace CentralServicesShared {
     QUOTE = 'quote',
     SETTLEMENT = 'settlement',
     SETTLEMENT_WINDOW = 'settlementwindow',
+    THIRDPARTY = 'thirdparty',
     TRANSACTION_REQUEST = 'transaction-request',
     TRANSFER = 'transfer',
     PARTY = 'party',
@@ -261,6 +277,7 @@ declare namespace CentralServicesShared {
     TIMEOUT_RECEIVED = 'timeout-received',
     TIMEOUT_RESERVED = 'timeout-reserved',
     TRANSFER = 'transfer',
+    PATCH = 'patch',
     PUT = 'put',
     POST = 'post'
   }
@@ -317,17 +334,21 @@ declare namespace CentralServicesShared {
           TIMEOUT_RECEIVED: EventActionEnum.TIMEOUT_RECEIVED;
           TIMEOUT_RESERVED: EventActionEnum.TIMEOUT_RESERVED;
           TRANSFER: EventActionEnum.TRANSFER;
+          PATCH: EventActionEnum.PATCH;
           PUT: EventActionEnum.PUT;
           POST: EventActionEnum.POST;
         };
         Type: {
           ADMIN: EventTypeEnum.ADMIN;
           AUTHORIZATION: EventTypeEnum.AUTHORIZATION;
+          ACCOUNT: EventTypeEnum.ACCOUNT;
           BULK: EventTypeEnum.BULK;
           BULK_QUOTE: EventTypeEnum.BULK_QUOTE;
           BULK_PROCESSING: EventTypeEnum.BULK_PROCESSING;
           BULK_PREPARE: EventTypeEnum.BULK_PREPARE;
           BULK_FULFIL: EventTypeEnum.BULK_FULFIL;
+          CONSENT: EventTypeEnum.CONSENT;
+          CONSENT_REQUEST: EventTypeEnum.CONSENT_REQUEST;
           ENDPOINTCACHE: EventTypeEnum.ENDPOINTCACHE;
           EVENT: EventTypeEnum.EVENT;
           FULFIL: EventTypeEnum.FULFIL;
@@ -339,6 +360,7 @@ declare namespace CentralServicesShared {
           QUOTE: EventTypeEnum.QUOTE;
           SETTLEMENT: EventTypeEnum.SETTLEMENT;
           SETTLEMENT_WINDOW: EventTypeEnum.SETTLEMENT_WINDOW;
+          THIRDPARTY: EventTypeEnum.THIRDPARTY;
           TRANSACTION_REQUEST: EventTypeEnum.TRANSACTION_REQUEST;
           TRANSFER: EventTypeEnum.TRANSFER;
           PARTY: EventTypeEnum.PARTY;

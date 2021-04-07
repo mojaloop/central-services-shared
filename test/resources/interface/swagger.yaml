@@ -982,6 +982,8 @@ components:
         - ACCOUNT_ID
         - IBAN
         - ALIAS
+        - CONSENT
+        - THIRD_PARTY_LINK
       type: string
     PartyName:
       title: PartyName

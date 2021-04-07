@@ -1,0 +1,25 @@
+{
+  "decisions": {
+    "1500|widdershins>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1617792116172,
+      "expiresAt": 1620384087624
+    },
+    "1640|widdershins>urijs": {
+      "decision": "fix",
+      "madeAt": 1615187901100
+    },
+    "1654|@mojaloop/event-sdk>grpc>protobufjs>yargs>y18n": {
+      "decision": "ignore",
+      "madeAt": 1617792104355,
+      "expiresAt": 1620384087624
+    },
+    "1654|widdershins>yargs>y18n": {
+      "decision": "ignore",
+      "madeAt": 1617792112545,
+      "expiresAt": 1620384087624
+    }
+  },
+  "rules": {},
+  "version": 1
+}
