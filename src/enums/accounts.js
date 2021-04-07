@@ -67,7 +67,7 @@ const PartyAccountTypes = {
   IBAN: 'IBAN',
   ALIAS: 'ALIAS',
   CONSENT: 'CONSENT',
-  THIRD_PARTY_LINK: 'THIRD_PARTY_LINK',
+  THIRD_PARTY_LINK: 'THIRD_PARTY_LINK'
 }
 
 module.exports = {
