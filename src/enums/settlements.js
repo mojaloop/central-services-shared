@@ -30,24 +30,42 @@ const SettlementWindowState = {
   PROCESSING: 'PROCESSING',
   CLOSED: 'CLOSED'
 }
+
+const SettlementDelayName = {
+  IMMEDIATE: 'IMMEDIATE',
+  DEFERRED: 'DEFFERED'
+}
+
 const SettlementDelay = {
   IMMEDIATE: 1,
   DEFERRED: 2
 }
+
+const settlementGranularityName = {
+  GROSS: 'GROSS',
+  NET: 'NET'
+}
+
 const SettlementGranularity = {
   GROSS: 1,
   NET: 2
 }
+
+const SettlementInterchangeName = {
+  BILATERAL: 'BILATERAL',
+  MULTILATERAL: 'MULTILATERAL'
+}
+
 const SettlementInterchange = {
   BILATERAL: 1,
   MULTILATERAL: 2
 }
 
 const ValidSettlementModels = [
-  { settlementDelay: 'IMMEDIATE', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
-  { settlementDelay: 'DEFERRED', settlementGranularity: 'GROSS', settlementInterchange: 'BILATERAL' },
-  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'BILATERAL' },
-  { settlementDelay: 'DEFERRED', settlementGranularity: 'NET', settlementInterchange: 'MULTILATERAL' }
+  { settlementDelay: SettlementDelayName.IMMEDIATE, settlementGranularity: settlementGranularityName.GROSS, settlementInterchange: SettlementInterchangeName.BILATERAL },
+  { settlementDelay: SettlementDelayName.DEFERRED, settlementGranularity: settlementGranularityName.GROSS, settlementInterchange: SettlementInterchangeName.BILATERAL },
+  { settlementDelay: SettlementDelayName.DEFERRED, settlementGranularity: settlementGranularityName.NET, settlementInterchange: SettlementInterchangeName.BILATERAL },
+  { settlementDelay: SettlementDelayName.DEFERRED, settlementGranularity: settlementGranularityName.NET, settlementInterchange: SettlementInterchangeName.MULTILATERAL }
 ]
 const isActiveText = {
   activated: 'activated',
@@ -60,8 +78,11 @@ const booleanType = {
 
 module.exports = {
   SettlementWindowState,
+  SettlementDelayName,
   SettlementDelay,
+  settlementGranularityName,
   SettlementGranularity,
+  SettlementInterchangeName,
   SettlementInterchange,
   ValidSettlementModels,
   isActiveText,
