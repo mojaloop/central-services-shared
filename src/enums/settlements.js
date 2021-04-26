@@ -33,7 +33,7 @@ const SettlementWindowState = {
 
 const SettlementDelayName = {
   IMMEDIATE: 'IMMEDIATE',
-  DEFERRED: 'DEFFERED'
+  DEFERRED: 'DEFERRED'
 }
 
 const SettlementDelay = {
