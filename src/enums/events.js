@@ -93,6 +93,7 @@ const Event = {
     REQUEST: 'request',
     RESERVE: 'reserve',
     SETTLEMENT_WINDOW: 'settlement-window',
+    DEFERRED_SETTLEMENT: 'deferred-settlement',
     TIMEOUT_RECEIVED: 'timeout-received',
     TIMEOUT_RESERVED: 'timeout-reserved',
     TRANSFER: 'transfer',
