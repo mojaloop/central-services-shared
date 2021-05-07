@@ -18,6 +18,21 @@
       "decision": "ignore",
       "madeAt": 1617792112545,
       "expiresAt": 1620384087624
+    },
+    "1673|@mojaloop/event-sdk>lodash": {
+      "decision": "ignore",
+      "madeAt": 1620357960127,
+      "expiresAt": 1622949946141
+    },
+    "1675|shins>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1620357963846,
+      "expiresAt": 1622949946141
+    },
+    "1676|shins>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1620357963846,
+      "expiresAt": 1622949946141
     }
   },
   "rules": {},
