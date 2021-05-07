@@ -91,7 +91,10 @@ declare namespace CentralServicesShared {
     TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR = 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR',
     TP_CB_URL_ACCOUNTS_GET = 'TP_CB_URL_ACCOUNTS_GET',
     TP_CB_URL_ACCOUNTS_PUT = 'TP_CB_URL_ACCOUNTS_PUT',
-    TP_CB_URL_ACCOUNTS_PUT_ERROR = 'TP_CB_URL_ACCOUNTS_PUT_ERROR'
+    TP_CB_URL_ACCOUNTS_PUT_ERROR = 'TP_CB_URL_ACCOUNTS_PUT_ERROR',
+    TP_CB_URL_SERVICES_GET = 'TP_CB_URL_SERVICES_GET',
+    TP_CB_URL_SERVICES_PUT = 'TP_CB_URL_SERVICES_PUT',
+    TP_CB_URL_SERVICES_PUT_ERROR = 'TP_CB_URL_SERVICES_PUT_ERROR'
   }
   interface EndPointsEnum {
     EndpointType: {
@@ -153,6 +156,9 @@ declare namespace CentralServicesShared {
       TP_CB_URL_ACCOUNTS_GET: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_GET;
       TP_CB_URL_ACCOUNTS_PUT: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_PUT;
       TP_CB_URL_ACCOUNTS_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_ACCOUNTS_PUT_ERROR;
+      TP_CB_URL_SERVICES_GET: FspEndpointTypesEnum.TP_CB_URL_SERVICES_GET;
+      TP_CB_URL_SERVICES_PUT: FspEndpointTypesEnum.TP_CB_URL_SERVICES_PUT;
+      TP_CB_URL_SERVICES_PUT_ERROR: FspEndpointTypesEnum.TP_CB_URL_SERVICES_PUT_ERROR;
     };
     FspEndpointTemplates: {
       TRANSACTION_REQUEST_POST: string;
@@ -199,6 +205,9 @@ declare namespace CentralServicesShared {
       TP_ACCOUNTS_GET: string;
       TP_ACCOUNTS_PUT: string;
       TP_ACCOUNTS_PUT_ERROR: string;
+      TP_SERVICES_GET: string;
+      TP_SERVICES_PUT: string;
+      TP_SERVICES_PUT_ERROR: string;
     };
   }
 
@@ -273,6 +282,7 @@ declare namespace CentralServicesShared {
     RESOLVE = 'resolve',
     REQUEST = 'request',
     RESERVE = 'reserve',
+    SERVICE = 'service',
     SETTLEMENT_WINDOW = 'settlement-window',
     TIMEOUT_RECEIVED = 'timeout-received',
     TIMEOUT_RESERVED = 'timeout-reserved',
@@ -330,6 +340,7 @@ declare namespace CentralServicesShared {
           RESOLVE: EventActionEnum.RESOLVE;
           REQUEST: EventActionEnum.REQUEST;
           RESERVE: EventActionEnum.RESERVE;
+          SERVICE: EventActionEnum.SERVICE;
           SETTLEMENT_WINDOW: EventActionEnum.SETTLEMENT_WINDOW;
           TIMEOUT_RECEIVED: EventActionEnum.TIMEOUT_RECEIVED;
           TIMEOUT_RESERVED: EventActionEnum.TIMEOUT_RESERVED;

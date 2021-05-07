@@ -85,7 +85,10 @@ const FspEndpointTypes = {
   TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: 'TP_CB_URL_CONSENT_GENERATE_CHALLENGE_PUT_ERROR',
   TP_CB_URL_ACCOUNTS_GET: 'TP_CB_URL_ACCOUNTS_GET',
   TP_CB_URL_ACCOUNTS_PUT: 'TP_CB_URL_ACCOUNTS_PUT',
-  TP_CB_URL_ACCOUNTS_PUT_ERROR: 'TP_CB_URL_ACCOUNTS_PUT_ERROR'
+  TP_CB_URL_ACCOUNTS_PUT_ERROR: 'TP_CB_URL_ACCOUNTS_PUT_ERROR',
+  TP_CB_URL_SERVICES_GET: 'TP_CB_URL_SERVICES_GET',
+  TP_CB_URL_SERVICES_PUT: 'TP_CB_URL_SERVICES_PUT',
+  TP_CB_URL_SERVICES_PUT_ERROR: 'TP_CB_URL_SERVICES_PUT_ERROR'
 }
 
 const FspEndpointTemplates = {
@@ -134,7 +137,10 @@ const FspEndpointTemplates = {
   TP_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: '/consents/{{ID}}/generateChallenge/error',
   TP_ACCOUNTS_GET: '/accounts/{{ID}}',
   TP_ACCOUNTS_PUT: '/accounts/{{ID}}',
-  TP_ACCOUNTS_PUT_ERROR: '/accounts/{{ID}}/error'
+  TP_ACCOUNTS_PUT_ERROR: '/accounts/{{ID}}/error',
+  TP_SERVICES_GET: '/services/{{ServiceType}}',
+  TP_SERVICES_PUT: '/services/{{ServiceType}}',
+  TP_SERVICES_PUT_ERROR: '/services/{{ServiceType}}/error'
 }
 
 module.exports = {
