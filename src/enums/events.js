@@ -45,6 +45,7 @@ const Event = {
     POSITION: 'position',
     PREPARE: 'prepare',
     QUOTE: 'quote',
+    SERVICE: 'service',
     SETTLEMENT: 'settlement',
     SETTLEMENT_WINDOW: 'settlementwindow',
     THIRDPARTY: 'thirdparty',

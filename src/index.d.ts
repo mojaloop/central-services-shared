@@ -282,6 +282,7 @@ declare namespace CentralServicesShared {
     RESOLVE = 'resolve',
     REQUEST = 'request',
     RESERVE = 'reserve',
+    SERVICE = 'service',
     SETTLEMENT_WINDOW = 'settlement-window',
     TIMEOUT_RECEIVED = 'timeout-received',
     TIMEOUT_RESERVED = 'timeout-reserved',
@@ -339,6 +340,7 @@ declare namespace CentralServicesShared {
           RESOLVE: EventActionEnum.RESOLVE;
           REQUEST: EventActionEnum.REQUEST;
           RESERVE: EventActionEnum.RESERVE;
+          SERVICE: EventActionEnum.SERVICE;
           SETTLEMENT_WINDOW: EventActionEnum.SETTLEMENT_WINDOW;
           TIMEOUT_RECEIVED: EventActionEnum.TIMEOUT_RECEIVED;
           TIMEOUT_RESERVED: EventActionEnum.TIMEOUT_RESERVED;
