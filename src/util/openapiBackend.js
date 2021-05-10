@@ -34,6 +34,7 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
     ajvOpts.coerceTypes = true
   }
   const ajv = new Ajv(ajvOpts)
+  ajv.addVocabulary(["example"])
   await require('ajv-keywords')(ajv)
   const api = new OpenAPIBackend({
     definition: definitionPath,
