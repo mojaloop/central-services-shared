@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "11.7.2",
+  "version": "11.7.3",
   "description": "Shared code for mojaloop central services",
   "main": "src/index.js",
   "types": "src/index.d.ts",
