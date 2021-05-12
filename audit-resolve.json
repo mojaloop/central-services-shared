@@ -31,6 +31,11 @@
       "decision": "ignore",
       "madeAt": 1620357963846,
       "expiresAt": 1622949946141
+    },
+    "1693|shins>sanitize-html>postcss": {
+      "decision": "ignore",
+      "madeAt": 1620811315404,
+      "expiresAt": 1621416076794
     }
   },
   "rules": {},

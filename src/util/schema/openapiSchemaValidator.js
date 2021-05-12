@@ -23,13 +23,15 @@
  ******/
 'use strict'
 
+/* istanbul ignore file */
+
+//// The below updateDefinition function is ONLY compatible with when using AJV v6.x - https://ajv.js.org/v6-to-v8-migration.html.
 function updateDefinition (obj, key, regexFlags) {
-  let objects = []
   for (const i in obj) {
     // eslint-disable-next-line no-prototype-builtins
     if (obj.hasOwnProperty(i)) {
       if (typeof obj[i] === 'object') {
-        objects = objects.concat(updateDefinition(obj[i], key, regexFlags))
+        updateDefinition(obj[i], key, regexFlags)
       } else if (i === key) {
         if (!obj.regexp && !obj.flags) {
           obj.regexp = {
