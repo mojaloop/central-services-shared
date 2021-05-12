@@ -48,7 +48,7 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
       const api = await OpenapiBackend.initialise(swagger, Handlers)
       test.ok(api, 'api object created')
       test.ok(api.definition, 'definition created')
-      test.ok(api.definition.components.schemas.FirstName.regexp, 'regex object created')
+      test.ok(api.definition.components.schemas.FirstName.pattern, 'regex object created')
       test.end()
     })
 
@@ -61,7 +61,7 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
       const api = await OpenapiBackend.initialise(swagger, Handlers, { $data: true })
       test.ok(api, 'api object created')
       test.ok(api.definition, 'definition created')
-      test.ok(api.definition.components.schemas.FirstName.regexp, 'regex object created')
+      test.ok(api.definition.components.schemas.FirstName.pattern, 'regex object created')
       test.end()
     })
 

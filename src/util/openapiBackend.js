@@ -47,14 +47,15 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
     handlers
   })
   await api.init()
-  const updatedDefinition = schemaValidator.generateNewDefinition(api.definition, regexFlags)
-  api.validator = new OpenAPIValidator({
-    definition: updatedDefinition,
-    ajvOpts: {
-      coerceTypes: true
-    },
-    customizeAjv: () => ajv
-  })
+  //// The below custom OpenAPIValidator is no longer needed when using AJV v8.x as it supports unicode by default - https://ajv.js.org/v6-to-v8-migration.html. Keeping this code snippet if we need to downgrade to AJV v6.x.
+  // const updatedDefinition = schemaValidator.generateNewDefinition(api.definition, regexFlags)
+  // api.validator = new OpenAPIValidator({
+  //   definition: updatedDefinition,
+  //   ajvOpts: {
+  //     coerceTypes: true
+  //   },
+  //   customizeAjv: () => ajv
+  // })
   return api
 }
 
