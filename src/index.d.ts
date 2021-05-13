@@ -236,6 +236,7 @@ declare namespace CentralServicesShared {
     POSITION = 'position',
     PREPARE = 'prepare',
     QUOTE = 'quote',
+    SERVICE = 'service',
     SETTLEMENT = 'settlement',
     SETTLEMENT_WINDOW = 'settlementwindow',
     THIRDPARTY = 'thirdparty',
@@ -282,7 +283,6 @@ declare namespace CentralServicesShared {
     RESOLVE = 'resolve',
     REQUEST = 'request',
     RESERVE = 'reserve',
-    SERVICE = 'service',
     SETTLEMENT_WINDOW = 'settlement-window',
     TIMEOUT_RECEIVED = 'timeout-received',
     TIMEOUT_RESERVED = 'timeout-reserved',
@@ -340,7 +340,6 @@ declare namespace CentralServicesShared {
           RESOLVE: EventActionEnum.RESOLVE;
           REQUEST: EventActionEnum.REQUEST;
           RESERVE: EventActionEnum.RESERVE;
-          SERVICE: EventActionEnum.SERVICE;
           SETTLEMENT_WINDOW: EventActionEnum.SETTLEMENT_WINDOW;
           TIMEOUT_RECEIVED: EventActionEnum.TIMEOUT_RECEIVED;
           TIMEOUT_RESERVED: EventActionEnum.TIMEOUT_RESERVED;
@@ -369,6 +368,7 @@ declare namespace CentralServicesShared {
           POSITION: EventTypeEnum.POSITION;
           PREPARE: EventTypeEnum.PREPARE;
           QUOTE: EventTypeEnum.QUOTE;
+          SERVICE: EventTypeEnum.SERVICE;
           SETTLEMENT: EventTypeEnum.SETTLEMENT;
           SETTLEMENT_WINDOW: EventTypeEnum.SETTLEMENT_WINDOW;
           THIRDPARTY: EventTypeEnum.THIRDPARTY;
