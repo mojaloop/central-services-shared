@@ -25,16 +25,17 @@
 
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const OpenAPIBackend = require('openapi-backend').default
-const OpenAPIValidator = require('openapi-backend').OpenAPIValidator
 const Ajv = require('ajv')
-const schemaValidator = require('./schema').OpenapiSchemaValidator
+/// The below custom OpenAPIValidator is no longer needed when using AJV v8.x as it supports unicode by default - https://ajv.js.org/v6-to-v8-migration.html. Keeping this code snippet if we need to downgrade to AJV v6.x.
+// const OpenAPIValidator = require('openapi-backend').OpenAPIValidator
+// const schemaValidator = require('./schema').OpenapiSchemaValidator
 
 const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coerceTypes: true }, regexFlags = 'u') => {
   if (ajvOpts.coerceTypes === undefined) {
     ajvOpts.coerceTypes = true
   }
   const ajv = new Ajv(ajvOpts)
-  ajv.addVocabulary(["example"])
+  ajv.addVocabulary(['example'])
   await require('ajv-keywords')(ajv)
   const api = new OpenAPIBackend({
     definition: definitionPath,
@@ -47,7 +48,7 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
     handlers
   })
   await api.init()
-  //// The below custom OpenAPIValidator is no longer needed when using AJV v8.x as it supports unicode by default - https://ajv.js.org/v6-to-v8-migration.html. Keeping this code snippet if we need to downgrade to AJV v6.x.
+  /// The below custom OpenAPIValidator is no longer needed when using AJV v8.x as it supports unicode by default - https://ajv.js.org/v6-to-v8-migration.html. Keeping this code snippet if we need to downgrade to AJV v6.x.
   // const updatedDefinition = schemaValidator.generateNewDefinition(api.definition, regexFlags)
   // api.validator = new OpenAPIValidator({
   //   definition: updatedDefinition,
