@@ -25,7 +25,7 @@
 
 /* istanbul ignore file */
 
-//// The below updateDefinition function is ONLY compatible with when using AJV v6.x - https://ajv.js.org/v6-to-v8-migration.html.
+/// / The below updateDefinition function is ONLY compatible with when using AJV v6.x - https://ajv.js.org/v6-to-v8-migration.html.
 function updateDefinition (obj, key, regexFlags) {
   for (const i in obj) {
     // eslint-disable-next-line no-prototype-builtins
