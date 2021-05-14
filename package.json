@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "13.0.0",
+  "version": "13.0.1",
   "description": "Shared code for mojaloop central services",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -70,7 +70,7 @@
     "@hapi/joi": "17.1.1",
     "@mojaloop/sdk-standard-components": "10.3.2",
     "@mojaloop/central-services-error-handling": "11.3.0",
-    "@mojaloop/central-services-logger": "10.6.0",
+    "@mojaloop/central-services-logger": "10.6.1",
     "@mojaloop/central-services-metrics": "9.5.0",
     "@mojaloop/event-sdk": "10.7.0",
     "ajv": "8.3.0",
@@ -91,7 +91,7 @@
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": "11.3.0",
-    "@mojaloop/central-services-logger": "10.6.0",
+    "@mojaloop/central-services-logger": "10.6.1",
     "@mojaloop/central-services-metrics": "9.5.0",
     "@mojaloop/event-sdk": "10.7.0",
     "ajv": "8.3.0",
