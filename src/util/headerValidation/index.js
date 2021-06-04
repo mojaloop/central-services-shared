@@ -15,13 +15,13 @@ const protocolVersionsMap = [
 // Some convenience functions for generating regexes for header matching
 
 const generateContentTypeRegex = resource =>
-  new RegExp(`^application/vnd\\.interoperability\\.${resource}\\+json;version=(\\d+\\.\\d+)$`)
+  new RegExp(`^application/vnd\\.interoperability\\.${resource}\\+json;\\s{0,1}version=(\\d+\\.\\d+)$`)
 
 const generateAcceptRegex = resource =>
   new RegExp(`^${generateSingleAcceptRegexStr(resource)}(,${generateSingleAcceptRegexStr(resource)})*$`)
 
 const generateSingleAcceptRegexStr = resource =>
-  `application/vnd\\.interoperability\\.${resource}\\+json(;version=\\d+(\\.\\d+)?)?`
+  `application/vnd\\.interoperability\\.${resource}\\+json(;\\s{0,1}version=\\d+(\\.\\d+)?)?`
 
 const parseContentTypeHeader = (resource, header) => {
   assert(typeof header === 'string')
