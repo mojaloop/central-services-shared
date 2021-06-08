@@ -11,6 +11,8 @@ const validAcceptHeaders = resource => [
   `application/vnd.interoperability.${resource}+json;version=1,application/vnd.interoperability.${resource}+json;version=1`,
   `application/vnd.interoperability.${resource}+json;version=1.0`,
   `application/vnd.interoperability.${resource}+json; version=1.0`,
+  `application/vnd.interoperability.${resource}+json ;version=1.0`,
+  `application/vnd.interoperability.${resource}+json ; version=1.0`,
   `application/vnd.interoperability.${resource}+json;version=1.0,application/vnd.interoperability.${resource}+json;version=1.1`,
   `application/vnd.interoperability.${resource}+json;version=1.1`,
   `application/vnd.interoperability.${resource}+json;version=2.0`,
@@ -35,6 +37,8 @@ const invalidAcceptHeaders = resource => [
   'application/vnd.interoperability.whatever+json;  version=1, ',
   `application/vnd.interoperability.a${resource}+json;version=1, `,
   `application/vnd.interoperability.${resource}+json;version=1, `,
+  `application/vnd.interoperability.${resource}+json;  version=1`,
+  `application/vnd.interoperability.${resource}+json  ;  version=1`,
   `application/vnd.interoperability.${resource}+json;version=1, application/vnd.interoperability.${resource}+json;version=1`,
   ...validAcceptHeaders(resource).map(h => h.toUpperCase())
 ]
@@ -42,6 +46,8 @@ const invalidAcceptHeaders = resource => [
 const validContentTypeHeaders = resource => [
   `application/vnd.interoperability.${resource}+json;version=1.0`,
   `application/vnd.interoperability.${resource}+json; version=1.0`,
+  `application/vnd.interoperability.${resource}+json ;version=1.0`,
+  `application/vnd.interoperability.${resource}+json ; version=1.0`,
   `application/vnd.interoperability.${resource}+json;version=1.1`,
   `application/vnd.interoperability.${resource}+json;version=2.0`,
   `application/vnd.interoperability.${resource}+json;version=2.1`,
@@ -57,6 +63,8 @@ const invalidContentTypeHeaders = resource => [
   `application/vnd.interoperability.${resource}+json,application/vnd.interoperability.${resource}+json;version=1`,
   `application/vnd.interoperability.${resource}+json;version=1`,
   `application/vnd.interoperability.${resource}+json;  version=1.0`,
+  `application/vnd.interoperability.${resource}+json  ;version=1.0`,
+  `application/vnd.interoperability.${resource}+json  ;  version=1.0`,
   `application/vnd.interoperability.${resource}+json;version=1,application/vnd.interoperability.${resource}+json;version=1`,
   `application/vnd.interoperability.${resource}+json;version=1.0,application/vnd.interoperability.${resource}+json;version=1.1`,
   `application/vnd.interoperability.${resource}+json;version=1,application/vnd.interoperability.${resource}+json;version=2.1`,
