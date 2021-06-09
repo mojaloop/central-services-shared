@@ -30,7 +30,7 @@ const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const resourceVersions = require('../helpers').resourceVersions
 
-const regexForContentAndAcceptHeaders = /(application\/vnd.interoperability.)(\w*)+(\+json;version=)(.*)/
+const regexForContentAndAcceptHeaders = /(application\/vnd\.interoperability\.)(\w*)+(\+json\s{0,1};\s{0,1}version=)(.*)/
 
 /**
  * @module src/headers/transformer
