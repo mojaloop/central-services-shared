@@ -100,6 +100,10 @@ const Headers = {
     thirdparty: {
       contentVersion: '1.0',
       acceptVersion: '1'
+    },
+    services: {
+      contentVersion: '1.0',
+      acceptVersion: '1'
     }
   }
 }
