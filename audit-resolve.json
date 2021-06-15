@@ -2,8 +2,8 @@
   "decisions": {
     "1500|widdershins>yargs>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1623071239319,
-      "expiresAt": 1623675976368
+      "madeAt": 1623755999183,
+      "expiresAt": 1626347994107
     },
     "1640|widdershins>urijs": {
       "decision": "fix",
@@ -24,18 +24,18 @@
     },
     "1675|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1623071250265,
-      "expiresAt": 1623675976368
+      "madeAt": 1623756000737,
+      "expiresAt": 1626347994107
     },
     "1676|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1623071250265,
-      "expiresAt": 1623675976368
+      "madeAt": 1623756000737,
+      "expiresAt": 1626347994107
     },
     "1693|shins>sanitize-html>postcss": {
       "decision": "ignore",
-      "madeAt": 1623071253416,
-      "expiresAt": 1623675976368
+      "madeAt": 1623756002194,
+      "expiresAt": 1626347994107
     }
   },
   "rules": {},
