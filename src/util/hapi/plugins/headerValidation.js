@@ -113,5 +113,6 @@ const plugin = {
 module.exports = {
   plugin,
   errorMessages,
+  defaultProtocolResources,
   defaultProtocolVersions
 }
