@@ -33,6 +33,7 @@ const Request = require('./request')
 const Http = require('./http')
 const Hapi = require('./hapi')
 const Headers = require('./headers/transformer')
+const HeaderValidation = require('./headersValidation')
 const Encoding = require('./encoding')
 const StreamingProtocol = require('./streaming/protocol')
 const Time = require('./time')
@@ -239,6 +240,7 @@ module.exports = {
   Http,
   Hapi,
   Headers,
+  HeaderValidation,
   Encoding,
   StreamingProtocol,
   Time,
