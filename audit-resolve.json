@@ -1,41 +1,21 @@
 {
   "decisions": {
+    "1766|widdershins>urijs": {
+      "decision": "fix",
+      "madeAt": 1627877107764
+    },
     "1500|widdershins>yargs>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1623755999183,
-      "expiresAt": 1626347994107
-    },
-    "1640|widdershins>urijs": {
-      "decision": "fix",
-      "madeAt": 1615187901100
-    },
-    "1654|@mojaloop/event-sdk>grpc>protobufjs>yargs>y18n": {
-      "decision": "fix",
-      "madeAt": 1620391401423
-    },
-    "1654|widdershins>yargs>y18n": {
-      "decision": "fix",
-      "madeAt": 1620391421241
-    },
-    "1673|@mojaloop/event-sdk>lodash": {
-      "decision": "ignore",
-      "madeAt": 1620357960127,
-      "expiresAt": 1622949946141
+      "madeAt": 1627877040831,
+      "expiresAt": 1630469028768
     },
     "1675|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1623756000737,
-      "expiresAt": 1626347994107
+      "madeAt": 1627877046520
     },
     "1676|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1623756000737,
-      "expiresAt": 1626347994107
-    },
-    "1693|shins>sanitize-html>postcss": {
-      "decision": "ignore",
-      "madeAt": 1623756002194,
-      "expiresAt": 1626347994107
+      "madeAt": 1627877046520
     }
   },
   "rules": {},
