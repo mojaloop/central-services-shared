@@ -141,7 +141,7 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
-       - run:
+      - run:
           name: Install testing dependencies
           command: npm install tape tapes tap-xunit
       - run:
