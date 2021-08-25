@@ -387,6 +387,7 @@ declare namespace CentralServicesShared {
           TRANSFER: EventTypeEnum.TRANSFER;
           PARTY: EventTypeEnum.PARTY;
           PARTICIPANT: EventTypeEnum.PARTICIPANT;
+          VERIFICATION: EventTypeEnum.VERIFICATION;
         };
       };
     };
