@@ -54,7 +54,8 @@ const Event = {
     PARTY: 'party',
     PARTICIPANT: 'participant',
     DEFERRED_SETTLEMENT: 'deferredsettlement',
-    GROSS_SETTLEMENT: 'transfersettlement'
+    GROSS_SETTLEMENT: 'transfersettlement',
+    VERIFICATION: 'verification'
   },
   Action: {
     ABORT: 'abort',
