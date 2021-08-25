@@ -253,7 +253,8 @@ declare namespace CentralServicesShared {
     TRANSACTION_REQUEST = 'transaction-request',
     TRANSFER = 'transfer',
     PARTY = 'party',
-    PARTICIPANT = 'participant'
+    PARTICIPANT = 'participant',
+    VERIFICATION = 'verification'
   }
 
   enum EventActionEnum {
