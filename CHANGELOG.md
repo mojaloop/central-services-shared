@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.4.0](https://github.com/mojaloop/central-services-shared/compare/v13.0.5...v13.4.0) (2021-08-25)
+
+
+### Features
+
+* **ci:** automate releases ([#311](https://github.com/mojaloop/central-services-shared/issues/311)) ([3ec7998](https://github.com/mojaloop/central-services-shared/commit/3ec79987a4acaddba83c74b41fe61ec3200946cc))
+* **enums:** add enums for /tpr/authorizations and /tpr/verifications ([#310](https://github.com/mojaloop/central-services-shared/issues/310)) ([332869b](https://github.com/mojaloop/central-services-shared/commit/332869bcefbb08d4fbc766b85c14a0bfb12c11bb))
+
 ## [13.3.0](https://github.com/mojaloop/central-services-shared/compare/v13.0.5...v13.3.0) (2021-08-25)
 
 
