@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.4.1](https://github.com/mojaloop/central-services-shared/compare/v13.4.0...v13.4.1) (2021-08-25)
+
+
+### Bug Fixes
+
+* **index.d.ts:** missing eventTypeEnum ([#312](https://github.com/mojaloop/central-services-shared/issues/312)) ([0dc78fc](https://github.com/mojaloop/central-services-shared/commit/0dc78fc228b65e52d5a4fc814fb88ad871952bdb))
+
 ## [13.4.0](https://github.com/mojaloop/central-services-shared/compare/v13.0.5...v13.4.0) (2021-08-25)
 
 
