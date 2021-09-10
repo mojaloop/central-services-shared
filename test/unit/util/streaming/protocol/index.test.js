@@ -452,7 +452,7 @@ Test('Utility Test', utilityTest => {
     assert.end()
   })
 
-  utilityTest.test('Protocol::decodePayload should correctly handle a base64URI encoded payload', function (assert) {
+  utilityTest.test('Protocol::decodePayload should correctly handle a base64URI encoded payload to ensure backward compatbilility', function (assert) {
     const encodedDataUriWithBase64URL = 'data:application/vnd.interoperability.parties+json;version=1.0;base64,eyJwYXJ0eSI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjIyMjQ0NDg4ODgiLCJmc3BJZCI6InBheWVlZnNwIn0sInBlcnNvbmFsSW5mbyI6eyJjb21wbGV4TmFtZSI6eyJmaXJzdE5hbWUiOiLhgIDhgLHhgKzhgIThgLrhgLjhgJHhgIDhgLrhgIXhgLYiLCJtaWRkbGVOYW1lIjoi4YCh4YCx4YCs4YCE4YC6IiwibGFzdE5hbWUiOiLhgJLhgLHhgKvhgLrhgJ7hgJThgLnhgJDhgKzhgJHhgL3hgJThgLoifSwiZGF0ZU9mQmlydGgiOiIxOTkwLTAxLTAxIn0sIm5hbWUiOiLhgIDhgLHhgKzhgIThgLrhgLjhgJHhgIDhgLrhgIXhgLYg4YCh4YCx4YCs4YCE4YC6IOGAkuGAseGAq-GAuuGAnuGAlOGAueGAkOGArOGAkeGAveGAlOGAuiJ9fQ'
     const result = StreamingProtocol.decodePayload(encodedDataUriWithBase64URL, { asParsed: false })
     assert.equal(encodedDataUriWithBase64URL.includes(base64url(result.body)), true)
@@ -460,7 +460,7 @@ Test('Utility Test', utilityTest => {
     assert.end()
   })
 
-  utilityTest.test('Protocol::decodeMessages should decode message as single message ', function (assert) {
+  utilityTest.test('Protocol::decodePayload should correctly handle none-base64 encoded dataURIs', function (assert) {
     const jsonMessage = { hello: 'world' }
     const mimeType = 'application/vnd.interoperability.parties+json'
     const paramList = [
