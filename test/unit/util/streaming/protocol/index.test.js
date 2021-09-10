@@ -34,6 +34,7 @@ const Uuid = require('uuid4')
 const StreamingProtocol = require(`${src}/util`).StreamingProtocol
 const Enum = require(`${src}`).Enum
 const Helper = require('../../../../util/helper')
+const base64url = require('base64url')
 
 const TRANSFER = Enum.Events.Event.Type.TRANSFER
 const PREPARE = Enum.Events.Event.Action.PREPARE
@@ -91,8 +92,8 @@ const messageProtocol = {
 const purePayload = '{"errorInformation":{"errorCode":"5200","errorDescription":"Generic limit error, amount \u0026 payments threshold."}}'
 const rawPayload = Buffer.from(purePayload)
 
-const plainTextDataUri = 'data:text/plain;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
-const plainTextDataUriErrorMimeType = 'data:tet/plain;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+const plainTextDataUri = 'data:text/plain;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ=='
+const plainTextDataUriErrorMimeType = 'data:tet/plain;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ=='
 
 const encodedMessage = {
   value: {
@@ -109,7 +110,7 @@ const encodedMessage = {
         'fspiop-destination': 'mockfsp02',
         'content-length': 437
       },
-      payload: 'data:application/json;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+      payload: 'data:application/json;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ=='
     },
     metadata: {
       event: {
@@ -437,6 +438,43 @@ Test('Utility Test', utilityTest => {
   utilityTest.test('Protocol::decodeMessages should decode message as single message ', function (assert) {
     const test = StreamingProtocol.decodeMessages(messages)
     assert.deepEqual(test, [decodedMessage])
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodePayload should correctly handle a base64 encoded payload', function (assert) {
+    const rawPayoad = '{"party":{"partyIdInfo":{"partyIdType":"MSISDN","partyIdentifier":"2224448888","fspId":"payeefsp"},"personalInfo":{"complexName":{"firstName":"ကောင်းထက်စံ","middleName":"အောင်","lastName":"ဒေါ်သန္တာထွန်"},"dateOfBirth":"1990-01-01"},"name":"ကောင်းထက်စံ အောင် ဒေါ်သန္တာထွန်"}}'
+    const mimeType = 'application/vnd.interoperability.parties+json;version=1.0'
+    const encodedPayload = StreamingProtocol.encodePayload(rawPayoad, mimeType)
+    assert.deepEqual(StreamingProtocol.isDataUri(encodedPayload), true)
+    const result = StreamingProtocol.decodePayload(encodedPayload, { asParsed: false })
+    assert.deepEqual(rawPayoad, result.body)
+
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodePayload should correctly handle a base64URI encoded payload', function (assert) {
+    const encodedDataUriWithBase64URL = 'data:application/vnd.interoperability.parties+json;version=1.0;base64,eyJwYXJ0eSI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjIyMjQ0NDg4ODgiLCJmc3BJZCI6InBheWVlZnNwIn0sInBlcnNvbmFsSW5mbyI6eyJjb21wbGV4TmFtZSI6eyJmaXJzdE5hbWUiOiLhgIDhgLHhgKzhgIThgLrhgLjhgJHhgIDhgLrhgIXhgLYiLCJtaWRkbGVOYW1lIjoi4YCh4YCx4YCs4YCE4YC6IiwibGFzdE5hbWUiOiLhgJLhgLHhgKvhgLrhgJ7hgJThgLnhgJDhgKzhgJHhgL3hgJThgLoifSwiZGF0ZU9mQmlydGgiOiIxOTkwLTAxLTAxIn0sIm5hbWUiOiLhgIDhgLHhgKzhgIThgLrhgLjhgJHhgIDhgLrhgIXhgLYg4YCh4YCx4YCs4YCE4YC6IOGAkuGAseGAq-GAuuGAnuGAlOGAueGAkOGArOGAkeGAveGAlOGAuiJ9fQ'
+    const result = StreamingProtocol.decodePayload(encodedDataUriWithBase64URL, { asParsed: false })
+    assert.equal(encodedDataUriWithBase64URL.includes(base64url(result.body)), true)
+
+    assert.end()
+  })
+
+  utilityTest.test('Protocol::decodeMessages should decode message as single message ', function (assert) {
+    const jsonMessage = { hello: 'world' }
+    const mimeType = 'application/vnd.interoperability.parties+json'
+    const paramList = [
+      'version=1.0'
+    ]
+    const params = paramList.reduce((prevParam, newParam) => {
+      return `${prevParam};${newParam}`
+    })
+    const base64URLEncodedInput = `data:${mimeType};${params}, ${JSON.stringify(jsonMessage)}`
+    const result = StreamingProtocol.decodePayload(base64URLEncodedInput, { asParsed: false })
+    assert.deepEqual(mimeType, result.mimeType)
+    assert.deepEqual(paramList, result.parameters)
+    assert.deepEqual(jsonMessage, JSON.parse(result.body))
+
     assert.end()
   })
 

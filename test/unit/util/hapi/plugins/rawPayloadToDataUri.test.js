@@ -28,6 +28,8 @@ const Hapi = require('@hapi/hapi')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Joi = require('@hapi/joi')
+const StreamingProtocol = require('../../../../../src/util').StreamingProtocol
+
 const init = async (options) => {
   const server = await new Hapi.Server(options)
 
@@ -120,13 +122,16 @@ Test('rawPayloadToDataUri plugin test', async (pluginTest) => {
         }
       }
 
+      const mimeType = 'application/json'
+      const encodedRequestPayload = StreamingProtocol.encodePayload(JSON.stringify(requestOptions.payload), mimeType)
+
       const server = await init(okOptions)
 
       const response = await server.inject(requestOptions)
       const parsedPayloadRequest = JSON.parse(response.payload)
       assert.equal(response.statusCode, 200, 'status code is correct')
       assert.deepEqual(parsedPayloadRequest.payload, requestOptions.payload)
-      assert.equal(parsedPayloadRequest.dataUri, 'data:application/json;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ', 'payload is base64 encoded dataUri')
+      assert.equal(parsedPayloadRequest.dataUri, encodedRequestPayload)
       await server.stop()
       assert.end()
     } catch (e) {
