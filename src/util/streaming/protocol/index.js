@@ -25,9 +25,8 @@
 
 const Uuid = require('uuid4')
 const Enum = require('../../../enums')
-const base64url = require('base64url')
-const parseDataURL = require('data-urls')
 const clone = require('clone')
+
 const allowedRegexForMimeTypes = /(text\/plain)|(application\/json)|(application\/vnd.interoperability[.])/
 
 /**
@@ -215,12 +214,14 @@ const createEventState = (status, code, description) => {
 const encodePayload = (input, mimeType) => {
   if (allowedRegexForMimeTypes.test(mimeType)) {
     return (input instanceof Buffer)
-      ? `data:${mimeType};base64,${base64url(input, 'utf8')}`
-      : `data:${mimeType};base64,${base64url(Buffer.from(input), 'utf8')}`
+      ? `data:${mimeType};base64,${input.toString('base64')}`
+      : `data:${mimeType};base64,${Buffer.from(input).toString('base64')}`
   } else {
     throw new Error(`mime type should match the following regex:${allowedRegexForMimeTypes.toString()}`)
   }
 }
+
+const DataUriRegEx = /^data:((?:\w+\/(?:(?!;).)+)?)((?:;[\w\W]*?[^;])*),(.+)$/
 
 /**
  *
@@ -228,8 +229,38 @@ const encodePayload = (input, mimeType) => {
  * @returns {boolean} - Whether or not the input is a data uri per regex
  */
 const isDataUri = (input) => {
-  const dataUriRegEx = /^\s*data:'?(?:([\w-]+)\/([\w+.-;=]+))'??(?:;charset=([\w-]+))?(?:;(base64))?,(.*)/
-  return dataUriRegEx.test(input)
+  return DataUriRegEx.test(input)
+}
+
+/**
+ * Parse dataUri into its components consisting of: data:[<mimeType>][;<parameters>][;base64],<body>
+ *  - mimeType: The mime type
+ *  - body: un-parsed body (i.e. a string will be returned), but will be base64 decoded if `base64` extension is found in the dataUri
+ *  - parameters: parameter list
+ *
+ * @param {string} dataUri - Data URI string
+ *
+ * @return {(object\|Protocol~DecodedURI)} returns an decodedURI containing the mimeType, body (base64 decoded if necessary), and parameter list
+ */
+const parseDataURI = (dataUri) => {
+  const matches = DataUriRegEx.exec(dataUri)
+  let isBase64 = false
+  let parameters = []
+  let body = (matches[3] && matches[3].length > 0) ? matches[3] : ''
+  if (matches[2] && matches[2].length > 0) {
+    parameters = matches[2].split(';').filter(param => param.length > 0)
+    isBase64 = (parameters.length > 0 && parameters[parameters.length - 1] === 'base64')
+  }
+
+  if (isBase64) {
+    body = Buffer.from(body, 'base64').toString()
+  }
+
+  return {
+    mimeType: matches[1],
+    body,
+    parameters
+  }
 }
 
 /**
@@ -240,7 +271,6 @@ const isDataUri = (input) => {
  *
  * @return {(object\|Protocol~DecodedURI)} based on the options, returns parsed JSON or decodedURI object
  */
-
 const decodePayload = (input, { asParsed = true } = {}) => {
   const parseDecodedDataToJson = (decodedData) => {
     const isAllowedMimeTypes = allowedRegexForMimeTypes.test(decodedData.mimeType.toString())
@@ -249,7 +279,7 @@ const decodePayload = (input, { asParsed = true } = {}) => {
     else throw new Error('invalid mime type')
   }
   if (isDataUri(input)) {
-    const parsedDataUrl = parseDataURL(input)
+    const parsedDataUrl = parseDataURI(input)
     return asParsed
       ? parseDecodedDataToJson(parsedDataUrl)
       : parsedDataUrl
