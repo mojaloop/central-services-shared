@@ -233,7 +233,10 @@ const isDataUri = (input) => {
 }
 
 /**
- * Decode Payload to base64 encoded data URI
+ * Parse dataUri into its components consisting of: data:[<mimeType>][;<parameters>][;base64],<body>
+ *  - mimeType: The mime type
+ *  - body: un-parsed body (i.e. a string will be returned), but will be base64 decoded if `base64` extension is found in the dataUri
+ *  - parameters: parameter list
  *
  * @param {string} dataUri - Data URI string
  *
