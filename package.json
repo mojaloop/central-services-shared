@@ -5,13 +5,13 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "scripts": {
-    "test": "npm run test:unit | npx faucet",
     "pretest": "standard",
     "standard": "standard",
     "standard:fix": "standard --fix",
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
-    "test:unit": "tapes 'test/unit/**/**.test.js'",
+    "test": "npm run test:unit | faucet",
+    "test:unit": "tape 'test/unit/**/*.test.js' | tap-spec",
     "test:xunit": "npm run test:unit | tap-xunit",
     "test:coverage": "nyc --reporter=lcov --reporter=text-summary tapes -- 'test/unit/**/**.test.js'",
     "test:coverage-check": "npm run test:coverage && nyc check-coverage",
@@ -86,6 +86,7 @@
     "sinon": "11.1.2",
     "standard": "16.0.4",
     "standard-version": "9.3.1",
+    "tap-spec": "^5.0.0",
     "tap-xunit": "2.4.1",
     "tape": "5.3.1",
     "tapes": "4.1.0"
