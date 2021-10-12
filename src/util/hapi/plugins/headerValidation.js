@@ -49,7 +49,8 @@ const plugin = {
   name: 'fspiop-api-protocol-version-header-validator',
   register: function (server, /* options: */ {
     resources = defaultProtocolResources,
-    supportedProtocolVersions = defaultProtocolVersions
+    supportedProtocolContentVersions = defaultProtocolVersions,
+    supportedProtocolAcceptVersions = defaultProtocolVersions
   }) {
     server.ext('onPostAuth', (request, h) => {
       // First, extract the resource type from the path
@@ -73,8 +74,8 @@ const plugin = {
             errorMessages.INVALID_ACCEPT_HEADER
           )
         }
-        if (!supportedProtocolVersions.some(supportedVer => accept.versions.has(supportedVer))) {
-          const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolVersions)
+        if (!supportedProtocolAcceptVersions.some(supportedVer => accept.versions.has(supportedVer))) {
+          const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolAcceptVersions)
           throw createFSPIOPError(
             Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
             errorMessages.REQUESTED_VERSION_NOT_SUPPORTED,
@@ -96,8 +97,8 @@ const plugin = {
           errorMessages.INVALID_CONTENT_TYPE_HEADER
         )
       }
-      if (!supportedProtocolVersions.includes(contentType.version)) {
-        const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolVersions)
+      if (!supportedProtocolContentVersions.includes(contentType.version)) {
+        const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolContentVersions)
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
           errorMessages.SUPPLIED_VERSION_NOT_SUPPORTED,
