@@ -1,15 +1,17 @@
 'use strict'
 
 const assert = require('assert').strict
+const _ = require('lodash')
 
 const protocolVersions = {
-  anyVersion: Symbol('Any version'),
+  anyVersion: Symbol('Any'),
   ONE: ['1', '1.0', '1.1']
 }
 
 const protocolVersionsMap = [
   { key: '1', value: '0' },
-  { key: '1', value: '1' }
+  { key: '1', value: '1' },
+  { key: 'Any', value: 'version' } // SHOULD THIS BE HERE?
 ]
 
 // Some convenience functions for generating regexes for header matching
@@ -65,11 +67,33 @@ const parseAcceptHeader = (resource, header) => {
   }
 }
 
+const convertSupportedVersionToExtensionList = (supportedVersions) => {
+  const supportedVersionsExtensionListMap = []
+  for (const version of supportedVersions) {
+    const versionList = version.toString().split('.').filter(num => num !== '')
+    if (versionList != null && versionList.length === 2) {
+      const versionMap = {}
+      // versionMap[versionList[0]] = versionList[1]
+      versionMap.key = versionList[0]
+      versionMap.value = versionList[1]
+      supportedVersionsExtensionListMap.push(versionMap)
+    } else if (versionList != null && versionList.length === 1) { // SHOULD we filter out 'version === protocolVersions.anyVersion'?
+      const versionMap = {}
+      // versionMap[versionList[0]] = '0'
+      versionMap.key = (version === protocolVersions.anyVersion) ? 'Any' : versionList[0]
+      versionMap.value = (version === protocolVersions.anyVersion) ? 'version' : '0'
+      supportedVersionsExtensionListMap.push(versionMap)
+    }
+  }
+  return _.uniqWith(supportedVersionsExtensionListMap, _.isEqual)
+}
+
 module.exports = {
   protocolVersions,
   protocolVersionsMap,
   generateAcceptRegex,
   generateContentTypeRegex,
   parseAcceptHeader,
-  parseContentTypeHeader
+  parseContentTypeHeader,
+  convertSupportedVersionToExtensionList
 }
