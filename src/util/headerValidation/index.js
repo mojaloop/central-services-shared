@@ -10,8 +10,7 @@ const protocolVersions = {
 
 const protocolVersionsMap = [
   { key: '1', value: '0' },
-  { key: '1', value: '1' },
-  { key: 'Any', value: 'version' } // SHOULD THIS BE HERE?
+  { key: '1', value: '1' }
 ]
 
 // Some convenience functions for generating regexes for header matching
@@ -57,6 +56,7 @@ const parseAcceptHeader = (resource, header) => {
   // The header contains a comma-delimited set of versions, extract these
   const versions = new Set(header
     .split(',')
+    // @ts-ignore
     .map(verStr => verStr.match(new RegExp(generateSingleAcceptRegexStr(resource)))[1])
     .map(match => match === undefined ? protocolVersions.anyVersion : match.split('=')[1])
   )
@@ -73,15 +73,13 @@ const convertSupportedVersionToExtensionList = (supportedVersions) => {
     const versionList = version.toString().split('.').filter(num => num !== '')
     if (versionList != null && versionList.length === 2) {
       const versionMap = {}
-      // versionMap[versionList[0]] = versionList[1]
       versionMap.key = versionList[0]
       versionMap.value = versionList[1]
       supportedVersionsExtensionListMap.push(versionMap)
-    } else if (versionList != null && versionList.length === 1) { // SHOULD we filter out 'version === protocolVersions.anyVersion'?
+    } else if (versionList != null && versionList.length === 1 && version !== protocolVersions.anyVersion) {
       const versionMap = {}
-      // versionMap[versionList[0]] = '0'
-      versionMap.key = (version === protocolVersions.anyVersion) ? 'Any' : versionList[0]
-      versionMap.value = (version === protocolVersions.anyVersion) ? 'version' : '0'
+      versionMap.key = versionList[0]
+      versionMap.value = '0'
       supportedVersionsExtensionListMap.push(versionMap)
     }
   }
