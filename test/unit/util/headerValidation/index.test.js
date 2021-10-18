@@ -9,7 +9,10 @@ const fs = require('fs')
 const path = require('path')
 const {
   generateAcceptRegex,
-  generateContentTypeRegex
+  generateContentTypeRegex,
+  convertSupportedVersionToExtensionList,
+  parseAcceptHeader,
+  protocolVersions
 } = require('../../../../src/util/headerValidation/index')
 const {
   generateAcceptHeader,
@@ -122,5 +125,93 @@ test('Run positive content-type header fuzz', t => {
     const fname = saveToTempFile('\'' + failures.join('\'\n\'') + '\'', 'positivefuzz')
     return t.fail(`Positive fuzz failed. Failures saved to: ${fname}.`)
   }
+  t.end()
+})
+
+test('Run test-case 1 for convertSupportedVersionToExtensionList', t => {
+  const supportedVersionList = [
+    '1',
+    '1.0',
+    '1.1'
+  ]
+  const expectedResult = [
+    { key: '1', value: '0' },
+    { key: '1', value: '1' }
+  ]
+  const result = convertSupportedVersionToExtensionList(supportedVersionList)
+  t.deepEqual(result, expectedResult)
+  t.end()
+})
+
+test('Run test-case 2 for convertSupportedVersionToExtensionList', t => {
+  const supportedVersionList = [
+    '1.',
+    '1.0',
+    '1.1'
+  ]
+  const expectedResult = [
+    { key: '1', value: '0' },
+    { key: '1', value: '1' }
+  ]
+  const result = convertSupportedVersionToExtensionList(supportedVersionList)
+  t.deepEqual(result, expectedResult)
+  t.end()
+})
+
+test('Run test-case 3 for convertSupportedVersionToExtensionList', t => {
+  const supportedVersionList = []
+  const expectedResult = []
+  const result = convertSupportedVersionToExtensionList(supportedVersionList)
+  t.deepEqual(result, expectedResult)
+  t.end()
+})
+
+test('Run test-case 4 for convertSupportedVersionToExtensionList', t => {
+  const supportedVersionList = [
+    2,
+    2.0,
+    3.1,
+    '1.0'
+  ]
+  const expectedResult = [
+    { key: '2', value: '0' },
+    { key: '3', value: '1' },
+    { key: '1', value: '0' }
+  ]
+  const result = convertSupportedVersionToExtensionList(supportedVersionList)
+  t.deepEqual(result, expectedResult)
+  t.end()
+})
+
+test('Run test-case 4 for convertSupportedVersionToExtensionList', t => {
+  const supportedVersionList = [
+    2,
+    2.0,
+    3.1,
+    '1.0',
+    protocolVersions.anyVersion
+  ]
+  const expectedResult = [
+    { key: '2', value: '0' },
+    { key: '3', value: '1' },
+    { key: '1', value: '0' }
+  ]
+  const result = convertSupportedVersionToExtensionList(supportedVersionList)
+  t.deepEqual(result, expectedResult)
+  t.end()
+})
+
+test('Run test-case for parseAcceptHeader', t => {
+  const resource = 'participants'
+  const acceptHeader = `application/vnd.interoperability.${resource}+json;version=1,application/vnd.interoperability.${resource}+json;version=1.1`
+  const expectedResult = {
+    valid: true,
+    versions: new Set([
+      '1',
+      '1.1'
+    ])
+  }
+  const result = parseAcceptHeader(resource, acceptHeader)
+  t.deepEqual(result, expectedResult)
   t.end()
 })
