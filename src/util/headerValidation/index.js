@@ -21,6 +21,9 @@ const generateContentTypeRegex = resource =>
 const generateAcceptRegex = resource =>
   new RegExp(`^${generateSingleAcceptRegexStr(resource)}(,${generateSingleAcceptRegexStr(resource)})*$`)
 
+const generateSingleAcceptRegex = resource =>
+  new RegExp(generateSingleAcceptRegexStr(resource))
+
 const generateSingleAcceptRegexStr = resource =>
   `application/vnd\\.interoperability\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
 
@@ -57,7 +60,7 @@ const parseAcceptHeader = (resource, header) => {
   const versions = new Set(header
     .split(',')
     // @ts-ignore
-    .map(verStr => verStr.match(new RegExp(generateSingleAcceptRegexStr(resource)))[1])
+    .map(verStr => verStr.match(generateSingleAcceptRegex(resource))[1])
     .map(match => match === undefined ? protocolVersions.anyVersion : match.split('=')[1])
   )
 
