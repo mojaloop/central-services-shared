@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.0.0](https://github.com/mojaloop/central-services-shared/compare/v14.0.0...v15.0.0) (2021-10-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mojaloop/#2536:** split options config for supportedProtocolVersions to supportedProtocolVersions & supportedProtocolAcceptVersions of HeaderValidation Hapi Plugin. It should be backward compatible, but forcing a major version bump to reflect this new functionality.
+
+### Bug Fixes
+
+* **mojaloop/#2536:** fspiop api version negotiation not handled by transfers service ([#315](https://github.com/mojaloop/central-services-shared/issues/315)) ([e3a8748](https://github.com/mojaloop/central-services-shared/commit/e3a874829794ed8b85b6487dd58bcb58f31a5dd1)), closes [mojaloop/#2536](https://github.com/mojaloop/central-services-shared/issues/2536) [mojaloop/#2536](https://github.com/mojaloop/central-services-shared/issues/2536)
+
 ## [14.0.0](https://github.com/mojaloop/central-services-shared/compare/v13.4.1...v14.0.0) (2021-09-10)
 
 
