@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.0.1](https://github.com/mojaloop/central-services-shared/compare/v15.0.0...v15.0.1) (2021-11-08)
+
+
+### Bug Fixes
+
+* **#2557:** error notification to payer fsp, header for source having wrong value ([#316](https://github.com/mojaloop/central-services-shared/issues/316)) ([d4b95b6](https://github.com/mojaloop/central-services-shared/commit/d4b95b619ce2c4f810ae6909859ef6dbf5894ad0)), closes [#2557](https://github.com/mojaloop/central-services-shared/issues/2557)
+
 ## [15.0.0](https://github.com/mojaloop/central-services-shared/compare/v14.0.0...v15.0.0) (2021-10-18)
 
 
