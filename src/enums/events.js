@@ -60,6 +60,7 @@ const Event = {
   Action: {
     ABORT: 'abort',
     ABORT_DUPLICATE: 'abort-duplicate',
+    ABORT_VALIDATION: 'abort-validation',
     ACCEPT: 'accept',
     BULK_ABORT: 'bulk-abort',
     BULK_COMMIT: 'bulk-commit',
