@@ -90,6 +90,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'abort-validation': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'bulk-abort': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
@@ -201,6 +205,10 @@ const TopicMap = {
       action: transferEventAction.POSITION
     },
     abort: {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'abort-validation': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     }

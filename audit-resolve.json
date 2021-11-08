@@ -2,28 +2,28 @@
   "decisions": {
     "1002401|widdershins>yargs>string-width>strip-ansi>ansi-regex": {
       "decision": "ignore",
-      "madeAt": 1634055157672,
-      "expiresAt": 1634659948656
+      "madeAt": 1636372052422,
+      "expiresAt": 1638964045850
     },
     "1002401|widdershins>yargs>cliui>string-width>strip-ansi>ansi-regex": {
       "decision": "ignore",
-      "madeAt": 1634055157672,
-      "expiresAt": 1634659948656
+      "madeAt": 1636372052422,
+      "expiresAt": 1638964045850
     },
     "1002865|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1634055159088,
-      "expiresAt": 1634659948656
+      "madeAt": 1636372053964,
+      "expiresAt": 1638964045850
     },
     "1002866|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1634055159088,
-      "expiresAt": 1634659948656
+      "madeAt": 1636372053964,
+      "expiresAt": 1638964045850
     },
     "1003019|widdershins>yargs>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1634055160271,
-      "expiresAt": 1634659948656
+      "madeAt": 1636372055094,
+      "expiresAt": 1638964045850
     }
   },
   "rules": {},
