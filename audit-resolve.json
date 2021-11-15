@@ -24,6 +24,21 @@
       "decision": "ignore",
       "madeAt": 1636372055094,
       "expiresAt": 1638964045850
+    },
+    "1004809|widdershins>openapi-sampler>json-pointer": {
+      "decision": "ignore",
+      "madeAt": 1636956486789,
+      "expiresAt": 1639548471465
+    },
+    "1004812|widdershins>swagger2openapi>better-ajv-errors>jsonpointer": {
+      "decision": "ignore",
+      "madeAt": 1636956491233,
+      "expiresAt": 1639548471465
+    },
+    "1004812|widdershins>swagger2openapi>oas-validator>better-ajv-errors>jsonpointer": {
+      "decision": "ignore",
+      "madeAt": 1636956491233,
+      "expiresAt": 1639548471465
     }
   },
   "rules": {},
