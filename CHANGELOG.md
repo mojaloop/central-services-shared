@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.1.0](https://github.com/mojaloop/central-services-shared/compare/v15.0.1...v15.1.0) (2021-11-17)
+
+
+### Features
+
+* add a new action enum for `RESERVED_ABORTED` ([#317](https://github.com/mojaloop/central-services-shared/issues/317)) ([0e743b8](https://github.com/mojaloop/central-services-shared/commit/0e743b82a90dd0c97ce3c72454621c191d2a6675))
+
 ### [15.0.1](https://github.com/mojaloop/central-services-shared/compare/v15.0.0...v15.0.1) (2021-11-08)
 
 
