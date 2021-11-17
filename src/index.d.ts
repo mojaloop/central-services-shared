@@ -260,6 +260,7 @@ declare namespace CentralServicesShared {
   enum EventActionEnum {
     ABORT = 'abort',
     ABORT_DUPLICATE = 'abort-duplicate',
+    ABORT_VALIDATION = 'abort-validation',
     ACCEPT = 'accept',
     BULK_ABORT = 'bulk-abort',
     BULK_COMMIT = 'bulk-commit',
@@ -294,6 +295,7 @@ declare namespace CentralServicesShared {
     RESOLVE = 'resolve',
     REQUEST = 'request',
     RESERVE = 'reserve',
+    RESERVED_ABORTED = 'reserved-aborted',
     SETTLEMENT_WINDOW = 'settlement-window',
     TIMEOUT_RECEIVED = 'timeout-received',
     TIMEOUT_RESERVED = 'timeout-reserved',
@@ -317,6 +319,7 @@ declare namespace CentralServicesShared {
         Action: {
           ABORT: EventActionEnum.ABORT;
           ABORT_DUPLICATE: EventActionEnum.ABORT_DUPLICATE;
+          ABORT_VALIDATION: EventActionEnum.ABORT_VALIDATION;
           ACCEPT: EventActionEnum.ACCEPT;
           BULK_ABORT: EventActionEnum.BULK_ABORT;
           BULK_COMMIT: EventActionEnum.BULK_COMMIT;
@@ -351,6 +354,7 @@ declare namespace CentralServicesShared {
           RESOLVE: EventActionEnum.RESOLVE;
           REQUEST: EventActionEnum.REQUEST;
           RESERVE: EventActionEnum.RESERVE;
+          RESERVED_ABORTED: EventActionEnum.RESERVED_ABORTED;
           SETTLEMENT_WINDOW: EventActionEnum.SETTLEMENT_WINDOW;
           TIMEOUT_RECEIVED: EventActionEnum.TIMEOUT_RECEIVED;
           TIMEOUT_RESERVED: EventActionEnum.TIMEOUT_RESERVED;

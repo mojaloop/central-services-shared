@@ -93,6 +93,10 @@ const Event = {
     RECORD_FUNDS_OUT_PREPARE_RESERVE: 'recordFundsOutPrepareReserve',
     REJECT: 'reject',
     RESOLVE: 'resolve',
+    
+    // The Transfer was marked as RESERVED by the payee DFSP
+    // and was then aborted by the switch
+    RESERVED_ABORTED: 'reserved-aborted',
     REQUEST: 'request',
     RESERVE: 'reserve',
     SETTLEMENT_WINDOW: 'settlement-window',
