@@ -143,7 +143,9 @@ const transformAccountToTopicName = (template, participantName, functionality, a
 const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
   try {
     const flowObject = kafkaConfig[flow]
+    console.log('flowObject', flowObject)
     const functionalityObject = flowObject[functionality]
+    console.log('functionalityObject', functionalityObject)
     const actionObject = action ? functionalityObject[action] : functionalityObject
     actionObject.config.logger = Logger
     return actionObject.config
