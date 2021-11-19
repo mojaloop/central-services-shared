@@ -327,5 +327,8 @@ module.exports = {
   produceParticipantMessage,
   produceGeneralMessage,
   commitMessageSync,
-  proceed
+  proceed,
+
+  // exported for testing purposes:
+  _getFunctionalityAction: getFunctionalityAction
 }

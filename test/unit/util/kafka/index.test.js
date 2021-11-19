@@ -46,6 +46,7 @@ const Utility = require('../../../../src/util').Kafka
 const Enum = require('../../../../src').Enum
 const Config = require('../../../util/config')
 const clone = require('../../../../src/util').clone
+const { _getFunctionalityAction } = require('../../../../src/util/kafka')
 
 let participantName
 const TRANSFER = Enum.Events.Event.Type.TRANSFER
@@ -124,406 +125,439 @@ Test('Utility Test', utilityTest => {
     test.end()
   })
 
-  utilityTest.test('createParticipantTopicConf should', createParticipantTopicConfTest => {
-    createParticipantTopicConfTest.test('return a participant topic conf object', test => {
-      const response = Utility.createParticipantTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, TRANSFER, PREPARE, 0)
-      test.equal(response.topicName, participantTopic)
-      test.equal(response.key, 0)
-      test.equal(response.partition, null)
-      test.equal(response.opaqueKey, null)
+  utilityTest.test('getFunctionalityAction', gfaTest => {
+    gfaTest.test('should return config for transfer-prepare', test => {
+      // Arrange
+      const expected = { functionalityMapped: 'transfer', actionMapped: 'prepare' }
+      // Act
+      const result = _getFunctionalityAction('transfer', 'prepare')
+      
+      // Assert
+      test.deepEqual(result, expected)
       test.end()
     })
 
-    createParticipantTopicConfTest.test('throw error when Mustache cannot find config', test => {
-      try {
-        Sinon.stub(Mustache, 'render').throws(new Error())
-        Utility.createParticipantTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, TRANSFER, PREPARE)
-        test.fail('No Error thrown')
-        test.end()
-        Mustache.render.restore()
-      } catch (e) {
-        test.pass('Error thrown')
-        test.end()
-        Mustache.render.restore()
-      }
+    gfaTest.test('should return config for transfer-reserved-aborted', test => {
+      // Arrange
+      const expected = { functionalityMapped: 'transfer', actionMapped: 'reserved-aborted' }
+      // Act
+      const result = _getFunctionalityAction('transfer', 'reserved-aborted')
+      
+      // Assert
+      test.deepEqual(result, expected)
+      test.end()
     })
 
-    createParticipantTopicConfTest.end()
+    gfaTest.end()
   })
 
-  utilityTest.test('createGeneralTopicConf should', createGeneralTopicConfTest => {
-    createGeneralTopicConfTest.test('return a general topic conf object', test => {
-      const response = Utility.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL, 0)
-      test.equal(response.topicName, generalTopic)
-      test.equal(response.key, 0)
-      test.equal(response.partition, null)
-      test.equal(response.opaqueKey, null)
-      test.end()
-    })
+  // utilityTest.test('createParticipantTopicConf should', createParticipantTopicConfTest => {
+  //   createParticipantTopicConfTest.test('return a participant topic conf object', test => {
+  //     const response = Utility.createParticipantTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, TRANSFER, PREPARE, 0)
+  //     test.equal(response.topicName, participantTopic)
+  //     test.equal(response.key, 0)
+  //     test.equal(response.partition, null)
+  //     test.equal(response.opaqueKey, null)
+  //     test.end()
+  //   })
 
-    createGeneralTopicConfTest.test('return a general topic conf object using topicMap', test => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
-        '../../enums': {
-          topicMap: {
-            transfer: {
-              fulfil: {
-                functionality: 'transfer',
-                action: 'fulfil'
-              }
-            }
-          }
-        }
-      })
-      const response = ModuleProxy.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL, 0)
-      test.equal(response.topicName, generalTopic)
-      test.equal(response.key, 0)
-      test.equal(response.partition, null)
-      test.equal(response.opaqueKey, null)
-      test.end()
-    })
+  //   createParticipantTopicConfTest.test('throw error when Mustache cannot find config', test => {
+  //     try {
+  //       Sinon.stub(Mustache, 'render').throws(new Error())
+  //       Utility.createParticipantTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.PARTICIPANT_TOPIC_TEMPLATE.TEMPLATE, participantName, TRANSFER, PREPARE)
+  //       test.fail('No Error thrown')
+  //       test.end()
+  //       Mustache.render.restore()
+  //     } catch (e) {
+  //       test.pass('Error thrown')
+  //       test.end()
+  //       Mustache.render.restore()
+  //     }
+  //   })
 
-    createGeneralTopicConfTest.test('throw error when Mustache cannot find config', test => {
-      try {
-        Sinon.stub(Mustache, 'render').throws(new Error())
-        Utility.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL)
-        test.fail('No Error thrown')
-        test.end()
-        Mustache.render.restore()
-      } catch (e) {
-        test.pass('Error thrown')
-        test.end()
-        Mustache.render.restore()
-      }
-    })
+  //   createParticipantTopicConfTest.end()
+  // })
 
-    createGeneralTopicConfTest.end()
-  })
+  // utilityTest.test('createGeneralTopicConf should', createGeneralTopicConfTest => {
+  //   createGeneralTopicConfTest.test('return a general topic conf object', test => {
+  //     const response = Utility.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL, 0)
+  //     test.equal(response.topicName, generalTopic)
+  //     test.equal(response.key, 0)
+  //     test.equal(response.partition, null)
+  //     test.equal(response.opaqueKey, null)
+  //     test.end()
+  //   })
+
+  //   createGeneralTopicConfTest.test('return a general topic conf object using topicMap', test => {
+  //     const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+  //       '../../enums': {
+  //         topicMap: {
+  //           transfer: {
+  //             fulfil: {
+  //               functionality: 'transfer',
+  //               action: 'fulfil'
+  //             }
+  //           }
+  //         }
+  //       }
+  //     })
+  //     const response = ModuleProxy.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL, 0)
+  //     test.equal(response.topicName, generalTopic)
+  //     test.equal(response.key, 0)
+  //     test.equal(response.partition, null)
+  //     test.equal(response.opaqueKey, null)
+  //     test.end()
+  //   })
+
+  //   createGeneralTopicConfTest.test('throw error when Mustache cannot find config', test => {
+  //     try {
+  //       Sinon.stub(Mustache, 'render').throws(new Error())
+  //       Utility.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL)
+  //       test.fail('No Error thrown')
+  //       test.end()
+  //       Mustache.render.restore()
+  //     } catch (e) {
+  //       test.pass('Error thrown')
+  //       test.end()
+  //       Mustache.render.restore()
+  //     }
+  //   })
+
+  //   createGeneralTopicConfTest.end()
+  // })
 
   utilityTest.test('getKafkaConfig should', getKafkaConfigTest => {
-    getKafkaConfigTest.test('return the Kafka config from the default.json', test => {
+    // getKafkaConfigTest.test('return the Kafka config from the default.json', test => {
+    //   const config = Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER.toUpperCase(), PREPARE.toUpperCase())
+    //   test.ok(config.rdkafkaConf !== undefined)
+    //   test.ok(config.options !== undefined)
+    //   test.end()
+    // })
+
+    getKafkaConfigTest.test('return the Kafka config fpr TRANSFER RESERVED_ABORTED', test => {
       const config = Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER.toUpperCase(), PREPARE.toUpperCase())
       test.ok(config.rdkafkaConf !== undefined)
       test.ok(config.options !== undefined)
       test.end()
     })
 
-    getKafkaConfigTest.test('throw and error if Kafka config not in default.json', test => {
-      try {
-        Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER, PREPARE)
-        test.fail('Error not thrown')
-        test.end()
-      } catch (e) {
-        test.pass('Error thrown')
-        test.end()
-      }
-    })
+    // getKafkaConfigTest.test('throw and error if Kafka config not in default.json', test => {
+    //   try {
+    //     Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER, PREPARE)
+    //     test.fail('Error not thrown')
+    //     test.end()
+    //   } catch (e) {
+    //     test.pass('Error thrown')
+    //     test.end()
+    //   }
+    // })
 
     getKafkaConfigTest.end()
   })
 
-  utilityTest.test('transformGeneralTopicName should', getKafkaConfigTest => {
-    getKafkaConfigTest.test('return the general topic name using a template in the default.json', test => {
-      const topicName = Utility.transformGeneralTopicName(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT)
-      test.ok(topicName === 'topic-notification-event')
-      test.end()
-    })
-    getKafkaConfigTest.end()
-  })
+  // utilityTest.test('transformGeneralTopicName should', getKafkaConfigTest => {
+  //   getKafkaConfigTest.test('return the general topic name using a template in the default.json', test => {
+  //     const topicName = Utility.transformGeneralTopicName(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT)
+  //     test.ok(topicName === 'topic-notification-event')
+  //     test.end()
+  //   })
+  //   getKafkaConfigTest.end()
+  // })
 
-  utilityTest.test('produceGeneralMessage should', produceGeneralMessageTest => {
-    produceGeneralMessageTest.test('produce a general message', async (test) => {
-      const span = EventSdk.Tracer.createSpan('test_span')
-      const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS, undefined, span)
-      test.equal(result, true)
-      test.end()
-    })
+  // utilityTest.test('produceGeneralMessage should', produceGeneralMessageTest => {
+  //   produceGeneralMessageTest.test('produce a general message', async (test) => {
+  //     const span = EventSdk.Tracer.createSpan('test_span')
+  //     const result = await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS, undefined, span)
+  //     test.equal(result, true)
+  //     test.end()
+  //   })
 
-    produceGeneralMessageTest.test('produce a general message using topicMap', async (test) => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
-        '../../enums': {
-          topicMap: {
-            transfer: {
-              prepare: {
-                functionality: 'transfer',
-                action: 'prepare'
-              }
-            }
-          }
-        }
-      })
-      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      test.equal(result, true)
-      test.end()
-    })
+  //   produceGeneralMessageTest.test('produce a general message using topicMap', async (test) => {
+  //     const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+  //       '../../enums': {
+  //         topicMap: {
+  //           transfer: {
+  //             prepare: {
+  //               functionality: 'transfer',
+  //               action: 'prepare'
+  //             }
+  //           }
+  //         }
+  //       }
+  //     })
+  //     const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     test.equal(result, true)
+  //     test.end()
+  //   })
 
-    produceGeneralMessageTest.test('produce a notification message using topicMap', async (test) => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
-        '../../enums': {
-          topicMap: {
-            transfer: {
-              prepare: {
-                functionality: 'transfer',
-                action: 'prepare'
-              }
-            }
-          }
-        }
-      })
-      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      test.equal(result, true)
-      test.end()
-    })
+  //   produceGeneralMessageTest.test('produce a notification message using topicMap', async (test) => {
+  //     const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+  //       '../../enums': {
+  //         topicMap: {
+  //           transfer: {
+  //             prepare: {
+  //               functionality: 'transfer',
+  //               action: 'prepare'
+  //             }
+  //           }
+  //         }
+  //       }
+  //     })
+  //     const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     test.equal(result, true)
+  //     test.end()
+  //   })
 
-    produceGeneralMessageTest.test('produce a general message', async (test) => {
-      try {
-        await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      } catch (e) {
-        test.ok(e instanceof Error)
-      }
-      test.end()
-    })
+  //   produceGeneralMessageTest.test('produce a general message', async (test) => {
+  //     try {
+  //       await Utility.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     } catch (e) {
+  //       test.ok(e instanceof Error)
+  //     }
+  //     test.end()
+  //   })
 
-    produceGeneralMessageTest.end()
-  })
+  //   produceGeneralMessageTest.end()
+  // })
 
-  utilityTest.test('produceParticipantMessage should', produceParticipantMessageTest => {
-    produceParticipantMessageTest.test('produce a participant message', async (test) => {
-      const result = await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      test.equal(result, true)
-      test.end()
-    })
+  // utilityTest.test('produceParticipantMessage should', produceParticipantMessageTest => {
+  //   produceParticipantMessageTest.test('produce a participant message', async (test) => {
+  //     const result = await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     test.equal(result, true)
+  //     test.end()
+  //   })
 
-    produceParticipantMessageTest.test('produce a participant message using topicMap', async (test) => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
-        '../../enums': {
-          topicMap: {
-            transfer: {
-              prepare: {
-                functionality: 'transfer',
-                action: 'prepare'
-              }
-            }
-          }
-        }
-      })
-      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      test.equal(result, true)
-      test.end()
-    })
+  //   produceParticipantMessageTest.test('produce a participant message using topicMap', async (test) => {
+  //     const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+  //       '../../enums': {
+  //         topicMap: {
+  //           transfer: {
+  //             prepare: {
+  //               functionality: 'transfer',
+  //               action: 'prepare'
+  //             }
+  //           }
+  //         }
+  //       }
+  //     })
+  //     const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     test.equal(result, true)
+  //     test.end()
+  //   })
 
-    produceParticipantMessageTest.test('produce a notification message using topicMap', async (test) => {
-      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
-        '../../enums': {
-          topicMap: {
-            transfer: {
-              prepare: {
-                functionality: 'transfer',
-                action: 'prepare'
-              }
-            }
-          }
-        }
-      })
-      const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      test.equal(result, true)
-      test.end()
-    })
+  //   produceParticipantMessageTest.test('produce a notification message using topicMap', async (test) => {
+  //     const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+  //       '../../enums': {
+  //         topicMap: {
+  //           transfer: {
+  //             prepare: {
+  //               functionality: 'transfer',
+  //               action: 'prepare'
+  //             }
+  //           }
+  //         }
+  //       }
+  //     })
+  //     const result = await ModuleProxy.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, Enum.Events.Event.Type.NOTIFICATION, Enum.Events.Event.Action.ABORT, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     test.equal(result, true)
+  //     test.end()
+  //   })
 
-    produceParticipantMessageTest.test('produce a participant message', async (test) => {
-      try {
-        await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
-      } catch (e) {
-        test.ok(e instanceof Error)
-      }
-      test.end()
-    })
+  //   produceParticipantMessageTest.test('produce a participant message', async (test) => {
+  //     try {
+  //       await Utility.produceParticipantMessage(Config.KAFKA_CONFIG, KafkaProducer, participantName, TRANSFER, 'invalid', messageProtocol, Enum.Events.EventStatus.SUCCESS)
+  //     } catch (e) {
+  //       test.ok(e instanceof Error)
+  //     }
+  //     test.end()
+  //   })
 
-    produceParticipantMessageTest.end()
-  })
+  //   produceParticipantMessageTest.end()
+  // })
 
-  utilityTest.test('commitMessageSync should', commitMessageSyncTest => {
-    commitMessageSyncTest.test('commit message when auto commit is disabled', async (test) => {
-      const kafkaTopic = 'test-topic'
-      const message = 'message'
-      const commitMessageSyncStub = sandbox.stub()
-      const consumerStub = {
-        commitMessageSync: commitMessageSyncStub
-      }
-      const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
-        getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
-      }
-      const UtilityProxy = rewire(`${src}/util/kafka`)
+  // utilityTest.test('commitMessageSync should', commitMessageSyncTest => {
+  //   commitMessageSyncTest.test('commit message when auto commit is disabled', async (test) => {
+  //     const kafkaTopic = 'test-topic'
+  //     const message = 'message'
+  //     const commitMessageSyncStub = sandbox.stub()
+  //     const consumerStub = {
+  //       commitMessageSync: commitMessageSyncStub
+  //     }
+  //     const ConsumerStub = {
+  //       isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
+  //       getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
+  //     }
+  //     const UtilityProxy = rewire(`${src}/util/kafka`)
 
-      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
-      test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
-      test.ok(commitMessageSyncStub.withArgs(message).calledOnce, 'commitMessageSyncStub called once')
-      test.end()
-    })
+  //     await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
+  //     test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
+  //     test.ok(commitMessageSyncStub.withArgs(message).calledOnce, 'commitMessageSyncStub called once')
+  //     test.end()
+  //   })
 
-    commitMessageSyncTest.test('skip committing message when auto commit is enabled', async (test) => {
-      const kafkaTopic = 'test-topic'
-      const message = 'message'
-      const commitMessageSyncStub = sandbox.stub()
-      const consumerStub = {
-        commitMessageSync: commitMessageSyncStub
-      }
-      const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true),
-        getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
-      }
+  //   commitMessageSyncTest.test('skip committing message when auto commit is enabled', async (test) => {
+  //     const kafkaTopic = 'test-topic'
+  //     const message = 'message'
+  //     const commitMessageSyncStub = sandbox.stub()
+  //     const consumerStub = {
+  //       commitMessageSync: commitMessageSyncStub
+  //     }
+  //     const ConsumerStub = {
+  //       isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(true),
+  //       getConsumer: sandbox.stub().withArgs(kafkaTopic).returns(consumerStub)
+  //     }
 
-      const UtilityProxy = rewire(`${src}/util/kafka`)
+  //     const UtilityProxy = rewire(`${src}/util/kafka`)
 
-      await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
-      test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
-      test.equal(commitMessageSyncStub.withArgs(message).callCount, 0, 'commitMessageSyncStub not called')
-      test.end()
-    })
+  //     await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
+  //     test.ok(ConsumerStub.isConsumerAutoCommitEnabled.withArgs(kafkaTopic).calledOnce, 'isConsumerAutoCommitEnabled called once')
+  //     test.equal(commitMessageSyncStub.withArgs(message).callCount, 0, 'commitMessageSyncStub not called')
+  //     test.end()
+  //   })
 
-    commitMessageSyncTest.test('skip committing message when auto commit is enabled', async (test) => {
-      const kafkaTopic = 'fail-topic'
-      const message = 'message'
-      const ConsumerStub = {
-        isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
-        getConsumer: sandbox.stub().withArgs(kafkaTopic).throwsException(new Error('No Consumer'))
-      }
+  //   commitMessageSyncTest.test('skip committing message when auto commit is enabled', async (test) => {
+  //     const kafkaTopic = 'fail-topic'
+  //     const message = 'message'
+  //     const ConsumerStub = {
+  //       isConsumerAutoCommitEnabled: sandbox.stub().withArgs(kafkaTopic).returns(false),
+  //       getConsumer: sandbox.stub().withArgs(kafkaTopic).throwsException(new Error('No Consumer'))
+  //     }
 
-      const UtilityProxy = rewire(`${src}/util/kafka`)
-      try {
-        await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
-        test.fail('No error thrown')
-        test.end()
-      } catch (err) {
-        test.ok(err instanceof Error)
-        test.end()
-      }
-    })
+  //     const UtilityProxy = rewire(`${src}/util/kafka`)
+  //     try {
+  //       await UtilityProxy.commitMessageSync(ConsumerStub, kafkaTopic, message)
+  //       test.fail('No error thrown')
+  //       test.end()
+  //     } catch (err) {
+  //       test.ok(err instanceof Error)
+  //       test.end()
+  //     }
+  //   })
 
-    commitMessageSyncTest.end()
-  })
+  //   commitMessageSyncTest.end()
+  // })
 
-  utilityTest.test('proceed should', async proceedTest => {
-    const commitMessageSyncStub = sandbox.stub().returns(Promise.resolve())
-    const produceGeneralMessageStub = sandbox.stub().returns(Promise.resolve())
-    const successState = Enum.Events.EventStatus.SUCCESS
-    const from = 'from'
-    const extList = []
-    const message = {
-      value: {
-        content: {
-          payload: {
-            extensionList: extList
-          },
-          headers: {
-            'fspiop-destination': 'dfsp'
-          }
-        },
-        from
-      }
-    }
-    const transferId = Uuid()
-    const kafkaTopic = 'kafkaTopic'
-    const consumer = 'consumer'
-    const producer = 'producer'
-    const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload, producer }
-    const eventDetail = { functionality: 'functionality', action: 'action' }
-    const UtilityProxy = rewire(`${src}/util/kafka/index`)
-    UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)
-    UtilityProxy.__set__('produceGeneralMessage', produceGeneralMessageStub)
+  // utilityTest.test('proceed should', async proceedTest => {
+  //   const commitMessageSyncStub = sandbox.stub().returns(Promise.resolve())
+  //   const produceGeneralMessageStub = sandbox.stub().returns(Promise.resolve())
+  //   const successState = Enum.Events.EventStatus.SUCCESS
+  //   const from = 'from'
+  //   const extList = []
+  //   const message = {
+  //     value: {
+  //       content: {
+  //         payload: {
+  //           extensionList: extList
+  //         },
+  //         headers: {
+  //           'fspiop-destination': 'dfsp'
+  //         }
+  //       },
+  //       from
+  //     }
+  //   }
+  //   const transferId = Uuid()
+  //   const kafkaTopic = 'kafkaTopic'
+  //   const consumer = 'consumer'
+  //   const producer = 'producer'
+  //   const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload, producer }
+  //   const eventDetail = { functionality: 'functionality', action: 'action' }
+  //   const UtilityProxy = rewire(`${src}/util/kafka/index`)
+  //   UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)
+  //   UtilityProxy.__set__('produceGeneralMessage', produceGeneralMessageStub)
 
-    proceedTest.test('commitMessageSync when consumerCommit and produce toDestination', async test => {
-      const opts = { consumerCommit: true, eventDetail, toDestination: true }
-      try {
-        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub called once')
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub called once')
-        test.equal(result, true, 'result returned')
-      } catch (err) {
-        test.fail(err.message)
-      }
+  //   proceedTest.test('commitMessageSync when consumerCommit and produce toDestination', async test => {
+  //     const opts = { consumerCommit: true, eventDetail, toDestination: true }
+  //     try {
+  //       const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+  //       test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub called once')
+  //       test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub called once')
+  //       test.equal(result, true, 'result returned')
+  //     } catch (err) {
+  //       test.fail(err.message)
+  //     }
 
-      test.end()
-    })
+  //     test.end()
+  //   })
 
-    proceedTest.test('commitMessageSync when consumerCommit and toDestination is string', async test => {
-      const opts = { consumerCommit: true, eventDetail, toDestination: 'dfsp1' }
-      try {
-        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.ok(commitMessageSyncStub.calledTwice, 'commitMessageSyncStub called once')
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).secondCall, 'produceGeneralMessageStub called once')
-        test.equal(result, true, 'result returned')
-      } catch (err) {
-        test.fail(err.message)
-      }
+  //   proceedTest.test('commitMessageSync when consumerCommit and toDestination is string', async test => {
+  //     const opts = { consumerCommit: true, eventDetail, toDestination: 'dfsp1' }
+  //     try {
+  //       const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+  //       test.ok(commitMessageSyncStub.calledTwice, 'commitMessageSyncStub called once')
+  //       test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).secondCall, 'produceGeneralMessageStub called once')
+  //       test.equal(result, true, 'result returned')
+  //     } catch (err) {
+  //       test.fail(err.message)
+  //     }
 
-      test.end()
-    })
+  //     test.end()
+  //   })
 
-    proceedTest.test('produce fromSwitch and do not stop timer', async test => {
-      const opts = { fromSwitch: true, eventDetail }
-      try {
-        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).lastCall, 'produceGeneralMessageStub called twice')
-        test.equal(message.value.to, from, 'message destination set to sender')
-        test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
-        test.equal(result, true, 'result returned')
-      } catch (err) {
-        test.fail(err.message)
-      }
+  //   proceedTest.test('produce fromSwitch and do not stop timer', async test => {
+  //     const opts = { fromSwitch: true, eventDetail }
+  //     try {
+  //       const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+  //       test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).lastCall, 'produceGeneralMessageStub called twice')
+  //       test.equal(message.value.to, from, 'message destination set to sender')
+  //       test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+  //       test.equal(result, true, 'result returned')
+  //     } catch (err) {
+  //       test.fail(err.message)
+  //     }
 
-      test.end()
-    })
+  //     test.end()
+  //   })
 
-    proceedTest.test('produce fromSwitch without headers', async test => {
-      const opts = { fromSwitch: true, eventDetail }
-      try {
-        const localParams = clone(params)
-        delete localParams.message.value.content.headers
-        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).lastCall, 'produceGeneralMessageStub called twice')
-        test.equal(message.value.to, from, 'message destination set to sender')
-        test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
-        test.equal(result, true, 'result returned')
-      } catch (err) {
-        test.fail(err.message)
-      }
+  //   proceedTest.test('produce fromSwitch without headers', async test => {
+  //     const opts = { fromSwitch: true, eventDetail }
+  //     try {
+  //       const localParams = clone(params)
+  //       delete localParams.message.value.content.headers
+  //       const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
+  //       test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).lastCall, 'produceGeneralMessageStub called twice')
+  //       test.equal(message.value.to, from, 'message destination set to sender')
+  //       test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+  //       test.equal(result, true, 'result returned')
+  //     } catch (err) {
+  //       test.fail(err.message)
+  //     }
 
-      test.end()
-    })
+  //     test.end()
+  //   })
 
-    proceedTest.test('create error status and end timer', async test => {
-      const desc = 'desc'
-      const fspiopError = ErrorHandler.Factory.createInternalServerFSPIOPError(desc).toApiErrorObject()
-      const opts = { fspiopError }
-      try {
-        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.equal(result, true, 'result returned')
-      } catch (err) {
-        test.fail(err.message)
-      }
+  //   proceedTest.test('create error status and end timer', async test => {
+  //     const desc = 'desc'
+  //     const fspiopError = ErrorHandler.Factory.createInternalServerFSPIOPError(desc).toApiErrorObject()
+  //     const opts = { fspiopError }
+  //     try {
+  //       const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+  //       test.equal(result, true, 'result returned')
+  //     } catch (err) {
+  //       test.fail(err.message)
+  //     }
 
-      test.end()
-    })
+  //     test.end()
+  //   })
 
-    proceedTest.test('create error status and end timer with uriParams', async test => {
-      const desc = 'desc'
-      const fspiopError = ErrorHandler.Factory.createInternalServerFSPIOPError(desc).toApiErrorObject()
-      const opts = { fspiopError }
-      try {
-        const localParams = MainUtil.clone(params)
-        localParams.message.value.content.uriParams = { id: Uuid() }
-        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
-        test.equal(result, true, 'result returned')
-      } catch (err) {
-        test.fail(err.message)
-      }
+  //   proceedTest.test('create error status and end timer with uriParams', async test => {
+  //     const desc = 'desc'
+  //     const fspiopError = ErrorHandler.Factory.createInternalServerFSPIOPError(desc).toApiErrorObject()
+  //     const opts = { fspiopError }
+  //     try {
+  //       const localParams = MainUtil.clone(params)
+  //       localParams.message.value.content.uriParams = { id: Uuid() }
+  //       const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
+  //       test.equal(result, true, 'result returned')
+  //     } catch (err) {
+  //       test.fail(err.message)
+  //     }
 
-      test.end()
-    })
+  //     test.end()
+  //   })
 
-    proceedTest.end()
-  })
+  //   proceedTest.end()
+  // })
 
   utilityTest.end()
 })
