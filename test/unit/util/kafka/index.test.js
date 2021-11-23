@@ -245,32 +245,6 @@ Test('Utility Test', utilityTest => {
       test.end()
     })
 
-    // getKafkaConfigTest.test('return the Kafka config for NOTIFICATION ABORT_VALIDATION', test => {
-    //   const config = Utility.getKafkaConfig(
-    //     Config.KAFKA_CONFIG, 
-    //     CONSUMER, 
-    //     Enum.Events.Event.Type.POSITION.toUpperCase(),
-    //     Enum.Events.Event.Action.ABORT_VALIDATION.toUpperCase()
-    //   )
-    //   console.log('config is', config)
-    //   test.ok(config.rdkafkaConf !== undefined)
-    //   test.ok(config.options !== undefined)
-    //   test.end()
-    // })
-
-    // getKafkaConfigTest.test('return the Kafka config for NOTIFICATION RESERVED_ABORTED', test => {
-    //   const config = Utility.getKafkaConfig(
-    //     Config.KAFKA_CONFIG, 
-    //     CONSUMER, 
-    //     Enum.Events.Event.Type.NOTIFICATION.toUpperCase(),
-    //     Enum.Events.Event.Action.RESERVED_ABORTED.toUpperCase()
-    //   )
-    //   console.log('config is', config)
-    //   test.ok(config.rdkafkaConf !== undefined)
-    //   test.ok(config.options !== undefined)
-    //   test.end()
-    // })
-
     getKafkaConfigTest.test('throw and error if Kafka config not in default.json', test => {
       try {
         Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER, PREPARE)
