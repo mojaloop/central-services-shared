@@ -127,6 +127,7 @@ Test('Transfer Transformer tests', TransformerTest => {
 
     transformHeadersTest.test('Set ContentType && Accept versions via config', async test => {
       const RESOURCE_VERSIONS_BACKUP = process.env.RESOURCE_VERSIONS
+      // we keep this here to make sure it does not override the injected protocolVersions config
       process.env.RESOURCE_VERSIONS = 'transfers=1.0,quotes=1.0'
 
       const headerConfig = {
