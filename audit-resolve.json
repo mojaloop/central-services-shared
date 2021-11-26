@@ -39,6 +39,46 @@
       "decision": "ignore",
       "madeAt": 1636956491233,
       "expiresAt": 1639548471465
+    },
+    "1004854|widdershins>openapi-sampler>json-pointer": {
+      "decision": "ignore",
+      "madeAt": 1637925238134,
+      "expiresAt": 1640517233443
+    },
+    "1004869|widdershins>swagger2openapi>better-ajv-errors>jsonpointer": {
+      "decision": "ignore",
+      "madeAt": 1637925239670,
+      "expiresAt": 1640517233443
+    },
+    "1004869|widdershins>swagger2openapi>oas-validator>better-ajv-errors>jsonpointer": {
+      "decision": "ignore",
+      "madeAt": 1637925239670,
+      "expiresAt": 1640517233443
+    },
+    "1004946|widdershins>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1637925241156,
+      "expiresAt": 1640517233443
+    },
+    "1004946|widdershins>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1637925241156,
+      "expiresAt": 1640517233443
+    },
+    "1005383|shins>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1637925243300,
+      "expiresAt": 1640517233443
+    },
+    "1005384|shins>sanitize-html": {
+      "decision": "ignore",
+      "madeAt": 1637925243300,
+      "expiresAt": 1640517233443
+    },
+    "1005534|widdershins>yargs>yargs-parser": {
+      "decision": "ignore",
+      "madeAt": 1637925244682,
+      "expiresAt": 1640517233443
     }
   },
   "rules": {},
