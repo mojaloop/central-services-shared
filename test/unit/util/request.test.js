@@ -112,6 +112,59 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       }
     })
 
+    getEndpointTest.test('handle protocolVersions for config injection', async (test) => {
+      const protocolVersions = {
+        content: '2.1',
+        accept: '2'
+      }
+      const fsp = 'fsp'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+      const requestFunction = (request) => {
+        test.equal(request.headers['content-type'], Helper.generateProtocolHeader('participants', protocolVersions.content))
+        test.equal(request.headers.accept, Helper.generateProtocolHeader('participants', protocolVersions.accept))
+        return Helper.getEndPointsResponse
+      }
+      const span = EventSdk.Tracer.createSpan('test-span')
+      Model = proxyquire('../../../src/util/request', { axios: requestFunction })
+
+      try {
+        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span, null, protocolVersions)
+        test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('handle protocolVersions without config injection', async (test) => {
+      const protocolVersions = null
+      const fsp = 'fsp'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+      const requestFunction = (request) => {
+        test.equal(request.headers['content-type'], Helper.generateProtocolHeader('participants', '1.0'))
+        test.equal(request.headers.accept, Helper.generateProtocolHeader('participants', '1'))
+        return Helper.getEndPointsResponse
+      }
+      const span = EventSdk.Tracer.createSpan('test-span')
+      Model = proxyquire('../../../src/util/request', { axios: requestFunction })
+
+      try {
+        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span, null, protocolVersions)
+        test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
     getEndpointTest.test('throw error', async (test) => {
       const fsp = 'fsp1'
 

@@ -31,6 +31,7 @@ const Sinon = require('sinon')
 const Transformer = require('../../../src/util').Headers
 const Enum = require('../../../src/enums')
 const Util = require('../../../src/util')
+const Helper = require('../../util/helper')
 
 const headerConfigExample = {
   httpMethod: 'PUT',
@@ -54,8 +55,6 @@ const headerDataTransformedExample = {
   'FSPIOP-Destination': headerDataInputExample['FSPIOP-Destination']
 }
 
-const generateProtocolHeader = (resource, version) => `application/vnd.interoperability.${resource}+json;version=${version}`
-
 Test('Transfer Transformer tests', TransformerTest => {
   let sandbox
 
@@ -72,7 +71,7 @@ Test('Transfer Transformer tests', TransformerTest => {
   TransformerTest.test('Transformer.getResourceInfoFromHeaderTest() should', getResourceInfoFromHeaderTest => {
     getResourceInfoFromHeaderTest.test('parse FSPIOP Content-Type example correctly', async test => {
       const result = Transformer.getResourceInfoFromHeader(headerDataInputExample['Content-Type'])
-      test.equal(headerDataInputExample['Content-Type'], generateProtocolHeader(result.resourceType, result.version))
+      test.equal(headerDataInputExample['Content-Type'], Helper.generateProtocolHeader(result.resourceType, result.version))
       test.end()
     })
 
@@ -115,7 +114,7 @@ Test('Transfer Transformer tests', TransformerTest => {
       }
 
       const headerData = Util.clone(headerDataInputExample)
-      headerData.Accept = generateProtocolHeader('transfers', '1')
+      headerData.Accept = Helper.generateProtocolHeader('transfers', '1')
 
       const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
 
@@ -141,7 +140,7 @@ Test('Transfer Transformer tests', TransformerTest => {
       }
 
       const headerData = Util.clone(headerDataInputExample)
-      headerData.Accept = generateProtocolHeader('transfers', '1.1')
+      headerData.Accept = Helper.generateProtocolHeader('transfers', '1.1')
 
       const resourceInfoFromHeader = Transformer.getResourceInfoFromHeader(headerData['Content-Type'])
 
@@ -151,7 +150,7 @@ Test('Transfer Transformer tests', TransformerTest => {
       test.equal(resourceInfoFromHeader.resourceType, resourceInfoFromTransformedHeader.resourceType)
       test.equal(resourceInfoFromHeader.version, '1.0')
       test.equal(resourceInfoFromTransformedHeader.version, '1.1')
-      test.equal(transformedHeaderData.Accept, generateProtocolHeader('transfers', headerConfig.protocolVersions.accept))
+      test.equal(transformedHeaderData.Accept, Helper.generateProtocolHeader('transfers', headerConfig.protocolVersions.accept))
       test.end()
       process.env.RESOURCE_VERSIONS = RESOURCE_VERSIONS_BACKUP
     })
