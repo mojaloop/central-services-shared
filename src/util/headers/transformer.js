@@ -30,11 +30,35 @@ const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const resourceVersions = require('../helpers').resourceVersions
 
-const regexForContentAndAcceptHeaders = /(application\/vnd\.interoperability\.)(\w*)+(\+json\s{0,1};\s{0,1}version=)(.*)/
-
 /**
  * @module src/headers/transformer
  */
+
+const regexForContentAndAcceptHeaders = /(application\/vnd\.interoperability\.)(\w*)+(\+json\s{0,1};\s{0,1}version=)(.*)/
+
+/**
+* @function getResourceInfoFromHeader
+*
+* @description This will parse either a FSPIOP Content-Type or Accept header and return an object containing the resourceType and applicable version
+*
+* @typedef ResourceInfo
+* @type {object}
+* @property {string} resourceType - resource parsed from the headerValue.
+* @property {string} version - version parsed from the headerValue.
+*
+* @param {string} headerValue - the http header from the request, thus must be either an FSPIOP Content-Type or Accept header.
+*
+* @returns {ResourceInfo} Returns resourceInfo object. If the headerValue was not parsed correctly, an empty object {} will be returned.
+*/
+const getResourceInfoFromHeader = (headerValue) => {
+  const result = {}
+  const regex = regexForContentAndAcceptHeaders.exec(headerValue)
+  if (regex) {
+    if (regex[2]) result.resourceType = regex[2]
+    if (regex[4]) result.version = regex[4]
+  }
+  return result
+}
 
 /**
 * @function transformHeaders
@@ -45,7 +69,31 @@ const regexForContentAndAcceptHeaders = /(application\/vnd\.interoperability\.)(
 *
 * see https://nodejs.org/dist/latest-v10.x/docs/api/http.html#http_message_headers
 *
+* @typedef TransformProtocolVersions
+* @type {object}
+* @property {string} content - protocol version to be used in the ContentType HTTP Header.
+* @property {string} accept - protocol version to be used in the Accept HTTP Header.
+*
+* @typedef TransformHeadersConfig
+* @type {object}
+* @property {string} contentType - HTTP method such as "POST", "PUT", etc.
+* @property {string} accept - Source FSP Identifier.
+* @property {string} destinationFsp - Destination FSP Identifier.
+* @property {TransformProtocolVersions} protocolVersions - Config for Protocol versions to be used.
+*
+* Config supports the following parameters:
+*  config: {
+*    httpMethod: string,
+*    sourceFsp: string,
+*    destinationFsp: string,
+*    protocolVersions: {
+*      content: string,
+*      accept: string
+*    }
+*  }
+*
 * @param {object} headers - the http header from the request
+* @param {TransformHeadersConfig} headers - the http header from the request
 *
 * @returns {object} Returns the normalized headers
 */
@@ -62,8 +110,15 @@ const transformHeaders = (headers, config) => {
   const normalizedHeaders = {}
 
   // resource type for content-type and accept headers
-  const getResourceFromHeader = (headerValue) => regexForContentAndAcceptHeaders.exec(headerValue)[2]
   let resourceType
+  let acceptVersion
+  let contentVersion
+
+  // Determine the acceptVersion using the injected config
+  if (config && config.protocolVersions && config.protocolVersions.accept) acceptVersion = config.protocolVersions.accept
+
+  // Determine the contentVersion using the injected config
+  if (config && config.protocolVersions && config.protocolVersions.content) contentVersion = config.protocolVersions.content
 
   // check to see if FSPIOP-Destination header has been left out of the initial request. If so then add it.
   if (!normalizedKeys[ENUM.Headers.FSPIOP.DESTINATION]) {
@@ -127,16 +182,20 @@ const transformHeaders = (headers, config) => {
           normalizedHeaders[headerKey] = headerValue
           break
         }
-        if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
-        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].acceptVersion}`
+        if (!resourceType) resourceType = getResourceInfoFromHeader(headers[headerKey]).resourceType
+        // Fall back to using the legacy approach to determine the resourceVersion
+        if (resourceType && !acceptVersion) acceptVersion = resourceVersions[resourceType].acceptVersion
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${acceptVersion}`
         break
       case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
         if (!ENUM.Headers.FSPIOP.SWITCH.regex.test(config.sourceFsp)) {
           normalizedHeaders[headerKey] = headerValue
           break
         }
-        if (!resourceType) resourceType = getResourceFromHeader(headers[headerKey])
-        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${resourceVersions[resourceType].contentVersion}`
+        if (!resourceType) resourceType = getResourceInfoFromHeader(headers[headerKey]).resourceType
+        // Fall back to using the legacy approach to determine the resourceVersion
+        if (resourceType && !contentVersion) contentVersion = resourceVersions[resourceType].contentVersion
+        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${contentVersion}`
         break
       default:
         normalizedHeaders[headerKey] = headerValue
@@ -157,5 +216,6 @@ const transformHeaders = (headers, config) => {
 }
 
 module.exports = {
+  getResourceInfoFromHeader,
   transformHeaders
 }
