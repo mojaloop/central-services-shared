@@ -56,8 +56,8 @@
     "immutable": "4.0.0",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
-    "openapi-backend": "5.0.0",
-    "raw-body": "2.4.1",
+    "openapi-backend": "5.0.1",
+    "raw-body": "2.4.2",
     "rc": "1.2.8",
     "shins": "2.6.0",
     "uuid4": "2.0.2",
@@ -72,12 +72,12 @@
     "@mojaloop/central-services-metrics": "11.0.0",
     "@mojaloop/event-sdk": "10.7.1",
     "@mojaloop/sdk-standard-components": "10.3.2",
-    "ajv": "8.6.3",
-    "ajv-keywords": "5.0.0",
+    "ajv": "8.8.2",
+    "ajv-keywords": "5.1.0",
     "base64url": "3.0.1",
     "chance": "1.1.8",
     "npm-audit-resolver": "2.3.1",
-    "npm-check-updates": "12.0.0",
+    "npm-check-updates": "12.0.2",
     "nyc": "15.1.0",
     "pre-commit": "1.2.2",
     "proxyquire": "2.1.3",
@@ -87,7 +87,7 @@
     "standard-version": "9.3.2",
     "tap-spec": "^5.0.0",
     "tap-xunit": "2.4.1",
-    "tape": "5.3.1",
+    "tape": "5.3.2",
     "tapes": "4.1.0"
   },
   "peerDependencies": {
@@ -95,8 +95,8 @@
     "@mojaloop/central-services-logger": "10.6.2",
     "@mojaloop/central-services-metrics": "11.0.0",
     "@mojaloop/event-sdk": "10.7.1",
-    "ajv": "8.6.3",
-    "ajv-keywords": "5.0.0"
+    "ajv": "8.8.2",
+    "ajv-keywords": "5.1.0"
   },
   "peerDependenciesMeta": {
     "@mojaloop/central-services-error-handling": {

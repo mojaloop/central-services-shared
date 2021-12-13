@@ -31,6 +31,7 @@ const Sinon = require('sinon')
 const Transformer = require('../../../src/util').Headers
 const Enum = require('../../../src/enums')
 const Util = require('../../../src/util')
+const Helper = require('../../util/helper')
 
 const headerConfigExample = {
   httpMethod: 'PUT',
@@ -67,6 +68,30 @@ Test('Transfer Transformer tests', TransformerTest => {
     t.end()
   })
 
+  TransformerTest.test('Transformer.getResourceInfoFromHeaderTest() should', getResourceInfoFromHeaderTest => {
+    getResourceInfoFromHeaderTest.test('parse FSPIOP Content-Type example correctly', async test => {
+      const result = Transformer.getResourceInfoFromHeader(headerDataInputExample['Content-Type'])
+      test.equal(headerDataInputExample['Content-Type'], Helper.generateProtocolHeader(result.resourceType, result.version))
+      test.end()
+    })
+
+    getResourceInfoFromHeaderTest.test('return an empty result with standard application/json', async test => {
+      const contentType = 'application/json'
+      const result = Transformer.getResourceInfoFromHeader(contentType)
+      test.same(result, {})
+      test.end()
+    })
+
+    getResourceInfoFromHeaderTest.test('return an empty result with incorrect FSPIOP Content-Type input', async test => {
+      const contentType = 'application/vnd.interoperability.transfers+json'
+      const result = Transformer.getResourceInfoFromHeader(contentType)
+      test.same(result, {})
+      test.end()
+    })
+
+    getResourceInfoFromHeaderTest.end()
+  })
+
   TransformerTest.test('Transformer.transformHeaders() should', transformHeadersTest => {
     transformHeadersTest.test('Remove all unnecessary fields from Header', async test => {
       const headerData = Util.clone(headerDataInputExample)
@@ -76,6 +101,58 @@ Test('Transfer Transformer tests', TransformerTest => {
       }
       test.equals(transformedHeaderData[Enum.Http.Headers.GENERAL.CONTENT_LENGTH], undefined)
       test.end()
+    })
+
+    transformHeadersTest.test('Set ContentType && Accept versions via RESOURCE_VERSIONS env variable', async test => {
+      const RESOURCE_VERSIONS_BACKUP = process.env.RESOURCE_VERSIONS
+      process.env.RESOURCE_VERSIONS = 'transfers=1.1,quotes=1.0'
+
+      const headerConfig = {
+        httpMethod: 'PUT',
+        sourceFsp: 'switch',
+        destinationFsp: 'FSPDest'
+      }
+
+      const headerData = Util.clone(headerDataInputExample)
+      headerData.Accept = Helper.generateProtocolHeader('transfers', '1')
+
+      const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
+
+      test.deepEqual(headerData['Content-Type'], transformedHeaderData['Content-Type'])
+      test.deepEqual(headerData.Accept, transformedHeaderData.Accept)
+      test.end()
+      process.env.RESOURCE_VERSIONS = RESOURCE_VERSIONS_BACKUP
+    })
+
+    transformHeadersTest.test('Set ContentType && Accept versions via config', async test => {
+      const RESOURCE_VERSIONS_BACKUP = process.env.RESOURCE_VERSIONS
+      // we keep this here to make sure it does not override the injected protocolVersions config
+      process.env.RESOURCE_VERSIONS = 'transfers=1.0,quotes=1.0'
+
+      const headerConfig = {
+        httpMethod: 'PUT',
+        sourceFsp: 'switch',
+        destinationFsp: 'FSPDest',
+        protocolVersions: {
+          content: '1.1',
+          accept: '1'
+        }
+      }
+
+      const headerData = Util.clone(headerDataInputExample)
+      headerData.Accept = Helper.generateProtocolHeader('transfers', '1.1')
+
+      const resourceInfoFromHeader = Transformer.getResourceInfoFromHeader(headerData['Content-Type'])
+
+      const transformedHeaderData = Transformer.transformHeaders(headerData, headerConfig)
+      const resourceInfoFromTransformedHeader = Transformer.getResourceInfoFromHeader(transformedHeaderData['Content-Type'])
+
+      test.equal(resourceInfoFromHeader.resourceType, resourceInfoFromTransformedHeader.resourceType)
+      test.equal(resourceInfoFromHeader.version, '1.0')
+      test.equal(resourceInfoFromTransformedHeader.version, '1.1')
+      test.equal(transformedHeaderData.Accept, Helper.generateProtocolHeader('transfers', headerConfig.protocolVersions.accept))
+      test.end()
+      process.env.RESOURCE_VERSIONS = RESOURCE_VERSIONS_BACKUP
     })
 
     transformHeadersTest.test('Translate Date field into correct format for String value', async test => {

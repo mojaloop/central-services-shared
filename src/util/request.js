@@ -43,20 +43,26 @@ delete request.defaults.headers.common.Accept
  *
  * @description sends a request to url
  *
+ * @typedef SendRequestProtocolVersions
+ * @type {object}
+ * @property {string} content - protocol version to be used in the ContentType HTTP Header.
+ * @property {string} accept - protocol version to be used in the Accept HTTP Header.
+ *
  * @param {string} url the endpoint for the service you require
  * @param {object} headers the http headers
  * @param {string} method http method being requested i.e. GET, POST, PUT
  * @param {string} source id for which callback is being sent from
  * @param {string} destination id for which callback is being sent
- * @param {object} payload the body of the request being sent
+ * @param {object | undefined} payload the body of the request being sent
  * @param {string} responseType the type of the response object
- * @param {object} span a span for event logging if this request is within a span
- * @param {object} jwsSigner the jws signer for signing the requests
+ * @param {object | undefined} span a span for event logging if this request is within a span
+ * @param {object | undefined} jwsSigner the jws signer for signing the requests
+ * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
  *
- *@return {object} The response for the request being sent or error object with response included
+ *@return {Promise<any>} The response for the request being sent or error object with response included
  */
 
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined, jwsSigner = undefined) => {
+const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined, jwsSigner = undefined, protocolVersions = undefined) => {
   const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -75,7 +81,8 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     const transformedHeaders = Headers.transformHeaders(headers, {
       httpMethod: method,
       sourceFsp: source,
-      destinationFsp: destination
+      destinationFsp: destination,
+      protocolVersions
     })
     requestOptions = {
       url,

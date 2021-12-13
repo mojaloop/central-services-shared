@@ -26,13 +26,15 @@
 
 const Enums = require('../../src/enums')
 
-function defaultHeaders (destination, resource, source, version = '1.0') {
+const generateProtocolHeader = (resource, version) => `application/vnd.interoperability.${resource}+json;version=${version}`
+
+const defaultHeaders = (destination, resource, source, version = '1.0') => {
   // TODO: See API section 3.2.1; what should we do about X-Forwarded-For? Also, should we
   // add/append to this field in all 'queueResponse' calls?
   return {
-    accept: `application/vnd.interoperability.${resource}+json;version=${version}`,
+    accept: generateProtocolHeader(resource, version),
     'fspiop-destination': destination || '',
-    'content-type': `application/vnd.interoperability.${resource}+json;version=${version}`,
+    'content-type': generateProtocolHeader(resource, version),
     date: '2019-05-24 08:52:19',
     'fspiop-source': source
   }
@@ -74,6 +76,7 @@ const getEndpointAndRenderResponse = {
 
 module.exports = {
   defaultHeaders,
+  generateProtocolHeader,
   getEndPointsResponse,
   getEndpointAndRenderResponse
 }
