@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.2.0](https://github.com/mojaloop/central-services-shared/compare/v15.1.0...v15.2.0) (2021-12-13)
+
+
+### Features
+
+* **mojaloop/#2608:** injected resource versions config for outbound requests ([#319](https://github.com/mojaloop/central-services-shared/issues/319)) ([13a3d9d](https://github.com/mojaloop/central-services-shared/commit/13a3d9dc8ab8d4815db2aea22563317e3670a19b)), closes [mojaloop/#2608](https://github.com/mojaloop/central-services-shared/issues/2608)
+
 ## [15.1.0](https://github.com/mojaloop/central-services-shared/compare/v15.0.1...v15.1.0) (2021-11-17)
 
 
