@@ -131,7 +131,7 @@ Test('Utility Test', utilityTest => {
       const expected = { functionalityMapped: 'transfer', actionMapped: 'prepare' }
       // Act
       const result = _getFunctionalityAction('transfer', 'prepare')
-      
+
       // Assert
       test.deepEqual(result, expected)
       test.end()
@@ -142,7 +142,7 @@ Test('Utility Test', utilityTest => {
       const expected = { functionalityMapped: 'notification', actionMapped: 'event' }
       // Act
       const result = _getFunctionalityAction('notification', 'abort-validation')
-      
+
       // Assert
       test.deepEqual(result, expected)
       test.end()
@@ -153,7 +153,7 @@ Test('Utility Test', utilityTest => {
       const expected = { functionalityMapped: 'notification', actionMapped: 'event' }
       // Act
       const result = _getFunctionalityAction('notification', 'reserved-aborted')
-      
+
       // Assert
       test.deepEqual(result, expected)
       test.end()

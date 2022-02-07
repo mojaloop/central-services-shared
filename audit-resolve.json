@@ -42,43 +42,57 @@
     },
     "1004854|widdershins>openapi-sampler>json-pointer": {
       "decision": "ignore",
-      "madeAt": 1637925238134,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227612906,
+      "expiresAt": 1646819457744
     },
     "1004869|widdershins>swagger2openapi>better-ajv-errors>jsonpointer": {
       "decision": "ignore",
-      "madeAt": 1637925239670,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227615371,
+      "expiresAt": 1646819457744
     },
     "1004869|widdershins>swagger2openapi>oas-validator>better-ajv-errors>jsonpointer": {
       "decision": "ignore",
-      "madeAt": 1637925239670,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227615371,
+      "expiresAt": 1646819457744
     },
     "1004946|widdershins>yargs>string-width>strip-ansi>ansi-regex": {
       "decision": "ignore",
-      "madeAt": 1637925241156,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227616947,
+      "expiresAt": 1646819457744
     },
     "1004946|widdershins>yargs>cliui>string-width>strip-ansi>ansi-regex": {
       "decision": "ignore",
-      "madeAt": 1637925241156,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227616947,
+      "expiresAt": 1646819457744
     },
     "1005383|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1637925243300,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227618453,
+      "expiresAt": 1646819457744
     },
     "1005384|shins>sanitize-html": {
       "decision": "ignore",
-      "madeAt": 1637925243300,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227618454,
+      "expiresAt": 1646819457744
     },
     "1005534|widdershins>yargs>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1637925244682,
-      "expiresAt": 1640517233443
+      "madeAt": 1644227619978,
+      "expiresAt": 1646819457744
+    },
+    "1006899|widdershins>node-fetch": {
+      "decision": "fix",
+      "madeAt": 1644227510867
+    },
+    "1006846|shins>sanitize-html>postcss": {
+      "decision": "ignore",
+      "madeAt": 1644227621510,
+      "expiresAt": 1646819457744
+    },
+    "1006886|shins>markdown-it": {
+      "decision": "ignore",
+      "madeAt": 1644227622831,
+      "expiresAt": 1646819457744
     }
   },
   "rules": {},
