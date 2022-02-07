@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.3.0](https://github.com/mojaloop/central-services-shared/compare/v15.2.0...v15.3.0) (2022-02-07)
+
+
+### Features
+
+* **mojaloop/project#2556:** implement patch notification for failure scenarios (following v1.1 update) ([#321](https://github.com/mojaloop/central-services-shared/issues/321)) ([92015a7](https://github.com/mojaloop/central-services-shared/commit/92015a7d9eec7e01e85eff86af5cc6e6147e5f20)), closes [mojaloop/project#2556](https://github.com/mojaloop/project/issues/2556)
+
 ## [15.2.0](https://github.com/mojaloop/central-services-shared/compare/v15.1.0...v15.2.0) (2021-12-13)
 
 
