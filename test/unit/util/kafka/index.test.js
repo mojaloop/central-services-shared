@@ -46,6 +46,7 @@ const Utility = require('../../../../src/util').Kafka
 const Enum = require('../../../../src').Enum
 const Config = require('../../../util/config')
 const clone = require('../../../../src/util').clone
+const { _getFunctionalityAction } = require('../../../../src/util/kafka')
 
 let participantName
 const TRANSFER = Enum.Events.Event.Type.TRANSFER
@@ -122,6 +123,43 @@ Test('Utility Test', utilityTest => {
   utilityTest.afterEach(test => {
     sandbox.restore()
     test.end()
+  })
+
+  utilityTest.test('getFunctionalityAction', gfaTest => {
+    gfaTest.test('should return config for transfer-prepare', test => {
+      // Arrange
+      const expected = { functionalityMapped: 'transfer', actionMapped: 'prepare' }
+      // Act
+      const result = _getFunctionalityAction('transfer', 'prepare')
+      
+      // Assert
+      test.deepEqual(result, expected)
+      test.end()
+    })
+
+    gfaTest.test('should return config for NOTIFICATION ABORT_VALIDATION', test => {
+      // Arrange
+      const expected = { functionalityMapped: 'notification', actionMapped: 'event' }
+      // Act
+      const result = _getFunctionalityAction('notification', 'abort-validation')
+      
+      // Assert
+      test.deepEqual(result, expected)
+      test.end()
+    })
+
+    gfaTest.test('should return config for transfer-reserved-aborted', test => {
+      // Arrange
+      const expected = { functionalityMapped: 'notification', actionMapped: 'event' }
+      // Act
+      const result = _getFunctionalityAction('notification', 'reserved-aborted')
+      
+      // Assert
+      test.deepEqual(result, expected)
+      test.end()
+    })
+
+    gfaTest.end()
   })
 
   utilityTest.test('createParticipantTopicConf should', createParticipantTopicConfTest => {

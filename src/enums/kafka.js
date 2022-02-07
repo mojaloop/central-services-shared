@@ -150,6 +150,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'reserved-aborted': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'settlement-window': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
