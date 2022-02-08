@@ -71,7 +71,7 @@
     "@mojaloop/central-services-logger": "10.6.2",
     "@mojaloop/central-services-metrics": "11.0.0",
     "@mojaloop/event-sdk": "10.7.1",
-    "@mojaloop/sdk-standard-components": "15.13.0",
+    "@mojaloop/sdk-standard-components": "10.3.2",
     "ajv": "8.10.0",
     "ajv-keywords": "5.1.0",
     "base64url": "3.0.1",
