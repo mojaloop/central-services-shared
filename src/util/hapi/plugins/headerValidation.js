@@ -98,9 +98,7 @@ const plugin = {
         )
       }
       // if (!supportedProtocolContentVersions.includes(contentType.version)) {
-      if (!supportedProtocolContentVersions.some(supportedVer => {
-        return contentType.version === supportedVer
-      })) {
+      if (!supportedProtocolContentVersions.some(supportedVer => contentType.version === supportedVer)) {
         const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolContentVersions)
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
