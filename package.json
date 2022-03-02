@@ -48,7 +48,7 @@
   "dependencies": {
     "@hapi/catbox": "11.1.1",
     "@hapi/catbox-memory": "5.0.1",
-    "axios": "0.25.0",
+    "axios": "0.26.0",
     "clone": "2.1.2",
     "dotenv": "16.0.0",
     "env-var": "7.1.1",
@@ -56,8 +56,8 @@
     "immutable": "4.0.0",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
-    "openapi-backend": "5.2.0",
-    "raw-body": "2.4.2",
+    "openapi-backend": "5.2.1",
+    "raw-body": "2.5.1",
     "rc": "1.2.8",
     "shins": "2.6.0",
     "uuid4": "2.0.2",
@@ -77,7 +77,7 @@
     "base64url": "3.0.1",
     "chance": "1.1.8",
     "npm-audit-resolver": "2.3.1",
-    "npm-check-updates": "12.2.1",
+    "npm-check-updates": "12.5.0",
     "nyc": "15.1.0",
     "pre-commit": "1.2.2",
     "proxyquire": "2.1.3",
@@ -87,7 +87,7 @@
     "standard-version": "9.3.2",
     "tap-spec": "^5.0.0",
     "tap-xunit": "2.4.1",
-    "tape": "5.5.0",
+    "tape": "5.5.2",
     "tapes": "4.1.0"
   },
   "peerDependencies": {

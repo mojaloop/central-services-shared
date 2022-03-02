@@ -93,6 +93,16 @@
       "decision": "ignore",
       "madeAt": 1644227622831,
       "expiresAt": 1646819457744
+    },
+    "1007050|widdershins>urijs": {
+      "decision": "ignore",
+      "madeAt": 1646234133511,
+      "expiresAt": 1648826119845
+    },
+    "1007017|widdershins>swagger2openapi>oas-validator>ajv": {
+      "decision": "ignore",
+      "madeAt": 1646234136454,
+      "expiresAt": 1648826119845
     }
   },
   "rules": {},
