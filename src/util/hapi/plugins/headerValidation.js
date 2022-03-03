@@ -97,7 +97,8 @@ const plugin = {
           errorMessages.INVALID_CONTENT_TYPE_HEADER
         )
       }
-      if (!supportedProtocolContentVersions.includes(contentType.version)) {
+      // if (!supportedProtocolContentVersions.includes(contentType.version)) {
+      if (!supportedProtocolContentVersions.some(supportedVer => contentType.version === supportedVer)) {
         const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolContentVersions)
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
@@ -107,7 +108,6 @@ const plugin = {
           supportedVersionExtensionListMap
         )
       }
-
       return h.continue
     })
   }
