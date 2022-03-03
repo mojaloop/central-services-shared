@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.0.0](https://github.com/mojaloop/central-services-shared/compare/v15.3.0...v16.0.0) (2022-03-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mojaloop/#2704:** - headerValidation.FSPIOPHeaderValidation now expects the`supportedProtocolContentVersions` options argument to be a list, the same as `supportedProtocolAcceptVersions`
+
+### Features
+
+* **mojaloop/#2704:** core-services support for non-breaking backward api compatibility ([#325](https://github.com/mojaloop/central-services-shared/issues/325)) ([cb81f7e](https://github.com/mojaloop/central-services-shared/commit/cb81f7ec92376e0d6ce45e2ce046379ce1996167)), closes [mojaloop/#2704](https://github.com/mojaloop/central-services-shared/issues/2704) [mojaloop/#2704](https://github.com/mojaloop/central-services-shared/issues/2704)
+
 ## [15.3.0](https://github.com/mojaloop/central-services-shared/compare/v15.2.0...v15.3.0) (2022-02-07)
 
 
