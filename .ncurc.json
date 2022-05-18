@@ -1,4 +1,6 @@
 {
   "reject": [
+    "@hapi/catbox",
+    "@hapi/catbox-memory"
   ]
 }
