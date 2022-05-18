@@ -62,7 +62,7 @@
     "rc": "1.2.8",
     "shins": "2.6.0",
     "uuid4": "2.0.2",
-    "widdershins": "4.0.1",
+    "widdershins": "^3.6.7",
     "yaml": "2.1.0"
   },
   "devDependencies": {
@@ -71,7 +71,7 @@
     "@mojaloop/central-services-error-handling": "12.0.0",
     "@mojaloop/central-services-logger": "11.0.0",
     "@mojaloop/central-services-metrics": "12.0.2",
-    "@mojaloop/event-sdk": "10.7.2",
+    "@mojaloop/event-sdk": "^1.0.3",
     "@mojaloop/sdk-standard-components": "17.0.0",
     "ajv": "8.11.0",
     "ajv-keywords": "5.1.0",
@@ -87,7 +87,7 @@
     "sinon": "14.0.0",
     "standard": "17.0.0",
     "standard-version": "9.5.0",
-    "tap-spec": "^5.0.0",
+    "tap-spec": "^2.2.2",
     "tap-xunit": "2.4.1",
     "tape": "5.5.3",
     "tapes": "4.1.0"
@@ -96,7 +96,7 @@
     "@mojaloop/central-services-error-handling": "12.0.0",
     "@mojaloop/central-services-logger": "11.0.0",
     "@mojaloop/central-services-metrics": "12.0.2",
-    "@mojaloop/event-sdk": "10.7.2",
+    "@mojaloop/event-sdk": "^1.0.3",
     "ajv": "8.11.0",
     "ajv-keywords": "5.1.0"
   },
