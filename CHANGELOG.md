@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.0.0](https://github.com/mojaloop/central-services-shared/compare/v16.0.0...v17.0.0) (2022-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mojaloop/#2092:** major version bump for node v16 LTS support, and re-structuring of project directories to align to core Mojaloop repositories!
+
+### Features
+
+* **mojaloop/#2092:** upgrade nodeJS version for core services ([#330](https://github.com/mojaloop/central-services-shared/issues/330)) ([4778864](https://github.com/mojaloop/central-services-shared/commit/477886485299940b08a29d3db5a4ceaab431d47d)), closes [mojaloop/#2092](https://github.com/mojaloop/project/issues/2092)
+
 ## [16.0.0](https://github.com/mojaloop/central-services-shared/compare/v15.3.0...v16.0.0) (2022-03-03)
 
 
