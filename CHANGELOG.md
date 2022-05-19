@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.0.2](https://github.com/mojaloop/central-services-shared/compare/v17.0.1...v17.0.2) (2022-05-19)
+
+
+### Bug Fixes
+
+* updated peerDependencies as NPM v7+ handles their resolution for us ([968da97](https://github.com/mojaloop/central-services-shared/commit/968da97051e0a59f6108ff86b1b51c0670b967bd))
+
 ### [17.0.1](https://github.com/mojaloop/central-services-shared/compare/v17.0.0...v17.0.1) (2022-05-19)
 
 
