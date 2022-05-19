@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.0.1](https://github.com/mojaloop/central-services-shared/compare/v17.0.0...v17.0.1) (2022-05-19)
+
+
+### Bug Fixes
+
+* removed typescript build from ci config ([cc75c8a](https://github.com/mojaloop/central-services-shared/commit/cc75c8ab6326b2ef3fb1116a328f3aa3792bcd7e))
+
 ## [17.0.0](https://github.com/mojaloop/central-services-shared/compare/v16.0.0...v17.0.0) (2022-05-19)
 
 
