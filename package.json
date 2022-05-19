@@ -2,18 +2,46 @@
   "name": "@mojaloop/central-services-shared",
   "version": "16.0.0",
   "description": "Shared code for mojaloop central services",
+  "license": "Apache-2.0",
+  "author": "ModusBox",
+  "contributors": [
+    "ModusBox",
+    "Dwolla"
+  ],
+  "homepage": "https://github.com/mojaloop/central-services-shared#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojaloop/central-services-shared.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mojaloop/central-services-shared/issues"
+  },
+  "keywords": [
+    "shared",
+    "central",
+    "services",
+    "mojaloop"
+  ],
   "main": "src/index.js",
   "types": "src/index.d.ts",
+  "engines": {
+    "node": "=16.x"
+  },
+  "pre-commit": [
+    "lint",
+    "dep:check",
+    "test"
+  ],
   "scripts": {
-    "pretest": "standard",
-    "standard": "standard",
-    "standard:fix": "standard --fix",
+    "pretest": "npm run lint",
+    "standard": "npx standard",
+    "standard:fix": "npm run standard -- --fix",
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
     "test": "npm run test:unit",
-    "test:unit": "tape 'test/unit/**/*.test.js' | tap-spec",
-    "test:xunit": "tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
-    "test:coverage": "nyc --reporter=lcov --reporter=text-summary tapes -- 'test/unit/**/**.test.js'",
+    "test:unit": "npx tape 'test/unit/**/*.test.js' | tap-spec",
+    "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
+    "test:coverage": "npx nyc --reporter=lcov --reporter=text-summary tapes -- 'test/unit/**/**.test.js'",
     "test:coverage-check": "npm run test:coverage && nyc check-coverage",
     "audit:resolve": "npx resolve-audit --production",
     "audit:check": "npx check-audit --production",
@@ -22,30 +50,6 @@
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
-  "pre-commit": [
-    "lint",
-    "dep:check",
-    "test"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mojaloop/central-services-shared.git"
-  },
-  "keywords": [
-    "shared",
-    "central",
-    "services"
-  ],
-  "author": "ModusBox",
-  "contributors": [
-    "ModusBox",
-    "Dwolla"
-  ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/mojaloop/central-services-shared/issues"
-  },
-  "homepage": "https://github.com/mojaloop/central-services-shared#readme",
   "dependencies": {
     "@hapi/catbox": "12.0.0",
     "@hapi/catbox-memory": "5.0.1",
@@ -71,7 +75,7 @@
     "@mojaloop/central-services-error-handling": "12.0.0",
     "@mojaloop/central-services-logger": "11.0.0",
     "@mojaloop/central-services-metrics": "12.0.2",
-    "@mojaloop/event-sdk": "^10.7.2",
+    "@mojaloop/event-sdk": "^11.0.0",
     "@mojaloop/sdk-standard-components": "17.0.0",
     "ajv": "8.11.0",
     "ajv-keywords": "5.1.0",
@@ -96,7 +100,7 @@
     "@mojaloop/central-services-error-handling": "12.0.0",
     "@mojaloop/central-services-logger": "11.0.0",
     "@mojaloop/central-services-metrics": "12.0.2",
-    "@mojaloop/event-sdk": "^10.7.2",
+    "@mojaloop/event-sdk": "11.0.0",
     "ajv": "8.11.0",
     "ajv-keywords": "5.1.0"
   },
