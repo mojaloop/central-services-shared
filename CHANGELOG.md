@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **mojaloop/#2704:** core-services support for non-breaking backward api compatibility ([#325](https://github.com/mojaloop/central-services-shared/issues/325)) ([cb81f7e](https://github.com/mojaloop/central-services-shared/commit/cb81f7ec92376e0d6ce45e2ce046379ce1996167)), closes [mojaloop/#2704](https://github.com/mojaloop/central-services-shared/issues/2704) [mojaloop/#2704](https://github.com/mojaloop/central-services-shared/issues/2704)
+* **mojaloop/#2704:** core-services support for non-breaking backward api compatibility ([#325](https://github.com/mojaloop/central-services-shared/issues/325)) ([cb81f7e](https://github.com/mojaloop/central-services-shared/commit/cb81f7ec92376e0d6ce45e2ce046379ce1996167)), closes [mojaloop/#2704](https://github.com/mojaloop/project/issues/2704)
 
 ## [15.3.0](https://github.com/mojaloop/central-services-shared/compare/v15.2.0...v15.3.0) (2022-02-07)
 
@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **mojaloop/#2608:** injected resource versions config for outbound requests ([#319](https://github.com/mojaloop/central-services-shared/issues/319)) ([13a3d9d](https://github.com/mojaloop/central-services-shared/commit/13a3d9dc8ab8d4815db2aea22563317e3670a19b)), closes [mojaloop/#2608](https://github.com/mojaloop/central-services-shared/issues/2608)
+* **mojaloop/#2608:** injected resource versions config for outbound requests ([#319](https://github.com/mojaloop/central-services-shared/issues/319)) ([13a3d9d](https://github.com/mojaloop/central-services-shared/commit/13a3d9dc8ab8d4815db2aea22563317e3670a19b)), closes [mojaloop/#2608](https://github.com/mojaloop/project/issues/2608)
 
 ## [15.1.0](https://github.com/mojaloop/central-services-shared/compare/v15.0.1...v15.1.0) (2021-11-17)
 
@@ -50,7 +50,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* **mojaloop/#2536:** fspiop api version negotiation not handled by transfers service ([#315](https://github.com/mojaloop/central-services-shared/issues/315)) ([e3a8748](https://github.com/mojaloop/central-services-shared/commit/e3a874829794ed8b85b6487dd58bcb58f31a5dd1)), closes [mojaloop/#2536](https://github.com/mojaloop/central-services-shared/issues/2536) [mojaloop/#2536](https://github.com/mojaloop/central-services-shared/issues/2536)
+* **mojaloop/#2536:** fspiop api version negotiation not handled by transfers service ([#315](https://github.com/mojaloop/central-services-shared/issues/315)) ([e3a8748](https://github.com/mojaloop/central-services-shared/commit/e3a874829794ed8b85b6487dd58bcb58f31a5dd1)), closes [mojaloop/#2536](https://github.com/mojaloop/project/issues/2536)
 
 ## [14.0.0](https://github.com/mojaloop/central-services-shared/compare/v13.4.1...v14.0.0) (2021-09-10)
 
@@ -61,7 +61,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* **mojaloop/#2470:** central-services-shared streamingprotocol encode/decode functionality fix ([#313](https://github.com/mojaloop/central-services-shared/issues/313)) ([cedc359](https://github.com/mojaloop/central-services-shared/commit/cedc3595508ebe2fd67517f732e8e1da35635171)), closes [mojaloop/#2470](https://github.com/mojaloop/central-services-shared/issues/2470)
+* **mojaloop/#2470:** central-services-shared streamingprotocol encode/decode functionality fix ([#313](https://github.com/mojaloop/central-services-shared/issues/313)) ([cedc359](https://github.com/mojaloop/central-services-shared/commit/cedc3595508ebe2fd67517f732e8e1da35635171)), closes [mojaloop/#2470](https://github.com/mojaloop/project/issues/2470)
 
 ### [13.4.1](https://github.com/mojaloop/central-services-shared/compare/v13.4.0...v13.4.1) (2021-08-25)
 
