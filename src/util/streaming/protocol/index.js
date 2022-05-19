@@ -48,7 +48,7 @@ const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAc
         id: Uuid(),
         type: metadataType,
         action: metadataAction,
-        state: state
+        state
       }
     }
   } else {
@@ -85,7 +85,7 @@ const createMessage = (id, to, from, metadata, headers, payload, uriParams = und
     type: type || Enum.Http.Headers.DEFAULT.APPLICATION_JSON,
     content: {
       uriParams: uriParams || undefined,
-      headers: headers,
+      headers,
       payload: payload || {}
     },
     metadata

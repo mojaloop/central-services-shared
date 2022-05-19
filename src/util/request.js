@@ -86,7 +86,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     })
     requestOptions = {
       url,
-      method: method,
+      method,
       headers: transformedHeaders,
       data: payload,
       responseType
