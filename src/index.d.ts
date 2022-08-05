@@ -325,6 +325,7 @@ declare namespace CentralServicesShared {
           BULK_ABORT: EventActionEnum.BULK_ABORT;
           BULK_COMMIT: EventActionEnum.BULK_COMMIT;
           BULK_PREPARE: EventActionEnum.BULK_PREPARE;
+          BULK_PREPARE_DUPLICATE: EventActionEnum.BULK_PREPARE_DUPLICATE;
           BULK_PROCESSING: EventActionEnum.BULK_PROCESSING;
           BULK_TIMEOUT_RECEIVED: EventActionEnum.BULK_TIMEOUT_RECEIVED;
           BULK_TIMEOUT_RESERVED: EventActionEnum.BULK_TIMEOUT_RESERVED;
