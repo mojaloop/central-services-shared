@@ -106,6 +106,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'bulk-prepare-duplicate': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'bulk-processing': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
