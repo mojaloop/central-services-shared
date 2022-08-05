@@ -65,6 +65,7 @@ const Event = {
     BULK_ABORT: 'bulk-abort',
     BULK_COMMIT: 'bulk-commit',
     BULK_PREPARE: 'bulk-prepare',
+    BULK_PREPARE_DUPLICATE: 'bulk-prepare-duplicate',
     BULK_PROCESSING: 'bulk-processing',
     BULK_TIMEOUT_RECEIVED: 'bulk-timeout-received',
     BULK_TIMEOUT_RESERVED: 'bulk-timeout-reserved',

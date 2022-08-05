@@ -268,6 +268,7 @@ declare namespace CentralServicesShared {
     BULK_PROCESSING = 'bulk-processing',
     BULK_TIMEOUT_RECEIVED = 'bulk-timeout-received',
     BULK_TIMEOUT_RESERVED = 'bulk-timeout-reserved',
+    BULK_PREPARE_DUPLICATE = 'bulk-prepare-duplicate',
     BULK_GET = 'bulk-get',
     CLOSE = 'close',
     COMMIT = 'commit',
