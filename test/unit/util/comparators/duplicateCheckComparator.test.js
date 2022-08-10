@@ -45,8 +45,9 @@ Test('Duplicate check comparator', dccTest => {
   dccTest.test('duplicateCheckComparator should', duplicateCheckComparatorTest => {
     duplicateCheckComparatorTest.test('compare hashes when id exists', async test => {
       try {
+        // Arrange
         const hash = 'helper.hash'
-        const duplicateCheckComparator = Proxyquire('../../../../src/util/comparators/duplicateCheckComparator', {
+        const duplicateCheckComparator = Proxyquire('#src/util/comparators/duplicateCheckComparator', {
           '../hash': {
             generateSha256: sandbox.stub().returns(hash)
           }
@@ -54,26 +55,32 @@ Test('Duplicate check comparator', dccTest => {
         const id = 1
         const object = { key: 'value' }
         const getDuplicateDataFuncOverride = async (id) => { return Promise.resolve({ id, hash }) }
-        const saveHashFuncOverride = async () => { return true }
+        const saveHashFuncOverride = sandbox.stub().resolves(true)
 
         const expected = {
           hasDuplicateId: true,
           hasDuplicateHash: true
         }
+        // Act
         const result = await duplicateCheckComparator(id, object, getDuplicateDataFuncOverride, saveHashFuncOverride)
+
+        // Assert
         test.deepEqual(result, expected, 'hash matched')
+        test.ok(saveHashFuncOverride.called === false)
         test.end()
       } catch (err) {
+        // Assert
         Logger.error(`duplicateCheckComparator failed with error - ${err}`)
         test.fail()
         test.end()
       }
     })
 
-    duplicateCheckComparatorTest.test('save hashe when id not found', async test => {
+    duplicateCheckComparatorTest.test('save hash when id not found', async test => {
       try {
+        // Arrange
         const hash = 'helper.hash'
-        const duplicateCheckComparator = Proxyquire('../../../../src/util/comparators/duplicateCheckComparator', {
+        const duplicateCheckComparator = Proxyquire('#src/util/comparators/duplicateCheckComparator', {
           '../hash': {
             generateSha256: sandbox.stub().returns(hash)
           }
@@ -81,16 +88,92 @@ Test('Duplicate check comparator', dccTest => {
         const id = 1
         const object = { key: 'value' }
         const getDuplicateDataFuncOverride = async () => { return Promise.resolve(null) }
-        const saveHashFuncOverride = async () => { return true }
+        const saveHashFuncOverride = sandbox.stub().resolves(true)
 
         const expected = {
           hasDuplicateId: false,
           hasDuplicateHash: false
         }
+
+        // Act
         const result = await duplicateCheckComparator(id, object, getDuplicateDataFuncOverride, saveHashFuncOverride)
+
+        // Assert
         test.deepEqual(result, expected, 'hash saved')
+        test.ok(saveHashFuncOverride.calledOnce)
         test.end()
       } catch (err) {
+        // Assert
+        Logger.error(`duplicateCheckComparator failed with error - ${err}`)
+        test.fail()
+        test.end()
+      }
+    })
+
+    duplicateCheckComparatorTest.test('compare hashes when id exists and generatedHashOverride is injected', async test => {
+      try {
+        // Arrange
+        const hash = 'helper.hash'
+        const generatedHashOverride = 'helper.hash.override'
+        const duplicateCheckComparator = Proxyquire('#src/util/comparators/duplicateCheckComparator', {
+          '../hash': {
+            generateSha256: sandbox.stub().returns(hash)
+          }
+        })
+        const id = 1
+        const object = { key: 'value' }
+        const getDuplicateDataFuncOverride = async (id) => { return Promise.resolve({ id, hash: generatedHashOverride }) }
+        const saveHashFuncOverride = sandbox.stub().resolves(true)
+
+        const expected = {
+          hasDuplicateId: true,
+          hasDuplicateHash: true
+        }
+
+        // Act
+        const result = await duplicateCheckComparator(id, object, getDuplicateDataFuncOverride, saveHashFuncOverride, generatedHashOverride)
+
+        // Assert
+        test.deepEqual(result, expected, 'hash matched')
+        test.ok(saveHashFuncOverride.called === false)
+        test.end()
+      } catch (err) {
+        // Assert
+        Logger.error(`duplicateCheckComparator failed with error - ${err}`)
+        test.fail()
+        test.end()
+      }
+    })
+
+    duplicateCheckComparatorTest.test('save hash when id not found', async test => {
+      try {
+        // Arrange
+        const hash = 'helper.hash'
+        const generatedHashOverride = 'helper.hash.override'
+        const duplicateCheckComparator = Proxyquire('#src/util/comparators/duplicateCheckComparator', {
+          '../hash': {
+            generateSha256: sandbox.stub().returns(hash)
+          }
+        })
+        const id = 1
+        const object = { key: 'value' }
+        const getDuplicateDataFuncOverride = async () => { return Promise.resolve(null) }
+        const saveHashFuncOverride = sandbox.stub().resolves(true)
+
+        const expected = {
+          hasDuplicateId: false,
+          hasDuplicateHash: false
+        }
+
+        // Act
+        const result = await duplicateCheckComparator(id, object, getDuplicateDataFuncOverride, saveHashFuncOverride, generatedHashOverride)
+
+        // Assert
+        test.deepEqual(result, expected, 'hash saved')
+        test.ok(saveHashFuncOverride.calledOnce)
+        test.end()
+      } catch (err) {
+        // Assert
         Logger.error(`duplicateCheckComparator failed with error - ${err}`)
         test.fail()
         test.end()

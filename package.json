@@ -27,6 +27,10 @@
   "engines": {
     "node": "=16.x"
   },
+  "imports": {
+    "#src/*": "./src/*.js",
+    "#test/*": "./test/*.js"
+  },
   "pre-commit": [
     "lint",
     "dep:check",

@@ -30,11 +30,12 @@
 
 const Hash = require('../hash')
 
-const duplicateCheckComparator = async (id, object, getDuplicateDataFuncOverride, saveHashFuncOverride) => {
+const duplicateCheckComparator = async (id, object, getDuplicateDataFuncOverride, saveHashFuncOverride, generatedHashOverride = null) => {
   let hasDuplicateId = false
   let hasDuplicateHash = false
-  const generatedHash = Hash.generateSha256(object)
   let duplicateHashRecord
+
+  const generatedHash = generatedHashOverride || Hash.generateSha256(object) // generatedHashOverride is useful for cases where the hash is already provided, such as Bulk Transfers Prepare/Fulfil Use-Case - the hash is calculated in the Bulk-API-Adapter.
 
   const compareById = async () => {
     duplicateHashRecord = await getDuplicateDataFuncOverride(id)
