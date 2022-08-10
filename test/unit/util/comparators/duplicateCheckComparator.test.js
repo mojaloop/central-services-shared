@@ -145,7 +145,7 @@ Test('Duplicate check comparator', dccTest => {
       }
     })
 
-    duplicateCheckComparatorTest.test('save hash when id not found', async test => {
+    duplicateCheckComparatorTest.test('save hash when id not found and generatedHashOverride is injected', async test => {
       try {
         // Arrange
         const hash = 'helper.hash'
