@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.1.0](https://github.com/mojaloop/central-services-shared/compare/v17.0.2...v17.1.0) (2022-08-05)
+
+
+### Features
+
+* **mojaloop/#2796:** duplicate transaction not getting callback for post /bulkTransfers ([#331](https://github.com/mojaloop/central-services-shared/issues/331)) ([b7f6ba6](https://github.com/mojaloop/central-services-shared/commit/b7f6ba6cb90565b1f50a6574408f33f41388be68)), closes [mojaloop/#2796](https://github.com/mojaloop/project/issues/2796)
+
 ### [17.0.2](https://github.com/mojaloop/central-services-shared/compare/v17.0.1...v17.0.2) (2022-05-19)
 
 
