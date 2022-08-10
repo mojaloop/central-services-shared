@@ -100,7 +100,7 @@ Test('Duplicate check comparator', dccTest => {
 
         // Assert
         test.deepEqual(result, expected, 'hash saved')
-        test.ok(saveHashFuncOverride.calledOnce)
+        test.ok(saveHashFuncOverride.calledOnceWith(id, hash))
         test.end()
       } catch (err) {
         // Assert
@@ -170,7 +170,7 @@ Test('Duplicate check comparator', dccTest => {
 
         // Assert
         test.deepEqual(result, expected, 'hash saved')
-        test.ok(saveHashFuncOverride.calledOnce)
+        test.ok(saveHashFuncOverride.calledOnceWith(id, generatedHashOverride))
         test.end()
       } catch (err) {
         // Assert
