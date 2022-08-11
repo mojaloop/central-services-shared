@@ -30,33 +30,41 @@
 
 const Hash = require('../hash')
 
-const duplicateCheckComparator = async (id, object, getDuplicateDataFuncOverride, saveHashFuncOverride, generatedHashOverride = null) => {
+const duplicateCheckComparator = async (id, objectOrHashOverride, getDuplicateDataFuncOverride, saveHashFuncOverride, options = {
+  hashOverride: false
+}) => {
+  // lets check if we can actually do the comparison
+  if (objectOrHashOverride == null) throw Error('objectOrHashOverride arg is null')
+
   let hasDuplicateId = false
   let hasDuplicateHash = false
-  let duplicateHashRecord
+  let duplicateHashRecordResult = null
+  let saveHashFuncOverrideResult = false
 
-  const generatedHash = generatedHashOverride || Hash.generateSha256(object) // generatedHashOverride is useful for cases where the hash is already provided, such as Bulk Transfers Prepare/Fulfil Use-Case - the hash is calculated in the Bulk-API-Adapter.
+  const generatedHash = options?.hashOverride ? objectOrHashOverride : Hash.generateSha256(objectOrHashOverride) // options.hashOverride is useful for cases where the hash is already provided, such as Bulk Transfers Prepare/Fulfil Use-Case - the hash is calculated in the Bulk-API-Adapter.
 
   const compareById = async () => {
-    duplicateHashRecord = await getDuplicateDataFuncOverride(id)
-    hasDuplicateId = duplicateHashRecord !== null
+    duplicateHashRecordResult = await getDuplicateDataFuncOverride(id)
+    hasDuplicateId = duplicateHashRecordResult !== null
     return hasDuplicateId
   }
 
   const compareByHash = () => {
-    hasDuplicateHash = duplicateHashRecord.hash === generatedHash
+    hasDuplicateHash = duplicateHashRecordResult.hash === generatedHash
     return hasDuplicateHash
   }
 
   if (await compareById()) {
     compareByHash()
   } else {
-    await saveHashFuncOverride(id, generatedHash)
+    saveHashFuncOverrideResult = await saveHashFuncOverride(id, generatedHash)
   }
 
   return {
     hasDuplicateId,
-    hasDuplicateHash
+    hasDuplicateHash,
+    duplicateHashRecordResult,
+    saveHashFuncOverrideResult
   }
 }
 
