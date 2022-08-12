@@ -58,10 +58,12 @@ const BulkProcessingState = {
   FULFIL_INVALID: 7,
   COMPLETED: 8,
   REJECTED: 9,
-  EXPIRED: 10
+  EXPIRED: 10,
+  ABORTING: 11
 }
 
 const BulkTransferState = {
+  ABORTING: 'ABORTING',
   ACCEPTED: 'ACCEPTED',
   COMPLETED: 'COMPLETED',
   EXPIRED: 'EXPIRED',
