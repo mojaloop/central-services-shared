@@ -306,6 +306,83 @@ declare namespace CentralServicesShared {
     POST = 'post'
   }
 
+  enum TransferInternalStateEnum {
+    ABORTED_ERROR = 'ABORTED_ERROR',
+    ABORTED_REJECTED= 'ABORTED_REJECTED',
+    COMMITTED = 'COMMITTED',
+    EXPIRED_PREPARED = 'EXPIRED_PREPARED',
+    EXPIRED_RESERVED = 'EXPIRED_RESERVED',
+    FAILED = 'FAILED',
+    INVALID = 'INVALID',
+    RECEIVED_ERROR = 'RECEIVED_ERROR',
+    RECEIVED_FULFIL = 'RECEIVED_FULFIL',
+    RECEIVED_PREPARE = 'RECEIVED_PREPARE',
+    RECEIVED_REJECT = 'RECEIVED_REJECT',
+    RESERVED = 'RESERVED',
+    RESERVED_TIMEOUT = 'RESERVED_TIMEOUT'
+  }
+
+  enum TransferStateEnum {
+    RECEIVED = 'RECEIVED',
+    ABORTED = 'ABORTED',
+    COMMITTED = 'COMMITTED',
+    RESERVED = 'RESERVED',
+    SETTLED = 'SETTLED'
+  }
+
+  enum BulkProcessingStateEnum {
+    RECEIVED = 1,
+    RECEIVED_DUPLICATE = 2,
+    RECEIVED_INVALID = 3,
+    ACCEPTED = 4,
+    PROCESSING = 5,
+    FULFIL_DUPLICATE = 6,
+    FULFIL_INVALID = 7,
+    COMPLETED = 8,
+    REJECTED = 9,
+    EXPIRED = 10,
+    ABORTING = 11
+  }
+
+  enum BulkTransferStateEnum {
+    ABORTING = 'ABORTING',
+    ACCEPTED = 'ACCEPTED',
+    COMPLETED = 'COMPLETED',
+    EXPIRED = 'EXPIRED',
+    EXPIRING = 'EXPIRING',
+    INVALID = 'INVALID',
+    PENDING_FULFIL = 'PENDING_FULFIL',
+    PENDING_INVALID = 'PENDING_INVALID',
+    PENDING_PREPARE = 'PENDING_PREPARE',
+    PROCESSING = 'PROCESSING',
+    RECEIVED = 'RECEIVED',
+    REJECTED = 'REJECTED'
+  }
+
+  enum BulkTransferStateEnum {
+    ACCEPTED = 'ACCEPTED',
+    COMPLETED = 'COMPLETED',
+    EXPIRED = 'COMPLETED',
+    EXPIRING = 'PROCESSING',
+    INVALID = 'REJECTED',
+    PENDING_FULFIL = 'PROCESSING',
+    PENDING_INVALID = 'PENDING',
+    PENDING_PREPARE = 'PENDING',
+    PROCESSING = 'PROCESSING',
+    RECEIVED = 'RECEIVED',
+    REJECTED = 'REJECTED'
+  }
+
+  enum AdminTransferActionEnum {
+    RECORD_FUNDS_IN = 'recordFundsIn',
+    RECORD_FUNDS_OUT_PREPARE_RESERVE = 'recordFundsOutPrepareReserve',
+    RECORD_FUNDS_OUT_COMMIT = 'recordFundsOutCommit',
+    RECORD_FUNDS_OUT_ABORT = 'recordFundsOutAbort'
+  }
+
+  enum AdminNotificationActionsEnum {
+    LIMIT_ADJUSTMENT = 'limit-adjustment'
+  }
   interface Enum {
     Http: HttpEnum;
     EndPoints: EndPointsEnum;
@@ -397,6 +474,79 @@ declare namespace CentralServicesShared {
         };
       };
     };
+    Transfers: {
+      TransferInternalState: {
+        ABORTED_ERROR: TransferInternalStateEnum.ABORTED_ERROR;
+        ABORTED_REJECTED: TransferInternalStateEnum.ABORTED_REJECTED;
+        COMMITTED: TransferInternalStateEnum.COMMITTED;
+        EXPIRED_PREPARED: TransferInternalStateEnum.EXPIRED_PREPARED;
+        EXPIRED_RESERVED: TransferInternalStateEnum.EXPIRED_RESERVED;
+        FAILED: TransferInternalStateEnum.FAILED;
+        INVALID: TransferInternalStateEnum.INVALID;
+        RECEIVED_ERROR: TransferInternalStateEnum.RECEIVED_ERROR;
+        RECEIVED_FULFIL: TransferInternalStateEnum.RECEIVED_FULFIL;
+        RECEIVED_PREPARE: TransferInternalStateEnum.RECEIVED_PREPARE;
+        RECEIVED_REJECT: TransferInternalStateEnum.RECEIVED_REJECT;
+        RESERVED: TransferInternalStateEnum.RESERVED;
+        RESERVED_TIMEOUT: TransferInternalStateEnum.RESERVED_TIMEOUT;
+      };
+      TransferState: {
+        RECEIVED: TransferStateEnum.RECEIVED;
+        ABORTED: TransferStateEnum.ABORTED;
+        COMMITTED: TransferStateEnum.COMMITTED;
+        RESERVED: TransferStateEnum.RESERVED;
+        SETTLED: TransferStateEnum.SETTLED;
+      };
+      BulkProcessingState: {
+        RECEIVED: BulkProcessingStateEnum.RECEIVED;
+        RECEIVED_DUPLICATE: BulkProcessingStateEnum.RECEIVED_DUPLICATE;
+        RECEIVED_INVALID: BulkProcessingStateEnum.RECEIVED_INVALID;
+        ACCEPTED: BulkProcessingStateEnum.ACCEPTED;
+        PROCESSING: BulkProcessingStateEnum.PROCESSING;
+        FULFIL_DUPLICATE: BulkProcessingStateEnum.FULFIL_DUPLICATE;
+        FULFIL_INVALID: BulkProcessingStateEnum.FULFIL_INVALID;
+        COMPLETED: BulkProcessingStateEnum.COMPLETED;
+        REJECTED: BulkProcessingStateEnum.REJECTED;
+        EXPIRED: BulkProcessingStateEnum.EXPIRED;
+        ABORTING: BulkProcessingStateEnum.ABORTING;
+      };
+      BulkTransferState: {
+        ABORTING: BulkTransferStateEnum.ABORTING;
+        ACCEPTED: BulkTransferStateEnum.ACCEPTED;
+        COMPLETED: BulkTransferStateEnum.COMPLETED;
+        EXPIRED: BulkTransferStateEnum.EXPIRED;
+        EXPIRING: BulkTransferStateEnum.EXPIRING;
+        INVALID: BulkTransferStateEnum.INVALID;
+        PENDING_FULFIL: BulkTransferStateEnum.PENDING_FULFIL;
+        PENDING_INVALID: BulkTransferStateEnum.PENDING_INVALID;
+        PENDING_PREPARE: BulkTransferStateEnum.PENDING_PREPARE;
+        PROCESSING: BulkTransferStateEnum.PROCESSING;
+        RECEIVED: BulkTransferStateEnum.RECEIVED;
+        REJECTED: BulkTransferStateEnum.REJECTED;
+      };
+      BulkTransferStateEnum: {
+        ACCEPTED: BulkTransferStateEnum.ACCEPTED;
+        COMPLETED: BulkTransferStateEnum.COMPLETED;
+        EXPIRED: BulkTransferStateEnum.EXPIRED;
+        EXPIRING: BulkTransferStateEnum.EXPIRING;
+        INVALID: BulkTransferStateEnum.INVALID;
+        PENDING_FULFIL: BulkTransferStateEnum.PENDING_FULFIL;
+        PENDING_INVALID: BulkTransferStateEnum.PENDING_INVALID;
+        PENDING_PREPARE: BulkTransferStateEnum.PENDING_PREPARE;
+        PROCESSING: BulkTransferStateEnum.PROCESSING;
+        RECEIVED: BulkTransferStateEnum.RECEIVED;
+        REJECTED: BulkTransferStateEnum.REJECTED;
+      };
+      AdminTransferAction: {
+        RECORD_FUNDS_IN: AdminTransferActionEnum.RECORD_FUNDS_IN;
+        RECORD_FUNDS_OUT_PREPARE_RESERVE: AdminTransferActionEnum.RECORD_FUNDS_OUT_PREPARE_RESERVE;
+        RECORD_FUNDS_OUT_COMMIT: AdminTransferActionEnum.RECORD_FUNDS_OUT_COMMIT;
+        RECORD_FUNDS_OUT_ABORT: AdminTransferActionEnum.RECORD_FUNDS_OUT_ABORT;
+      };
+      AdminNotificationActions: {
+        LIMIT_ADJUSTMENT: AdminNotificationActionsEnum.LIMIT_ADJUSTMENT;
+      };
+    }
   }
   interface Endpoints {
     fetchEndpoints(fspId: string): Promise<any>
@@ -409,7 +559,7 @@ declare namespace CentralServicesShared {
     content: string,
     accept: string
   }
-  
+
   interface Request {
     sendRequest(url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType): Promise<any>
   }
