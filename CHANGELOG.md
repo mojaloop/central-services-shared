@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.2.1](https://github.com/mojaloop/central-services-shared/compare/v17.2.0...v17.2.1) (2022-08-15)
+
+
+### Bug Fixes
+
+* **mojaloop/#2814:** added bulk quotes to header validation ([#334](https://github.com/mojaloop/central-services-shared/issues/334)) ([ab6c3f6](https://github.com/mojaloop/central-services-shared/commit/ab6c3f6f9ed5968c1f154f3c78fab080e03a1534)), closes [mojaloop/#2814](https://github.com/mojaloop/project/issues/2814)
+
 ## [17.2.0](https://github.com/mojaloop/central-services-shared/compare/v17.1.0...v17.2.0) (2022-08-11)
 
 
