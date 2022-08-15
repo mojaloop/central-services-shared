@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.3.0](https://github.com/mojaloop/central-services-shared/compare/v17.2.1...v17.3.0) (2022-08-15)
+
+
+### Features
+
+* **mojaloop/#2801:** add ABORTING bulk transfer state ([#333](https://github.com/mojaloop/central-services-shared/issues/333)) ([8b26635](https://github.com/mojaloop/central-services-shared/commit/8b266358999574727882c6a5c723ead7f12c2df8)), closes [mojaloop/#2801](https://github.com/mojaloop/project/issues/2801)
+
 ### [17.2.1](https://github.com/mojaloop/central-services-shared/compare/v17.2.0...v17.2.1) (2022-08-15)
 
 
