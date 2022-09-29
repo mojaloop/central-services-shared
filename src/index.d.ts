@@ -359,20 +359,6 @@ declare namespace CentralServicesShared {
     REJECTED = 'REJECTED'
   }
 
-  enum BulkTransferStateEnum {
-    ACCEPTED = 'ACCEPTED',
-    COMPLETED = 'COMPLETED',
-    EXPIRED = 'COMPLETED',
-    EXPIRING = 'PROCESSING',
-    INVALID = 'REJECTED',
-    PENDING_FULFIL = 'PROCESSING',
-    PENDING_INVALID = 'PENDING',
-    PENDING_PREPARE = 'PENDING',
-    PROCESSING = 'PROCESSING',
-    RECEIVED = 'RECEIVED',
-    REJECTED = 'REJECTED'
-  }
-
   enum AdminTransferActionEnum {
     RECORD_FUNDS_IN = 'recordFundsIn',
     RECORD_FUNDS_OUT_PREPARE_RESERVE = 'recordFundsOutPrepareReserve',
