@@ -359,7 +359,7 @@ declare namespace CentralServicesShared {
     REJECTED = 'REJECTED'
   }
 
-  enum BulkTransferStateEnum {
+  enum BulkTransferStateEnumDeclaration {
     ACCEPTED = 'ACCEPTED',
     COMPLETED = 'COMPLETED',
     EXPIRED = 'COMPLETED',
@@ -525,17 +525,17 @@ declare namespace CentralServicesShared {
         REJECTED: BulkTransferStateEnum.REJECTED;
       };
       BulkTransferStateEnum: {
-        ACCEPTED: BulkTransferStateEnum.ACCEPTED;
-        COMPLETED: BulkTransferStateEnum.COMPLETED;
-        EXPIRED: BulkTransferStateEnum.EXPIRED;
-        EXPIRING: BulkTransferStateEnum.EXPIRING;
-        INVALID: BulkTransferStateEnum.INVALID;
-        PENDING_FULFIL: BulkTransferStateEnum.PENDING_FULFIL;
-        PENDING_INVALID: BulkTransferStateEnum.PENDING_INVALID;
-        PENDING_PREPARE: BulkTransferStateEnum.PENDING_PREPARE;
-        PROCESSING: BulkTransferStateEnum.PROCESSING;
-        RECEIVED: BulkTransferStateEnum.RECEIVED;
-        REJECTED: BulkTransferStateEnum.REJECTED;
+        ACCEPTED: BulkTransferStateEnumDeclaration.ACCEPTED;
+        COMPLETED: BulkTransferStateEnumDeclaration.COMPLETED;
+        EXPIRED: BulkTransferStateEnumDeclaration.EXPIRED;
+        EXPIRING: BulkTransferStateEnumDeclaration.EXPIRING;
+        INVALID: BulkTransferStateEnumDeclaration.INVALID;
+        PENDING_FULFIL: BulkTransferStateEnumDeclaration.PENDING_FULFIL;
+        PENDING_INVALID: BulkTransferStateEnumDeclaration.PENDING_INVALID;
+        PENDING_PREPARE: BulkTransferStateEnumDeclaration.PENDING_PREPARE;
+        PROCESSING: BulkTransferStateEnumDeclaration.PROCESSING;
+        RECEIVED: BulkTransferStateEnumDeclaration.RECEIVED;
+        REJECTED: BulkTransferStateEnumDeclaration.REJECTED;
       };
       AdminTransferAction: {
         RECORD_FUNDS_IN: AdminTransferActionEnum.RECORD_FUNDS_IN;
