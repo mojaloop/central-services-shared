@@ -359,6 +359,21 @@ declare namespace CentralServicesShared {
     REJECTED = 'REJECTED'
   }
 
+  enum BulkTransferStateEnumDeclaration {
+    ABORTING = 'ABORTING',
+    ACCEPTED = 'ACCEPTED',
+    COMPLETED = 'COMPLETED',
+    EXPIRED = 'EXPIRED',
+    EXPIRING = 'EXPIRING',
+    INVALID = 'INVALID',
+    PENDING_FULFIL = 'PENDING_FULFIL',
+    PENDING_INVALID = 'PENDING_INVALID',
+    PENDING_PREPARE = 'PENDING_PREPARE',
+    PROCESSING = 'PROCESSING',
+    RECEIVED = 'RECEIVED',
+    REJECTED = 'REJECTED'
+  }
+
   enum AdminTransferActionEnum {
     RECORD_FUNDS_IN = 'recordFundsIn',
     RECORD_FUNDS_OUT_PREPARE_RESERVE = 'recordFundsOutPrepareReserve',
@@ -511,17 +526,17 @@ declare namespace CentralServicesShared {
         REJECTED: BulkTransferStateEnum.REJECTED;
       };
       BulkTransferStateEnum: {
-        ACCEPTED: BulkTransferStateEnum.ACCEPTED;
-        COMPLETED: BulkTransferStateEnum.COMPLETED;
-        EXPIRED: BulkTransferStateEnum.EXPIRED;
-        EXPIRING: BulkTransferStateEnum.EXPIRING;
-        INVALID: BulkTransferStateEnum.INVALID;
-        PENDING_FULFIL: BulkTransferStateEnum.PENDING_FULFIL;
-        PENDING_INVALID: BulkTransferStateEnum.PENDING_INVALID;
-        PENDING_PREPARE: BulkTransferStateEnum.PENDING_PREPARE;
-        PROCESSING: BulkTransferStateEnum.PROCESSING;
-        RECEIVED: BulkTransferStateEnum.RECEIVED;
-        REJECTED: BulkTransferStateEnum.REJECTED;
+        ACCEPTED: BulkTransferStateEnumDeclaration.ACCEPTED;
+        COMPLETED: BulkTransferStateEnumDeclaration.COMPLETED;
+        EXPIRED: BulkTransferStateEnumDeclaration.EXPIRED;
+        EXPIRING: BulkTransferStateEnumDeclaration.EXPIRING;
+        INVALID: BulkTransferStateEnumDeclaration.INVALID;
+        PENDING_FULFIL: BulkTransferStateEnumDeclaration.PENDING_FULFIL;
+        PENDING_INVALID: BulkTransferStateEnumDeclaration.PENDING_INVALID;
+        PENDING_PREPARE: BulkTransferStateEnumDeclaration.PENDING_PREPARE;
+        PROCESSING: BulkTransferStateEnumDeclaration.PROCESSING;
+        RECEIVED: BulkTransferStateEnumDeclaration.RECEIVED;
+        REJECTED: BulkTransferStateEnumDeclaration.REJECTED;
       };
       AdminTransferAction: {
         RECORD_FUNDS_IN: AdminTransferActionEnum.RECORD_FUNDS_IN;
