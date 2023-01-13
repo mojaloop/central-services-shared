@@ -332,5 +332,6 @@ module.exports = {
   createMetadataWithCorrelatedEvent,
   createMetadataWithCorrelatedEventState,
   createEventMetadata,
-  createEventState
+  createEventState,
+  parseDataURI
 }
