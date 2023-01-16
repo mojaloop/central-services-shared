@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.5.0](https://github.com/mojaloop/central-services-shared/compare/v17.4.0...v17.5.0) (2023-01-16)
+
+
+### Features
+
+* added enum types of ledger account types ([#337](https://github.com/mojaloop/central-services-shared/issues/337)) ([bc3399a](https://github.com/mojaloop/central-services-shared/commit/bc3399a53ee0713cd81c06de8078a3100bee9e52))
+
 ## [17.4.0](https://github.com/mojaloop/central-services-shared/compare/v17.3.1...v17.4.0) (2023-01-13)
 
 
