@@ -65,7 +65,7 @@
     "immutable": "4.2.2",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
-    "openapi-backend": "5.6.0",
+    "openapi-backend": "5.6.2",
     "raw-body": "2.5.1",
     "rc": "1.2.8",
     "shins": "2.6.0",
@@ -74,7 +74,7 @@
     "yaml": "2.2.1"
   },
   "devDependencies": {
-    "@hapi/hapi": "21.1.0",
+    "@hapi/hapi": "21.2.0",
     "@hapi/joi": "17.1.1",
     "audit-ci": "^6.6.0",
     "base64url": "3.0.1",
@@ -90,7 +90,7 @@
     "standard-version": "9.5.0",
     "tap-spec": "^5.0.0",
     "tap-xunit": "2.4.1",
-    "tape": "5.6.1",
+    "tape": "5.6.3",
     "tapes": "4.1.0"
   },
   "peerDependencies": {

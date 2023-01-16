@@ -17,6 +17,9 @@
     "GHSA-rjqq-98f6-6j3r",
     "GHSA-w5p7-h5w8-2hfq",
     "GHSA-p9pc-299p-vxgp",
+    // TODO: There is a conflict with the sub-dependency jsonwebtoken. Not able to fix with 'npm audit fix'. Need too investigate the root cause.
+    "GHSA-hjrf-2m68-5959",
+    "GHSA-8cf7-32gw-wr33",
     "GHSA-qwph-4952-7xr6",
     "GHSA-27h2-hvpr-p74q"
   ]
