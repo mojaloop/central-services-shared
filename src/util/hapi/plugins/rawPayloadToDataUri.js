@@ -75,6 +75,9 @@ module.exports.plugin = {
       server.ext([{
         type: 'onPostAuth',
         method: async (request, h) => {
+          if (!request.payload) {
+            return h.continue
+          }
           return getRawBody(request.payload)
             .then(rawBuffer => {
               if (Buffer.byteLength(rawBuffer) !== 0) {
