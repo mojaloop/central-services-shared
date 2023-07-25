@@ -29,6 +29,7 @@ const request = require('axios')
 const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
+const http = require('http')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 
@@ -37,6 +38,9 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 // Delete the default headers that the `axios` module inserts as they can brake our conventions.
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
 delete request.defaults.headers.common.Accept
+
+// Enable keepalive for http
+request.defaults.httpAgent = new http.Agent({ keepAlive: true })
 
 /**
  * @function sendRequest
