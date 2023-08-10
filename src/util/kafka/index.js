@@ -307,6 +307,7 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   }
   let key
   if (typeof toDestination === 'string') {
+    key = toDestination
     message.value.to = toDestination
     if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
   } else if (toDestination === true) {
