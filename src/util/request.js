@@ -100,9 +100,9 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
     }
-    Logger.isInfoEnabled && Logger.info(`sendRequest::request ${JSON.stringify(requestOptions)}`)
+    Logger.isDebugEnabled && Logger.debug(`sendRequest::request ${JSON.stringify(requestOptions)}`)
     const response = await request(requestOptions)
-    Logger.isInfoEnabled && Logger.info(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
+    Logger.isDebugEnabled && Logger.debug(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
     !!sendRequestSpan && await sendRequestSpan.finish()
     !!histTimerEnd && histTimerEnd({ success: true, source, destination, method })
     return response
