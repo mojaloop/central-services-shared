@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.5.2](https://github.com/mojaloop/central-services-shared/compare/v17.5.1...v17.5.2) (2023-08-16)
+
+
+### Bug Fixes
+
+* **mojaloop/#3480:** change performance impacting log statements to debug ([#343](https://github.com/mojaloop/central-services-shared/issues/343)) ([20c2fdb](https://github.com/mojaloop/central-services-shared/commit/20c2fdb3d1b1ad86308c602b0d69e95038d1c91a)), closes [mojaloop/#3480](https://github.com/mojaloop/project/issues/3480)
+
 ### [17.5.1](https://github.com/mojaloop/central-services-shared/compare/v17.5.0...v17.5.1) (2023-02-23)
 
 ## [17.5.0](https://github.com/mojaloop/central-services-shared/compare/v17.4.0...v17.5.0) (2023-01-16)
