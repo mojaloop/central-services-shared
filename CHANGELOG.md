@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.6.0](https://github.com/mojaloop/central-services-shared/compare/v17.5.3...v17.6.0) (2023-08-17)
+
+
+### Features
+
+* configure keepalive ([#342](https://github.com/mojaloop/central-services-shared/issues/342)) ([b753382](https://github.com/mojaloop/central-services-shared/commit/b753382c5ea1864eb8a869bc7a75c16d9da433d8))
+
 ### [17.5.3](https://github.com/mojaloop/central-services-shared/compare/v17.5.2...v17.5.3) (2023-08-17)
 
 
