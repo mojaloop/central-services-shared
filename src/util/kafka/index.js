@@ -276,7 +276,7 @@ const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
       const consumer = kafkaConsumer.getConsumer(kafkaTopic)
       await consumer.commitMessageSync(message)
     } catch (err) {
-      Logger.isInfoEnabled && Logger.info(`No consumer found for topic ${kafkaTopic}`)
+      Logger.isDebugEnabled && Logger.debug(`No consumer found for topic ${kafkaTopic}`)
       Logger.isErrorEnabled && Logger.error(err)
       throw err
     }
