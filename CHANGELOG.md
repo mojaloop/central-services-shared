@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.5.3](https://github.com/mojaloop/central-services-shared/compare/v17.5.2...v17.5.3) (2023-08-17)
+
+
+### Bug Fixes
+
+* add null check before passing payload to getRawBody ([#344](https://github.com/mojaloop/central-services-shared/issues/344)) ([a4dcccc](https://github.com/mojaloop/central-services-shared/commit/a4dccccef9224bdd0dba85b5cd751ca1477d4082))
+
 ### [17.5.2](https://github.com/mojaloop/central-services-shared/compare/v17.5.1...v17.5.2) (2023-08-16)
 
 
