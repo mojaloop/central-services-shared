@@ -22,7 +22,7 @@
     "GHSA-8cf7-32gw-wr33",
     "GHSA-qwph-4952-7xr6",
     "GHSA-27h2-hvpr-p74q",
-    // TODO: Need to fix this
-    "GHSA-h755-8qp9-cq85"
+    "GHSA-h755-8qp9-cq85", // https://github.com/advisories/GHSA-h755-8qp9-cq85
+    "GHSA-c2qf-rxjj-qqgw"  // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
   ]
 }

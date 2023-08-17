@@ -75,18 +75,18 @@ module.exports.plugin = {
       server.ext([{
         type: 'onPostAuth',
         method: async (request, h) => {
-          if (!request.payload) {
-            return h.continue
+          if (request.payload) {
+            return getRawBody(request.payload)
+              .then(rawBuffer => {
+                if (Buffer.byteLength(rawBuffer) !== 0) {
+                  request = requestRawPayloadTransform(request, rawBuffer)
+                }
+                return h.continue
+              }).catch(() => {
+                return h.continue
+              })
           }
-          return getRawBody(request.payload)
-            .then(rawBuffer => {
-              if (Buffer.byteLength(rawBuffer) !== 0) {
-                request = requestRawPayloadTransform(request, rawBuffer)
-              }
-              return h.continue
-            }).catch(() => {
-              return h.continue
-            })
+          return h.continue
         }
       }])
     }
