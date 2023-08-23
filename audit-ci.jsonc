@@ -8,21 +8,16 @@
     "GHSA-v88g-cgmw-v5xw",
     "GHSA-phwq-j96m-2c2q",
     "GHSA-282f-qqgm-c34q",
-    "GHSA-6vfc-qv3f-vr6c",
+    "GHSA-8cf7-32gw-wr33",
+    "GHSA-hjrf-2m68-5959",
+    "GHSA-qwph-4952-7xr6",
     "GHSA-6vfc-qv3f-vr6c",
     "GHSA-wc69-rhjr-hc9g",
-    "GHSA-g954-5hwp-pp24",
-    "GHSA-g954-5hwp-pp24",
     "GHSA-mjxr-4v3x-q3m4",
     "GHSA-rjqq-98f6-6j3r",
     "GHSA-w5p7-h5w8-2hfq",
     "GHSA-p9pc-299p-vxgp",
-    // TODO: There is a conflict with the sub-dependency jsonwebtoken. Not able to fix with 'npm audit fix'. Need too investigate the root cause.
-    "GHSA-hjrf-2m68-5959",
-    "GHSA-8cf7-32gw-wr33",
-    "GHSA-qwph-4952-7xr6",
-    "GHSA-27h2-hvpr-p74q",
-    "GHSA-h755-8qp9-cq85", // https://github.com/advisories/GHSA-h755-8qp9-cq85
-    "GHSA-c2qf-rxjj-qqgw"  // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
+    "GHSA-g954-5hwp-pp24",
+    "GHSA-h755-8qp9-cq85"
   ]
 }
