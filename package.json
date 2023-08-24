@@ -91,10 +91,10 @@
     "tapes": "4.1.0"
   },
   "peerDependencies": {
-    "@mojaloop/central-services-error-handling": "12.x.x",
-    "@mojaloop/central-services-logger": "11.x.x",
-    "@mojaloop/central-services-metrics": "12.x.x",
-    "@mojaloop/event-sdk": "12.x.x",
+    "@mojaloop/central-services-error-handling": ">=12.x.x",
+    "@mojaloop/central-services-logger": ">=11.x.x",
+    "@mojaloop/central-services-metrics": ">=12.x.x",
+    "@mojaloop/event-sdk": ">=12.x.x",
     "ajv": "8.x.x",
     "ajv-keywords": "5.x.x"
   },
