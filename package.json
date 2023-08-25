@@ -59,7 +59,7 @@
     "dotenv": "16.3.1",
     "env-var": "7.4.0",
     "event-stream": "4.0.1",
-    "immutable": "4.3.3",
+    "immutable": "4.3.4",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
     "openapi-backend": "5.9.2",
