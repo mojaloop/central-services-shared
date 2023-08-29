@@ -54,12 +54,12 @@
   "dependencies": {
     "@hapi/catbox": "12.0.0",
     "@hapi/catbox-memory": "5.0.1",
-    "axios": "1.4.0",
+    "axios": "1.5.0",
     "clone": "2.1.2",
     "dotenv": "16.3.1",
-    "env-var": "7.4.0",
+    "env-var": "7.4.1",
     "event-stream": "4.0.1",
-    "immutable": "4.3.3",
+    "immutable": "4.3.4",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
     "openapi-backend": "5.9.2",
@@ -68,7 +68,7 @@
     "shins": "2.6.0",
     "uuid4": "2.0.3",
     "widdershins": "^4.0.1",
-    "yaml": "2.3.1"
+    "yaml": "2.3.2"
   },
   "devDependencies": {
     "@hapi/hapi": "21.3.2",
@@ -76,7 +76,7 @@
     "audit-ci": "^6.6.1",
     "base64url": "3.0.1",
     "chance": "1.1.11",
-    "npm-check-updates": "16.13.1",
+    "npm-check-updates": "16.13.2",
     "nyc": "15.1.0",
     "pre-commit": "1.2.2",
     "proxyquire": "2.1.3",
