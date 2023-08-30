@@ -285,7 +285,7 @@ const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
 
 const proceed = async (defaultKafkaConfig, params, opts) => {
   const { message, kafkaTopic, consumer, decodedPayload, span, producer } = params
-  const { consumerCommit, fspiopError, eventDetail, fromSwitch, toDestination } = opts
+  const { consumerCommit, fspiopError, eventDetail, fromSwitch, toDestination, messageKey } = opts
   let metadataState
 
   if (consumerCommit) {
@@ -305,15 +305,12 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
     message.value.from = Enum.Http.Headers.FSPIOP.SWITCH.value
     if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = message.value.to
   }
-  let key
   if (typeof toDestination === 'string') {
     message.value.to = toDestination
     if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
-  } else if (toDestination === true) {
-    key = message.value.content.headers && message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION]
   }
   if (eventDetail && producer) {
-    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, key, span)
+    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, messageKey?.toString(), span)
   }
   return true
 }

@@ -442,39 +442,56 @@ Test('Utility Test', utilityTest => {
   })
 
   utilityTest.test('proceed should', async proceedTest => {
-    const commitMessageSyncStub = sandbox.stub().returns(Promise.resolve())
-    const produceGeneralMessageStub = sandbox.stub().returns(Promise.resolve())
-    const successState = Enum.Events.EventStatus.SUCCESS
+    let proceedSandbox
+    let commitMessageSyncStub
+    let produceGeneralMessageStub
+    let params
+    let message
+    const transferId = Uuid()
     const from = 'from'
     const extList = []
-    const message = {
-      value: {
-        content: {
-          payload: {
-            extensionList: extList
-          },
-          headers: {
-            'fspiop-destination': 'dfsp'
-          }
-        },
-        from
-      }
-    }
-    const transferId = Uuid()
     const kafkaTopic = 'kafkaTopic'
     const consumer = 'consumer'
     const producer = 'producer'
-    const params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload, producer }
+    const successState = Enum.Events.EventStatus.SUCCESS
     const eventDetail = { functionality: 'functionality', action: 'action' }
     const UtilityProxy = rewire(`${src}/util/kafka/index`)
-    UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)
-    UtilityProxy.__set__('produceGeneralMessage', produceGeneralMessageStub)
+
+    proceedTest.beforeEach(test => {
+      // `proceed` mutates the message so reset it after every test
+      message = {
+        value: {
+          content: {
+            payload: {
+              extensionList: extList
+            },
+            headers: {
+              'fspiop-destination': 'dfsp'
+            }
+          },
+          from
+        }
+      }
+
+      params = { message, transferId, kafkaTopic, consumer, decodedPayload: message.value.content.payload, producer }
+      proceedSandbox = Sinon.createSandbox()
+      commitMessageSyncStub = sandbox.stub().returns(Promise.resolve())
+      produceGeneralMessageStub = sandbox.stub().returns(Promise.resolve())
+      UtilityProxy.__set__('commitMessageSync', commitMessageSyncStub)
+      UtilityProxy.__set__('produceGeneralMessage', produceGeneralMessageStub)
+      test.end()
+    })
+
+    proceedTest.afterEach(test => {
+      proceedSandbox.restore()
+      test.end()
+    })
 
     proceedTest.test('commitMessageSync when consumerCommit and produce toDestination', async test => {
       const opts = { consumerCommit: true, eventDetail, toDestination: true }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub called once')
+        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub not called')
         test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub called once')
         test.equal(result, true, 'result returned')
       } catch (err) {
@@ -488,8 +505,22 @@ Test('Utility Test', utilityTest => {
       const opts = { consumerCommit: true, eventDetail, toDestination: 'dfsp1' }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.ok(commitMessageSyncStub.calledTwice, 'commitMessageSyncStub called once')
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).secondCall, 'produceGeneralMessageStub called once')
+        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub not called')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub not called')
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.test('produce message when messageKey is specified', async test => {
+      const opts = { consumerCommit: true, eventDetail, messageKey: 101 }
+      try {
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub not called')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState, '101').calledOnce, 'produceGeneralMessageStub not called')
         test.equal(result, true, 'result returned')
       } catch (err) {
         test.fail(err.message)
@@ -502,7 +533,7 @@ Test('Utility Test', utilityTest => {
       const opts = { fromSwitch: true, eventDetail }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).lastCall, 'produceGeneralMessageStub called twice')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub not called')
         test.equal(message.value.to, from, 'message destination set to sender')
         test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
         test.equal(result, true, 'result returned')
@@ -519,9 +550,9 @@ Test('Utility Test', utilityTest => {
         const localParams = clone(params)
         delete localParams.message.value.content.headers
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
-        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).lastCall, 'produceGeneralMessageStub called twice')
-        test.equal(message.value.to, from, 'message destination set to sender')
-        test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, localParams.message.value, successState).calledOnce, 'produceGeneralMessageStub not called')
+        test.equal(localParams.message.value.to, from, 'message destination set to sender')
+        test.equal(localParams.message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
         test.equal(result, true, 'result returned')
       } catch (err) {
         test.fail(err.message)
