@@ -516,7 +516,7 @@ Test('Utility Test', utilityTest => {
     })
 
     proceedTest.test('produce message when messageKey is specified', async test => {
-      const opts = { consumerCommit: true, eventDetail, messageKey: 101 }
+      const opts = { consumerCommit: true, eventDetail, messageKey: '101' }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
         test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub not called')

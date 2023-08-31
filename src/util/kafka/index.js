@@ -310,7 +310,7 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
     if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
   }
   if (eventDetail && producer) {
-    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, messageKey?.toString(), span)
+    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, messageKey, span)
   }
   return true
 }
