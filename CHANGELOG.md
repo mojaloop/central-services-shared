@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.0.0](https://github.com/mojaloop/central-services-shared/compare/v17.6.3...v18.0.0) (2023-08-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mojaloop/#3498:** refactor message keying logic in proceed function (#350)
+
+* **mojaloop/#3498:** refactor message keying logic in proceed function ([#350](https://github.com/mojaloop/central-services-shared/issues/350)) ([664f454](https://github.com/mojaloop/central-services-shared/commit/664f4546346e9ab3d4b377f473c25e02d151c72c)), closes [mojaloop/#3498](https://github.com/mojaloop/project/issues/3498)
+
 ### [17.6.3](https://github.com/mojaloop/central-services-shared/compare/v17.6.2...v17.6.3) (2023-08-29)
 
 ### [17.6.2](https://github.com/mojaloop/central-services-shared/compare/v17.6.1...v17.6.2) (2023-08-24)
