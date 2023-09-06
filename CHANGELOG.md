@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.1.0](https://github.com/mojaloop/central-services-shared/compare/v18.0.0...v18.1.0) (2023-09-06)
+
+
+### Features
+
+* **mojaloop/#3519:** add topic name override to proceed and produce message ([#351](https://github.com/mojaloop/central-services-shared/issues/351)) ([305566b](https://github.com/mojaloop/central-services-shared/commit/305566bdfd5e09c8916760d57b52a2d31562aa85)), closes [mojaloop/#3519](https://github.com/mojaloop/project/issues/3519)
+
 ## [18.0.0](https://github.com/mojaloop/central-services-shared/compare/v17.6.3...v18.0.0) (2023-08-31)
 
 
