@@ -234,6 +234,27 @@ Test('Utility Test', utilityTest => {
       }
     })
 
+    createGeneralTopicConfTest.test('return topic name override when specfied', test => {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+        '../../enums': {
+          topicMap: {
+            transfer: {
+              fulfil: {
+                functionality: 'transfer',
+                action: 'fulfil'
+              }
+            }
+          }
+        }
+      })
+      const response = ModuleProxy.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, TRANSFER, FULFIL, 0, null, null, 'topic-name-override')
+      test.equal(response.topicName, 'topic-name-override')
+      test.equal(response.key, 0)
+      test.equal(response.partition, null)
+      test.equal(response.opaqueKey, null)
+      test.end()
+    })
+
     createGeneralTopicConfTest.end()
   })
 
@@ -290,6 +311,25 @@ Test('Utility Test', utilityTest => {
         }
       })
       const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS)
+      test.equal(result, true)
+      test.end()
+    })
+
+    produceGeneralMessageTest.test('produce a message with topic name override when specified', async (test) => {
+      const ModuleProxy = Proxyquire('../../../../src/util/kafka', {
+        '../../enums': {
+          topicMap: {
+            transfer: {
+              prepare: {
+                functionality: 'transfer',
+                action: 'prepare'
+              }
+            }
+          }
+        }
+      })
+      const result = await ModuleProxy.produceGeneralMessage(Config.KAFKA_CONFIG, KafkaProducer, TRANSFER, PREPARE, messageProtocol, Enum.Events.EventStatus.SUCCESS, null, null, 'topic-name-override')
+      test.equal(KafkaProducer.produceMessage.getCall(0).args[1].topicName, 'topic-name-override')
       test.equal(result, true)
       test.end()
     })
@@ -521,6 +561,20 @@ Test('Utility Test', utilityTest => {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
         test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub not called')
         test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState, '101').calledOnce, 'produceGeneralMessageStub not called')
+        test.equal(result, true, 'result returned')
+      } catch (err) {
+        test.fail(err.message)
+      }
+
+      test.end()
+    })
+
+    proceedTest.test('produce message when topicNameOverride specified', async test => {
+      const opts = { consumerCommit: true, eventDetail, messageKey: '101', topicNameOverride: 'topic-name-override' }
+      try {
+        const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
+        test.ok(commitMessageSyncStub.calledOnce, 'commitMessageSyncStub not called')
+        test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState, '101', undefined, 'topic-name-override').calledOnce, 'produceGeneralMessageStub not called')
         test.equal(result, true, 'result returned')
       } catch (err) {
         test.fail(err.message)

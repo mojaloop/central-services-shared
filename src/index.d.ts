@@ -565,7 +565,7 @@ declare namespace CentralServicesShared {
   }
 
   interface Kafka {
-    createGeneralTopicConf(template: string, functionality: string, action: string, key?: string, partition?: number, opaqueKey?: any): {topicName: string, key: string | null, partition: number | null, opaqueKey: any }
+    createGeneralTopicConf(template: string, functionality: string, action: string, key?: string, partition?: number, opaqueKey?: any, topicNameOverride: string): {topicName: string, key: string | null, partition: number | null, opaqueKey: any }
   }
 
   interface StreamingProtocol {
