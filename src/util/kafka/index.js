@@ -182,12 +182,13 @@ const createParticipantTopicConf = (template, participantName, functionality, ac
  * @param {string} key - optional key that allows partitioning it occur
  * @param {number} partition - optional partition to produce to
  * @param {*} opaqueKey - optional opaque token, which gets passed along to your delivery reports
+ * @param {string} topicNameOverride - optional topic name override that skips topic name rendering
  *
  * @returns {object} - Returns newly created general topicConfig
  */
-const createGeneralTopicConf = (template, functionality, action, key = null, partition = null, opaqueKey = null) => {
+const createGeneralTopicConf = (template, functionality, action, key = null, partition = null, opaqueKey = null, topicNameOverride = null) => {
   return {
-    topicName: transformGeneralTopicName(template, functionality, action),
+    topicName: topicNameOverride || transformGeneralTopicName(template, functionality, action),
     key,
     partition,
     opaqueKey
@@ -223,13 +224,14 @@ const getFunctionalityAction = (functionality, action) => {
  * @param {object} state - state of the message being produced
  * @param {string} key - optional key that allows partitioning it occur
  * @param {object} span - the span for event logging
+ * @param {string} topicNameOverride - optional topic name override that skips topic name rendering
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
-const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, functionality, action, message, state, key = null, span = null) => {
+const produceGeneralMessage = async (defaultKafkaConfig, kafkaProducer, functionality, action, message, state, key = null, span = null, topicNameOverride = null) => {
   const { functionalityMapped, actionMapped } = getFunctionalityAction(functionality, action)
   let messageProtocol = StreamingProtocol.updateMessageProtocolMetadata(message, functionality, action, state)
-  const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key)
+  const topicConfig = createGeneralTopicConf(defaultKafkaConfig.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, functionalityMapped, actionMapped, key, null, null, topicNameOverride)
   const kafkaConfig = getKafkaConfig(defaultKafkaConfig, Enum.Kafka.Config.PRODUCER, functionalityMapped.toUpperCase(), actionMapped.toUpperCase())
   if (span) {
     messageProtocol = await span.injectContextToMessage(messageProtocol)
@@ -285,7 +287,7 @@ const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
 
 const proceed = async (defaultKafkaConfig, params, opts) => {
   const { message, kafkaTopic, consumer, decodedPayload, span, producer } = params
-  const { consumerCommit, fspiopError, eventDetail, fromSwitch, toDestination, messageKey } = opts
+  const { consumerCommit, fspiopError, eventDetail, fromSwitch, toDestination, messageKey, topicNameOverride } = opts
   let metadataState
 
   if (consumerCommit) {
@@ -310,7 +312,7 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
     if (message.value.content.headers) message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = toDestination
   }
   if (eventDetail && producer) {
-    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, messageKey, span)
+    await produceGeneralMessage(defaultKafkaConfig, producer, eventDetail.functionality, eventDetail.action, message.value, metadataState, messageKey, span, topicNameOverride)
   }
   return true
 }
