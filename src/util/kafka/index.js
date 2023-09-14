@@ -159,8 +159,9 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
  * @param {string} participantName - The participant name
  * @param {string} functionality - the functionality flow. Example: 'transfer' ie: note the case of text
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
- * @param {number} partition - optional partition to produce to
- * @param {*} opaqueKey - optional opaque token, which gets passed along to your delivery reports
+ * @param {string} [key] - optional key that allows partitioning it occur
+ * @param {number} [partition] - optional partition to produce to
+ * @param {*} [opaqueKey] - optional opaque token, which gets passed along to your delivery reports
  *
  * @returns {object} - Returns newly created participant topicConfig
  */
@@ -179,10 +180,10 @@ const createParticipantTopicConf = (template, participantName, functionality, ac
  * @param {string} template - The template for that needs to be populated
  * @param {string} functionality - the functionality flow. Example: 'transfer' ie: note the case of text
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
- * @param {string} key - optional key that allows partitioning it occur
- * @param {number} partition - optional partition to produce to
- * @param {*} opaqueKey - optional opaque token, which gets passed along to your delivery reports
- * @param {string} topicNameOverride - optional topic name override that skips topic name rendering
+ * @param {string} [key] - optional key that allows partitioning it occur
+ * @param {number} [partition] - optional partition to produce to
+ * @param {*} [opaqueKey] - optional opaque token, which gets passed along to your delivery reports
+ * @param {string} [topicNameOverride] - optional topic name override that skips topic name rendering
  *
  * @returns {object} - Returns newly created general topicConfig
  */
@@ -222,9 +223,9 @@ const getFunctionalityAction = (functionality, action) => {
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
  * @param {object} message - a list of messages to consume for the relevant topic
  * @param {object} state - state of the message being produced
- * @param {string} key - optional key that allows partitioning it occur
- * @param {object} span - the span for event logging
- * @param {string} topicNameOverride - optional topic name override that skips topic name rendering
+ * @param {string} [key] - optional key that allows partitioning it occur
+ * @param {object} [span] - the span for event logging
+ * @param {string} [topicNameOverride] - optional topic name override that skips topic name rendering
  *
  * @returns {object} - Returns a boolean: true if successful, or throws and error if failed
  */
