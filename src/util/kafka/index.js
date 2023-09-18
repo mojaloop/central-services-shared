@@ -159,6 +159,7 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
  * @param {string} participantName - The participant name
  * @param {string} functionality - the functionality flow. Example: 'transfer' ie: note the case of text
  * @param {string} action - the action that applies to the flow. Example: 'prepare' ie: note the case of text
+ * @param {string} key - optional key that allows partitioning it occur
  * @param {number} partition - optional partition to produce to
  * @param {*} opaqueKey - optional opaque token, which gets passed along to your delivery reports
  *
