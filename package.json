@@ -68,7 +68,7 @@
     "shins": "2.6.0",
     "uuid4": "2.0.3",
     "widdershins": "^4.0.1",
-    "yaml": "2.3.3"
+    "yaml": "2.3.4"
   },
   "devDependencies": {
     "@hapi/hapi": "21.3.2",
