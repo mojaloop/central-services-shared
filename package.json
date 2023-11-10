@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.2.0-snapshot.1",
+  "version": "18.2.0-snapshot.2",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -23,7 +23,7 @@
     "mojaloop"
   ],
   "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "types__": "src/index.d.ts",
   "imports": {
     "#src/*": "./src/*.js",
     "#test/*": "./test/*.js"
