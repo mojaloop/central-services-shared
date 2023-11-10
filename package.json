@@ -23,7 +23,7 @@
     "mojaloop"
   ],
   "main": "src/index.js",
-  "types__": "src/index.d.ts",
+  "types": "src/index.d.ts",
   "imports": {
     "#src/*": "./src/*.js",
     "#test/*": "./test/*.js"
