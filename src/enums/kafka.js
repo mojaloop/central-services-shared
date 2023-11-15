@@ -192,6 +192,26 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
+    'fx-abort': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'fx-commit': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'fx-prepare': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'fx-reject': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'fx-reserve': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
     prepare: {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
