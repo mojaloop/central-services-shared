@@ -37,6 +37,7 @@ const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
 const { Map } = require('immutable')
 
+const PARTICIPANT_CACHE_KEY = 'participantCache'
 let client
 let policy
 let switchEndpoint
@@ -125,7 +126,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
-    const participants = await policy.get()
+    const participants = await policy.get(PARTICIPANT_CACHE_KEY)
     if ('value' in participants && 'cached' in participants) {
       if (participants.cached === null) {
         histTimer({ success: true, hit: false })
