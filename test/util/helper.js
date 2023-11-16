@@ -40,6 +40,33 @@ const defaultHeaders = (destination, resource, source, version = '1.0') => {
   }
 }
 
+const getParticipantsResponse = {
+  data: [
+    {
+      name: 'fsp1',
+      id: 'http://central-ledger/participants/fsp1',
+      created: '"2023-11-07T21:52:25.000Z"',
+      isActive: 1,
+      links: { self: 'http://central-ledger/participants/fsp1' },
+      accounts: [
+        { id: 7, ledgerAccountType: 'POSITION', currency: 'USD', isActive: 1, createdDate: null, createdBy: 'unknown' },
+        { id: 8, ledgerAccountType: 'SETTLEMENT', currency: 'USD', isActive: 1, createdDate: null, createdBy: 'unknown' }
+      ]
+    },
+    {
+      name: 'fsp2',
+      id: 'http://central-ledger/participants/fsp2',
+      created: '"2023-11-07T21:52:25.000Z"',
+      isActive: 1,
+      links: { self: 'http://central-ledger/participants/fsp2' },
+      accounts: [
+        { id: 9, ledgerAccountType: 'POSITION', currency: 'USD', isActive: 1, createdDate: null, createdBy: 'unknown' },
+        { id: 10, ledgerAccountType: 'SETTLEMENT', currency: 'USD', isActive: 1, createdDate: null, createdBy: 'unknown' }
+      ]
+    }
+  ]
+}
+
 const getEndPointsResponse = {
   data: [
     {
@@ -78,5 +105,6 @@ module.exports = {
   defaultHeaders,
   generateProtocolHeader,
   getEndPointsResponse,
-  getEndpointAndRenderResponse
+  getEndpointAndRenderResponse,
+  getParticipantsResponse
 }

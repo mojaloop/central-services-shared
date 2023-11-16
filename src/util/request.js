@@ -62,11 +62,24 @@ request.defaults.httpAgent = new http.Agent({ keepAlive: true })
  * @param {object | undefined} span a span for event logging if this request is within a span
  * @param {object | undefined} jwsSigner the jws signer for signing the requests
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
+ * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
  *
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
 
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined, jwsSigner = undefined, protocolVersions = undefined) => {
+const sendRequest = async (
+  url,
+  headers,
+  source,
+  destination,
+  method = enums.Http.RestMethods.GET,
+  payload = undefined,
+  responseType = enums.Http.ResponseTypes.JSON,
+  span = undefined,
+  jwsSigner = undefined,
+  protocolVersions = undefined,
+  axiosRequestOptionsOverride = {}
+) => {
   const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -93,7 +106,8 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       method,
       headers: transformedHeaders,
       data: payload,
-      responseType
+      responseType,
+      ...axiosRequestOptionsOverride
     }
     // if jwsSigner is passed then sign the request
     if (jwsSigner != null && typeof (jwsSigner) === 'object') {

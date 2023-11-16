@@ -175,6 +175,7 @@ declare namespace CentralServicesShared {
       TRANSACTION_REQUEST_PUT_ERROR: string;
       PARTICIPANT_ENDPOINTS_GET: string;
       PARTICIPANTS_GET: string;
+      PARTICIPANTS_POST: string;
       PARTIES_GET: string;
       PARTIES_PUT_ERROR: string;
       PARTIES_SUB_ID_PUT_ERROR: string;
