@@ -556,6 +556,11 @@ declare namespace CentralServicesShared {
     getEndpointAndRender(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, path: string, options?: any): Promise<string>
   }
 
+  interface Participants {
+    getParticipant(switchUrl: string, fsp: string): Promise<object>
+    initializeCache(policyOptions: object): Promise<boolean>
+  }
+
   interface ProtocolVersionsType {
     content: string,
     accept: string
@@ -575,6 +580,7 @@ declare namespace CentralServicesShared {
 
   interface Util {
     Endpoints: Endpoints;
+    Participants: Participants;
     Hapi: any;
     Kafka: Kafka;
     OpenapiBackend: any;
