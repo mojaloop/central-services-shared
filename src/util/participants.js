@@ -126,6 +126,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
     const participants = await policy.get()
+    Logger.isErrorEnabled && Logger.error(JSON.stringify(participants))
     if ('value' in participants && 'cached' in participants) {
       if (participants.cached === null) {
         histTimer({ success: true, hit: false })
