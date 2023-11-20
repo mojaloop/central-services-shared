@@ -26,16 +26,19 @@
 'use strict'
 
 const Logger = require('@mojaloop/central-services-logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Catbox = require('@hapi/catbox')
 const CatboxMemory = require('@hapi/catbox-memory')
+const Mustache = require('mustache')
 const { Map } = require('immutable')
-const Http = require('./http')
+
+const { ERROR_MESSAGES } = require('../constants')
 const Enum = require('../enums')
+const Http = require('./http')
+const request = require('./request')
+
 const partition = 'endpoint-cache'
 const clientOptions = { partition }
-const Mustache = require('mustache')
-const request = require('./request')
-const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 let client
 let policy
@@ -117,9 +120,13 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
   Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
   try {
     const endpoints = await policy.get(fsp)
-    return Mustache.render(new Map(endpoints).get(endpointType), options)
+    const endpoint = new Map(endpoints).get(endpointType)
+    if (!endpoint) {
+      throw new Error(ERROR_MESSAGES.noFspEndpointInCache)
+    }
+    return Mustache.render(endpoint, options)
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
+    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'  [fsp: ${fsp},  endpointType: ${endpointType}]`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
