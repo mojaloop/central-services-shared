@@ -5,7 +5,8 @@ const _ = require('lodash')
 
 const protocolVersions = {
   anyVersion: Symbol('Any'),
-  ONE: ['1', '1.0', '1.1']
+  ONE: ['1', '1.0', '1.1'],
+  TWO: ['2', '2.0']
 }
 
 const protocolVersionsMap = [
