@@ -11,7 +11,8 @@ const protocolVersions = {
 
 const protocolVersionsMap = [
   { key: '1', value: '0' },
-  { key: '1', value: '1' }
+  { key: '1', value: '1' },
+  { key: '2', value: '0' }
 ]
 
 // Some convenience functions for generating regexes for header matching

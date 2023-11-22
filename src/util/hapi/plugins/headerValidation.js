@@ -25,6 +25,7 @@ const defaultProtocolResources = [
 
 const defaultProtocolVersions = [
   ...protocolVersions.ONE,
+  ...protocolVersions.TWO,
   protocolVersions.anyVersion
 ]
 
