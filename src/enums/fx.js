@@ -22,8 +22,6 @@
  --------------
  ******/
 
-
-
 const FxTransferType = {
   PAYER_CONVERSION: 1,
   PAYEE_CONVERSION: 2
