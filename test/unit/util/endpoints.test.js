@@ -13,11 +13,26 @@ const Mustache = require('mustache')
 const Helper = require('../../util/helper')
 const Logger = require('@mojaloop/central-services-logger')
 const FSPIOP_CALLBACK_URL_TRANSFER_PUT = Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
+const Metrics = require('@mojaloop/central-services-metrics')
 
 Test('Cache Test', cacheTest => {
   let sandbox
 
   cacheTest.beforeEach(async test => {
+    Metrics.setup({
+      INSTRUMENTATION: {
+        METRICS: {
+          DISABLED: false,
+          config: {
+            timeout: 5000,
+            prefix: 'moja_ml_',
+            defaultLabels: {
+              serviceName: 'ml-service'
+            }
+          }
+        }
+      }
+    })
     sandbox = Sinon.createSandbox()
     sandbox.stub(request, 'sendRequest')
     sandbox.stub(Http, 'SwitchDefaultHeaders').returns(Helper.defaultHeaders())
@@ -40,6 +55,29 @@ Test('Cache Test', cacheTest => {
       const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
       await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndPointsResponse))
+
+      try {
+        const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.equal(result, expected, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('return the endpoint if catbox returns decoratedValue object', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+      const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
+
+      await Cache.initializeCache({
+        ...Config.ENDPOINT_CACHE_CONFIG,
+        getDecoratedValue: true
+      })
       request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndPointsResponse))
 
       try {
@@ -121,6 +159,34 @@ Test('Cache Test', cacheTest => {
       }
     })
 
+    getEndpointAndRenderTest.test('return the rendered endpoint if catbox returns decoratedValue object', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+      const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
+
+      await Cache.initializeCache({
+        ...Config.ENDPOINT_CACHE_CONFIG,
+        getDecoratedValue: true
+      })
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndpointAndRenderResponse))
+
+      try {
+        const result = await Cache.getEndpointAndRender(
+          Config.ENDPOINT_SOURCE_URL,
+          fsp,
+          endpointType,
+          'transfers/{{transferId}}',
+          { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.equal(result, expected, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
     getEndpointAndRenderTest.test('return throw an error if array not returned in response object', async (test) => {
       const fsp = 'fsp'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
@@ -183,8 +249,7 @@ Test('Cache Test', cacheTest => {
 
     initializeCacheTest.test('should throw error', async (test) => {
       try {
-        Catbox.Client = sandbox.stub()
-        Catbox.Client.throws(new Error())
+        sandbox.stub(Catbox, 'Client').throws(new Error())
         await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
         test.fail('should throw')
         test.end()
