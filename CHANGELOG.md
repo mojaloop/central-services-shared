@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.2.0](https://github.com/mojaloop/central-services-shared/compare/v18.1.3...v18.2.0) (2023-11-23)
+
+
+### Features
+
+* **mojaloop/#3426:** add participant request caching, axios override and metrics ([#357](https://github.com/mojaloop/central-services-shared/issues/357)) ([c5329a2](https://github.com/mojaloop/central-services-shared/commit/c5329a2f92c63fd9c9319f07ae01e5d3a4f2c11b)), closes [mojaloop/#3426](https://github.com/mojaloop/project/issues/3426)
+
 ### [18.1.3](https://github.com/mojaloop/central-services-shared/compare/v18.1.2...v18.1.3) (2023-11-02)
 
 
