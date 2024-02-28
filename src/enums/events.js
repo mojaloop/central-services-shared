@@ -39,6 +39,7 @@ const Event = {
     ENDPOINTCACHE: 'endpointcache',
     EVENT: 'event',
     FULFIL: 'fulfil',
+    FX_QUOTE: 'fxquote',
     GET: 'get',
     NOTIFICATION: 'notification',
     ORACLE: 'oracle',
