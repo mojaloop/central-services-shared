@@ -87,7 +87,6 @@ exports.initializeCache = async (policyOptions) => {
     Logger.isDebugEnabled && Logger.debug('participantCache::initializeCache::Cache initialized successfully')
     return true
   } catch (err) {
-    console.log(err)
     Logger.isErrorEnabled && Logger.error(`participantCache::Cache error:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
@@ -127,11 +126,13 @@ exports.getParticipant = async (switchUrl, fsp) => {
     } else {
       histTimer({ success: true, hit: false })
     }
-    if (participant) {
-      return participant
-    } else {
-      throw ErrorHandler.Factory.createInternalServerFSPIOPError('Participant does not exist')
+
+    if (participant.errorInformation) {
+      // Drop error from cache
+      await policy.drop(fsp)
+      throw ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(participant.errorInformation)
     }
+    return participant
   } catch (err) {
     histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantCache::getParticipant:: ERROR:'${err}'`)

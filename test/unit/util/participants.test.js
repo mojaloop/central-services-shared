@@ -138,6 +138,24 @@ Test('Participants Cache Test', participantsCacheTest => {
       }
     })
 
+    getParticipantTest.test('handles error from central-ledger', async (test) => {
+      const fsp = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseError))
+
+      try {
+        await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
     getParticipantTest.test('throw error', async (test) => {
       const fsp = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
@@ -145,8 +163,7 @@ Test('Participants Cache Test', participantsCacheTest => {
       request.sendRequest.withArgs(url, Helper.defaultHeaders()).throws(new Error())
 
       try {
-        const participant = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
-        console.log(participant)
+        await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
         test.fail('should throw error')
         await Cache.stopCache()
         test.end()

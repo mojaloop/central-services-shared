@@ -40,6 +40,15 @@ const defaultHeaders = (destination, resource, source, version = '1.0') => {
   }
 }
 
+const getParticipantsResponseError = {
+  data: {
+    errorInformation: {
+      errorCode: '3200',
+      errorDescription: 'Generic ID not found - The requested resource could not be found.'
+    }
+  }
+}
+
 const getParticipantsResponseFsp1 = {
   data: {
     name: 'fsp1',
@@ -107,5 +116,6 @@ module.exports = {
   getEndPointsResponse,
   getEndpointAndRenderResponse,
   getParticipantsResponseFsp1,
-  getParticipantsResponseFsp2
+  getParticipantsResponseFsp2,
+  getParticipantsResponseError
 }
