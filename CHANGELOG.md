@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.3.0](https://github.com/mojaloop/central-services-shared/compare/v18.2.0...v18.3.0) (2024-03-07)
+
+
+### Features
+
+* **mojaloop/#3759:** fix faulty cache implementation and add invalidation feature ([#360](https://github.com/mojaloop/central-services-shared/issues/360)) ([459291f](https://github.com/mojaloop/central-services-shared/commit/459291ffccc9d089605fc6dd8ed306285cb43772))
+
 ## [18.2.0](https://github.com/mojaloop/central-services-shared/compare/v18.1.3...v18.2.0) (2023-11-23)
 
 
