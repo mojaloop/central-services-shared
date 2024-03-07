@@ -35,43 +35,33 @@ const Mustache = require('mustache')
 const request = require('./request')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
-const { Map } = require('immutable')
 
-const PARTICIPANT_CACHE_KEY = 'participantCache'
 let client
 let policy
 let switchEndpoint
 
 /**
-* @function fetchParticipants
+* @function fetchParticipant
 *
 * @description This populates the cache of participants
 *
-* @returns {object} participantMap Returns the object containing the participants
+* @returns {object} participant Returns the object containing the participants
 */
-const fetchParticipants = async () => {
+const fetchParticipant = async (fsp) => {
   const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
-    'fetchParticipants',
-    'fetchParticipants - Metrics for fetchParticipants',
+    'fetchParticipant',
+    'fetchParticipant - Metrics for fetchParticipant',
     ['success']
   ).startTimer()
   try {
-    Logger.isDebugEnabled && Logger.debug('participantCache::fetchParticipants := Refreshing participant cache')
+    Logger.isDebugEnabled && Logger.debug('participantCache::fetchParticipant := Refreshing participant cache')
     const defaultHeaders = Http.SwitchDefaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH)
-    // The templates have a counter-intuitive naming structure, but this is the correct template to use
-    // for a GET /participants request.
-    const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_POST)
-    Logger.isDebugEnabled && Logger.debug(`participantCache::fetchParticipants := URL: ${url}`)
+    const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+    Logger.isDebugEnabled && Logger.debug(`participantCache::fetchParticipant := URL: ${url}`)
     const response = await request.sendRequest(url, defaultHeaders, Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
-    const participants = response.data
-    const participantMap = {}
-    if (Array.isArray(participants)) {
-      participants.forEach(participant => {
-        participantMap[participant.name] = participant
-      })
-    }
+    const participant = response.data
     histTimer({ success: true })
-    return participantMap
+    return participant
   } catch (e) {
     histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantCache::fetchParticipants:: ERROR:'${e}'`)
@@ -91,13 +81,12 @@ exports.initializeCache = async (policyOptions) => {
     Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
-    policyOptions.generateFunc = fetchParticipants
+    policyOptions.generateFunc = fetchParticipant
     Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
     policy = new Catbox.Policy(policyOptions, client, partition)
     Logger.isDebugEnabled && Logger.debug('participantCache::initializeCache::Cache initialized successfully')
     return true
   } catch (err) {
-    console.log(err)
     Logger.isErrorEnabled && Logger.error(`participantCache::Cache error:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
@@ -121,32 +110,47 @@ exports.getParticipant = async (switchUrl, fsp) => {
   ).startTimer()
   switchEndpoint = switchUrl
   Logger.isDebugEnabled && Logger.debug('participantCache::getParticipant')
-  let participant
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
-    const participants = await policy.get(PARTICIPANT_CACHE_KEY)
-    if ('value' in participants && 'cached' in participants) {
-      if (participants.cached === null) {
+    let participant = await policy.get(fsp)
+
+    if ('value' in participant && 'cached' in participant) {
+      if (participant.cached === null) {
         histTimer({ success: true, hit: false })
       } else {
         histTimer({ success: true, hit: true })
       }
-      participant = new Map(participants.value).get(fsp)
+      participant = participant.value
     } else {
-      participant = new Map(participants).get(fsp)
       histTimer({ success: true, hit: false })
     }
-    if (participant) {
-      return participant
-    } else {
-      throw ErrorHandler.Factory.createInternalServerFSPIOPError('Participant does not exist')
+
+    if (participant.errorInformation) {
+      // Drop error from cache
+      await policy.drop(fsp)
+      throw ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(participant.errorInformation)
     }
+    return participant
   } catch (err) {
     histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantCache::getParticipant:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
+  }
+}
+
+/**
+* @function invalidateParticipantCache
+*
+* @description It drops the cache for a given participant by fspId
+*
+* @returns {void}
+*/
+exports.invalidateParticipantCache = async (fsp) => {
+  Logger.isDebugEnabled && Logger.debug('participantCache::invalidateParticipantCache::Invalidating the cache')
+  if (policy) {
+    return policy.drop(fsp)
   }
 }
 
