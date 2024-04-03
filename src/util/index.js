@@ -29,6 +29,7 @@
 const _ = require('lodash')
 const Kafka = require('./kafka')
 const Endpoints = require('./endpoints')
+const Participants = require('./participants')
 const Request = require('./request')
 const Http = require('./http')
 const Hapi = require('./hapi')
@@ -235,6 +236,7 @@ module.exports = {
   getCircularReplacer,
   filterExtensions,
   Kafka,
+  Participants,
   Endpoints,
   Request,
   Http,

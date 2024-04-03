@@ -1,0 +1,207 @@
+'use strict'
+
+const Test = require('tapes')(require('tape'))
+const src = '../../../src'
+const Sinon = require('sinon')
+const Cache = require(`${src}/util/participants`)
+const request = require(`${src}/util/request`)
+const Catbox = require('@hapi/catbox')
+const Config = require('../../util/config')
+const Http = require(`${src}/util`).Http
+const Enum = require(`${src}`).Enum
+const Mustache = require('mustache')
+const Helper = require('../../util/helper')
+const Logger = require('@mojaloop/central-services-logger')
+const Metrics = require('@mojaloop/central-services-metrics')
+
+Test('Participants Cache Test', participantsCacheTest => {
+  let sandbox
+
+  participantsCacheTest.beforeEach(async test => {
+    Metrics.setup({
+      INSTRUMENTATION: {
+        METRICS: {
+          DISABLED: false,
+          config: {
+            timeout: 5000,
+            prefix: 'moja_ml_',
+            defaultLabels: {
+              serviceName: 'ml-service'
+            }
+          }
+        }
+      }
+    })
+    sandbox = Sinon.createSandbox()
+    sandbox.stub(request, 'sendRequest')
+    sandbox.stub(Http, 'SwitchDefaultHeaders').returns(Helper.defaultHeaders())
+    sandbox.stub(Logger, 'isErrorEnabled').value(true)
+    sandbox.stub(Logger, 'isInfoEnabled').value(true)
+    sandbox.stub(Logger, 'isDebugEnabled').value(true)
+    test.end()
+  })
+
+  participantsCacheTest.afterEach(async test => {
+    sandbox.restore()
+    test.end()
+  })
+
+  participantsCacheTest.test('getParticipant should', async (getParticipantTest) => {
+    getParticipantTest.test('return the participant', async (test) => {
+      const fsp = 'fsp2'
+      const expectedName = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+
+      try {
+        const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.equal(result.name, expectedName, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getParticipantTest.test('return the participant without calling request after being cached', async (test) => {
+      const fsp = 'fsp2'
+      const expectedName = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+
+      try {
+        const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.equal(result.name, expectedName, 'The results match')
+        test.ok(request.sendRequest.calledOnceWith(url, Helper.defaultHeaders()), 'Fetch participants was called once')
+
+        const resultCached = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.equal(request.sendRequest.callCount, 1)
+        test.ok(request.sendRequest.calledOnceWith(url, Helper.defaultHeaders()), 'Fetch participants was not needlessly called')
+        test.equal(resultCached.name, expectedName, 'The results match')
+
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getParticipantTest.test('request fresh participants after invalidating cache', async (test) => {
+      const fsp = 'fsp2'
+      const expectedName = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+
+      try {
+        const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.equal(result.name, expectedName, 'The results match')
+        test.ok(request.sendRequest.calledOnceWith(url, Helper.defaultHeaders()), 'Fetch participants was called once')
+
+        await Cache.invalidateParticipantCache(fsp)
+
+        const resultCached = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.equal(request.sendRequest.callCount, 2)
+        test.ok(request.sendRequest.getCall(1).calledWith(url, Helper.defaultHeaders()), 'Fetch participants was called again')
+        test.equal(resultCached.name, expectedName, 'The results match')
+
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getParticipantTest.test('return the participant if catbox returns decoratedValue object', async (test) => {
+      const fsp = 'fsp2'
+      const expectedName = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache({
+        ...Config.ENDPOINT_CACHE_CONFIG,
+        getDecoratedValue: true
+      })
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+
+      try {
+        const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.equal(result.name, expectedName, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getParticipantTest.test('handles error from central-ledger', async (test) => {
+      const fsp = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseError))
+
+      try {
+        await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
+    getParticipantTest.test('throw error', async (test) => {
+      const fsp = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).throws(new Error())
+
+      try {
+        await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+    await getParticipantTest.end()
+  })
+
+  participantsCacheTest.test('initializeCache should', async (participantsInitializeCacheTest) => {
+    participantsInitializeCacheTest.test('initializeCache cache and return true', async (test) => {
+      try {
+        const result = await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+        test.equal(result, true, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    participantsInitializeCacheTest.test('should throw error', async (test) => {
+      try {
+        sandbox.stub(Catbox, 'Client').throws(new Error())
+        await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+        test.fail('should throw')
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        test.end()
+      }
+    })
+
+    await participantsInitializeCacheTest.end()
+  })
+  participantsCacheTest.end()
+})

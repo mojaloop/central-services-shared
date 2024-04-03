@@ -175,6 +175,7 @@ declare namespace CentralServicesShared {
       TRANSACTION_REQUEST_PUT_ERROR: string;
       PARTICIPANT_ENDPOINTS_GET: string;
       PARTICIPANTS_GET: string;
+      PARTICIPANTS_POST: string;
       PARTIES_GET: string;
       PARTIES_PUT_ERROR: string;
       PARTIES_SUB_ID_PUT_ERROR: string;
@@ -555,6 +556,11 @@ declare namespace CentralServicesShared {
     getEndpointAndRender(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, path: string, options?: any): Promise<string>
   }
 
+  interface Participants {
+    getParticipant(switchUrl: string, fsp: string): Promise<object>
+    initializeCache(policyOptions: object): Promise<boolean>
+  }
+
   interface ProtocolVersionsType {
     content: string,
     accept: string
@@ -574,6 +580,7 @@ declare namespace CentralServicesShared {
 
   interface Util {
     Endpoints: Endpoints;
+    Participants: Participants;
     Hapi: any;
     Kafka: Kafka;
     OpenapiBackend: any;

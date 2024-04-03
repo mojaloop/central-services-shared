@@ -13,6 +13,7 @@
     "GHSA-rjqq-98f6-6j3r",
     "GHSA-w5p7-h5w8-2hfq",
     "GHSA-p9pc-299p-vxgp",
-    "GHSA-7fh5-64p2-3v2j"
+    "GHSA-7fh5-64p2-3v2j",
+    "GHSA-rm97-x556-q36h" // https://github.com/advisories/GHSA-rm97-x556-q36h
   ]
 }
