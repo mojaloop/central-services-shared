@@ -117,6 +117,7 @@ exports.initializeCache = async (policyOptions) => {
  * @param {string} fsp - the id of the fsp
  * @param {string} endpointType - the type of the endpoint
  * @param {object} options - contains the options for the mustache template function
+ * @param {object} renderOptions - contains the options for the rendering the endpoint
  *
  * @returns {string} - Returns the endpoint, throws error if failure occurs
  */
