@@ -98,6 +98,11 @@
     "ajv": "8.x.x",
     "ajv-keywords": "5.x.x"
   },
+  "overrides": {
+    "shins": {
+      "ejs": "3.1.7"
+    }
+  },
   "peerDependenciesMeta": {
     "@mojaloop/central-services-error-handling": {
       "optional": false
