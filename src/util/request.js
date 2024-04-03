@@ -39,9 +39,6 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
 delete request.defaults.headers.common.Accept
 
-// Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive: true })
-
 /**
  * @function sendRequest
  *
@@ -107,6 +104,7 @@ const sendRequest = async (
       headers: transformedHeaders,
       data: payload,
       responseType,
+      httpAgent: new http.Agent({ keepAlive: true }),
       ...axiosRequestOptionsOverride
     }
     // if jwsSigner is passed then sign the request
