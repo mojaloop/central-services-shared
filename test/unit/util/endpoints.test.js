@@ -61,6 +61,10 @@ Test('Cache Test', cacheTest => {
       try {
         const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
         test.equal(result, expected, 'The results match')
+
+        const result2 = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }, { path: '/additionalPath' })
+        test.equal(result2, `${expected}/additionalPath`, 'The results match')
+
         await Cache.stopCache()
         test.end()
       } catch (err) {
@@ -84,6 +88,10 @@ Test('Cache Test', cacheTest => {
       try {
         const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
         test.equal(result, expected, 'The results match')
+
+        const result2 = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }, { path: '/additionalPath' })
+        test.equal(result2, `${expected}/additionalPath`, 'The results match')
+
         await Cache.stopCache()
         test.end()
       } catch (err) {

@@ -48,7 +48,7 @@ let switchEndpoint
 * @returns {object} participant Returns the object containing the participants
 */
 const fetchParticipant = async (fsp) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'fetchParticipant',
     'fetchParticipant - Metrics for fetchParticipant',
     ['success']
@@ -103,7 +103,7 @@ exports.initializeCache = async (policyOptions) => {
 * @returns {string} - Returns the endpoint, throws error if failure occurs
 */
 exports.getParticipant = async (switchUrl, fsp) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'getParticipant',
     'getParticipant - Metrics for getParticipant with cache hit rate',
     ['success', 'hit']
@@ -118,13 +118,13 @@ exports.getParticipant = async (switchUrl, fsp) => {
 
     if ('value' in participant && 'cached' in participant) {
       if (participant.cached === null) {
-        histTimer && histTimer({ success: true, hit: false })
+        histTimer({ success: true, hit: false })
       } else {
-        histTimer && histTimer({ success: true, hit: true })
+        histTimer({ success: true, hit: true })
       }
       participant = participant.value
     } else {
-      histTimer && histTimer({ success: true, hit: false })
+      histTimer({ success: true, hit: false })
     }
 
     if (participant.errorInformation) {
@@ -134,7 +134,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     }
     return participant
   } catch (err) {
-    histTimer && histTimer({ success: false, hit: false })
+    histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantCache::getParticipant:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }

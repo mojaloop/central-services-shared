@@ -51,7 +51,7 @@ let switchEndpoint
  * @returns {object} endpointMap Returns the object containing the endpoints for given fsp id
  */
 const fetchEndpoints = async (fsp) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'fetchParticipants',
     'fetchParticipants - Metrics for fetchParticipants',
     ['success']
@@ -72,10 +72,10 @@ const fetchEndpoints = async (fsp) => {
       })
     }
     Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Returning the endpoints: ${JSON.stringify(endpointMap)}`)
-    histTimer && histTimer({ success: true })
+    histTimer({ success: true })
     return endpointMap
   } catch (e) {
-    histTimer && histTimer({ success: false })
+    histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
   }
 }
@@ -122,7 +122,7 @@ exports.initializeCache = async (policyOptions) => {
  * @returns {string} - Returns the endpoint, throws error if failure occurs
  */
 exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'getEndpoint',
     'getEndpoint - Metrics for getEndpoint with cache hit rate',
     ['success', 'hit']
@@ -136,9 +136,9 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     const endpoints = await policy.get(fsp)
     if ('value' in endpoints && 'cached' in endpoints) {
       if (endpoints.cached === null) {
-        histTimer && histTimer({ success: true, hit: false })
+        histTimer({ success: true, hit: false })
       } else {
-        histTimer && histTimer({ success: true, hit: true })
+        histTimer({ success: true, hit: true })
       }
       const endpoint = new Map(endpoints.value).get(endpointType)
       if (renderOptions.path) {
@@ -151,10 +151,10 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     if (renderOptions.path) {
       endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
     }
-    histTimer && histTimer({ success: true, hit: false })
+    histTimer({ success: true, hit: false })
     return Mustache.render(endpoint, options)
   } catch (err) {
-    histTimer && histTimer({ success: false, hit: false })
+    histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
@@ -174,7 +174,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
  * @returns {string} - Returns the rendered endpoint, throws error if failure occurs
  */
 exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', options) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'getEndpointAndRender',
     'getEndpoint - Metrics for getEndpointAndRender',
     ['success']
@@ -184,10 +184,10 @@ exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', o
 
   try {
     const endpoint = exports.getEndpoint(switchUrl, fsp, endpointType, options, { path })
-    histTimer && histTimer({ success: true })
+    histTimer({ success: true })
     return endpoint
   } catch (err) {
-    histTimer && histTimer({ success: false })
+    histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpointAndRender:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
