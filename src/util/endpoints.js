@@ -72,10 +72,10 @@ const fetchEndpoints = async (fsp) => {
       })
     }
     Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Returning the endpoints: ${JSON.stringify(endpointMap)}`)
-    histTimer({ success: true })
+    histTimer && histTimer({ success: true })
     return endpointMap
   } catch (e) {
-    histTimer({ success: false })
+    histTimer && histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
   }
 }
@@ -136,9 +136,9 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     const endpoints = await policy.get(fsp)
     if ('value' in endpoints && 'cached' in endpoints) {
       if (endpoints.cached === null) {
-        histTimer({ success: true, hit: false })
+        histTimer && histTimer({ success: true, hit: false })
       } else {
-        histTimer({ success: true, hit: true })
+        histTimer && histTimer({ success: true, hit: true })
       }
       const endpoint = new Map(endpoints.value).get(endpointType)
       if (renderOptions.path) {
@@ -151,10 +151,10 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     if (renderOptions.path) {
       endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
     }
-    histTimer({ success: true, hit: false })
+    histTimer && histTimer({ success: true, hit: false })
     return Mustache.render(endpoint, options)
   } catch (err) {
-    histTimer({ success: false, hit: false })
+    histTimer && histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
@@ -184,10 +184,10 @@ exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', o
 
   try {
     const endpoint = exports.getEndpoint(switchUrl, fsp, endpointType, options, { path })
-    histTimer({ success: true })
+    histTimer && histTimer({ success: true })
     return endpoint
   } catch (err) {
-    histTimer({ success: false })
+    histTimer && histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpointAndRender:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }

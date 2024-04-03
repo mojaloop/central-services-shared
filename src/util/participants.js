@@ -118,13 +118,13 @@ exports.getParticipant = async (switchUrl, fsp) => {
 
     if ('value' in participant && 'cached' in participant) {
       if (participant.cached === null) {
-        histTimer({ success: true, hit: false })
+        histTimer && histTimer({ success: true, hit: false })
       } else {
-        histTimer({ success: true, hit: true })
+        histTimer && histTimer({ success: true, hit: true })
       }
       participant = participant.value
     } else {
-      histTimer({ success: true, hit: false })
+      histTimer && histTimer({ success: true, hit: false })
     }
 
     if (participant.errorInformation) {
@@ -134,7 +134,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     }
     return participant
   } catch (err) {
-    histTimer({ success: false, hit: false })
+    histTimer && histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantCache::getParticipant:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
