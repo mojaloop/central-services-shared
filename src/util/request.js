@@ -39,9 +39,6 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
 delete request.defaults.headers.common.Accept
 
-// Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive: true })
-
 /**
  * @function sendRequest
  *
@@ -62,12 +59,25 @@ request.defaults.httpAgent = new http.Agent({ keepAlive: true })
  * @param {object | undefined} span a span for event logging if this request is within a span
  * @param {object | undefined} jwsSigner the jws signer for signing the requests
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
+ * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
  *
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
 
-const sendRequest = async (url, headers, source, destination, method = enums.Http.RestMethods.GET, payload = undefined, responseType = enums.Http.ResponseTypes.JSON, span = undefined, jwsSigner = undefined, protocolVersions = undefined) => {
-  const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
+const sendRequest = async (
+  url,
+  headers,
+  source,
+  destination,
+  method = enums.Http.RestMethods.GET,
+  payload = undefined,
+  responseType = enums.Http.ResponseTypes.JSON,
+  span = undefined,
+  jwsSigner = undefined,
+  protocolVersions = undefined,
+  axiosRequestOptionsOverride = {}
+) => {
+  const histTimerEnd = Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
     ['success', 'source', 'destination', 'method']
@@ -93,7 +103,9 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       method,
       headers: transformedHeaders,
       data: payload,
-      responseType
+      responseType,
+      httpAgent: new http.Agent({ keepAlive: true }),
+      ...axiosRequestOptionsOverride
     }
     // if jwsSigner is passed then sign the request
     if (jwsSigner != null && typeof (jwsSigner) === 'object') {
@@ -108,7 +120,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
     const response = await request(requestOptions)
     Logger.isDebugEnabled && Logger.debug(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
     !!sendRequestSpan && await sendRequestSpan.finish()
-    !!histTimerEnd && histTimerEnd({ success: true, source, destination, method })
+    histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
     Logger.isErrorEnabled && Logger.error(error)
@@ -134,7 +146,7 @@ const sendRequest = async (url, headers, source, destination, method = enums.Htt
       await sendRequestSpan.error(fspiopError, state)
       await sendRequestSpan.finish(fspiopError.message, state)
     }
-    !!histTimerEnd && histTimerEnd({ success: false, source, destination, method })
+    histTimerEnd({ success: false, source, destination, method })
     throw fspiopError
   }
 }
