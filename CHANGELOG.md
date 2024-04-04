@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.3.1](https://github.com/mojaloop/central-services-shared/compare/v18.3.0...v18.3.1) (2024-04-04)
+
+
+### Chore
+
+* **deps:** bump express from 4.18.2 to 4.19.2 ([#363](https://github.com/mojaloop/central-services-shared/issues/363)) ([248bad2](https://github.com/mojaloop/central-services-shared/commit/248bad29d36ad9a09832792f45d3a2d8d66ae2da))
+* **deps:** bump follow-redirects from 1.15.5 to 1.15.6 ([#364](https://github.com/mojaloop/central-services-shared/issues/364)) ([eed3eeb](https://github.com/mojaloop/central-services-shared/commit/eed3eebf0adefeed5f954d5aa31eddc730e04325))
+
 ## [18.3.0](https://github.com/mojaloop/central-services-shared/compare/v18.2.0...v18.3.0) (2024-03-07)
 
 
