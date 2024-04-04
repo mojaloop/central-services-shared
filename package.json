@@ -71,7 +71,7 @@
     "yaml": "2.4.1"
   },
   "devDependencies": {
-    "@hapi/hapi": "21.3.7",
+    "@hapi/hapi": "21.3.8",
     "@hapi/joi": "17.1.1",
     "audit-ci": "^6.6.1",
     "base64url": "3.0.1",
