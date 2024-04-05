@@ -92,11 +92,16 @@
   },
   "overrides": {
     "shins": {
-      "ejs": "3.1.7"
+      "ejs": "^3.1.7",
+      "sanitize-html": "^2.12.1",
+      "jsonpointer": "^5.0.0",
+      "markdown-it": "^12.3.2",
+      "yargs-parser": "13.1.2",
+      "postcss": "8.4.31"
     }
   },
   "peerDependencies": {
-    "@mojaloop/central-services-error-handling": ">=12.x.x",
+    "@mojaloop/central-services-error-handling": ">=13.x.x",
     "@mojaloop/central-services-logger": ">=11.x.x",
     "@mojaloop/central-services-metrics": ">=12.x.x",
     "@mojaloop/event-sdk": ">=14.x.x",
