@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.3.2](https://github.com/mojaloop/central-services-shared/compare/v18.3.1...v18.3.2) (2024-04-05)
+
+
+### Chore
+
+* dependency updates to address issues ([#365](https://github.com/mojaloop/central-services-shared/issues/365)) ([6dd4a53](https://github.com/mojaloop/central-services-shared/commit/6dd4a53fd5092a3af566032fd7a8f4a968778d4d))
+
 ### [18.3.1](https://github.com/mojaloop/central-services-shared/compare/v18.3.0...v18.3.1) (2024-04-04)
 
 
