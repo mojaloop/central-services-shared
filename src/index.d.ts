@@ -60,12 +60,17 @@ declare namespace CentralServicesShared {
     FSPIOP_CALLBACK_URL_TRANSFER_POST = 'FSPIOP_CALLBACK_URL_TRANSFER_POST',
     FSPIOP_CALLBACK_URL_TRANSFER_PUT = 'FSPIOP_CALLBACK_URL_TRANSFER_PUT',
     FSPIOP_CALLBACK_URL_TRANSFER_ERROR = 'FSPIOP_CALLBACK_URL_TRANSFER_ERROR',
+    FSPIOP_CALLBACK_URL_FX_TRANSFER_POST = 'FSPIOP_CALLBACK_URL_FX_TRANSFER_POST',
+    FSPIOP_CALLBACK_URL_FX_TRANSFER_PUT = 'FSPIOP_CALLBACK_URL_FX_TRANSFER_PUT',
+    FSPIOP_CALLBACK_URL_FX_TRANSFER_ERROR = 'FSPIOP_CALLBACK_URL_FX_TRANSFER_ERROR',
     ALARM_NOTIFICATION_URL = 'ALARM_NOTIFICATION_URL',
     ALARM_NOTIFICATION_TOPIC = 'ALARM_NOTIFICATION_TOPIC',
     NET_DEBIT_CAP_THRESHOLD_BREACH_EMAIL = 'NET_DEBIT_CAP_THRESHOLD_BREACH_EMAIL',
     NET_DEBIT_CAP_ADJUSTMENT_EMAIL = 'NET_DEBIT_CAP_ADJUSTMENT_EMAIL',
     SETTLEMENT_TRANSFER_POSITION_CHANGE_EMAIL = 'SETTLEMENT_TRANSFER_POSITION_CHANGE_EMAIL',
     FSPIOP_CALLBACK_URL_QUOTES = 'FSPIOP_CALLBACK_URL_QUOTES',
+    FSPIOP_CALLBACK_URL_FX_QUOTES = 'FSPIOP_CALLBACK_URL_FX_QUOTES',
+    FSPIOP_CALLBACK_URL_BULK_QUOTES = 'FSPIOP_CALLBACK_URL_BULK_QUOTES',
     FSPIOP_CALLBACK_URL_BULK_TRANSFER_POST = 'FSPIOP_CALLBACK_URL_BULK_TRANSFER_POST',
     FSPIOP_CALLBACK_URL_BULK_TRANSFER_PUT = 'FSPIOP_CALLBACK_URL_BULK_TRANSFER_PUT',
     FSPIOP_CALLBACK_URL_BULK_TRANSFER_ERROR = 'FSPIOP_CALLBACK_URL_BULK_TRANSFER_ERROR',
@@ -125,6 +130,9 @@ declare namespace CentralServicesShared {
       FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_PUT: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_PUT;
       FSPIOP_CALLBACK_URL_PARTIES_PUT_ERROR: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_PARTIES_PUT_ERROR;
       FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_PUT_ERROR: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_PUT_ERROR;
+      FSPIOP_CALLBACK_URL_FX_TRANSFER_POST: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_FX_TRANSFER_POST;
+      FSPIOP_CALLBACK_URL_FX_TRANSFER_PUT: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_FX_TRANSFER_PUT;
+      FSPIOP_CALLBACK_URL_FX_TRANSFER_ERROR: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_FX_TRANSFER_ERROR;
       FSPIOP_CALLBACK_URL_TRANSFER_POST: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_TRANSFER_POST;
       FSPIOP_CALLBACK_URL_TRANSFER_PUT: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_TRANSFER_PUT;
       FSPIOP_CALLBACK_URL_TRANSFER_ERROR: FspEndpointTypesEnum.FSPIOP_CALLBACK_URL_TRANSFER_ERROR;
@@ -184,12 +192,20 @@ declare namespace CentralServicesShared {
       ORACLE_PARTICIPANTS_TYPE_ID_SUB_ID: string;
       ORACLE_PARTICIPANTS_TYPE_ID_CURRENCY_SUB_ID: string;
       ORACLE_PARTICIPANTS_BATCH: string;
+      FX_TRANSFERS_POST: string;
+      FX_TRANSFERS_PUT: string;
+      FX_TRANSFERS_PUT_ERROR: string;
+      FX_QUOTES_POST: string;
+      FX_QUOTES_PUT: string;
+      FX_QUOTES_ERROR_PUT: string;
       TRANSFERS_POST: string;
       TRANSFERS_PUT: string;
       TRANSFERS_PUT_ERROR: string;
       BULK_TRANSFERS_POST: string;
       BULK_TRANSFERS_PUT: string;
       BULK_TRANSFERS_PUT_ERROR: string;
+      BULK_QUOTES_POST: string;
+      BULK_QUOTES_ERROR_PUT: string;
       TP_TRANSACTION_REQUEST_GET: string;
       TP_TRANSACTION_REQUEST_POST: string;
       TP_TRANSACTION_REQUEST_PUT: string;
@@ -241,6 +257,7 @@ declare namespace CentralServicesShared {
     ENDPOINTCACHE = 'endpointcache',
     EVENT = 'event',
     FULFIL = 'fulfil',
+    FX_QUOTE = 'fx-quote',
     GET = 'get',
     NOTIFICATION = 'notification',
     ORACLE = 'oracle',
@@ -255,6 +272,8 @@ declare namespace CentralServicesShared {
     TRANSFER = 'transfer',
     PARTY = 'party',
     PARTICIPANT = 'participant',
+    DEFERRED_SETTLEMENT = 'deferred-settlement',
+    GROSS_SETTLEMENT = 'gross-settlement',
     VERIFICATION = 'verification'
   }
 
@@ -279,6 +298,20 @@ declare namespace CentralServicesShared {
     FAIL = 'fail',
     FULFIL = 'fulfil',
     FULFIL_DUPLICATE = 'fulfil-duplicate',
+    FX_FULFIL = 'fx-fulfil',
+    FX_ABORT = 'fx-abort',
+    FX_COMMIT = 'fx-commit',
+    FX_PREPARE = 'fx-prepare',
+    FX_REJECT = 'fx-reject',
+    FX_RESERVE = 'fx-reserve',
+    FX_PREPARE_DUPLICATE = 'fx-prepare-duplicate',
+    FX_ABORT_VALIDATION = 'fx-abort-validation',
+    FX_RESERVED_ABORTED = 'fx-reserved-aborted',
+    FX_FULFIL_DUPLICATE = 'fx-fulfil-duplicate',
+    FX_ABORT_DUPLICATE = 'fx-abort-duplicate',
+    FX_TIMEOUT_RECEIVED = 'fx-timeout-received',
+    FX_TIMEOUT_RESERVED = 'fx-timeout-reserved',
+    FX_GET = 'fx-get',
     GET = 'get',
     INITIATE = 'initiate',
     LIMIT_ADJUSTMENT = 'limit-adjustment',
@@ -416,6 +449,20 @@ declare namespace CentralServicesShared {
           FAIL: EventActionEnum.FAIL;
           FULFIL: EventActionEnum.FULFIL;
           FULFIL_DUPLICATE: EventActionEnum.FULFIL_DUPLICATE;
+          FX_FULFIL: EventActionEnum.FX_FULFIL;
+          FX_ABORT: EventActionEnum.FX_ABORT,
+          FX_COMMIT: EventActionEnum.FX_COMMIT,
+          FX_PREPARE: EventActionEnum.FX_PREPARE,
+          FX_REJECT: EventActionEnum.FX_REJECT,
+          FX_RESERVE: EventActionEnum.FX_RESERVE,
+          FX_PREPARE_DUPLICATE: EventActionEnum.FX_PREPARE_DUPLICATE,
+          FX_ABORT_VALIDATION: EventActionEnum.FX_ABORT_VALIDATION,
+          FX_RESERVED_ABORTED: EventActionEnum.FX_RESERVED_ABORTED,
+          FX_FULFIL_DUPLICATE: EventActionEnum.FX_FULFIL_DUPLICATE,
+          FX_ABORT_DUPLICATE: EventActionEnum.FX_ABORT_DUPLICATE,
+          FX_TIMEOUT_RECEIVED: EventActionEnum.FX_TIMEOUT_RECEIVED,
+          FX_TIMEOUT_RESERVED: EventActionEnum.FX_TIMEOUT_RESERVED,
+          FX_GET: EventActionEnum.FX_GET,
           GET: EventActionEnum.GET;
           INITIATE: EventActionEnum.INITIATE;
           LIMIT_ADJUSTMENT: EventActionEnum.LIMIT_ADJUSTMENT;
@@ -457,6 +504,7 @@ declare namespace CentralServicesShared {
           ENDPOINTCACHE: EventTypeEnum.ENDPOINTCACHE;
           EVENT: EventTypeEnum.EVENT;
           FULFIL: EventTypeEnum.FULFIL;
+          FX_QUOTE: EventTypeEnum.FX_QUOTE;
           GET: EventTypeEnum.GET;
           NOTIFICATION: EventTypeEnum.NOTIFICATION;
           ORACLE: EventTypeEnum.ORACLE;
@@ -471,6 +519,8 @@ declare namespace CentralServicesShared {
           TRANSFER: EventTypeEnum.TRANSFER;
           PARTY: EventTypeEnum.PARTY;
           PARTICIPANT: EventTypeEnum.PARTICIPANT;
+          DEFERRED_SETTLEMENT: EventTypeEnum.DEFERRED_SETTLEMENT,
+          GROSS_SETTLEMENT: EventTypeEnum.GROSS_SETTLEMENT,
           VERIFICATION: EventTypeEnum.VERIFICATION;
         };
       };
@@ -547,7 +597,7 @@ declare namespace CentralServicesShared {
       AdminNotificationActions: {
         LIMIT_ADJUSTMENT: AdminNotificationActionsEnum.LIMIT_ADJUSTMENT;
       };
-    }
+    };
   }
   interface Endpoints {
     fetchEndpoints(fspId: string): Promise<any>

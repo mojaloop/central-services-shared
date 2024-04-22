@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.4.0-snapshot.8",
+  "version": "18.4.0-snapshot.10",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -71,7 +71,7 @@
     "yaml": "2.4.1"
   },
   "devDependencies": {
-    "@hapi/hapi": "21.3.8",
+    "@hapi/hapi": "21.3.9",
     "@hapi/joi": "17.1.1",
     "audit-ci": "^6.6.1",
     "base64url": "3.0.1",
