@@ -598,16 +598,6 @@ declare namespace CentralServicesShared {
         LIMIT_ADJUSTMENT: AdminNotificationActionsEnum.LIMIT_ADJUSTMENT;
       };
     };
-    Fx: {
-      FxTransferType: {
-        PAYER_CONVERSION: number;
-        PAYEE_CONVERSION: number;
-      };
-      FxParticipantCurrencyType: {
-        SOURCE: number,
-        TARGET: number
-      };
-    }
   }
   interface Endpoints {
     fetchEndpoints(fspId: string): Promise<any>
