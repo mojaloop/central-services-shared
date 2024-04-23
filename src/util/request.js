@@ -41,6 +41,7 @@ delete request.defaults.headers.common.Accept
 
 // Enable keepalive for http
 request.defaults.httpAgent = new http.Agent({ keepAlive: true })
+request.defaults.httpAgent.toJSON = () => ({})
 
 /**
  * @function sendRequest

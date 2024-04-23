@@ -182,6 +182,7 @@ Test('ParticipantEndpoint Model Test', modelTest => {
         test.end()
       } catch (e) {
         test.ok(e instanceof Error)
+        test.ok(request.defaults.httpAgent.toJSON())
         test.end()
       }
     })
