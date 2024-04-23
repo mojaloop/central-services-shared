@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.3.5](https://github.com/mojaloop/central-services-shared/compare/v18.3.4...v18.3.5) (2024-04-23)
+
+
+### Bug Fixes
+
+* excessive logging of agent internals ([0073c37](https://github.com/mojaloop/central-services-shared/commit/0073c37724b96909cdabd43055ac8ce653f1516a))
+
 ### [18.3.4](https://github.com/mojaloop/central-services-shared/compare/v18.3.3...v18.3.4) (2024-04-09)
 
 
