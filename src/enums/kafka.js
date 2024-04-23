@@ -146,9 +146,17 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'fx-abort-duplicate': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
     'fx-commit': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
+    },
+    'fx-fulfil-duplicate': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
     },
     'fx-prepare': {
       functionality: transferEventType.NOTIFICATION,
@@ -213,6 +221,10 @@ const TopicMap = {
       action: transferEventAction.POSITION
     },
     'fx-abort': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
+    'fx-abort-validation': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
