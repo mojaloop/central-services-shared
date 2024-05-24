@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.3.6](https://github.com/mojaloop/central-services-shared/compare/v18.3.5...v18.3.6) (2024-05-24)
+
+
+### Bug Fixes
+
+* await span.audit ([#375](https://github.com/mojaloop/central-services-shared/issues/375)) ([3b1c8cb](https://github.com/mojaloop/central-services-shared/commit/3b1c8cb9c7357dbe28b55dba5b2885387827329b))
+
 ### [18.3.5](https://github.com/mojaloop/central-services-shared/compare/v18.3.4...v18.3.5) (2024-04-23)
 
 
