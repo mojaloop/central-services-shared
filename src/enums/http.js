@@ -73,6 +73,10 @@ const Headers = {
       contentVersion: '1.0',
       acceptVersion: '1'
     },
+    fxQuotes: {
+      contentVersion: '2.0',
+      acceptVersion: '2'
+    },
     bulkQuotes: {
       contentVersion: '1.0',
       acceptVersion: '1'
@@ -92,6 +96,10 @@ const Headers = {
     transfers: {
       contentVersion: '1.0',
       acceptVersion: '1'
+    },
+    fxTransfers: {
+      contentVersion: '2.0',
+      acceptVersion: '2'
     },
     custom: {
       contentVersion: '1.0',
@@ -121,7 +129,9 @@ const HeaderResources = {
   ORACLE: 'oracle',
   SWITCH: 'switch',
   TRANSFERS: 'transfers',
-  QUOTES: 'quotes'
+  FX_TRANSFERS: 'fxTransfers',
+  QUOTES: 'quotes',
+  FX_QUOTES: 'fxQuotes'
 }
 
 const ServiceType = {
