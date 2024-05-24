@@ -256,6 +256,10 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
+    'fx-timeout-reserved': {
+      functionality: transferEventType.TRANSFER,
+      action: transferEventAction.POSITION
+    },
     reject: {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
