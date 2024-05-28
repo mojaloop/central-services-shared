@@ -170,6 +170,14 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'fx-timeout-received': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
+    'fx-timeout-reserved': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'prepare-duplicate': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
