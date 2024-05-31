@@ -26,6 +26,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const idGenerator = require('../../../src/util/id')
+const uuidRegex = version => new RegExp(`[a-f0-9]{8}-[a-f0-9]{4}-${version}[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}`)
 
 Test('Id util', idTest => {
   let sandbox
@@ -43,12 +44,17 @@ Test('Id util', idTest => {
   idTest.test('Id should', generateSha256Test => {
     generateSha256Test.test('generate UUID v4', test => {
       const uuid4 = idGenerator({ type: 'uuid', version: 4 })
-      test.match(uuid4(), /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}/)
+      test.match(uuid4(), uuidRegex(4))
       test.end()
     })
     generateSha256Test.test('generate UUID v7', test => {
       const uuid7 = idGenerator({ type: 'uuid', version: 7 })
-      test.match(uuid7(), /[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}/)
+      test.match(uuid7(), uuidRegex(7))
+      test.end()
+    })
+    generateSha256Test.test('generate UUID v7 by default', test => {
+      const uuid = idGenerator()
+      test.match(uuid(), uuidRegex(7))
       test.end()
     })
     generateSha256Test.end()

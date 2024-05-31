@@ -27,7 +27,7 @@ const crypto = require('crypto')
 
 const generators = {
   // generate UUID compliant with https://datatracker.ietf.org/doc/html/rfc9562
-  uuid: ({ version }) => ({
+  uuid: ({ version = 7 }) => ({
     4: crypto.randomUUID,
     7: () => {
       const timestamp = Date.now().toString(16).padStart(12, 0)
@@ -37,4 +37,4 @@ const generators = {
   })[version]
 }
 
-module.exports = ({ type, ...config }) => generators[type](config)
+module.exports = ({ type = 'uuid', ...config } = {}) => generators[type](config)
