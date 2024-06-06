@@ -28,6 +28,7 @@ const path = require('path')
 const YAML = require('yaml')
 const shins = require('shins')
 const widdershins = require('widdershins')
+const { merge } = require('lodash')
 
 const defaultWiddershinsOptions = {
   codeSamples: true
@@ -88,6 +89,14 @@ const _getOpenAPISpec = (options) => {
     docObj = (ext === '.yaml')
       ? YAML.parse(fs.readFileSync(options.documentPath, 'utf8'))
       : JSON.parse(fs.readFileSync(options.documentPath))
+
+    const docConfig = path.join(path.dirname(options.documentPath), path.basename(options.documentPath, ext) + '.config' + ext)
+    if (fs.existsSync(docConfig)) {
+      const configObj = (ext === '.yaml')
+        ? YAML.parse(fs.readFileSync(docConfig, 'utf8'))
+        : JSON.parse(fs.readFileSync(docConfig))
+      docObj = merge(docObj, configObj)
+    }
   } else {
     docObj = options.document
   }
@@ -135,6 +144,7 @@ const _getOptions = (customOptions) => {
 }
 
 module.exports = {
+  loadApi: apiPath => _getOpenAPISpec({ documentPath: apiPath }),
   generateDocumentation,
   swaggerJSON
 }

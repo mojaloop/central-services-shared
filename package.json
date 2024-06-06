@@ -68,12 +68,12 @@
     "shins": "2.6.0",
     "uuid4": "2.0.3",
     "widdershins": "^4.0.1",
-    "yaml": "2.4.2"
+    "yaml": "2.4.3"
   },
   "devDependencies": {
     "@hapi/hapi": "21.3.9",
     "@hapi/joi": "17.1.1",
-    "audit-ci": "^6.6.1",
+    "audit-ci": "^7.0.1",
     "base64url": "3.0.1",
     "chance": "1.1.11",
     "npm-check-updates": "16.14.20",
