@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.3.7](https://github.com/mojaloop/central-services-shared/compare/v18.3.6...v18.3.7) (2024-06-07)
+
+
+### Chore
+
+* dependency updates to sub dependencies in widdershins for ajv ([#381](https://github.com/mojaloop/central-services-shared/issues/381)) ([b64403d](https://github.com/mojaloop/central-services-shared/commit/b64403d4936f7ca584938dd5614b10d532d2b48b))
+
 ### [18.3.6](https://github.com/mojaloop/central-services-shared/compare/v18.3.5...v18.3.6) (2024-05-24)
 
 
