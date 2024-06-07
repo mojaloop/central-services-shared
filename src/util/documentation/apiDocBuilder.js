@@ -28,7 +28,7 @@ const path = require('path')
 const YAML = require('yaml')
 const shins = require('shins')
 const widdershins = require('widdershins')
-const { merge } = require('lodash')
+const { mergeWith } = require('lodash')
 
 const defaultWiddershinsOptions = {
   codeSamples: true
@@ -95,7 +95,7 @@ const _getOpenAPISpec = (options) => {
       const configObj = (ext === '.yaml')
         ? YAML.parse(fs.readFileSync(docConfig, 'utf8'))
         : JSON.parse(fs.readFileSync(docConfig))
-      docObj = merge(docObj, configObj)
+      docObj = mergeWith(docObj, configObj, (objValue, srcValue) => Array.isArray(srcValue) ? srcValue : undefined)
     }
   } else {
     docObj = options.document
