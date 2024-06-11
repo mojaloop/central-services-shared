@@ -110,7 +110,7 @@
     "@mojaloop/central-services-error-handling": ">=13.x.x",
     "@mojaloop/central-services-logger": ">=11.x.x",
     "@mojaloop/central-services-metrics": ">=12.x.x",
-    "@mojaloop/event-sdk": ">=14.x.x",
+    "@mojaloop/event-sdk": ">=14.1.1",
     "ajv": "8.x.x",
     "ajv-keywords": "5.x.x"
   },
