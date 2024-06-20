@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.4.0](https://github.com/mojaloop/central-services-shared/compare/v18.3.8...v18.4.0) (2024-06-20)
+
+
+### Features
+
+* add shared resources for fx functionality ([#384](https://github.com/mojaloop/central-services-shared/issues/384)) ([8bec55c](https://github.com/mojaloop/central-services-shared/commit/8bec55c7077882e8c1b9e767a15396f2c59b7220)), closes [mojaloop/#3689](https://github.com/mojaloop/project/issues/3689)
+
 ### [18.3.8](https://github.com/mojaloop/central-services-shared/compare/v18.3.7...v18.3.8) (2024-06-11)
 
 
