@@ -45,6 +45,7 @@ const Settlement = require('./settlement')
 const EventFramework = require('./eventFramework')
 const Schema = require('./schema')
 const OpenapiBackend = require('./openapiBackend')
+const id = require('./id')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -252,5 +253,6 @@ module.exports = {
   Settlement,
   Schema,
   OpenapiBackend,
+  id,
   resourceVersions: Helpers.resourceVersions
 }

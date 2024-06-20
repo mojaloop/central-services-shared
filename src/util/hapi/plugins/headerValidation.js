@@ -18,11 +18,14 @@ const defaultProtocolResources = [
   'bulkTransfers',
   'bulkQuotes',
   'transactionRequests',
-  'authorizations'
+  'authorizations',
+  'fxQuotes',
+  'fxTransfers'
 ]
 
 const defaultProtocolVersions = [
   ...protocolVersions.ONE,
+  ...protocolVersions.TWO,
   protocolVersions.anyVersion
 ]
 

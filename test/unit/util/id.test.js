@@ -16,32 +16,49 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Infitx
+ - Kalin Krustev <kalin.krustev@infitx.com>
  --------------
  ******/
 'use strict'
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Settlements = require('./settlements')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
-const Fx = require('./fx')
+const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
+const idGenerator = require('../../../src/util/id')
+const uuidRegex = version => new RegExp(`[a-f0-9]{8}-[a-f0-9]{4}-${version}[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}`)
 
-module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Settlements,
-  Transfers,
-  Kafka,
-  Tags,
-  Fx
-}
+Test('Id util', idTest => {
+  let sandbox
+
+  idTest.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    t.end()
+  })
+
+  idTest.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
+  idTest.test('Id should', generateSha256Test => {
+    generateSha256Test.test('generate UUID v4', test => {
+      const uuid4 = idGenerator({ type: 'uuid', version: 4 })
+      test.match(uuid4(), uuidRegex(4))
+      test.end()
+    })
+    generateSha256Test.test('generate UUID v7', test => {
+      const uuid7 = idGenerator({ type: 'uuid', version: 7 })
+      test.match(uuid7(), uuidRegex(7))
+      test.end()
+    })
+    generateSha256Test.test('generate UUID v7 by default', test => {
+      const uuid = idGenerator()
+      test.match(uuid(), uuidRegex(7))
+      test.end()
+    })
+    generateSha256Test.end()
+  })
+
+  idTest.end()
+})

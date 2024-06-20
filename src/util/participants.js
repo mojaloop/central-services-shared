@@ -48,7 +48,7 @@ let switchEndpoint
 * @returns {object} participant Returns the object containing the participants
 */
 const fetchParticipant = async (fsp) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'fetchParticipant',
     'fetchParticipant - Metrics for fetchParticipant',
     ['success']
@@ -103,7 +103,7 @@ exports.initializeCache = async (policyOptions) => {
 * @returns {string} - Returns the endpoint, throws error if failure occurs
 */
 exports.getParticipant = async (switchUrl, fsp) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'getParticipant',
     'getParticipant - Metrics for getParticipant with cache hit rate',
     ['success', 'hit']

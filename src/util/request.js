@@ -81,7 +81,7 @@ const sendRequest = async (
   protocolVersions = undefined,
   axiosRequestOptionsOverride = {}
 ) => {
-  const histTimerEnd = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimerEnd = Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
     ['success', 'source', 'destination', 'method']
@@ -108,6 +108,7 @@ const sendRequest = async (
       headers: transformedHeaders,
       data: payload,
       responseType,
+      httpAgent: new http.Agent({ keepAlive: true }),
       ...axiosRequestOptionsOverride
     }
     // if jwsSigner is passed then sign the request
@@ -123,7 +124,7 @@ const sendRequest = async (
     const response = await request(requestOptions)
     Logger.isDebugEnabled && Logger.debug(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
     !!sendRequestSpan && await sendRequestSpan.finish()
-    !!histTimerEnd && histTimerEnd({ success: true, source, destination, method })
+    histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
     Logger.isErrorEnabled && Logger.error(error)
@@ -149,7 +150,7 @@ const sendRequest = async (
       await sendRequestSpan.error(fspiopError, state)
       await sendRequestSpan.finish(fspiopError.message, state)
     }
-    !!histTimerEnd && histTimerEnd({ success: false, source, destination, method })
+    histTimerEnd({ success: false, source, destination, method })
     throw fspiopError
   }
 }

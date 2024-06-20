@@ -56,7 +56,9 @@ const TransferParticipantRoleType = {
   PAYEE_DFSP: 2,
   HUB: 3,
   DFSP_SETTLEMENT: 4,
-  DFSP_POSITION: 5
+  DFSP_POSITION: 5,
+  INITIATING_FSP: 6,
+  COUNTER_PARTY_FSP: 7
 }
 
 const PartyAccountTypes = {

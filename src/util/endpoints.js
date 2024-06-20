@@ -26,16 +26,16 @@
 'use strict'
 
 const Logger = require('@mojaloop/central-services-logger')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Catbox = require('@hapi/catbox')
 const CatboxMemory = require('@hapi/catbox-memory')
 const { Map } = require('immutable')
-const Http = require('./http')
 const Enum = require('../enums')
+const Http = require('./http')
+const request = require('./request')
 const partition = 'endpoint-cache'
 const clientOptions = { partition }
 const Mustache = require('mustache')
-const request = require('./request')
-const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
 
 let client
@@ -51,7 +51,7 @@ let switchEndpoint
  * @returns {object} endpointMap Returns the object containing the endpoints for given fsp id
  */
 const fetchEndpoints = async (fsp) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'fetchParticipants',
     'fetchParticipants - Metrics for fetchParticipants',
     ['success']
@@ -117,11 +117,12 @@ exports.initializeCache = async (policyOptions) => {
  * @param {string} fsp - the id of the fsp
  * @param {string} endpointType - the type of the endpoint
  * @param {object} options - contains the options for the mustache template function
+ * @param {object} renderOptions - contains the options for the rendering the endpoint
  *
  * @returns {string} - Returns the endpoint, throws error if failure occurs
  */
-exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}) => {
+  const histTimer = Metrics.getHistogram(
     'getEndpoint',
     'getEndpoint - Metrics for getEndpoint with cache hit rate',
     ['success', 'hit']
@@ -139,10 +140,19 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
       } else {
         histTimer({ success: true, hit: true })
       }
-      return Mustache.render(new Map(endpoints.value).get(endpointType), options)
+      const endpoint = new Map(endpoints.value).get(endpointType)
+      if (renderOptions.path) {
+        const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
+        return Mustache.render(renderedEndpoint, options)
+      }
+      return Mustache.render(endpoint, options)
+    }
+    let endpoint = new Map(endpoints).get(endpointType)
+    if (renderOptions.path) {
+      endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
     }
     histTimer({ success: true, hit: false })
-    return Mustache.render(new Map(endpoints).get(endpointType), options)
+    return Mustache.render(endpoint, options)
   } catch (err) {
     histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
@@ -164,35 +174,20 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}) => {
  * @returns {string} - Returns the rendered endpoint, throws error if failure occurs
  */
 exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', options) => {
-  const histTimer = !!Metrics.isInitiated() && Metrics.getHistogram(
+  const histTimer = Metrics.getHistogram(
     'getEndpointAndRender',
-    'getEndpoint - Metrics for getEndpointAndRender with cache hit rate',
-    ['success', 'hit']
+    'getEndpoint - Metrics for getEndpointAndRender',
+    ['success']
   ).startTimer()
   switchEndpoint = switchUrl
   Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpointAndRender::endpointType - ${endpointType}`)
-  try {
-    // If a service passes in `getDecoratedValue` as true, then an object
-    // { value, cached, report } is returned, where value is the cached value,
-    // `cached` is null on a cache miss.
-    const endpoints = await policy.get(fsp)
-    if ('value' in endpoints && 'cached' in endpoints) {
-      if (endpoints.cached === null) {
-        histTimer({ success: true, hit: false })
-      } else {
-        histTimer({ success: true, hit: true })
-      }
-      const endpoint = new Map(endpoints.value).get(endpointType)
-      const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + path
-      return Mustache.render(renderedEndpoint, options)
-    }
 
-    const endpoint = new Map(endpoints).get(endpointType)
-    const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + path
-    histTimer({ success: true, hit: false })
-    return Mustache.render(renderedEndpoint, options)
+  try {
+    const endpoint = exports.getEndpoint(switchUrl, fsp, endpointType, options, { path })
+    histTimer({ success: true })
+    return endpoint
   } catch (err) {
-    histTimer({ success: false, hit: false })
+    histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpointAndRender:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }

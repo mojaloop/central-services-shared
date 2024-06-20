@@ -16,32 +16,25 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Infitx
+ - Kalin Krustev <kalin.krustev@infitx.com>
+
  --------------
  ******/
-'use strict'
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Settlements = require('./settlements')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
-const Fx = require('./fx')
+const crypto = require('crypto')
 
-module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Settlements,
-  Transfers,
-  Kafka,
-  Tags,
-  Fx
+const generators = {
+  // generate UUID compliant with https://datatracker.ietf.org/doc/html/rfc9562
+  uuid: ({ version = 7 }) => ({
+    4: crypto.randomUUID,
+    7: () => {
+      const timestamp = Date.now().toString(16).padStart(12, 0)
+      const random = crypto.randomUUID()
+      return `${timestamp.substring(0, 8)}-${timestamp.substring(8, 12)}-7${random.substring(15, 36)}`
+    }
+  })[version]
 }
+
+module.exports = ({ type = 'uuid', ...config } = {}) => generators[type](config)

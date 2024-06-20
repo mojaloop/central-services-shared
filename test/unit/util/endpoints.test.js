@@ -1,17 +1,18 @@
 'use strict'
 
 const Test = require('tapes')(require('tape'))
-const src = '../../../src'
+const Mustache = require('mustache')
+const Catbox = require('@hapi/catbox')
+const Logger = require('@mojaloop/central-services-logger')
 const Sinon = require('sinon')
+
+const src = '../../../src'
 const Cache = require(`${src}/util/endpoints`)
 const request = require(`${src}/util/request`)
-const Catbox = require('@hapi/catbox')
 const Config = require('../../util/config')
 const Http = require(`${src}/util`).Http
 const Enum = require(`${src}`).Enum
-const Mustache = require('mustache')
 const Helper = require('../../util/helper')
-const Logger = require('@mojaloop/central-services-logger')
 const FSPIOP_CALLBACK_URL_TRANSFER_PUT = Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
 const Metrics = require('@mojaloop/central-services-metrics')
 
@@ -60,6 +61,37 @@ Test('Cache Test', cacheTest => {
       try {
         const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
         test.equal(result, expected, 'The results match')
+
+        const result2 = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }, { path: '/additionalPath' })
+        test.equal(result2, `${expected}/additionalPath`, 'The results match')
+
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('return the endpoint if catbox returns decoratedValue object', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+      const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
+
+      await Cache.initializeCache({
+        ...Config.ENDPOINT_CACHE_CONFIG,
+        getDecoratedValue: true
+      })
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndPointsResponse))
+
+      try {
+        const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.equal(result, expected, 'The results match')
+
+        const result2 = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }, { path: '/additionalPath' })
+        test.equal(result2, `${expected}/additionalPath`, 'The results match')
+
         await Cache.stopCache()
         test.end()
       } catch (err) {
@@ -102,13 +134,11 @@ Test('Cache Test', cacheTest => {
       try {
         await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
         test.fail('should throw error')
-        await Cache.stopCache()
-        test.end()
       } catch (e) {
         test.ok(e instanceof Error)
-        await Cache.stopCache()
-        test.end()
       }
+      await Cache.stopCache()
+      test.end()
     })
 
     getEndpointTest.test('throw error', async (test) => {

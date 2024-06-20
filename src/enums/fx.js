@@ -18,30 +18,21 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- * Georgi Georgiev <georgi.georgiev@modusbox.com> : sourced from ml-api-adapter
- * Miguel de Barros <miguel.debarros@modusbox.com>
+ * Vijay Kumar Guthi <vijaya.guthi@infitx.com>
  --------------
  ******/
-'use strict'
 
-const Accounts = require('./accounts')
-const EndPoints = require('./endpoints')
-const Http = require('./http')
-const Settlements = require('./settlements')
-const Transfers = require('./transfers')
-const Events = require('./events')
-const Kafka = require('./kafka')
-const Tags = require('./tags')
-const Fx = require('./fx')
+const FxTransferType = {
+  PAYER_CONVERSION: 1,
+  PAYEE_CONVERSION: 2
+}
+
+const FxParticipantCurrencyType = {
+  SOURCE: 1,
+  TARGET: 2
+}
 
 module.exports = {
-  Accounts,
-  EndPoints,
-  Events,
-  Http,
-  Settlements,
-  Transfers,
-  Kafka,
-  Tags,
-  Fx
+  FxTransferType,
+  FxParticipantCurrencyType
 }
