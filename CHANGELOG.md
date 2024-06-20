@@ -2,6 +2,63 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.3.8](https://github.com/mojaloop/central-services-shared/compare/v18.3.7...v18.3.8) (2024-06-11)
+
+
+### Chore
+
+* dependency updates and minor maintenance ([#383](https://github.com/mojaloop/central-services-shared/issues/383)) ([764f6b0](https://github.com/mojaloop/central-services-shared/commit/764f6b082f04a187f561f0fc17ea1eafa4736929))
+
+### [18.3.7](https://github.com/mojaloop/central-services-shared/compare/v18.3.6...v18.3.7) (2024-06-07)
+
+
+### Chore
+
+* dependency updates to sub dependencies in widdershins for ajv ([#381](https://github.com/mojaloop/central-services-shared/issues/381)) ([b64403d](https://github.com/mojaloop/central-services-shared/commit/b64403d4936f7ca584938dd5614b10d532d2b48b))
+
+### [18.3.6](https://github.com/mojaloop/central-services-shared/compare/v18.3.5...v18.3.6) (2024-05-24)
+
+
+### Bug Fixes
+
+* await span.audit ([#375](https://github.com/mojaloop/central-services-shared/issues/375)) ([3b1c8cb](https://github.com/mojaloop/central-services-shared/commit/3b1c8cb9c7357dbe28b55dba5b2885387827329b))
+
+### [18.3.5](https://github.com/mojaloop/central-services-shared/compare/v18.3.4...v18.3.5) (2024-04-23)
+
+
+### Bug Fixes
+
+* excessive logging of agent internals ([0073c37](https://github.com/mojaloop/central-services-shared/commit/0073c37724b96909cdabd43055ac8ce653f1516a))
+
+### [18.3.4](https://github.com/mojaloop/central-services-shared/compare/v18.3.3...v18.3.4) (2024-04-09)
+
+
+### Chore
+
+* updated 3p dependencies to address moderate vulns ([#367](https://github.com/mojaloop/central-services-shared/issues/367)) ([08d1c74](https://github.com/mojaloop/central-services-shared/commit/08d1c7474e00fd12585274f39f349f8dea65ffb9))
+
+### [18.3.3](https://github.com/mojaloop/central-services-shared/compare/v18.3.2...v18.3.3) (2024-04-05)
+
+
+### Chore
+
+* overrides to 3p dependencies to address vulnerabilities ([#366](https://github.com/mojaloop/central-services-shared/issues/366)) ([8e87809](https://github.com/mojaloop/central-services-shared/commit/8e87809c8f552d18dd644fe1242987cec178414c))
+
+### [18.3.2](https://github.com/mojaloop/central-services-shared/compare/v18.3.1...v18.3.2) (2024-04-05)
+
+
+### Chore
+
+* dependency updates to address issues ([#365](https://github.com/mojaloop/central-services-shared/issues/365)) ([6dd4a53](https://github.com/mojaloop/central-services-shared/commit/6dd4a53fd5092a3af566032fd7a8f4a968778d4d))
+
+### [18.3.1](https://github.com/mojaloop/central-services-shared/compare/v18.3.0...v18.3.1) (2024-04-04)
+
+
+### Chore
+
+* **deps:** bump express from 4.18.2 to 4.19.2 ([#363](https://github.com/mojaloop/central-services-shared/issues/363)) ([248bad2](https://github.com/mojaloop/central-services-shared/commit/248bad29d36ad9a09832792f45d3a2d8d66ae2da))
+* **deps:** bump follow-redirects from 1.15.5 to 1.15.6 ([#364](https://github.com/mojaloop/central-services-shared/issues/364)) ([eed3eeb](https://github.com/mojaloop/central-services-shared/commit/eed3eebf0adefeed5f954d5aa31eddc730e04325))
+
 ## [18.3.0](https://github.com/mojaloop/central-services-shared/compare/v18.2.0...v18.3.0) (2024-03-07)
 
 

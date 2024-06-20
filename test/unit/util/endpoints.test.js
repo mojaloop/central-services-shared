@@ -100,6 +100,29 @@ Test('Cache Test', cacheTest => {
       }
     })
 
+    getEndpointTest.test('return the endpoint if catbox returns decoratedValue object', async (test) => {
+      const fsp = 'fsp'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+      const expected = 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
+
+      await Cache.initializeCache({
+        ...Config.ENDPOINT_CACHE_CONFIG,
+        getDecoratedValue: true
+      })
+      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getEndPointsResponse))
+
+      try {
+        const result = await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType, { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' })
+        test.equal(result, expected, 'The results match')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
     getEndpointTest.test('return throw an error if array not returned in response object', async (test) => {
       const fsp = 'fsp'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
