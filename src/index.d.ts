@@ -7,10 +7,6 @@ declare namespace CentralServicesShared {
   interface HttpEnum {
     Headers: {
       FSPIOP: {
-        SWITCH: {
-          regex: RegExp;
-          value: string;
-        };
         SOURCE: string;
         DESTINATION: string;
         HTTP_METHOD: string;
@@ -602,13 +598,13 @@ declare namespace CentralServicesShared {
   interface Endpoints {
     fetchEndpoints(fspId: string): Promise<any>
     getEndpoint(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, options?: any): Promise<string>
-    initializeCache(policyOptions: object): Promise<boolean>
+    initializeCache(policyOptions: object, config: { hubName: string, hubNameRegex: RegExp }): Promise<boolean>
     getEndpointAndRender(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, path: string, options?: any): Promise<string>
   }
 
   interface Participants {
     getParticipant(switchUrl: string, fsp: string): Promise<object>
-    initializeCache(policyOptions: object): Promise<boolean>
+    initializeCache(policyOptions: object, config: { hubName: string, hubNameRegex: RegExp }): Promise<boolean>
   }
 
   interface ProtocolVersionsType {
@@ -616,8 +612,9 @@ declare namespace CentralServicesShared {
     accept: string
   }
 
+  type RequestParams = { url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType, hubNameRegex: RegExp }
   interface Request {
-    sendRequest(url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType): Promise<any>
+    sendRequest(params: RequestParams): Promise<any>
   }
 
   interface Kafka {
