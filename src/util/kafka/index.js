@@ -305,6 +305,11 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   }
   if (fromSwitch) {
     message.value.to = message.value.from
+
+    if (!opts.hubName) {
+      throw ErrorHandler.Factory.createInternalServerFSPIOPError('No hubName found in opts')
+    }
+
     message.value.from = opts.hubName
     if (message.value.content.headers) {
       message.value.content.headers[Enum.Http.Headers.FSPIOP.SOURCE] = message.value.from
