@@ -103,7 +103,7 @@ const fetchEndpoints = async (fsp) => {
  *
  * @description This initializes the cache for endpoints
  * @param {object} policyOptions The Endpoint_Cache_Config for the Cache being stored https://hapi.dev/module/catbox/api/?v=12.1.1#policy
- * @param {object} config The config object containing paramters used for the request function e.g hubNameRegex
+ * @param {object} config The config object containing paramters used for the request function
  * @returns {boolean} Returns true on successful initialization of the cache, throws error on failures
  */
 exports.initializeCache = async (policyOptions, config) => {
