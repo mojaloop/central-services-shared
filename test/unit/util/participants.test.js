@@ -175,6 +175,43 @@ Test('Participants Cache Test', participantsCacheTest => {
         test.end()
       }
     })
+
+    getParticipantTest.test('throws error if hubName is not defined', async (test) => {
+      const fsp = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+
+      try {
+        await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
+    getParticipantTest.test('throws error if hubNameRegex is not defined', async (test) => {
+      const fsp = 'fsp2'
+      const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+
+      try {
+        await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
+        test.fail('should throw error')
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.ok(err instanceof Error)
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
     await getParticipantTest.end()
   })
 
