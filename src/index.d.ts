@@ -612,7 +612,7 @@ declare namespace CentralServicesShared {
     accept: string
   }
 
-  type RequestParams = { url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType, hubNameRegex: RegExp }
+  type RequestParams = { url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, hubNameRegex: RegExp, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType }
   interface Request {
     sendRequest(params: RequestParams): Promise<any>
   }

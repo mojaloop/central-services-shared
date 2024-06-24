@@ -93,7 +93,7 @@ const sendRequest = async ({
     sendRequestSpan.setTags({ source, destination, method, url })
   }
   let requestOptions
-  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !destination) {
+  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !destination || !hubNameRegex) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
   try {

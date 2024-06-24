@@ -30,6 +30,8 @@ const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const resourceVersions = require('../helpers').resourceVersions
 
+const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
+
 /**
  * @module src/headers/transformer
  */
@@ -93,12 +95,15 @@ const getResourceInfoFromHeader = (headerValue) => {
 *  }
 *
 * @param {object} headers - the http header from the request
-* @param {TransformHeadersConfig} headers - the http header from the request
+* @param {TransformHeadersConfig} config - additional configuration for the transformation
 *
 * @returns {object} Returns the normalized headers
 */
 
 const transformHeaders = (headers, config) => {
+  if (!config.hubNameRegex) {
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
+  }
   // Normalized keys
   const normalizedKeys = Object.keys(headers).reduce(
     function (keys, k) {
