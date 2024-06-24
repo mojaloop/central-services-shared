@@ -8,6 +8,7 @@ const test = require('tapes')(require('tape'))
 const fs = require('fs')
 const path = require('path')
 const {
+  getHubNameRegex,
   generateAcceptRegex,
   generateContentTypeRegex,
   convertSupportedVersionToExtensionList,
@@ -213,5 +214,15 @@ test('Run test-case for parseAcceptHeader', t => {
   }
   const result = parseAcceptHeader(resource, acceptHeader)
   t.deepEqual(result, expectedResult)
+  t.end()
+})
+
+test('Run test-case for getHubNameRegex', t => {
+  const result = getHubNameRegex('Hub')
+  const cache = getHubNameRegex('Hub2')
+
+  t.ok(result instanceof RegExp)
+  // Check if the cache is used
+  t.equal(result, cache)
   t.end()
 })
