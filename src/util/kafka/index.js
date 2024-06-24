@@ -305,7 +305,7 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
   }
   if (fromSwitch) {
     message.value.to = message.value.from
-    message.value.from = Enum.Http.Headers.FSPIOP.SWITCH.value
+    message.value.from = opts.hubName
     if (message.value.content.headers) {
       message.value.content.headers[Enum.Http.Headers.FSPIOP.SOURCE] = message.value.from
       message.value.content.headers[Enum.Http.Headers.FSPIOP.DESTINATION] = message.value.to

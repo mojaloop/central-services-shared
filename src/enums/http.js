@@ -34,10 +34,6 @@
 
 const Headers = {
   FSPIOP: {
-    SWITCH: {
-      regex: /^switch$/i,
-      value: 'switch'
-    },
     SOURCE: 'fspiop-source',
     DESTINATION: 'fspiop-destination',
     HTTP_METHOD: 'fspiop-http-method',
@@ -127,7 +123,7 @@ const RestMethods = {
 const HeaderResources = {
   PARTICIPANTS: 'participants',
   ORACLE: 'oracle',
-  SWITCH: 'switch',
+  // SWITCH: 'switch', // @note: hub/switch name should now be passed in via service config.
   TRANSFERS: 'transfers',
   FX_TRANSFERS: 'fxTransfers',
   QUOTES: 'quotes',

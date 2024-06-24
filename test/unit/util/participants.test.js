@@ -16,6 +16,8 @@ const Metrics = require('@mojaloop/central-services-metrics')
 
 Test('Participants Cache Test', participantsCacheTest => {
   let sandbox
+  const hubName = 'Hub'
+  const hubNameRegex = /^Hub$/i
 
   participantsCacheTest.beforeEach(async test => {
     Metrics.setup({
@@ -51,8 +53,8 @@ Test('Participants Cache Test', participantsCacheTest => {
       const fsp = 'fsp2'
       const expectedName = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
 
       try {
         const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
@@ -69,17 +71,17 @@ Test('Participants Cache Test', participantsCacheTest => {
       const fsp = 'fsp2'
       const expectedName = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
 
       try {
         const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
         test.equal(result.name, expectedName, 'The results match')
-        test.ok(request.sendRequest.calledOnceWith(url, Helper.defaultHeaders()), 'Fetch participants was called once')
+        test.ok(request.sendRequest.calledOnceWith({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }), 'Fetch participants was called once')
 
         const resultCached = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
         test.equal(request.sendRequest.callCount, 1)
-        test.ok(request.sendRequest.calledOnceWith(url, Helper.defaultHeaders()), 'Fetch participants was not needlessly called')
+        test.ok(request.sendRequest.calledOnceWith({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }), 'Fetch participants was not needlessly called')
         test.equal(resultCached.name, expectedName, 'The results match')
 
         await Cache.stopCache()
@@ -94,19 +96,19 @@ Test('Participants Cache Test', participantsCacheTest => {
       const fsp = 'fsp2'
       const expectedName = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
 
       try {
         const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
         test.equal(result.name, expectedName, 'The results match')
-        test.ok(request.sendRequest.calledOnceWith(url, Helper.defaultHeaders()), 'Fetch participants was called once')
+        test.ok(request.sendRequest.calledOnceWith({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }), 'Fetch participants was called once')
 
         await Cache.invalidateParticipantCache(fsp)
 
         const resultCached = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
         test.equal(request.sendRequest.callCount, 2)
-        test.ok(request.sendRequest.getCall(1).calledWith(url, Helper.defaultHeaders()), 'Fetch participants was called again')
+        test.ok(request.sendRequest.getCall(1).calledWith({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }), 'Fetch participants was called again')
         test.equal(resultCached.name, expectedName, 'The results match')
 
         await Cache.stopCache()
@@ -124,8 +126,8 @@ Test('Participants Cache Test', participantsCacheTest => {
       await Cache.initializeCache({
         ...Config.ENDPOINT_CACHE_CONFIG,
         getDecoratedValue: true
-      })
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
+      }, { hubName, hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseFsp2))
 
       try {
         const result = await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
@@ -141,8 +143,8 @@ Test('Participants Cache Test', participantsCacheTest => {
     getParticipantTest.test('handles error from central-ledger', async (test) => {
       const fsp = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).returns(Promise.resolve(Helper.getParticipantsResponseError))
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).returns(Promise.resolve(Helper.getParticipantsResponseError))
 
       try {
         await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
@@ -159,8 +161,8 @@ Test('Participants Cache Test', participantsCacheTest => {
     getParticipantTest.test('throw error', async (test) => {
       const fsp = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
-      request.sendRequest.withArgs(url, Helper.defaultHeaders()).throws(new Error())
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+      request.sendRequest.withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex }).throws(new Error())
 
       try {
         await Cache.getParticipant(Config.ENDPOINT_SOURCE_URL, fsp)
@@ -179,7 +181,7 @@ Test('Participants Cache Test', participantsCacheTest => {
   participantsCacheTest.test('initializeCache should', async (participantsInitializeCacheTest) => {
     participantsInitializeCacheTest.test('initializeCache cache and return true', async (test) => {
       try {
-        const result = await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+        const result = await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
         test.equal(result, true, 'The results match')
         await Cache.stopCache()
         test.end()
@@ -192,7 +194,7 @@ Test('Participants Cache Test', participantsCacheTest => {
     participantsInitializeCacheTest.test('should throw error', async (test) => {
       try {
         sandbox.stub(Catbox, 'Client').throws(new Error())
-        await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG)
+        await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
         test.fail('should throw')
         test.end()
       } catch (err) {

@@ -68,7 +68,7 @@ request.defaults.httpAgent.toJSON = () => ({})
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
 
-const sendRequest = async (
+const sendRequest = async ({
   url,
   headers,
   source,
@@ -79,8 +79,9 @@ const sendRequest = async (
   span = undefined,
   jwsSigner = undefined,
   protocolVersions = undefined,
-  axiosRequestOptionsOverride = {}
-) => {
+  axiosRequestOptionsOverride = {},
+  hubNameRegex
+}) => {
   const histTimerEnd = Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -100,7 +101,8 @@ const sendRequest = async (
       httpMethod: method,
       sourceFsp: source,
       destinationFsp: destination,
-      protocolVersions
+      protocolVersions,
+      hubNameRegex
     })
     requestOptions = {
       url,

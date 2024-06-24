@@ -36,7 +36,8 @@ const Helper = require('../../util/helper')
 const headerConfigExample = {
   httpMethod: 'PUT',
   sourceFsp: 'switch',
-  destinationFsp: 'FSPDest'
+  destinationFsp: 'FSPDest',
+  hubNameRegex: /^Hub$/i
 }
 
 const headerDataInputExample = {
@@ -110,7 +111,8 @@ Test('Transfer Transformer tests', TransformerTest => {
       const headerConfig = {
         httpMethod: 'PUT',
         sourceFsp: 'switch',
-        destinationFsp: 'FSPDest'
+        destinationFsp: 'FSPDest',
+        hubNameRegex: /^Hub$/i
       }
 
       const headerData = Util.clone(headerDataInputExample)
@@ -131,12 +133,13 @@ Test('Transfer Transformer tests', TransformerTest => {
 
       const headerConfig = {
         httpMethod: 'PUT',
-        sourceFsp: 'switch',
+        sourceFsp: 'Hub',
         destinationFsp: 'FSPDest',
         protocolVersions: {
           content: '1.1',
           accept: '1'
-        }
+        },
+        hubNameRegex: /^Hub$/i
       }
 
       const headerData = Util.clone(headerDataInputExample)
