@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.5.0](https://github.com/mojaloop/central-services-shared/compare/v18.4.0...v18.5.0) (2024-06-25)
+
+
+### Features
+
+* **csi-164:** parameterize switch id [BREAKING CHANGES] ([#385](https://github.com/mojaloop/central-services-shared/issues/385)) ([9cb880e](https://github.com/mojaloop/central-services-shared/commit/9cb880ecec57d8eb3d6870eeb6a891b1d4d9ad89))
+
 ## [18.4.0](https://github.com/mojaloop/central-services-shared/compare/v18.3.8...v18.4.0) (2024-06-20)
 
 
