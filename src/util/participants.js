@@ -39,10 +39,14 @@ const Metrics = require('@mojaloop/central-services-metrics')
 let client
 let policy
 let switchEndpoint
+let hubName
+let hubNameRegex
 
 /**
 * @function fetchParticipant
 *
+* @param {string} fsp The fsp id
+* @param {object} options The options for the request function
 * @description This populates the cache of participants
 *
 * @returns {object} participant Returns the object containing the participants
@@ -55,10 +59,22 @@ const fetchParticipant = async (fsp) => {
   ).startTimer()
   try {
     Logger.isDebugEnabled && Logger.debug('participantCache::fetchParticipant := Refreshing participant cache')
-    const defaultHeaders = Http.SwitchDefaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH)
+    if (!hubName) {
+      throw Error('"hubName" is not initialized. Initialize the cache first.')
+    }
+    if (!hubNameRegex) {
+      throw Error('"hubNameRegex" is not initialized. Initialize the cache first.')
+    }
+    const defaultHeaders = Http.SwitchDefaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName)
     const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
     Logger.isDebugEnabled && Logger.debug(`participantCache::fetchParticipant := URL: ${url}`)
-    const response = await request.sendRequest(url, defaultHeaders, Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
+    const response = await request.sendRequest({
+      url,
+      headers: defaultHeaders,
+      source: hubName,
+      destination: hubName,
+      hubNameRegex
+    })
     const participant = response.data
     histTimer({ success: true })
     return participant
@@ -72,11 +88,11 @@ const fetchParticipant = async (fsp) => {
 * @function initializeCache
 *
 * @description This initializes the cache for endpoints
-*  @param {object} policyOptions The Endpoint_Cache_Config for the Cache being stored https://hapi.dev/module/catbox/api/?v=12.1.1#policy
-
+* @param {object} policyOptions The Endpoint_Cache_Config for the Cache being stored https://hapi.dev/module/catbox/api/?v=12.1.1#policy
+* @param {object} config The config object containing paramters used for the request function
 * @returns {boolean} Returns true on successful initialization of the cache, throws error on failures
 */
-exports.initializeCache = async (policyOptions) => {
+exports.initializeCache = async (policyOptions, config) => {
   try {
     Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
     client = new Catbox.Client(CatboxMemory, clientOptions)
@@ -85,6 +101,8 @@ exports.initializeCache = async (policyOptions) => {
     Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
     policy = new Catbox.Policy(policyOptions, client, partition)
     Logger.isDebugEnabled && Logger.debug('participantCache::initializeCache::Cache initialized successfully')
+    hubName = config.hubName
+    hubNameRegex = config.hubNameRegex
     return true
   } catch (err) {
     Logger.isErrorEnabled && Logger.error(`participantCache::Cache error:: ERROR:'${err}'`)

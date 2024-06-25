@@ -34,7 +34,8 @@ const Util = require('../../../../src/util')
 const headerConfigExample = {
   httpMethod: 'PUT',
   sourceFsp: 'switch',
-  destinationFsp: 'FSPDest'
+  destinationFsp: 'FSPDest',
+  hubNameRegex: /^Hub$/i
 }
 
 const headerDataInputExample = {

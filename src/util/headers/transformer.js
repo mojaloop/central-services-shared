@@ -30,6 +30,8 @@ const ErrorHandler = require('@mojaloop/central-services-error-handling')
 
 const resourceVersions = require('../helpers').resourceVersions
 
+const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
+
 /**
  * @module src/headers/transformer
  */
@@ -93,12 +95,15 @@ const getResourceInfoFromHeader = (headerValue) => {
 *  }
 *
 * @param {object} headers - the http header from the request
-* @param {TransformHeadersConfig} headers - the http header from the request
+* @param {TransformHeadersConfig} config - additional configuration for the transformation
 *
 * @returns {object} Returns the normalized headers
 */
 
 const transformHeaders = (headers, config) => {
+  if (!config.hubNameRegex) {
+    throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
+  }
   // Normalized keys
   const normalizedKeys = Object.keys(headers).reduce(
     function (keys, k) {
@@ -153,7 +158,7 @@ const transformHeaders = (headers, config) => {
       case (ENUM.Headers.FSPIOP.HTTP_METHOD):
         // Check to see if we find a regex match the source header containing the switch name.
         // If so we include the signature otherwise we remove it.
-        if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) === null) {
+        if (headers[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(config.hubNameRegex) === null) {
           if (config.httpMethod.toLowerCase() === headerValue.toLowerCase()) {
             // HTTP Methods match, and thus no change is required
             normalizedHeaders[headerKey] = headerValue
@@ -178,7 +183,7 @@ const transformHeaders = (headers, config) => {
         normalizedHeaders[headerKey] = config.destinationFsp
         break
       case (ENUM.Headers.GENERAL.ACCEPT.value):
-        if (!ENUM.Headers.FSPIOP.SWITCH.regex.test(config.sourceFsp)) {
+        if (!config.hubNameRegex.test(config.sourceFsp)) {
           normalizedHeaders[headerKey] = headerValue
           break
         }
@@ -188,7 +193,7 @@ const transformHeaders = (headers, config) => {
         normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${acceptVersion}`
         break
       case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
-        if (!ENUM.Headers.FSPIOP.SWITCH.regex.test(config.sourceFsp)) {
+        if (!config.hubNameRegex.test(config.sourceFsp)) {
           normalizedHeaders[headerKey] = headerValue
           break
         }
@@ -202,7 +207,7 @@ const transformHeaders = (headers, config) => {
     }
   }
 
-  if (normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(ENUM.Headers.FSPIOP.SWITCH.regex) !== null) {
+  if (normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.SOURCE]].match(config.hubNameRegex) !== null) {
     // Check to see if we find a regex match the source header containing the switch name.
     // If so we remove the signature added by default.
     delete normalizedHeaders[normalizedKeys[ENUM.Headers.FSPIOP.SIGNATURE]]

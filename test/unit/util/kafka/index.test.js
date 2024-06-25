@@ -584,12 +584,12 @@ Test('Utility Test', utilityTest => {
     })
 
     proceedTest.test('produce fromSwitch and do not stop timer', async test => {
-      const opts = { fromSwitch: true, eventDetail }
+      const opts = { fromSwitch: true, eventDetail, hubName: 'Hub' }
       try {
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, params, opts)
         test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, message.value, successState).calledOnce, 'produceGeneralMessageStub not called')
         test.equal(message.value.to, from, 'message destination set to sender')
-        test.equal(message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+        test.equal(message.value.from, opts.hubName, 'from set to switch')
         test.equal(result, true, 'result returned')
       } catch (err) {
         test.fail(err.message)
@@ -599,14 +599,14 @@ Test('Utility Test', utilityTest => {
     })
 
     proceedTest.test('produce fromSwitch without headers', async test => {
-      const opts = { fromSwitch: true, eventDetail }
+      const opts = { fromSwitch: true, eventDetail, hubName: 'Hub' }
       try {
         const localParams = clone(params)
         delete localParams.message.value.content.headers
         const result = await UtilityProxy.proceed(Config.KAFKA_CONFIG, localParams, opts)
         test.ok(produceGeneralMessageStub.withArgs(Config.KAFKA_CONFIG, producer, eventDetail.functionality, eventDetail.action, localParams.message.value, successState).calledOnce, 'produceGeneralMessageStub not called')
         test.equal(localParams.message.value.to, from, 'message destination set to sender')
-        test.equal(localParams.message.value.from, Enum.Http.Headers.FSPIOP.SWITCH.value, 'from set to switch')
+        test.equal(localParams.message.value.from, opts.hubName, 'from set to switch')
         test.equal(result, true, 'result returned')
       } catch (err) {
         test.fail(err.message)

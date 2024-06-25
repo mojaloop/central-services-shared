@@ -91,9 +91,26 @@ const convertSupportedVersionToExtensionList = (supportedVersions) => {
   return _.uniqWith(supportedVersionsExtensionListMap, _.isEqual)
 }
 
+let hubNameRegex
+
+const escapeRegexInput = (str) => {
+  return str.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
+}
+
+const getHubNameRegex = (hubName) => {
+  // @note: we do not expect hubName to change during runtime
+  // so we can cache the regex
+  if (!hubNameRegex) {
+    const regexStr = String.raw`^${escapeRegexInput(hubName)}$`
+    hubNameRegex = new RegExp(regexStr, 'i')
+  }
+  return hubNameRegex
+}
+
 module.exports = {
   protocolVersions,
   protocolVersionsMap,
+  getHubNameRegex,
   generateAcceptRegex,
   generateContentTypeRegex,
   parseAcceptHeader,

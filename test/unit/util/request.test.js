@@ -44,6 +44,9 @@ Test('ParticipantEndpoint Model Test', modelTest => {
   let sandbox
   let request
   let Model
+  const hubName = 'Hub'
+  const hubNameRegex = /^Hub$/i
+
   Metrics.setup({
     INSTRUMENTATION: {
       METRICS: {
@@ -80,7 +83,13 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
-        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
+        const result = await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
@@ -103,7 +112,16 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: requestFunction })
 
       try {
-        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span)
+        const result = await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          method: Enum.Http.RestMethods.GET,
+          responseType: Enum.Http.ResponseTypes.JSON,
+          span,
+          hubNameRegex
+        })
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
@@ -131,7 +149,18 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: requestFunction })
 
       try {
-        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span, null, protocolVersions)
+        const result = await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          method: Enum.Http.RestMethods.GET,
+          responseType: Enum.Http.ResponseTypes.JSON,
+          span,
+          jwsSigner: null,
+          protocolVersions,
+          hubNameRegex
+        })
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
@@ -156,7 +185,18 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: requestFunction })
 
       try {
-        const result = await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.GET, undefined, Enum.Http.ResponseTypes.JSON, span, null, protocolVersions)
+        const result = await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          method: Enum.Http.RestMethods.GET,
+          responseType: Enum.Http.ResponseTypes.JSON,
+          span,
+          jwsSigner: null,
+          protocolVersions,
+          hubNameRegex
+        })
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
         test.end()
       } catch (err) {
@@ -177,7 +217,13 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
-        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
         test.fail('should throw error')
         test.end()
       } catch (e) {
@@ -204,7 +250,13 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
-        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH)
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
         test.fail('should throw error')
         test.end()
       } catch (e) {
@@ -225,7 +277,14 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
-        await Model.sendRequest(requestOptions.url, Helper.defaultHeaders(Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.PARTICIPANTS, Enum.Http.HeaderResources.SWITCH), Enum.Http.HeaderResources.SWITCH, Enum.Http.HeaderResources.SWITCH, Enum.Http.RestMethods.POST)
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          method: Enum.Http.RestMethods.POST,
+          hubNameRegex
+        })
         test.fail('should throw error')
         test.end()
       } catch (e) {
@@ -252,7 +311,17 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       request = sandbox.stub().returns({ status: 200 })
       Model = proxyquire('../../../src/util/request', { axios: request })
       const signSpy = Sinon.spy(jwsSigner, 'getSignature')
-      await Model.sendRequest(requestOptions.url, requestOptions.headers, Enum.Http.HeaderResources.SWITCH, fsp, requestOptions.method, payload, Enum.Http.ResponseTypes.JSON, undefined, jwsSigner)
+      await Model.sendRequest({
+        url: requestOptions.url,
+        headers: requestOptions.headers,
+        source: hubName,
+        destination: fsp,
+        method: requestOptions.method,
+        payload,
+        responseType: Enum.Http.ResponseTypes.JSON,
+        jwsSigner,
+        hubNameRegex
+      })
       test.ok(signSpy.calledOnce, 'JwsSigner.sign is called once')
       test.ok('fspiop-signature' in signSpy.getCall(0).firstArg.headers, 'The header has fspiop-signature')
       test.end()
@@ -276,7 +345,16 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       request = sandbox.stub().returns({ status: 200 })
       Model = proxyquire('../../../src/util/request', { axios: request })
       const signSpy = Sinon.spy(jwsSigner, 'getSignature')
-      await Model.sendRequest(requestOptions.url, requestOptions.headers, Enum.Http.HeaderResources.SWITCH, fsp, requestOptions.method, payload, Enum.Http.ResponseTypes.JSON, undefined, undefined)
+      await Model.sendRequest({
+        url: requestOptions.url,
+        headers: requestOptions.headers,
+        source: hubName,
+        destination: fsp,
+        method: requestOptions.method,
+        payload,
+        responseType: Enum.Http.ResponseTypes.JSON,
+        hubNameRegex
+      })
       test.equal(signSpy.callCount, 0, 'JwsSigner.sign is NOT called')
       test.end()
     })

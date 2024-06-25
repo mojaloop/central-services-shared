@@ -68,7 +68,7 @@ request.defaults.httpAgent.toJSON = () => ({})
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
 
-const sendRequest = async (
+const sendRequest = async ({
   url,
   headers,
   source,
@@ -79,8 +79,9 @@ const sendRequest = async (
   span = undefined,
   jwsSigner = undefined,
   protocolVersions = undefined,
-  axiosRequestOptionsOverride = {}
-) => {
+  axiosRequestOptionsOverride = {},
+  hubNameRegex
+}) => {
   const histTimerEnd = Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -92,7 +93,7 @@ const sendRequest = async (
     sendRequestSpan.setTags({ source, destination, method, url })
   }
   let requestOptions
-  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !destination) {
+  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !destination || !hubNameRegex) {
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
   try {
@@ -100,7 +101,8 @@ const sendRequest = async (
       httpMethod: method,
       sourceFsp: source,
       destinationFsp: destination,
-      protocolVersions
+      protocolVersions,
+      hubNameRegex
     })
     requestOptions = {
       url,
