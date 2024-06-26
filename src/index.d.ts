@@ -625,6 +625,17 @@ declare namespace CentralServicesShared {
     decodePayload(input: string, options: Object): Object
   }
 
+  interface HeaderValidation {
+    protocolVersions: { anyVersion: symbol, ONE: Array<string>, TWO: Array<string> },
+    protocolVersionsMap: Array<{ key: string, value: string }>,
+    getHubNameRegex(hubName: string): RegExp,
+    generateAcceptRegex(resource: string): RegExp,
+    generateContentTypeRegex(resource: string): RegExp,
+    parseAcceptHeader(resource: string, header: string): { valid: boolean, versions?: Set<string | symbol> },
+    parseContentTypeHeader(resource: string, header: string): { valid: boolean, version?: string },
+    convertSupportedVersionToExtensionList(supportedVersions: Array<number>): Array<{ key: string, value: string }>
+  }
+
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
@@ -633,6 +644,7 @@ declare namespace CentralServicesShared {
     OpenapiBackend: any;
     Request: Request;
     StreamingProtocol: StreamingProtocol;
+    HeaderValidation: HeaderValidation;
   }
 
   const Enum: Enum
