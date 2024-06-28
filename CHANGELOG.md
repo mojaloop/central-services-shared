@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.5.1](https://github.com/mojaloop/central-services-shared/compare/v18.5.0...v18.5.1) (2024-06-28)
+
+
+### Bug Fixes
+
+* **mojaloop/#3984:** add type definition for HeaderValidation ([#386](https://github.com/mojaloop/central-services-shared/issues/386)) ([3f79b90](https://github.com/mojaloop/central-services-shared/commit/3f79b90e87e2aeca669783bfc4f4d068055aaf58)), closes [mojaloop/#3984](https://github.com/mojaloop/project/issues/3984)
+
 ## [18.5.0](https://github.com/mojaloop/central-services-shared/compare/v18.4.0...v18.5.0) (2024-06-25)
 
 
