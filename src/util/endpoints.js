@@ -53,7 +53,7 @@ let proxy
  * @param {string} fsp The fsp id
  * @returns {object} endpointMap Returns the object containing the endpoints for given fsp id
  */
-const fetchEndpoints = async (fsp, proxyConfig) => {
+const fetchEndpoints = async (fsp) => {
   const histTimer = Metrics.getHistogram(
     'fetchParticipants',
     'fetchParticipants - Metrics for fetchParticipants',
