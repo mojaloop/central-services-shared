@@ -59,6 +59,7 @@ request.defaults.httpAgent.toJSON = () => ({})
  * @param {string} source id for which callback is being sent from
  * @param {string} destination id for which callback is being sent
  * @param {object | undefined} payload the body of the request being sent
+ * @param {object | null} params URL parameters to be sent with the request. Must be a plain object, URLSearchParams object or null/undefined
  * @param {string} responseType the type of the response object
  * @param {object | undefined} span a span for event logging if this request is within a span
  * @param {object | undefined} jwsSigner the jws signer for signing the requests
@@ -75,6 +76,7 @@ const sendRequest = async ({
   destination,
   method = enums.Http.RestMethods.GET,
   payload = undefined,
+  params,
   responseType = enums.Http.ResponseTypes.JSON,
   span = undefined,
   jwsSigner = undefined,
@@ -109,6 +111,7 @@ const sendRequest = async ({
       method,
       headers: transformedHeaders,
       data: payload,
+      params,
       responseType,
       httpAgent: new http.Agent({ keepAlive: true }),
       ...axiosRequestOptionsOverride

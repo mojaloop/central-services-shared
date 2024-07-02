@@ -105,6 +105,7 @@ const FspEndpointTemplates = {
   TRANSACTION_REQUEST_GET: '/transactionRequests/{{ID}}',
   TRANSACTION_REQUEST_PUT_ERROR: '/transactionRequests/{{ID}}/error',
   PARTICIPANT_ENDPOINTS_GET: '/participants/{{fsp}}/endpoints',
+  PARTICIPANTS_GET_ALL: '/participants',
   PARTICIPANTS_GET: '/participants/{{fsp}}',
   PARTICIPANTS_POST: '/participants',
   PARTIES_GET: '/parties/{{fsp}}',
