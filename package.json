@@ -44,6 +44,8 @@
     "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
     "test:coverage": "npx nyc --reporter=lcov --reporter=text-summary tapes -- 'test/unit/**/**.test.js'",
     "test:coverage-check": "npm run test:coverage && nyc check-coverage",
+    "test:functional": "true",
+    "test:integration": "true",
     "audit:fix": "npm audit fix",
     "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
     "dep:check": "npx ncu -e 2",
@@ -54,7 +56,7 @@
   "dependencies": {
     "@hapi/catbox": "12.1.1",
     "@hapi/catbox-memory": "5.0.1",
-    "@mojaloop/inter-scheme-proxy-cache-lib": "1.0.0",
+    "@mojaloop/inter-scheme-proxy-cache-lib": "1.1.0",
     "axios": "1.7.2",
     "clone": "2.1.2",
     "dotenv": "16.4.5",

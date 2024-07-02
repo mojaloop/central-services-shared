@@ -155,6 +155,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       if (!proxy) {
         const { type, ...config } = proxyConfig
         proxy = require('@mojaloop/inter-scheme-proxy-cache-lib').createProxyCache(type, config)
+        await proxy.connect()
       }
       const proxyId = await proxy.lookupProxyByDfspId(fsp)
       if (!proxyId) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
