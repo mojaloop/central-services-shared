@@ -93,15 +93,6 @@ const fetchEndpoints = async (fsp, proxyConfig) => {
     histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
   }
-  if (proxyConfig) {
-    if (!proxy) {
-      const { type, ...config } = proxyConfig
-      proxy = require('@mojaloop/inter-scheme-proxy-cache-lib').createProxyCache(type, config)
-    }
-    const url = await proxy.lookupProxyByDfspId(fsp)
-    if (!url) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
-    return { url, isProxy: true }
-  }
 }
 
 /**
@@ -147,7 +138,7 @@ exports.initializeCache = async (policyOptions, config) => {
  *
  * @returns {string} - Returns the endpoint, throws error if failure occurs
  */
-exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}) => {
+exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}, proxyConfig) => {
   const histTimer = Metrics.getHistogram(
     'getEndpoint',
     'getEndpoint - Metrics for getEndpoint with cache hit rate',
@@ -159,7 +150,16 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
-    const endpoints = await policy.get(fsp)
+    let endpoints = await policy.get(fsp)
+    if (!endpoints && proxyConfig) {
+      if (!proxy) {
+        const { type, ...config } = proxyConfig
+        proxy = require('@mojaloop/inter-scheme-proxy-cache-lib').createProxyCache(type, config)
+      }
+      const proxyId = await proxy.lookupProxyByDfspId(fsp)
+      if (!proxyId) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
+      endpoints = await policy.get(proxyId)
+    }
     if ('value' in endpoints && 'cached' in endpoints) {
       if (endpoints.cached === null) {
         histTimer({ success: true, hit: false })
