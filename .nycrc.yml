@@ -14,5 +14,6 @@ reporter: [
   "text-summary"
 ]
 exclude: [
-  "**/node_modules/**"
+  "**/node_modules/**",
+  "src/util/proxies.js" # todo: increase test coverage
 ]

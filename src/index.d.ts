@@ -595,16 +595,26 @@ declare namespace CentralServicesShared {
       };
     };
   }
-  interface Endpoints {
-    fetchEndpoints(fspId: string): Promise<any>
-    getEndpoint(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, options?: any): Promise<string>
+
+  interface Cacheable {
     initializeCache(policyOptions: object, config: { hubName: string, hubNameRegex: RegExp }): Promise<boolean>
+    stopCache(): Promise<void>
+  }
+
+  interface Endpoints extends Cacheable {
+    getEndpoint(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, options?: any): Promise<string>
     getEndpointAndRender(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, path: string, options?: any): Promise<string>
   }
 
-  interface Participants {
+  interface Participants extends Cacheable {
     getParticipant(switchUrl: string, fsp: string): Promise<object>
-    initializeCache(policyOptions: object, config: { hubName: string, hubNameRegex: RegExp }): Promise<boolean>
+    invalidateParticipantCache(fsp: string): Promise<void>
+  }
+
+  type ProxyNames = string[]
+  interface Proxies extends Cacheable {
+    getAllProxiesNames(switchUrl: string): Promise<ProxyNames>
+    invalidateProxiesCache(): Promise<void>
   }
 
   interface ProtocolVersionsType {
@@ -639,6 +649,7 @@ declare namespace CentralServicesShared {
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
+    proxies: Proxies;
     Hapi: any;
     Kafka: Kafka;
     OpenapiBackend: any;
