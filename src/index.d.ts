@@ -259,6 +259,7 @@ declare namespace CentralServicesShared {
     ORACLE = 'oracle',
     POSITION = 'position',
     PREPARE = 'prepare',
+    PREPARE_FORWARDED = 'prepare-forwarded',
     QUOTE = 'quote',
     SERVICE = 'service',
     SETTLEMENT = 'settlement',
@@ -348,7 +349,9 @@ declare namespace CentralServicesShared {
     RECEIVED_FULFIL = 'RECEIVED_FULFIL',
     RECEIVED_PREPARE = 'RECEIVED_PREPARE',
     RECEIVED_REJECT = 'RECEIVED_REJECT',
+    RECEIVED_FORWARDED = 'RECEIVED_FORWARDED',
     RESERVED = 'RESERVED',
+    RESERVED_FORWARDED = 'RESERVED_FORWARDED',
     RESERVED_TIMEOUT = 'RESERVED_TIMEOUT'
   }
 
