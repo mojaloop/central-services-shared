@@ -43,6 +43,7 @@ let policy
 let switchEndpoint
 let hubName
 let hubNameRegex
+let proxy
 
 /**
  * @function fetchEndpoints
@@ -52,7 +53,7 @@ let hubNameRegex
  * @param {string} fsp The fsp id
  * @returns {object} endpointMap Returns the object containing the endpoints for given fsp id
  */
-const fetchEndpoints = async (fsp) => {
+const fetchEndpoints = async (fsp, proxyConfig) => {
   const histTimer = Metrics.getHistogram(
     'fetchParticipants',
     'fetchParticipants - Metrics for fetchParticipants',
@@ -91,6 +92,15 @@ const fetchEndpoints = async (fsp) => {
   } catch (e) {
     histTimer({ success: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
+  }
+  if (proxyConfig) {
+    if (!proxy) {
+      const { type, ...config } = proxyConfig
+      proxy = require('@mojaloop/inter-scheme-proxy-cache-lib').createProxyCache(type, config)
+    }
+    const url = await proxy.lookupProxyByDfspId(fsp)
+    if (!url) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
+    return { url, isProxy: true }
   }
 }
 
