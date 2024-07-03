@@ -37,6 +37,7 @@ const partition = 'endpoint-cache'
 const clientOptions = { partition }
 const Mustache = require('mustache')
 const Metrics = require('@mojaloop/central-services-metrics')
+const proxyLib = require('@mojaloop/inter-scheme-proxy-cache-lib')
 
 let client
 let policy
@@ -154,13 +155,13 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     if (!endpoints && proxyConfig) {
       if (!proxy) {
         const { type, ...config } = proxyConfig
-        proxy = require('@mojaloop/inter-scheme-proxy-cache-lib').createProxyCache(type, config)
+        proxy = proxyLib.createProxyCache(type, config)
         await proxy.connect()
       }
       const proxyId = await proxy.lookupProxyByDfspId(fsp)
-      if (!proxyId) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
-      endpoints = await policy.get(proxyId)
+      endpoints = proxyId && await policy.get(proxyId)
     }
+    if (!endpoints) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
     if ('value' in endpoints && 'cached' in endpoints) {
       if (endpoints.cached === null) {
         histTimer({ success: true, hit: false })
