@@ -101,6 +101,7 @@ const Event = {
     POSITION_PREPARE: 'position-prepare',
     POSITION_FULFIL: 'position-fulfil',
     PREPARE: 'prepare',
+    FORWARDED: 'forwarded',
     PREPARE_DUPLICATE: 'prepare-duplicate',
     PROCESSING: 'processing',
     RECORD_FUNDS_IN: 'recordFundsIn',
