@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.5.2](https://github.com/mojaloop/central-services-shared/compare/v18.5.1...v18.5.2) (2024-07-04)
+
+
+### Chore
+
+* **mojaloop/csi-190:** update enums for proxy transfer states ([#388](https://github.com/mojaloop/central-services-shared/issues/388)) ([735d30a](https://github.com/mojaloop/central-services-shared/commit/735d30a92416ec024d094affd69b41781c0e11e3))
+
 ### [18.5.1](https://github.com/mojaloop/central-services-shared/compare/v18.5.0...v18.5.1) (2024-06-28)
 
 

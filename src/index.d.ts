@@ -317,6 +317,7 @@ declare namespace CentralServicesShared {
     POSITION_PREPARE = 'position-prepare',
     POSITION_FULFIL = 'position-fulfil',
     PREPARE = 'prepare',
+    FORWARDED = 'forwarded',
     PREPARE_DUPLICATE = 'prepare-duplicate',
     PROCESSING = 'processing',
     RECORD_FUNDS_IN = 'recordFundsIn',
@@ -350,6 +351,7 @@ declare namespace CentralServicesShared {
     RECEIVED_PREPARE = 'RECEIVED_PREPARE',
     RECEIVED_REJECT = 'RECEIVED_REJECT',
     RESERVED = 'RESERVED',
+    RESERVED_FORWARDED = 'RESERVED_FORWARDED',
     RESERVED_TIMEOUT = 'RESERVED_TIMEOUT'
   }
 
