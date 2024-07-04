@@ -139,7 +139,7 @@ exports.initializeCache = async (policyOptions, config) => {
  *
  * @returns {string} - Returns the endpoint, throws error if failure occurs
  */
-exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}, proxyConfig) => {
+exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}, proxyConfig = false) => {
   const histTimer = Metrics.getHistogram(
     'getEndpoint',
     'getEndpoint - Metrics for getEndpoint with cache hit rate',
