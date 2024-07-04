@@ -147,6 +147,8 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
   ).startTimer()
   switchEndpoint = switchUrl
   Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
+  let isProxy = false
+  const result = url => proxyConfig ? { url, isProxy } : url
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
@@ -159,6 +161,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
         await proxy.connect()
       }
       const proxyId = await proxy.lookupProxyByDfspId(fsp)
+      isProxy = true
       endpoints = proxyId && await policy.get(proxyId)
     }
     if (!endpoints) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
@@ -171,16 +174,16 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       const endpoint = new Map(endpoints.value).get(endpointType)
       if (renderOptions.path) {
         const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
-        return Mustache.render(renderedEndpoint, options)
+        return result(Mustache.render(renderedEndpoint, options))
       }
-      return Mustache.render(endpoint, options)
+      return result(Mustache.render(endpoint, options))
     }
     let endpoint = new Map(endpoints).get(endpointType)
     if (renderOptions.path) {
       endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
     }
     histTimer({ success: true, hit: false })
-    return Mustache.render(endpoint, options)
+    return result(Mustache.render(endpoint, options))
   } catch (err) {
     histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)

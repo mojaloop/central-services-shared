@@ -122,8 +122,10 @@ Test('Cache Test', (cacheTest) => {
         { fsp: proxiedFsp }
       )
       const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
-      const expected =
-        'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
+      const expected = {
+        url: 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed',
+        isProxy: true
+      }
 
       await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
         hubName, hubNameRegex
@@ -144,7 +146,7 @@ Test('Cache Test', (cacheTest) => {
           undefined,
           {}
         )
-        test.equal(result, expected, 'The results match')
+        test.deepEqual(result, expected, 'The results match')
 
         await Cache.stopCache()
         test.end()
