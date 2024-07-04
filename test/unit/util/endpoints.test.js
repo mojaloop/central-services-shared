@@ -124,7 +124,7 @@ Test('Cache Test', (cacheTest) => {
       const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
       const expected = {
         url: 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed',
-        isProxy: true
+        proxyId: 'fsp'
       }
 
       await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {

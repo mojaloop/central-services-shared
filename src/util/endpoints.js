@@ -147,8 +147,8 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
   ).startTimer()
   switchEndpoint = switchUrl
   Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
-  let isProxy = false
-  const result = url => proxyConfig ? { url, isProxy } : url
+  let proxyId
+  const result = url => proxyConfig ? { url, proxyId } : url
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
@@ -160,8 +160,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
         proxy = proxyLib.createProxyCache(type, config)
         await proxy.connect()
       }
-      const proxyId = await proxy.lookupProxyByDfspId(fsp)
-      isProxy = true
+      proxyId = await proxy.lookupProxyByDfspId(fsp)
       endpoints = proxyId && await policy.get(proxyId)
     }
     if (!endpoints) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
