@@ -9,6 +9,7 @@ declare namespace CentralServicesShared {
       FSPIOP: {
         SOURCE: string;
         DESTINATION: string;
+        PROXY: string;
         HTTP_METHOD: string;
         SIGNATURE: string;
         URI: string;
