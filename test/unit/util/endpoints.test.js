@@ -144,6 +144,9 @@ Test('Cache Test', (cacheTest) => {
         .rejects(new Error('Not found'))
 
       try {
+        test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy if not created')
+        test.equal(await Cache.stopProxy(), undefined, 'Stop proxy if not created')
+
         const result = await Cache.getEndpoint(
           Config.ENDPOINT_SOURCE_URL,
           proxiedFsp,
