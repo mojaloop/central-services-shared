@@ -37,12 +37,14 @@ const partition = 'endpoint-cache'
 const clientOptions = { partition }
 const Mustache = require('mustache')
 const Metrics = require('@mojaloop/central-services-metrics')
+const proxyLib = require('@mojaloop/inter-scheme-proxy-cache-lib')
 
 let client
 let policy
 let switchEndpoint
 let hubName
 let hubNameRegex
+let proxy
 
 /**
  * @function fetchEndpoints
@@ -137,7 +139,7 @@ exports.initializeCache = async (policyOptions, config) => {
  *
  * @returns {string} - Returns the endpoint, throws error if failure occurs
  */
-exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}) => {
+exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderOptions = {}, proxyConfig = undefined) => {
   const histTimer = Metrics.getHistogram(
     'getEndpoint',
     'getEndpoint - Metrics for getEndpoint with cache hit rate',
@@ -145,11 +147,23 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
   ).startTimer()
   switchEndpoint = switchUrl
   Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
+  let proxyId
+  const result = url => proxyConfig ? { url, proxyId } : url
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
-    const endpoints = await policy.get(fsp)
+    let endpoints = await policy.get(fsp)
+    if (!endpoints && proxyConfig) {
+      if (!proxy) {
+        const { type, ...config } = proxyConfig
+        proxy = proxyLib.createProxyCache(type, config)
+        await proxy.connect()
+      }
+      proxyId = await proxy.lookupProxyByDfspId(fsp)
+      endpoints = proxyId && await policy.get(proxyId)
+    }
+    if (!endpoints) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
     if ('value' in endpoints && 'cached' in endpoints) {
       if (endpoints.cached === null) {
         histTimer({ success: true, hit: false })
@@ -159,16 +173,16 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       const endpoint = new Map(endpoints.value).get(endpointType)
       if (renderOptions.path) {
         const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
-        return Mustache.render(renderedEndpoint, options)
+        return result(Mustache.render(renderedEndpoint, options))
       }
-      return Mustache.render(endpoint, options)
+      return result(Mustache.render(endpoint, options))
     }
     let endpoint = new Map(endpoints).get(endpointType)
     if (renderOptions.path) {
       endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
     }
     histTimer({ success: true, hit: false })
-    return Mustache.render(endpoint, options)
+    return result(Mustache.render(endpoint, options))
   } catch (err) {
     histTimer({ success: false, hit: false })
     Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
@@ -221,4 +235,29 @@ exports.stopCache = async () => {
   if (client) {
     return client.stop()
   }
+}
+
+/**
+ * @function stopProxy
+ *
+ * @description It stops the proxy client
+ *
+ * @returns {Promise<void>}
+ */
+exports.stopProxy = async () => {
+  const result = await proxy?.disconnect()
+  proxy = undefined
+  return result
+}
+
+/**
+ * @function healthCheckProxy
+ *
+ * @description It checks the health of the proxy client
+ *
+ * @returns {Promise<boolean>}
+ */
+
+exports.healthCheckProxy = async () => {
+  return proxy ? proxy.healthCheck() : true
 }
