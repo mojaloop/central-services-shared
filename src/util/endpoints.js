@@ -236,3 +236,28 @@ exports.stopCache = async () => {
     return client.stop()
   }
 }
+
+/**
+ * @function stopProxy
+ *
+ * @description It stops the proxy client
+ *
+ * @returns {Promise<void>}
+ */
+exports.stopProxy = async () => {
+  const result = await proxy?.disconnect()
+  proxy = undefined
+  return result
+}
+
+/**
+ * @function healthCheckProxy
+ *
+ * @description It checks the health of the proxy client
+ *
+ * @returns {Promise<boolean>}
+ */
+
+exports.healthCheckProxy = async () => {
+  return proxy ? proxy.healthCheck() : true
+}

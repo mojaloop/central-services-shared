@@ -12,9 +12,15 @@ const Cache = Proxyquire(`${src}/util/endpoints`, {
   '@mojaloop/inter-scheme-proxy-cache-lib': {
     createProxyCache () {
       return {
-        connect () {},
+        async connect () {},
         lookupProxyByDfspId () {
           return 'fsp'
+        },
+        async healthCheck () {
+          return true
+        },
+        async disconnect () {
+          return true
         }
       }
     }
@@ -147,6 +153,8 @@ Test('Cache Test', (cacheTest) => {
           {}
         )
         test.deepEqual(result, expected, 'The results match')
+        test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy')
+        test.equal(await Cache.stopProxy(), true, 'Stop proxy')
 
         await Cache.stopCache()
         test.end()
