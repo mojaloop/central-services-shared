@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.6.0](https://github.com/mojaloop/central-services-shared/compare/v18.5.2...v18.6.0) (2024-07-05)
+
+
+### Features
+
+* proxy calling ([#389](https://github.com/mojaloop/central-services-shared/issues/389)) ([b7a1615](https://github.com/mojaloop/central-services-shared/commit/b7a1615116214466a240d244376a8aaaa165951d))
+
 ### [18.5.2](https://github.com/mojaloop/central-services-shared/compare/v18.5.1...v18.5.2) (2024-07-04)
 
 
