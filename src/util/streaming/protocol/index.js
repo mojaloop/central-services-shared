@@ -205,7 +205,7 @@ const createEventState = (status, code, description) => {
 /**
  * Encodes Payload to base64 encoded data URI
  *
- * @param {buffer\|string} input - Buffer or String
+ * @param {buffer|string} input - Buffer or String
  * @param {MimeTypes} mimeType - mime type of the input
  *
  * @return {string} - Returns base64 encoded data  URI string
