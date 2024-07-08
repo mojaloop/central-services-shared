@@ -156,7 +156,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     let endpoints = await policy.get(fsp)
     if (!endpoints && proxyConfig?.enabled) {
       if (!proxy) {
-        proxy = proxyLib.createProxyCache(proxyConfig.type, proxyConfig.proxy_config)
+        proxy = proxyLib.createProxyCache(proxyConfig.type, proxyConfig.proxyConfig)
         await proxy.connect()
       }
       proxyId = await proxy.lookupProxyByDfspId(fsp)
