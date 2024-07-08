@@ -153,7 +153,7 @@ Test('Cache Test', (cacheTest) => {
           endpointType,
           { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' },
           undefined,
-          {}
+          { enabled: true }
         )
         test.deepEqual(result, expected, 'The results match')
         test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy')
