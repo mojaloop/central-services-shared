@@ -148,16 +148,15 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
   switchEndpoint = switchUrl
   Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
   let proxyId
-  const result = url => proxyConfig ? { url, proxyId } : url
+  const result = url => proxyConfig?.enabled ? { url, proxyId } : url
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
     let endpoints = await policy.get(fsp)
-    if (!endpoints && proxyConfig) {
+    if (!endpoints && proxyConfig?.enabled) {
       if (!proxy) {
-        const { type, ...config } = proxyConfig
-        proxy = proxyLib.createProxyCache(type, config)
+        proxy = proxyLib.createProxyCache(proxyConfig.type, proxyConfig.proxy_config)
         await proxy.connect()
       }
       proxyId = await proxy.lookupProxyByDfspId(fsp)
