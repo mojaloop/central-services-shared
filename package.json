@@ -78,7 +78,7 @@
     "@hapi/joi": "17.1.1",
     "audit-ci": "^7.1.0",
     "base64url": "3.0.1",
-    "chance": "1.1.11",
+    "chance": "1.1.12",
     "npm-check-updates": "16.14.20",
     "nyc": "17.0.0",
     "pre-commit": "1.2.2",
