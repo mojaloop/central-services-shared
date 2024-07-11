@@ -88,7 +88,7 @@ class HealthCheck {
    * @description Gets the health of the service along with sub-services
    *
    */
-  async getHealth () {
+  async getHealth (context = undefined) {
     // Default values
     let status = statusEnum.OK
     let isHealthy = true
@@ -100,7 +100,7 @@ class HealthCheck {
     const versionNumber = this.packageJson.version
 
     try {
-      const services = await Promise.all(this.serviceChecks.map(s => s()))
+      const services = await Promise.all(this.serviceChecks.map(s => s(context)))
       isHealthy = HealthCheck.evaluateServiceHealth(services)
       subServices = {
         services
