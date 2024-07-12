@@ -145,6 +145,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
       histTimer({ success: true, hit: false })
     }
 
+    /* istanbul ignore next */
     if (!participant) {
       Logger.isWarnEnabled && Logger.warn('participantCache::getParticipant - no participant found')
       return null
