@@ -145,6 +145,11 @@ exports.getParticipant = async (switchUrl, fsp) => {
       histTimer({ success: true, hit: false })
     }
 
+    if (!participant) {
+      Logger.isWarnEnabled && Logger.warn('participantCache::getParticipant - no participant found')
+      return null
+    }
+
     if (participant.errorInformation) {
       // Drop error from cache
       await policy.drop(fsp)
