@@ -24,12 +24,13 @@
  ******/
 'use strict'
 
-const EventSdk = require('@mojaloop/event-sdk')
+const http = require('node:http')
 const request = require('axios')
+const stringify = require('fast-safe-stringify')
+const EventSdk = require('@mojaloop/event-sdk')
 const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
-const http = require('http')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 
@@ -126,29 +127,29 @@ const sendRequest = async ({
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
     }
-    Logger.isDebugEnabled && Logger.debug(`sendRequest::request ${JSON.stringify(requestOptions)}`)
+    Logger.isDebugEnabled && Logger.debug(`sendRequest::requestOptions ${stringify(requestOptions)}`)
     const response = await request(requestOptions)
-    Logger.isDebugEnabled && Logger.debug(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
+
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    Logger.isErrorEnabled && Logger.error(error)
+    Logger.isErrorEnabled && Logger.error(`error in request.sendRequest: ${error.stack}`)
     const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
       { key: 'method', value: method },
-      { key: 'request', value: JSON.stringify(requestOptions) },
+      { key: 'request', value: stringify(requestOptions) },
       { key: 'errorMessage', value: error.message }
     ]
     const extensions = []
     if (error.response) {
-      extensionArray.push({ key: 'status', value: error.response && error.response.status })
-      extensionArray.push({ key: 'response', value: error.response && error.response.data })
-      extensions.push({ key: 'status', value: error.response && error.response.status })
+      extensionArray.push({ key: 'status', value: error.response?.status })
+      extensionArray.push({ key: 'response', value: error.response?.data })
+      extensions.push({ key: 'status', value: error.response?.status })
     }
-    const cause = JSON.stringify(extensionArray)
+    const cause = stringify(extensionArray)
     extensions.push({ key: 'cause', value: cause })
     const fspiopError = ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, extensions)
     if (sendRequestSpan) {
