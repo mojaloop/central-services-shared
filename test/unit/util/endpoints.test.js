@@ -5,9 +5,27 @@ const Mustache = require('mustache')
 const Catbox = require('@hapi/catbox')
 const Logger = require('@mojaloop/central-services-logger')
 const Sinon = require('sinon')
+const Proxyquire = require('proxyquire')
 
 const src = '../../../src'
-const Cache = require(`${src}/util/endpoints`)
+const Cache = Proxyquire(`${src}/util/endpoints`, {
+  '@mojaloop/inter-scheme-proxy-cache-lib': {
+    createProxyCache () {
+      return {
+        async connect () {},
+        lookupProxyByDfspId () {
+          return 'fsp'
+        },
+        async healthCheck () {
+          return true
+        },
+        async disconnect () {
+          return true
+        }
+      }
+    }
+  }
+})
 const request = require(`${src}/util/request`)
 const Config = require('../../util/config')
 const Http = require(`${src}/util`).Http
@@ -87,6 +105,59 @@ Test('Cache Test', (cacheTest) => {
           { path: '/additionalPath' }
         )
         test.equal(result2, `${expected}/additionalPath`, 'The results match')
+
+        await Cache.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('return the endpoint using proxy', async (test) => {
+      const fsp = 'fsp'
+      const proxiedFsp = 'proxied'
+      const url = Mustache.render(
+        Config.ENDPOINT_SOURCE_URL +
+          Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET,
+        { fsp }
+      )
+      const proxiedUrl = Mustache.render(
+        Config.ENDPOINT_SOURCE_URL +
+          Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET,
+        { fsp: proxiedFsp }
+      )
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+      const expected = {
+        url: 'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed',
+        proxyId: 'fsp'
+      }
+
+      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
+        hubName, hubNameRegex
+      })
+      request.sendRequest
+        .withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex })
+        .returns(Promise.resolve(Helper.getEndPointsResponse))
+      request.sendRequest
+        .withArgs({ url: proxiedUrl, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex })
+        .rejects(new Error('Not found'))
+
+      try {
+        test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy if not created')
+        test.equal(await Cache.stopProxy(), undefined, 'Stop proxy if not created')
+
+        const result = await Cache.getEndpoint(
+          Config.ENDPOINT_SOURCE_URL,
+          proxiedFsp,
+          endpointType,
+          { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' },
+          undefined,
+          { enabled: true }
+        )
+        test.deepEqual(result, expected, 'The results match')
+        test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy')
+        test.equal(await Cache.stopProxy(), true, 'Stop proxy')
 
         await Cache.stopCache()
         test.end()

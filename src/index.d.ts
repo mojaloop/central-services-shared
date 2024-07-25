@@ -446,6 +446,7 @@ declare namespace CentralServicesShared {
           DELETE: EventActionEnum.DELETE;
           EVENT: EventActionEnum.EVENT;
           FAIL: EventActionEnum.FAIL;
+          FORWARDED: EventActionEnum.FORWARDED;
           FULFIL: EventActionEnum.FULFIL;
           FULFIL_DUPLICATE: EventActionEnum.FULFIL_DUPLICATE;
           FX_FULFIL: EventActionEnum.FX_FULFIL;
@@ -538,6 +539,7 @@ declare namespace CentralServicesShared {
         RECEIVED_PREPARE: TransferInternalStateEnum.RECEIVED_PREPARE;
         RECEIVED_REJECT: TransferInternalStateEnum.RECEIVED_REJECT;
         RESERVED: TransferInternalStateEnum.RESERVED;
+        RESERVED_FORWARDED: TransferInternalStateEnum.RESERVED_FORWARDED;
         RESERVED_TIMEOUT: TransferInternalStateEnum.RESERVED_TIMEOUT;
       };
       TransferState: {

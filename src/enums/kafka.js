@@ -142,6 +142,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    forwarded: {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'fx-abort': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT

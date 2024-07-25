@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.6.3](https://github.com/mojaloop/central-services-shared/compare/v18.6.2...v18.6.3) (2024-07-12)
+
+
+### Chore
+
+* add forwarded notification to kafka topic map ([#392](https://github.com/mojaloop/central-services-shared/issues/392)) ([fe60cda](https://github.com/mojaloop/central-services-shared/commit/fe60cdad7bd0c66f1e03e3a8ff2cc1eae57af358))
+
+### [18.6.2](https://github.com/mojaloop/central-services-shared/compare/v18.6.1...v18.6.2) (2024-07-08)
+
+
+### Chore
+
+* align proxy config ([#391](https://github.com/mojaloop/central-services-shared/issues/391)) ([d92f8db](https://github.com/mojaloop/central-services-shared/commit/d92f8db4694b1e40a84060b5df46ceccb71063ff))
+
+### [18.6.1](https://github.com/mojaloop/central-services-shared/compare/v18.6.0...v18.6.1) (2024-07-08)
+
+
+### Chore
+
+* update index.d file ([#390](https://github.com/mojaloop/central-services-shared/issues/390)) ([93b8048](https://github.com/mojaloop/central-services-shared/commit/93b8048310b71f89993dede5a8d58d0f6283d00f))
+
+## [18.6.0](https://github.com/mojaloop/central-services-shared/compare/v18.5.2...v18.6.0) (2024-07-05)
+
+
+### Features
+
+* proxy calling ([#389](https://github.com/mojaloop/central-services-shared/issues/389)) ([b7a1615](https://github.com/mojaloop/central-services-shared/commit/b7a1615116214466a240d244376a8aaaa165951d))
+
 ### [18.5.2](https://github.com/mojaloop/central-services-shared/compare/v18.5.1...v18.5.2) (2024-07-04)
 
 
