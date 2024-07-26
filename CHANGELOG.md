@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.7.0](https://github.com/mojaloop/central-services-shared/compare/v18.6.3...v18.7.0) (2024-07-26)
+
+
+### Features
+
+* **csi-16:** added getAllProxiesNames method ([#387](https://github.com/mojaloop/central-services-shared/issues/387)) ([3fd95ac](https://github.com/mojaloop/central-services-shared/commit/3fd95ac128a1cb0c60afb4e359aef75230b49b69)), closes [#393](https://github.com/mojaloop/central-services-shared/issues/393)
+
 ### [18.6.3](https://github.com/mojaloop/central-services-shared/compare/v18.6.2...v18.6.3) (2024-07-12)
 
 
