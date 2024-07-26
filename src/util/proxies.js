@@ -5,6 +5,7 @@
  The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
  http://www.apache.org/licenses/LICENSE-2.0
  Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
  Contributors
  --------------
  This is the official list of the Mojaloop project contributors for this file.
@@ -16,25 +17,26 @@
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
  * Gates Foundation
- * Name Surname <name.surname@gatesfoundation.com>
+ - Name Surname <name.surname@gatesfoundation.com>
 
- * Kevin Leyow <kevin.leyow@infitx.com>
+ * Eugen Klymniuk <eugen.klymniuk@infitx.com>
  --------------
- ******/
+ **********/
 
-'use strict'
-
-const Logger = require('@mojaloop/central-services-logger')
+const Mustache = require('mustache')
 const Catbox = require('@hapi/catbox')
 const CatboxMemory = require('@hapi/catbox-memory')
-const Http = require('./http')
-const Enum = require('../enums')
-const partition = 'participant-cache'
-const clientOptions = { partition }
-const Mustache = require('mustache')
-const request = require('./request')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const Logger = require('@mojaloop/central-services-logger')
 const Metrics = require('@mojaloop/central-services-metrics')
+
+const Enum = require('../enums')
+const Http = require('./http')
+const request = require('./request')
+
+const partition = 'proxies-cache'
+const clientOptions = { partition }
+const cacheKey = 'allProxies'
 
 let client
 let policy
@@ -43,138 +45,125 @@ let hubName
 let hubNameRegex
 
 /**
-* @function fetchParticipant
-*
-* @param {string} fsp The fsp id
-* @param {object} options The options for the request function
-* @description This populates the cache of participants
-*
-* @returns {object} participant Returns the object containing the participants
+* @function fetchProxies
+* @description This populates the cache of proxies
+* @returns {array} proxies Returns the list containing proxies
 */
-const fetchParticipant = async (fsp) => {
+const fetchProxies = async () => {
   const histTimer = Metrics.getHistogram(
-    'fetchParticipant',
-    'fetchParticipant - Metrics for fetchParticipant',
+    'fetchProxies',
+    'fetchProxies - Metrics for fetchProxies',
     ['success']
   ).startTimer()
   try {
-    Logger.isDebugEnabled && Logger.debug('participantCache::fetchParticipant := Refreshing participant cache')
-    if (!hubName) {
-      throw Error('"hubName" is not initialized. Initialize the cache first.')
-    }
-    if (!hubNameRegex) {
-      throw Error('"hubNameRegex" is not initialized. Initialize the cache first.')
+    Logger.isDebugEnabled && Logger.debug('proxiesCache::fetchProxies := Refreshing proxies cache')
+    if (!hubName || !hubNameRegex) {
+      throw Error('No hubName or hubNameRegex! Initialize the cache first.')
     }
     const defaultHeaders = Http.SwitchDefaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName)
-    const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-    Logger.isDebugEnabled && Logger.debug(`participantCache::fetchParticipant := URL: ${url}`)
+    const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET_ALL)
+    const params = { isProxy: true }
+    Logger.isDebugEnabled && Logger.debug(`proxiesCache::fetchProxies := URL: ${url}  QS: ${JSON.stringify(params)}`)
     const response = await request.sendRequest({
       url,
       headers: defaultHeaders,
       source: hubName,
       destination: hubName,
+      params,
       hubNameRegex
     })
-    const participant = response.data
+    const proxies = response.data
     histTimer({ success: true })
-    return participant
+    return proxies
   } catch (e) {
     histTimer({ success: false })
-    Logger.isErrorEnabled && Logger.error(`participantCache::fetchParticipants:: ERROR:'${e}'`)
+    Logger.isErrorEnabled && Logger.error(`proxiesCache::fetchProxies:: ERROR:'${e}'`)
   }
 }
 
 /**
 * @function initializeCache
 *
-* @description This initializes the cache for endpoints
+* @description This initializes the cache for allProxies
 * @param {object} policyOptions The Endpoint_Cache_Config for the Cache being stored https://hapi.dev/module/catbox/api/?v=12.1.1#policy
 * @param {object} config The config object containing paramters used for the request function
 * @returns {boolean} Returns true on successful initialization of the cache, throws error on failures
 */
 exports.initializeCache = async (policyOptions, config) => {
   try {
-    Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
+    Logger.isDebugEnabled && Logger.debug(`proxiesCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
-    policyOptions.generateFunc = fetchParticipant
-    Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
+    policyOptions.generateFunc = fetchProxies
+    Logger.isDebugEnabled && Logger.debug(`proxiesCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
     policy = new Catbox.Policy(policyOptions, client, partition)
-    Logger.isDebugEnabled && Logger.debug('participantCache::initializeCache::Cache initialized successfully')
+    Logger.isDebugEnabled && Logger.debug('proxiesCache::initializeCache::Cache initialized successfully')
     hubName = config.hubName
     hubNameRegex = config.hubNameRegex
     return true
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(`participantCache::Cache error:: ERROR:'${err}'`)
+    Logger.isErrorEnabled && Logger.error(`proxiesCache::Cache error:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 
 /**
-* @function getParticipant
-*
-* @description It returns the participant data for a given fsp and type from the cache if the cache is still valid, otherwise it will refresh the cache and return the value
+* @function getAllProxiesNames
+* @description It returns a list of allProxies names from the cache if the cache is still valid, otherwise it will refresh the cache and return the value
 *
 * @param {string} switchUrl the endpoint for the switch
-* @param {string} fsp - the id of the fsp
 *
-* @returns {string} - Returns the endpoint, throws error if failure occurs
+* @returns {string[]} - Returns list of allProxies names, throws error if failure occurs
 */
-exports.getParticipant = async (switchUrl, fsp) => {
+exports.getAllProxiesNames = async (switchUrl) => {
   const histTimer = Metrics.getHistogram(
-    'getParticipant',
-    'getParticipant - Metrics for getParticipant with cache hit rate',
+    'getAllProxiesNames',
+    'getAllProxiesNames - Metrics for getAllProxies with cache hit rate',
     ['success', 'hit']
   ).startTimer()
   switchEndpoint = switchUrl
-  Logger.isDebugEnabled && Logger.debug('participantCache::getParticipant')
+  Logger.isDebugEnabled && Logger.debug('proxiesCache::getAllProxiesNames')
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
     // cached is null on a cache miss.
-    let participant = await policy.get(fsp)
+    let proxies = await policy.get(cacheKey)
 
-    if ('value' in participant && 'cached' in participant) {
-      if (participant.cached === null) {
+    if ('value' in proxies && 'cached' in proxies) {
+      if (proxies.cached === null) {
         histTimer({ success: true, hit: false })
       } else {
         histTimer({ success: true, hit: true })
       }
-      participant = participant.value
+      proxies = proxies.value
     } else {
       histTimer({ success: true, hit: false })
     }
 
-    /* istanbul ignore next */
-    if (!participant) {
-      Logger.isWarnEnabled && Logger.warn('participantCache::getParticipant - no participant found')
-      return null
-    }
-
-    if (participant.errorInformation) {
+    if (proxies.errorInformation) {
       // Drop error from cache
-      await policy.drop(fsp)
-      throw ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(participant.errorInformation)
+      await policy.drop(cacheKey)
+      throw ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(proxies.errorInformation)
     }
-    return participant
+    return proxies.map(p => p.name)
   } catch (err) {
     histTimer({ success: false, hit: false })
-    Logger.isErrorEnabled && Logger.error(`participantCache::getParticipant:: ERROR:'${err}'`)
+    Logger.isErrorEnabled && Logger.error(`proxiesCache::getAllProxiesNames:: ERROR:'${err}'`)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
 
 /**
-* @function invalidateParticipantCache
+* @function invalidateProxiesCache
 *
-* @description It drops the cache for a given participant by fspId
+* @description It drops the cache for all proxies
 *
 * @returns {void}
 */
-exports.invalidateParticipantCache = async (fsp) => {
-  Logger.isDebugEnabled && Logger.debug('participantCache::invalidateParticipantCache::Invalidating the cache')
+exports.invalidateProxiesCache = async () => {
+  Logger.isDebugEnabled && Logger.debug('proxiesCache::invalidateProxiesCache::Invalidating the cache')
   if (policy) {
-    return policy.drop(fsp)
+    return policy.drop(cacheKey)
   }
 }
 
@@ -186,7 +175,7 @@ exports.invalidateParticipantCache = async (fsp) => {
 * @returns {boolean} - Returns the status
 */
 exports.stopCache = async () => {
-  Logger.isDebugEnabled && Logger.debug('participantCache::stopCache::Stopping the cache')
+  Logger.isDebugEnabled && Logger.debug('proxiesCache::stopCache::Stopping the cache')
   if (client) {
     return client.stop()
   }

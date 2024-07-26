@@ -9,6 +9,7 @@ declare namespace CentralServicesShared {
       FSPIOP: {
         SOURCE: string;
         DESTINATION: string;
+        PROXY: string;
         HTTP_METHOD: string;
         SIGNATURE: string;
         URI: string;
@@ -599,16 +600,26 @@ declare namespace CentralServicesShared {
       };
     };
   }
-  interface Endpoints {
-    fetchEndpoints(fspId: string): Promise<any>
-    getEndpoint(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, options?: any): Promise<string>
+
+  interface Cacheable {
     initializeCache(policyOptions: object, config: { hubName: string, hubNameRegex: RegExp }): Promise<boolean>
+    stopCache(): Promise<void>
+  }
+
+  interface Endpoints extends Cacheable {
+    getEndpoint(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, options?: any): Promise<string>
     getEndpointAndRender(switchUrl: string, fsp: string, endpointType: FspEndpointTypesEnum, path: string, options?: any): Promise<string>
   }
 
-  interface Participants {
+  interface Participants extends Cacheable {
     getParticipant(switchUrl: string, fsp: string): Promise<object>
-    initializeCache(policyOptions: object, config: { hubName: string, hubNameRegex: RegExp }): Promise<boolean>
+    invalidateParticipantCache(fsp: string): Promise<void>
+  }
+
+  type ProxyNames = string[]
+  interface Proxies extends Cacheable {
+    getAllProxiesNames(switchUrl: string): Promise<ProxyNames>
+    invalidateProxiesCache(): Promise<void>
   }
 
   interface ProtocolVersionsType {
@@ -625,8 +636,10 @@ declare namespace CentralServicesShared {
     createGeneralTopicConf(template: string, functionality: string, action: string, key?: string, partition?: number, opaqueKey?: any, topicNameOverride?: string): {topicName: string, key: string | null, partition: number | null, opaqueKey: any }
   }
 
+  type MimeTypes = 'text/plain' | 'application/json' | 'application/vnd.interoperability.'
   interface StreamingProtocol {
     decodePayload(input: string, options: Object): Object
+    encodePayload(input: string | Buffer, mimeType: MimeTypes): string
   }
 
   interface HeaderValidation {
@@ -643,6 +656,7 @@ declare namespace CentralServicesShared {
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
+    proxies: Proxies;
     Hapi: any;
     Kafka: Kafka;
     OpenapiBackend: any;

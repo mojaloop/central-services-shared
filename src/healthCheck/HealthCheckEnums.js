@@ -16,7 +16,8 @@ const serviceName = {
   datastore: 'datastore',
   broker: 'broker',
   sidecar: 'sidecar',
-  cache: 'cache'
+  cache: 'cache',
+  proxyCache: 'proxyCache'
 }
 
 module.exports = {

@@ -24,12 +24,13 @@
  ******/
 'use strict'
 
-const EventSdk = require('@mojaloop/event-sdk')
+const http = require('node:http')
 const request = require('axios')
+const stringify = require('fast-safe-stringify')
+const EventSdk = require('@mojaloop/event-sdk')
 const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
-const http = require('http')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 
@@ -59,6 +60,7 @@ request.defaults.httpAgent.toJSON = () => ({})
  * @param {string} source id for which callback is being sent from
  * @param {string} destination id for which callback is being sent
  * @param {object | undefined} payload the body of the request being sent
+ * @param {object | null} params URL parameters to be sent with the request. Must be a plain object, URLSearchParams object or null/undefined
  * @param {string} responseType the type of the response object
  * @param {object | undefined} span a span for event logging if this request is within a span
  * @param {object | undefined} jwsSigner the jws signer for signing the requests
@@ -75,6 +77,7 @@ const sendRequest = async ({
   destination,
   method = enums.Http.RestMethods.GET,
   payload = undefined,
+  params,
   responseType = enums.Http.ResponseTypes.JSON,
   span = undefined,
   jwsSigner = undefined,
@@ -93,7 +96,8 @@ const sendRequest = async ({
     sendRequestSpan.setTags({ source, destination, method, url })
   }
   let requestOptions
-  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !destination || !hubNameRegex) {
+  if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !hubNameRegex) {
+    // think, if we can just avoid checking "destination"
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
   try {
@@ -109,6 +113,7 @@ const sendRequest = async ({
       method,
       headers: transformedHeaders,
       data: payload,
+      params,
       responseType,
       httpAgent: new http.Agent({ keepAlive: true }),
       ...axiosRequestOptionsOverride
@@ -122,29 +127,29 @@ const sendRequest = async ({
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
     }
-    Logger.isDebugEnabled && Logger.debug(`sendRequest::request ${JSON.stringify(requestOptions)}`)
+    Logger.isDebugEnabled && Logger.debug(`sendRequest::requestOptions ${stringify(requestOptions)}`)
     const response = await request(requestOptions)
-    Logger.isDebugEnabled && Logger.debug(`Success: sendRequest::response ${JSON.stringify(response, Object.getOwnPropertyNames(response))}`)
+
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    Logger.isErrorEnabled && Logger.error(error)
+    Logger.isErrorEnabled && Logger.error(`error in request.sendRequest: ${error.stack}`)
     const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },
       { key: 'destinationFsp', value: destination },
       { key: 'method', value: method },
-      { key: 'request', value: JSON.stringify(requestOptions) },
+      { key: 'request', value: stringify(requestOptions) },
       { key: 'errorMessage', value: error.message }
     ]
     const extensions = []
     if (error.response) {
-      extensionArray.push({ key: 'status', value: error.response && error.response.status })
-      extensionArray.push({ key: 'response', value: error.response && error.response.data })
-      extensions.push({ key: 'status', value: error.response && error.response.status })
+      extensionArray.push({ key: 'status', value: error.response?.status })
+      extensionArray.push({ key: 'response', value: error.response?.data })
+      extensions.push({ key: 'status', value: error.response?.status })
     }
-    const cause = JSON.stringify(extensionArray)
+    const cause = stringify(extensionArray)
     extensions.push({ key: 'cause', value: cause })
     const fspiopError = ErrorHandler.Factory.createFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, 'Failed to send HTTP request to host', error, source, extensions)
     if (sendRequestSpan) {
