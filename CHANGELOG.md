@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.7.1](https://github.com/mojaloop/central-services-shared/compare/v18.7.0...v18.7.1) (2024-08-20)
+
+
+### Bug Fixes
+
+* axios vulnerability GHSA-8hc4-vh64-cxmj ([#394](https://github.com/mojaloop/central-services-shared/issues/394)) ([8cf6e33](https://github.com/mojaloop/central-services-shared/commit/8cf6e336114d391fd2ec63fbb69aa99af707cbf5))
+
 ## [18.7.0](https://github.com/mojaloop/central-services-shared/compare/v18.6.3...v18.7.0) (2024-07-26)
 
 
