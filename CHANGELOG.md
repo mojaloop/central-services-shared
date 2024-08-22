@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.7.2](https://github.com/mojaloop/central-services-shared/compare/v18.7.1...v18.7.2) (2024-08-22)
+
+
+### Bug Fixes
+
+* added action map for fx abort validation ([#395](https://github.com/mojaloop/central-services-shared/issues/395)) ([90dd015](https://github.com/mojaloop/central-services-shared/commit/90dd01512b268907f315d72d6ac08f6bd94f696b))
+
 ### [18.7.1](https://github.com/mojaloop/central-services-shared/compare/v18.7.0...v18.7.1) (2024-08-20)
 
 
