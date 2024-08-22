@@ -154,6 +154,10 @@ const TopicMap = {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
     },
+    'fx-abort-validation': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'fx-commit': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
