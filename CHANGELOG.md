@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.7.3](https://github.com/mojaloop/central-services-shared/compare/v18.7.2...v18.7.3) (2024-08-27)
+
+
+### Chore
+
+* **csi/551:** add enums for fx-forwarded event ([#396](https://github.com/mojaloop/central-services-shared/issues/396)) ([fe87436](https://github.com/mojaloop/central-services-shared/commit/fe874360da7b7af2251abb2bdd1846dd08217546))
+
 ### [18.7.2](https://github.com/mojaloop/central-services-shared/compare/v18.7.1...v18.7.2) (2024-08-22)
 
 
