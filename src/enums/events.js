@@ -88,6 +88,7 @@ const Event = {
     FX_PREPARE_DUPLICATE: 'fx-prepare-duplicate',
     FX_ABORT_VALIDATION: 'fx-abort-validation',
     FX_RESERVED_ABORTED: 'fx-reserved-aborted',
+    FX_FORWARDED: 'fx-forwarded',
     FX_FULFIL_DUPLICATE: 'fx-fulfil-duplicate',
     FX_ABORT_DUPLICATE: 'fx-abort-duplicate',
     FX_TIMEOUT_RECEIVED: 'fx-timeout-received',
