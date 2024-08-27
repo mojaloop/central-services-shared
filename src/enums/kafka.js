@@ -162,6 +162,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'fx-forwarded': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'fx-fulfil-duplicate': {
       functionality: transferEventType.TRANSFER,
       action: transferEventAction.POSITION
