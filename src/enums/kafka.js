@@ -126,6 +126,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'fx-get': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'bulk-get': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
