@@ -174,6 +174,10 @@ const TopicMap = {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
     },
+    'fx-prepare-duplicate': {
+      functionality: transferEventType.NOTIFICATION,
+      action: transferEventAction.EVENT
+    },
     'fx-reject': {
       functionality: transferEventType.NOTIFICATION,
       action: transferEventAction.EVENT
