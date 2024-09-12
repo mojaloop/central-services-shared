@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.7.6](https://github.com/mojaloop/central-services-shared/compare/v18.7.5...v18.7.6) (2024-09-12)
+
+
+### Bug Fixes
+
+* fx-get-map ([#399](https://github.com/mojaloop/central-services-shared/issues/399)) ([f1184a6](https://github.com/mojaloop/central-services-shared/commit/f1184a6bd82fd2344ca5d2f74f410f1b19275975))
+
 ### [18.7.5](https://github.com/mojaloop/central-services-shared/compare/v18.7.4...v18.7.5) (2024-09-12)
 
 
