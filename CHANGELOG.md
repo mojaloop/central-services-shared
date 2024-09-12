@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.7.5](https://github.com/mojaloop/central-services-shared/compare/v18.7.4...v18.7.5) (2024-09-12)
+
+
+### Chore
+
+* add fx-prepare-duplicate to kakfa map ([#398](https://github.com/mojaloop/central-services-shared/issues/398)) ([ab33676](https://github.com/mojaloop/central-services-shared/commit/ab33676b6f7dd873eec2f88a3c9ae476448e3144))
+
 ### [18.7.4](https://github.com/mojaloop/central-services-shared/compare/v18.7.3...v18.7.4) (2024-09-11)
 
 
