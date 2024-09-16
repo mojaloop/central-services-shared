@@ -310,6 +310,7 @@ declare namespace CentralServicesShared {
     FX_TIMEOUT_RECEIVED = 'fx-timeout-received',
     FX_TIMEOUT_RESERVED = 'fx-timeout-reserved',
     FX_GET = 'fx-get',
+    FX_NOTIFY = 'fx-notify',
     GET = 'get',
     INITIATE = 'initiate',
     LIMIT_ADJUSTMENT = 'limit-adjustment',
@@ -465,6 +466,7 @@ declare namespace CentralServicesShared {
           FX_TIMEOUT_RECEIVED: EventActionEnum.FX_TIMEOUT_RECEIVED,
           FX_TIMEOUT_RESERVED: EventActionEnum.FX_TIMEOUT_RESERVED,
           FX_GET: EventActionEnum.FX_GET,
+          FX_NOTIFY: EventActionEnum.FX_NOTIFY,
           GET: EventActionEnum.GET;
           INITIATE: EventActionEnum.INITIATE;
           LIMIT_ADJUSTMENT: EventActionEnum.LIMIT_ADJUSTMENT;
