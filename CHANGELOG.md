@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.8.0](https://github.com/mojaloop/central-services-shared/compare/v18.7.6...v18.8.0) (2024-09-17)
+
+
+### Features
+
+* **csi/643:** add fx-notify event for patch fxTransfer updates ([#400](https://github.com/mojaloop/central-services-shared/issues/400)) ([8be247a](https://github.com/mojaloop/central-services-shared/commit/8be247a8b3258838fae590ea4572ef5f5237e5bb))
+
 ### [18.7.6](https://github.com/mojaloop/central-services-shared/compare/v18.7.5...v18.7.6) (2024-09-12)
 
 
