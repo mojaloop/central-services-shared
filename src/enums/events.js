@@ -94,6 +94,7 @@ const Event = {
     FX_TIMEOUT_RECEIVED: 'fx-timeout-received',
     FX_TIMEOUT_RESERVED: 'fx-timeout-reserved',
     FX_GET: 'fx-get',
+    FX_NOTIFY: 'fx-notify',
     GET: 'get',
     INITIATE: 'initiate',
     LIMIT_ADJUSTMENT: 'limit-adjustment',
