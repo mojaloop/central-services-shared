@@ -27,6 +27,7 @@ const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const idGenerator = require('../../../src/util/id')
 const uuidRegex = version => new RegExp(`[a-f0-9]{8}-[a-f0-9]{4}-${version}[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}`)
+const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/
 
 Test('Id util', idTest => {
   let sandbox
@@ -50,6 +51,20 @@ Test('Id util', idTest => {
     generateSha256Test.test('generate UUID v7', test => {
       const uuid7 = idGenerator({ type: 'uuid', version: 7 })
       test.match(uuid7(), uuidRegex(7))
+      test.end()
+    })
+    generateSha256Test.test('generate ULID monotonic by default', test => {
+      const ulid = idGenerator({ type: 'ulid' })
+      test.match(ulid(), ulidRegex)
+      const idList = Array.from({ length: 100 }, () => ulid())
+      test.ok(idList.slice().sort().join('') === idList.join(''), 'ULIDs should be monotonic')
+      test.end()
+    })
+    generateSha256Test.test('generate ULID non-monotonic', test => {
+      const ulid = idGenerator({ type: 'ulid', monotonic: false })
+      test.match(ulid(), ulidRegex)
+      const idList = Array.from({ length: 100 }, () => ulid())
+      test.ok(idList.slice().sort().join('') !== idList.join(''), 'ULIDs should not be monotonic')
       test.end()
     })
     generateSha256Test.test('generate UUID v7 by default', test => {
