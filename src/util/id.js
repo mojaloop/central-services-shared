@@ -24,6 +24,7 @@
  ******/
 
 const crypto = require('crypto')
+const { monotonicFactory, ulid } = require('ulidx')
 
 const generators = {
   // generate UUID compliant with https://datatracker.ietf.org/doc/html/rfc9562
@@ -34,7 +35,9 @@ const generators = {
       const random = crypto.randomUUID()
       return `${timestamp.substring(0, 8)}-${timestamp.substring(8, 12)}-7${random.substring(15, 36)}`
     }
-  })[version]
+  })[version],
+  // monotonic parameter ensures ULIDs are generated in order when called at the same or older seed millisecond
+  ulid: ({ monotonic = true }) => monotonic ? monotonicFactory() : ulid
 }
 
 module.exports = ({ type = 'uuid', ...config } = {}) => generators[type](config)
