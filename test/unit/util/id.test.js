@@ -27,7 +27,7 @@ const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const idGenerator = require('../../../src/util/id')
 const uuidRegex = version => new RegExp(`[a-f0-9]{8}-[a-f0-9]{4}-${version}[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}`)
-const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i
+const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/
 
 Test('Id util', idTest => {
   let sandbox
