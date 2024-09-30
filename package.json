@@ -39,7 +39,6 @@
     "standard:fix": "npm run standard -- --fix",
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
-    "test:header": "npx tape 'test/unit/util/headerValidation/**/*.test.js'",
     "test": "npm run test:unit",
     "test:unit": "npx tape 'test/unit/**/*.test.js' | tap-spec",
     "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
