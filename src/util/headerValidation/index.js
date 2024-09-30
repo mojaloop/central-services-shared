@@ -2,6 +2,7 @@
 
 const assert = require('assert').strict
 const _ = require('lodash')
+const { ISO_HEADER_PART } = require('../../constants')
 
 const protocolVersions = {
   anyVersion: Symbol('Any'),
@@ -18,7 +19,7 @@ const protocolVersionsMap = [
 // Some convenience functions for generating regexes for header matching
 
 const generateContentTypeRegex = resource =>
-  new RegExp(`^application/vnd\\.interoperability\\.${resource}\\+json\\s{0,1};\\s{0,1}version=(\\d+\\.\\d+)$`)
+  new RegExp(`^application/vnd\\.interoperability(?:\\.${ISO_HEADER_PART})?\\.${resource}\\+json\\s{0,1};\\s{0,1}version=(\\d+\\.\\d+)$`)
 
 const generateAcceptRegex = resource =>
   new RegExp(`^${generateSingleAcceptRegexStr(resource)}(,${generateSingleAcceptRegexStr(resource)})*$`)
@@ -27,7 +28,7 @@ const generateSingleAcceptRegex = resource =>
   new RegExp(generateSingleAcceptRegexStr(resource))
 
 const generateSingleAcceptRegexStr = resource =>
-  `application/vnd\\.interoperability\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
+  `application/vnd\\.interoperability(?:\\.${ISO_HEADER_PART})?\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
 
 const parseContentTypeHeader = (resource, header) => {
   assert(typeof header === 'string')
@@ -61,7 +62,6 @@ const parseAcceptHeader = (resource, header) => {
   // The header contains a comma-delimited set of versions, extract these
   const versions = new Set(header
     .split(',')
-    // @ts-ignore
     .map(verStr => verStr.match(generateSingleAcceptRegex(resource))[1])
     .map(match => match === undefined ? protocolVersions.anyVersion : match.split('=')[1])
   )
