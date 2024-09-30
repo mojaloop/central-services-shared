@@ -29,6 +29,7 @@ const Ajv = require('ajv')
 /// The below custom OpenAPIValidator is no longer needed when using AJV v8.x as it supports unicode by default - https://ajv.js.org/v6-to-v8-migration.html. Keeping this code snippet if we need to downgrade to AJV v6.x.
 // const OpenAPIValidator = require('openapi-backend').OpenAPIValidator
 // const schemaValidator = require('./schema').OpenapiSchemaValidator
+const { loadApi } = require('./documentation/apiDocBuilder')
 
 const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coerceTypes: true }, regexFlags = 'u') => {
   if (ajvOpts.coerceTypes === undefined) {
@@ -38,7 +39,7 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
   ajv.addVocabulary(['example'])
   await require('ajv-keywords')(ajv)
   const api = new OpenAPIBackend({
-    definition: definitionPath,
+    definition: loadApi(definitionPath),
     strict: false,
     validate: true,
     ajvOpts: {
