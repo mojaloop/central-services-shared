@@ -14,6 +14,7 @@ const {
   convertSupportedVersionToExtensionList,
   parseAcceptHeader,
   parseContentTypeHeader,
+  checkApiType,
   protocolVersions
 } = require('../../../../src/util/headerValidation/index')
 const { API_TYPES } = require('#src/constants')
@@ -266,10 +267,13 @@ Tape('headerValidation Tests -->', (headerTests) => {
     t.true(parsed.valid)
   }))
 
-  headerTests.test('should throw error on incorrect apiType', tryCatchEndTest(t => {
-    const resource = 'parties'
-    const header = validContentTypeHeaders(resource)[0]
-    t.throws(() => parseContentTypeHeader(resource, header, 'XXX'), TypeError)
+  headerTests.test('should validate supported apiTypes', tryCatchEndTest(t => {
+    const isValid = checkApiType(API_TYPES.fspiop)
+    t.true(isValid)
+  }))
+
+  headerTests.test('should fail validation on unsupported apiType', tryCatchEndTest(t => {
+    t.throws(() => checkApiType('xxx'), TypeError)
   }))
 
   headerTests.end()

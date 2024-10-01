@@ -7,7 +7,13 @@
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
 const { API_TYPES } = require('../../../constants')
-const { parseAcceptHeader, parseContentTypeHeader, protocolVersions, convertSupportedVersionToExtensionList } = require('../../headerValidation')
+const {
+  checkApiType,
+  parseAcceptHeader,
+  parseContentTypeHeader,
+  protocolVersions,
+  convertSupportedVersionToExtensionList
+} = require('../../headerValidation')
 
 // Some defaults
 
@@ -58,6 +64,8 @@ const plugin = {
     supportedProtocolAcceptVersions = defaultProtocolVersions,
     apiType = API_TYPES.fspiop
   }) {
+    checkApiType(apiType)
+
     server.ext('onPostAuth', (request, h) => {
       // First, extract the resource type from the path
       const resource = request.path.replace(/^\//, '').split('/')[0]

@@ -41,7 +41,6 @@ const checkApiType = (apiType) => {
 
 const parseContentTypeHeader = (resource, header, apiType = API_TYPES.fspiop) => {
   assert(typeof header === 'string')
-  checkApiType(apiType)
 
   // Create the validation regex
   const r = generateContentTypeRegex(resource, apiType)
@@ -60,7 +59,6 @@ const parseContentTypeHeader = (resource, header, apiType = API_TYPES.fspiop) =>
 
 const parseAcceptHeader = (resource, header, apiType = API_TYPES.fspiop) => {
   assert(typeof header === 'string')
-  checkApiType(apiType)
 
   // Create the validation regex
   const r = generateAcceptRegex(resource, apiType)
@@ -126,5 +124,6 @@ module.exports = {
   generateContentTypeRegex,
   parseAcceptHeader,
   parseContentTypeHeader,
+  checkApiType,
   convertSupportedVersionToExtensionList
 }
