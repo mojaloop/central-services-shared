@@ -16,6 +16,7 @@ const {
   parseContentTypeHeader,
   protocolVersions
 } = require('../../../../src/util/headerValidation/index')
+const { API_TYPES } = require('#src/constants')
 const {
   generateAcceptHeader,
   generateAcceptVersions,
@@ -236,7 +237,7 @@ Tape('headerValidation Tests -->', (headerTests) => {
     const resource = 'parties'
     const version = '2'
     const isoHeader = validIsoHeader(resource, version)
-    const parsed = parseAcceptHeader(resource, isoHeader)
+    const parsed = parseAcceptHeader(resource, isoHeader, API_TYPES.iso20022)
     t.true(parsed.valid)
     t.true(parsed.versions.has(version))
     t.equal(parsed.versions.size, 1)
@@ -246,9 +247,29 @@ Tape('headerValidation Tests -->', (headerTests) => {
     const resource = 'parties'
     const version = '2.0'
     const isoHeader = validIsoHeader(resource, version)
-    const parsed = parseContentTypeHeader(resource, isoHeader)
+    const parsed = parseContentTypeHeader(resource, isoHeader, API_TYPES.iso20022)
     t.true(parsed.valid)
     t.equal(parsed.version, version)
+  }))
+
+  headerTests.test('should parse FSPIOP content-type header', tryCatchEndTest(t => {
+    const resource = 'parties'
+    const header = validContentTypeHeaders(resource)[0]
+    const parsed = parseContentTypeHeader(resource, header, API_TYPES.fspiop)
+    t.true(parsed.valid)
+  }))
+
+  headerTests.test('should parse content-type header using default value of apiType', tryCatchEndTest(t => {
+    const resource = 'parties'
+    const header = validContentTypeHeaders(resource)[0]
+    const parsed = parseContentTypeHeader(resource, header)
+    t.true(parsed.valid)
+  }))
+
+  headerTests.test('should throw error on incorrect apiType', tryCatchEndTest(t => {
+    const resource = 'parties'
+    const header = validContentTypeHeaders(resource)[0]
+    t.throws(() => parseContentTypeHeader(resource, header, 'XXX'), TypeError)
   }))
 
   headerTests.end()
