@@ -25,10 +25,10 @@
 
 'use strict'
 
-const ENUM = require('../../enums').Http
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
-
-const resourceVersions = require('../helpers').resourceVersions
+const ENUM = require('../../enums').Http
+const { API_TYPES } = require('../../constants')
+const { resourceVersions, isoHeaderPart } = require('../helpers')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -60,6 +60,11 @@ const getResourceInfoFromHeader = (headerValue) => {
     if (regex[4]) result.version = regex[4]
   }
   return result
+}
+
+const makeAcceptContentTypeHeader = (resourceType, version, apiType = API_TYPES.fspiop) => {
+  const isoString = isoHeaderPart(apiType)
+  return `application/vnd.interoperability${isoString}.${resourceType}+json;version=${version}`
 }
 
 /**
@@ -190,7 +195,7 @@ const transformHeaders = (headers, config) => {
         if (!resourceType) resourceType = getResourceInfoFromHeader(headers[headerKey]).resourceType
         // Fall back to using the legacy approach to determine the resourceVersion
         if (resourceType && !acceptVersion) acceptVersion = resourceVersions[resourceType].acceptVersion
-        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${acceptVersion}`
+        normalizedHeaders[headerKey] = makeAcceptContentTypeHeader(resourceType, acceptVersion, config?.apiType)
         break
       case (ENUM.Headers.GENERAL.CONTENT_TYPE.value):
         if (!config.hubNameRegex.test(config.sourceFsp)) {
@@ -200,7 +205,7 @@ const transformHeaders = (headers, config) => {
         if (!resourceType) resourceType = getResourceInfoFromHeader(headers[headerKey]).resourceType
         // Fall back to using the legacy approach to determine the resourceVersion
         if (resourceType && !contentVersion) contentVersion = resourceVersions[resourceType].contentVersion
-        normalizedHeaders[headerKey] = `application/vnd.interoperability.${resourceType}+json;version=${contentVersion}`
+        normalizedHeaders[headerKey] = makeAcceptContentTypeHeader(resourceType, contentVersion, config?.apiType)
         break
       default:
         normalizedHeaders[headerKey] = headerValue
@@ -222,5 +227,6 @@ const transformHeaders = (headers, config) => {
 
 module.exports = {
   getResourceInfoFromHeader,
-  transformHeaders
+  transformHeaders,
+  makeAcceptContentTypeHeader
 }

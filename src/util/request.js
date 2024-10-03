@@ -28,11 +28,12 @@ const http = require('node:http')
 const request = require('axios')
 const stringify = require('fast-safe-stringify')
 const EventSdk = require('@mojaloop/event-sdk')
-const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
+const { logger } = require('../logger')
+const { API_TYPES } = require('../constants')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -65,7 +66,9 @@ request.defaults.httpAgent.toJSON = () => ({})
  * @param {object | undefined} span a span for event logging if this request is within a span
  * @param {object | undefined} jwsSigner the jws signer for signing the requests
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
+ * @param {'fspiop' | 'iso20022'} apiType the API type of the request being sent
  * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
+ * @param {regex} hubNameRegex hubName Regex
  *
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
@@ -82,6 +85,7 @@ const sendRequest = async ({
   span = undefined,
   jwsSigner = undefined,
   protocolVersions = undefined,
+  apiType = API_TYPES.fspiop,
   axiosRequestOptionsOverride = {},
   hubNameRegex
 }) => {
@@ -106,13 +110,14 @@ const sendRequest = async ({
       sourceFsp: source,
       destinationFsp: destination,
       protocolVersions,
-      hubNameRegex
+      hubNameRegex,
+      apiType
     })
     requestOptions = {
       url,
       method,
       headers: transformedHeaders,
-      data: payload,
+      data: payload, // todo: think, if it's better to transform to ISO format here (based on apiType)
       params,
       responseType,
       httpAgent: new http.Agent({ keepAlive: true }),
@@ -127,14 +132,14 @@ const sendRequest = async ({
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       span.audit(requestOptions, EventSdk.AuditEventAction.egress)
     }
-    Logger.isDebugEnabled && Logger.debug(`sendRequest::requestOptions ${stringify(requestOptions)}`)
+    logger.debug('sendRequest::requestOptions:', { requestOptions })
     const response = await request(requestOptions)
 
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    Logger.isErrorEnabled && Logger.error(`error in request.sendRequest: ${error.stack}`)
+    logger.warn('error in request.sendRequest:', error)
     const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },

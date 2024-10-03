@@ -25,6 +25,7 @@
 'use strict'
 
 const Enums = require('../../src/enums')
+const { logger } = require('#src/logger')
 
 const generateProtocolHeader = (resource, version) => `application/vnd.interoperability.${resource}+json;version=${version}`
 
@@ -110,6 +111,17 @@ const getEndpointAndRenderResponse = {
   ]
 }
 
+// to use as a wrapper on Tape tests
+const tryCatchEndTest = (testFn) => async (t) => {
+  try {
+    await testFn(t)
+  } catch (err) {
+    logger.error(`error in test "${t.name}":`, err)
+    t.fail(`${t.name} failed due to error: ${err?.message}`)
+  }
+  t.end()
+}
+
 module.exports = {
   defaultHeaders,
   generateProtocolHeader,
@@ -117,5 +129,6 @@ module.exports = {
   getEndpointAndRenderResponse,
   getParticipantsResponseFsp1,
   getParticipantsResponseFsp2,
-  getParticipantsResponseError
+  getParticipantsResponseError,
+  tryCatchEndTest
 }

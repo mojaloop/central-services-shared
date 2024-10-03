@@ -1,4 +1,5 @@
-import { Utils as HapiUtil } from '@hapi/hapi'
+import { Utils as HapiUtil, Server } from '@hapi/hapi'
+
 declare namespace CentralServicesShared {
   interface ReturnCode {
     CODE: number;
@@ -657,11 +658,43 @@ declare namespace CentralServicesShared {
     convertSupportedVersionToExtensionList(supportedVersions: Array<number>): Array<{ key: string, value: string }>
   }
 
+  type ProtocolResources = string[]
+  type ProtocolVersions = (string | symbol)[]
+  type ApiTypeValues = 'fspiop' | 'iso20022'
+
+  type HapiUtil = {
+    HapiRawPayload: {
+      plugin: {
+        name: string,
+        register: (server: Server) => void
+      }
+    };
+    FSPIOPHeaderValidation: {
+      plugin: {
+        name: string,
+        register: (
+          server: Server,
+          options: {
+            resources: ProtocolResources,
+            supportedProtocolContentVersions: ProtocolVersions,
+            supportedProtocolAcceptVersions: ProtocolVersions,
+            apiType: ApiTypeValues
+          }
+        ) => void
+      },
+      errorMessages: Record<string, string>,
+      defaultProtocolResources: ProtocolResources
+      defaultProtocolVersions: ProtocolVersions
+    };
+    API_TYPES: Record<ApiTypeValues, ApiTypeValues>;
+  }
+  // todo: define the rest of the types
+
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
     proxies: Proxies;
-    Hapi: any;
+    Hapi: HapiUtil;
     Kafka: Kafka;
     OpenapiBackend: any;
     Request: Request;

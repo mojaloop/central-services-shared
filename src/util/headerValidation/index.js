@@ -2,6 +2,8 @@
 
 const assert = require('assert').strict
 const _ = require('lodash')
+const { API_TYPES } = require('../../constants')
+const { isoHeaderPart } = require('../helpers')
 
 const protocolVersions = {
   anyVersion: Symbol('Any'),
@@ -17,23 +19,30 @@ const protocolVersionsMap = [
 
 // Some convenience functions for generating regexes for header matching
 
-const generateContentTypeRegex = resource =>
-  new RegExp(`^application/vnd\\.interoperability\\.${resource}\\+json\\s{0,1};\\s{0,1}version=(\\d+\\.\\d+)$`)
+const generateContentTypeRegex = (resource, apiType) =>
+  new RegExp(`^application/vnd\\.interoperability${isoHeaderPart(apiType)}\\.${resource}\\+json\\s{0,1};\\s{0,1}version=(\\d+\\.\\d+)$`)
 
-const generateAcceptRegex = resource =>
-  new RegExp(`^${generateSingleAcceptRegexStr(resource)}(,${generateSingleAcceptRegexStr(resource)})*$`)
+const generateAcceptRegex = (resource, apiType) =>
+  new RegExp(`^${generateSingleAcceptRegexStr(resource, apiType)}(,${generateSingleAcceptRegexStr(resource, apiType)})*$`)
 
-const generateSingleAcceptRegex = resource =>
-  new RegExp(generateSingleAcceptRegexStr(resource))
+const generateSingleAcceptRegex = (resource, apiType) =>
+  new RegExp(generateSingleAcceptRegexStr(resource, apiType))
 
-const generateSingleAcceptRegexStr = resource =>
-  `application/vnd\\.interoperability\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
+const generateSingleAcceptRegexStr = (resource, apiType) =>
+  `application/vnd\\.interoperability${isoHeaderPart(apiType)}\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
 
-const parseContentTypeHeader = (resource, header) => {
+const checkApiType = (apiType) => {
+  if (Object.values(API_TYPES).includes(apiType)) {
+    return true
+  }
+  throw new TypeError(`Invalid API type: ${apiType}`)
+}
+
+const parseContentTypeHeader = (resource, header, apiType = API_TYPES.fspiop) => {
   assert(typeof header === 'string')
 
   // Create the validation regex
-  const r = generateContentTypeRegex(resource)
+  const r = generateContentTypeRegex(resource, apiType)
 
   // Test the header
   const match = header.match(r)
@@ -47,11 +56,11 @@ const parseContentTypeHeader = (resource, header) => {
   }
 }
 
-const parseAcceptHeader = (resource, header) => {
+const parseAcceptHeader = (resource, header, apiType = API_TYPES.fspiop) => {
   assert(typeof header === 'string')
 
   // Create the validation regex
-  const r = generateAcceptRegex(resource)
+  const r = generateAcceptRegex(resource, apiType)
 
   // Test the header
   if (header.match(r) === null) {
@@ -61,8 +70,7 @@ const parseAcceptHeader = (resource, header) => {
   // The header contains a comma-delimited set of versions, extract these
   const versions = new Set(header
     .split(',')
-    // @ts-ignore
-    .map(verStr => verStr.match(generateSingleAcceptRegex(resource))[1])
+    .map(verStr => verStr.match(generateSingleAcceptRegex(resource, apiType))[1])
     .map(match => match === undefined ? protocolVersions.anyVersion : match.split('=')[1])
   )
 
@@ -115,5 +123,6 @@ module.exports = {
   generateContentTypeRegex,
   parseAcceptHeader,
   parseContentTypeHeader,
+  checkApiType,
   convertSupportedVersionToExtensionList
 }
