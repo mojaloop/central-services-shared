@@ -2,9 +2,8 @@
 
 const assert = require('assert').strict
 const _ = require('lodash')
-const { API_TYPES, ISO_HEADER_PART } = require('../../constants')
-
-const isoString = apiType => `${apiType === API_TYPES.iso20022 ? `.${ISO_HEADER_PART}` : ''}`
+const { API_TYPES } = require('../../constants')
+const { isoHeaderPart } = require('../helpers')
 
 const protocolVersions = {
   anyVersion: Symbol('Any'),
@@ -21,7 +20,7 @@ const protocolVersionsMap = [
 // Some convenience functions for generating regexes for header matching
 
 const generateContentTypeRegex = (resource, apiType) =>
-  new RegExp(`^application/vnd\\.interoperability${isoString(apiType)}\\.${resource}\\+json\\s{0,1};\\s{0,1}version=(\\d+\\.\\d+)$`)
+  new RegExp(`^application/vnd\\.interoperability${isoHeaderPart(apiType)}\\.${resource}\\+json\\s{0,1};\\s{0,1}version=(\\d+\\.\\d+)$`)
 
 const generateAcceptRegex = (resource, apiType) =>
   new RegExp(`^${generateSingleAcceptRegexStr(resource, apiType)}(,${generateSingleAcceptRegexStr(resource, apiType)})*$`)
@@ -30,7 +29,7 @@ const generateSingleAcceptRegex = (resource, apiType) =>
   new RegExp(generateSingleAcceptRegexStr(resource, apiType))
 
 const generateSingleAcceptRegexStr = (resource, apiType) =>
-  `application/vnd\\.interoperability${isoString(apiType)}\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
+  `application/vnd\\.interoperability${isoHeaderPart(apiType)}\\.${resource}\\+json(\\s{0,1};\\s{0,1}version=\\d+(\\.\\d+)?)?`
 
 const checkApiType = (apiType) => {
   if (Object.values(API_TYPES).includes(apiType)) {

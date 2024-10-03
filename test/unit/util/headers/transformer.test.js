@@ -30,6 +30,8 @@ const Sinon = require('sinon')
 const Transformer = require('../../../../src/util').Headers
 const Enum = require('../../../../src/enums')
 const Util = require('../../../../src/util')
+const { API_TYPES, ISO_HEADER_PART } = require('#src/constants')
+const { tryCatchEndTest } = require('#test/util/helper')
 
 const headerConfigExample = {
   httpMethod: 'PUT',
@@ -231,6 +233,24 @@ Test('Transfer Transformer tests', TransformerTest => {
       }
       test.end()
     })
+
+    transformHeadersTest.test('should create ISO headers', tryCatchEndTest(async t => {
+      const fspiopHeader = Transformer.makeAcceptContentTypeHeader('parties', '2.0', API_TYPES.fspiop)
+      const headerData = {
+        ...headerDataTransformedExample,
+        Accept: fspiopHeader,
+        'Content-Type': fspiopHeader
+      }
+      const headerConfig = {
+        ...headerConfigExample,
+        sourceFsp: 'Hub',
+        apiType: API_TYPES.iso20022
+      }
+      const headers = Transformer.transformHeaders(headerData, headerConfig)
+      t.ok(headers)
+      t.true(headers.Accept.includes(ISO_HEADER_PART))
+      t.true(headers['Content-Type'].includes(ISO_HEADER_PART))
+    }))
 
     transformHeadersTest.end()
   })

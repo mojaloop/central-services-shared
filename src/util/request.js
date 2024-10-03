@@ -33,6 +33,7 @@ const Metrics = require('@mojaloop/central-services-metrics')
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 const { logger } = require('../logger')
+const { API_TYPES } = require('../constants')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -65,6 +66,7 @@ request.defaults.httpAgent.toJSON = () => ({})
  * @param {object | undefined} span a span for event logging if this request is within a span
  * @param {object | undefined} jwsSigner the jws signer for signing the requests
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
+ * @param {'fspiop' | 'iso20022'} apiType the API type of the request being sent
  * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
  * @param {regex} hubNameRegex hubName Regex
  *
@@ -83,6 +85,7 @@ const sendRequest = async ({
   span = undefined,
   jwsSigner = undefined,
   protocolVersions = undefined,
+  apiType = API_TYPES.fspiop,
   axiosRequestOptionsOverride = {},
   hubNameRegex
 }) => {
@@ -107,13 +110,14 @@ const sendRequest = async ({
       sourceFsp: source,
       destinationFsp: destination,
       protocolVersions,
-      hubNameRegex
+      hubNameRegex,
+      apiType
     })
     requestOptions = {
       url,
       method,
       headers: transformedHeaders,
-      data: payload,
+      data: payload, // todo: think, if it's better to transform to ISO format here (based on apiType)
       params,
       responseType,
       httpAgent: new http.Agent({ keepAlive: true }),
