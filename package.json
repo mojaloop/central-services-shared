@@ -76,7 +76,7 @@
     "ulidx": "2.4.1",
     "uuid4": "2.0.3",
     "widdershins": "^4.0.1",
-    "yaml": "2.5.1"
+    "yaml": "2.6.0"
   },
   "devDependencies": {
     "@hapi/hapi": "21.3.10",
