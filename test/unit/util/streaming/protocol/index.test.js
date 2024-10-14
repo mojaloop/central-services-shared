@@ -316,6 +316,41 @@ Test('Utility Test', utilityTest => {
       test.end()
     })
 
+    createMessageFromRequestTest.test('adds context object to message', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const dataUri = 'data:application/json;base64,eyJlcnJvckluZm9ybWF0aW9uIjp7ImVycm9yQ29kZSI6IjUyMDAiLCJlcnJvckRlc2NyaXB0aW9uIjoiR2VuZXJpYyBsaW1pdCBlcnJvciwgYW1vdW50ICYgcGF5bWVudHMgdGhyZXNob2xkLiJ9fQ'
+      const correlationId = 'c74b826d-3c0b-4cfd-8ec1-08cc4343fe8c'
+      const metadata = StreamingProtocol.createMetadataWithCorrelatedEvent(correlationId, event.type, event.action, state)
+      const to = 'fsp1'
+      const from = 'fsp2'
+      const headers = Helper.defaultHeaders(to, 'participants', from)
+      const request = {
+        dataUri,
+        headers
+      }
+      const isoContext = { iso20022: { key: 'value' } }
+      const message = StreamingProtocol.createMessageFromRequest(
+        correlationId,
+        request,
+        to,
+        from,
+        metadata,
+        {
+          iso20022: { key: 'value' }
+        })
+      test.deepEqual(message.context, isoContext)
+      test.end()
+    })
+
     createMessageFromRequestTest.end()
   })
 
