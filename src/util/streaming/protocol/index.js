@@ -74,10 +74,11 @@ const updateMessageProtocolMetadata = (messageProtocol, metadataType, metadataAc
  * @param {object} headers - headers from the request
  * @param {object} uriParams - the URI parameters passed in request.
  * @param {string} type - the message type for the LIME message, defaults to 'application/json'
+ * @param {object} context - any additional context information
  *
  * @returns {object} - Returns generated messageProtocol
  */
-const createMessage = (id, to, from, metadata, headers, payload, uriParams = undefined, type = undefined) => {
+const createMessage = (id, to, from, metadata, headers, payload, uriParams = undefined, type = undefined, context = undefined) => {
   return {
     id,
     to,
@@ -88,7 +89,8 @@ const createMessage = (id, to, from, metadata, headers, payload, uriParams = und
       headers,
       payload: payload || {}
     },
-    metadata
+    metadata,
+    context
   }
 }
 
@@ -102,11 +104,12 @@ const createMessage = (id, to, from, metadata, headers, payload, uriParams = und
  * @param {string} to - the action flow. Example: 'prepare'
  * @param {string} from - the state of the message being passed.
  * @param {object} metadata - The metadata for streaming
+ * @param {object} context - any additional context information
  *
  * @returns {object} - Returns generated messageProtocol
  */
-const createMessageFromRequest = (id, request, to, from, metadata) => {
-  return createMessage(id, to, from, metadata, request.headers, request.dataUri, request.params)
+const createMessageFromRequest = (id, request, to, from, metadata, context) => {
+  return createMessage(id, to, from, metadata, request.headers, request.dataUri, request.params, undefined, context)
 }
 
 /**
