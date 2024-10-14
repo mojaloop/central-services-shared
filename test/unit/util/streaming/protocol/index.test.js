@@ -384,6 +384,28 @@ Test('Utility Test', utilityTest => {
       test.end()
     })
 
+    createMessageTest.test('add context object to message', (test) => {
+      const state = {
+        status: 'status',
+        code: 1,
+        description: 'description'
+      }
+      const event = {
+        type: Enum.Events.Event.Type.FULFIL,
+        action: Enum.Events.Event.Action.COMMIT,
+        state
+      }
+      const correlationId = 'c74b826d-3c0b-4cfd-8ec1-08cc4343fe8c'
+      const metadata = StreamingProtocol.createMetadataWithCorrelatedEvent(correlationId, event.type, event.action, state)
+      const to = 'fsp1'
+      const from = 'fsp2'
+      const headers = Helper.defaultHeaders(to, 'participants', from)
+      const isoContext = { iso20022: { key: 'value' } }
+      const message = StreamingProtocol.createMessage(correlationId, to, from, metadata, headers, null, undefined, undefined, isoContext)
+      test.deepEqual(message.context, isoContext)
+      test.end()
+    })
+
     createMessageTest.end()
   })
 
