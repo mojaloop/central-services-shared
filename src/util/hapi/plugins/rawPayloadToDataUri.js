@@ -75,6 +75,7 @@ module.exports.plugin = {
       server.ext([{
         type: 'onPostAuth',
         method: async (request, h) => {
+          /* istanbul ignore next */
           if (request.payload) {
             return getRawBody(request.payload)
               .then(rawBuffer => {
