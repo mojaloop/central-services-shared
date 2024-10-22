@@ -27,7 +27,7 @@
 
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const ENUM = require('../../enums').Http
-const { API_TYPES } = require('../../constants')
+const { API_TYPES, ISO_HEADER_PART } = require('../../constants')
 const { resourceVersions, isoHeaderPart } = require('../helpers')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
@@ -36,7 +36,10 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
  * @module src/headers/transformer
  */
 
-const regexForContentAndAcceptHeaders = /(application\/vnd\.interoperability\.)(\w*)+(\+json\s{0,1};\s{0,1}version=)(.*)/
+// eslint-disable-next-line prefer-regex-literals
+const regexForContentAndAcceptHeaders = new RegExp(
+  `(application\\/vnd\\.interoperability\\.)(?:${ISO_HEADER_PART}\\.)?(\\w*)+(\\+json\\s{0,1};\\s{0,1}version=)(.*)`
+)
 
 /**
 * @function getResourceInfoFromHeader
