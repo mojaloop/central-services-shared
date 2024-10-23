@@ -347,7 +347,7 @@ Test('Utility Test', utilityTest => {
         {
           iso20022: { key: 'value' }
         })
-      test.deepEqual(message.context, isoContext)
+      test.deepEqual(message.content.context, isoContext)
       test.end()
     })
 
@@ -402,7 +402,7 @@ Test('Utility Test', utilityTest => {
       const headers = Helper.defaultHeaders(to, 'participants', from)
       const isoContext = { iso20022: { key: 'value' } }
       const message = StreamingProtocol.createMessage(correlationId, to, from, metadata, headers, null, undefined, undefined, isoContext)
-      test.deepEqual(message.context, isoContext)
+      test.deepEqual(message.content.context, isoContext)
       test.end()
     })
 
