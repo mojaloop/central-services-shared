@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.10.0](https://github.com/mojaloop/central-services-shared/compare/v18.9.0...v18.10.0) (2024-10-14)
+
+
+### Features
+
+* add argument to add context to kafka message ([#404](https://github.com/mojaloop/central-services-shared/issues/404)) ([4d8f8de](https://github.com/mojaloop/central-services-shared/commit/4d8f8de33b613da1795d9b1765c81a108c212c39))
+
 ## [18.9.0](https://github.com/mojaloop/central-services-shared/compare/v18.8.0...v18.9.0) (2024-09-18)
 
 
