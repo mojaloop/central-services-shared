@@ -27,6 +27,7 @@
 
 const RC = require('rc')('LIB')
 const defaultVersions = require('../enums/http').Headers.DEFAULT_API_VERSIONS
+const { API_TYPES, ISO_HEADER_PART } = require('../constants')
 
 const getVersionFromConfig = (resourceString) => {
   const resourceVersionMap = {}
@@ -71,7 +72,10 @@ const transpose = (obj) => {
   return transposed
 }
 
+const isoHeaderPart = apiType => `${apiType === API_TYPES.iso20022 ? `.${ISO_HEADER_PART}` : ''}`
+
 module.exports = {
+  isoHeaderPart,
   transpose,
   resourceVersions,
   __parseResourceVersions: parseResourceVersions

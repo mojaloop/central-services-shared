@@ -1,8 +1,13 @@
 'use strict'
 
 const Chance = require('chance')
-const { anyVersion } = require('../../../../src/util/headerValidation/index').protocolVersions
+const { anyVersion } = require('#src/util/headerValidation/index').protocolVersions
+const { ISO_HEADER_PART } = require('#src/constants')
+
 const chance = new Chance()
+const HEADER_PREFIX = 'application/vnd.interoperability'
+
+const validIsoHeader = (resource, version = '2.0') => `${HEADER_PREFIX}.${ISO_HEADER_PART}.${resource}+json;version=${version}`
 
 const validAcceptHeaders = resource => [
   `application/vnd.interoperability.${resource}+json`,
@@ -110,7 +115,8 @@ module.exports = {
   generateContentTypeHeader,
   generateContentTypeVersion,
   validAcceptHeaders,
-  invalidAcceptHeaders,
   validContentTypeHeaders,
+  validIsoHeader,
+  invalidAcceptHeaders,
   invalidContentTypeHeaders
 }
