@@ -87,10 +87,10 @@ const createMessage = (id, to, from, metadata, headers, payload, uriParams = und
     content: {
       uriParams: uriParams || undefined,
       headers,
-      payload: payload || {}
+      payload: payload || {},
+      context
     },
-    metadata,
-    context
+    metadata
   }
 }
 

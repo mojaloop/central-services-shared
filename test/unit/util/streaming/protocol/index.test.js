@@ -337,17 +337,16 @@ Test('Utility Test', utilityTest => {
         dataUri,
         headers
       }
-      const isoContext = { iso20022: { key: 'value' } }
+      const isoContext = { orginalRequestPayload: { key: 'value' } }
       const message = StreamingProtocol.createMessageFromRequest(
         correlationId,
         request,
         to,
         from,
         metadata,
-        {
-          iso20022: { key: 'value' }
-        })
-      test.deepEqual(message.context, isoContext)
+        isoContext
+      )
+      test.deepEqual(message.content.context, isoContext)
       test.end()
     })
 
@@ -400,9 +399,9 @@ Test('Utility Test', utilityTest => {
       const to = 'fsp1'
       const from = 'fsp2'
       const headers = Helper.defaultHeaders(to, 'participants', from)
-      const isoContext = { iso20022: { key: 'value' } }
+      const isoContext = { orginalRequestPayload: { key: 'value' } }
       const message = StreamingProtocol.createMessage(correlationId, to, from, metadata, headers, null, undefined, undefined, isoContext)
-      test.deepEqual(message.context, isoContext)
+      test.deepEqual(message.content.context, isoContext)
       test.end()
     })
 
