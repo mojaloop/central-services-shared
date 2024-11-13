@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.11.1](https://github.com/mojaloop/central-services-shared/compare/v18.11.0...v18.11.1) (2024-11-13)
+
+
+### Bug Fixes
+
+* **csi-421:** misleading error in fetchParticipant ([#409](https://github.com/mojaloop/central-services-shared/issues/409)) ([62fdfce](https://github.com/mojaloop/central-services-shared/commit/62fdfceef9be2df5e3cc3f2d799a3f493acf4485))
+
 ## [18.11.0](https://github.com/mojaloop/central-services-shared/compare/v18.10.0...v18.11.0) (2024-10-24)
 
 
