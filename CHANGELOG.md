@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.11.2](https://github.com/mojaloop/central-services-shared/compare/v18.11.1...v18.11.2) (2024-11-21)
+
+
+### Bug Fixes
+
+* **csi-933:** added http error response.data to logs ([#410](https://github.com/mojaloop/central-services-shared/issues/410)) ([809a633](https://github.com/mojaloop/central-services-shared/commit/809a633f2105d461704899c1c684b11fc72d91d0))
+
 ### [18.11.1](https://github.com/mojaloop/central-services-shared/compare/v18.11.0...v18.11.1) (2024-11-13)
 
 
