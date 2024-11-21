@@ -150,6 +150,7 @@ const sendRequest = async ({
     ]
     const extensions = []
     if (error.response) {
+      logger.verbose('error.response.data:', error.response.data)
       extensionArray.push({ key: 'status', value: error.response?.status })
       extensionArray.push({ key: 'response', value: error.response?.data })
       extensions.push({ key: 'status', value: error.response?.status })
