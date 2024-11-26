@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.11.2](https://github.com/mojaloop/central-services-shared/compare/v18.11.1...v18.11.2) (2024-11-21)
+
+
+### Bug Fixes
+
+* **csi-933:** added http error response.data to logs ([#410](https://github.com/mojaloop/central-services-shared/issues/410)) ([809a633](https://github.com/mojaloop/central-services-shared/commit/809a633f2105d461704899c1c684b11fc72d91d0))
+
+### [18.11.1](https://github.com/mojaloop/central-services-shared/compare/v18.11.0...v18.11.1) (2024-11-13)
+
+
+### Bug Fixes
+
+* **csi-421:** misleading error in fetchParticipant ([#409](https://github.com/mojaloop/central-services-shared/issues/409)) ([62fdfce](https://github.com/mojaloop/central-services-shared/commit/62fdfceef9be2df5e3cc3f2d799a3f493acf4485))
+
+## [18.11.0](https://github.com/mojaloop/central-services-shared/compare/v18.10.0...v18.11.0) (2024-10-24)
+
+
+### Features
+
+* add generic redis get/set cache ([#403](https://github.com/mojaloop/central-services-shared/issues/403)) ([365f2d4](https://github.com/mojaloop/central-services-shared/commit/365f2d45e349d3d262c1e14ffd1245500537a633)), closes [#405](https://github.com/mojaloop/central-services-shared/issues/405)
+* **csi-106:** added iso-20022 headers support ([#402](https://github.com/mojaloop/central-services-shared/issues/402)) ([290cad3](https://github.com/mojaloop/central-services-shared/commit/290cad3f04db1ff5d8bf042b96dffc0cf3e9f746))
+
+
+### Chore
+
+* fix bad version ([#408](https://github.com/mojaloop/central-services-shared/issues/408)) ([e100a24](https://github.com/mojaloop/central-services-shared/commit/e100a248f67c5da6c84c5b9a0fae234749f768a0))
+
 ## [18.10.0](https://github.com/mojaloop/central-services-shared/compare/v18.9.0...v18.10.0) (2024-10-14)
 
 

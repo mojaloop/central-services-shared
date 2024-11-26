@@ -80,7 +80,8 @@ const fetchParticipant = async (fsp) => {
     return participant
   } catch (e) {
     histTimer({ success: false })
-    Logger.isErrorEnabled && Logger.error(`participantCache::fetchParticipants:: ERROR:'${e}'`)
+    // We're logging this as a "warning" rather than "error" because the participant might be a proxied participant
+    Logger.isWarnEnabled && Logger.warn(`participantCache::fetchParticipants:: WARNING:'${e}'`)
   }
 }
 

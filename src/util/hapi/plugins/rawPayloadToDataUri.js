@@ -32,9 +32,9 @@
 'use strict'
 
 const getRawBody = require('raw-body')
-const encodePayload = require('../../streaming/protocol').encodePayload
-const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const { logger } = require('../../../logger')
+const { encodePayload } = require('../../streaming/protocol')
 
 const requestRawPayloadTransform = (request, payloadBuffer) => {
   try {
@@ -44,7 +44,7 @@ const requestRawPayloadTransform = (request, payloadBuffer) => {
       rawPayload: payloadBuffer
     })
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(err)
+    logger.error('error in requestRawPayloadTransform:', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -75,6 +75,7 @@ module.exports.plugin = {
       server.ext([{
         type: 'onPostAuth',
         method: async (request, h) => {
+          /* istanbul ignore next */
           if (request.payload) {
             return getRawBody(request.payload)
               .then(rawBuffer => {

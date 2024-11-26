@@ -47,6 +47,8 @@ const EventFramework = require('./eventFramework')
 const Schema = require('./schema')
 const OpenapiBackend = require('./openapiBackend')
 const id = require('./id')
+const config = require('../config')
+const { loggerFactory } = require('@mojaloop/central-services-logger/src/contextLogger')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -218,7 +220,14 @@ const filterExtensions = (extensionsArray, exclKeysArray, exclValuesArray) => {
   })
 }
 
+const createLogger = (context) => {
+  const log = loggerFactory(context)
+  log.setLevel(config.get('logLevel'))
+  return log
+}
+
 module.exports = {
+  createLogger,
   assign,
   expand,
   formatAmount,

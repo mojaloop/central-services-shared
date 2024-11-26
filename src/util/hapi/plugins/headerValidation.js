@@ -6,7 +6,14 @@
 // accuracy of this statement has not been thoroughly tested.
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
-const { parseAcceptHeader, parseContentTypeHeader, protocolVersions, convertSupportedVersionToExtensionList } = require('../../headerValidation')
+const { API_TYPES } = require('../../../constants')
+const {
+  checkApiType,
+  parseAcceptHeader,
+  parseContentTypeHeader,
+  protocolVersions,
+  convertSupportedVersionToExtensionList
+} = require('../../headerValidation')
 
 // Some defaults
 
@@ -54,8 +61,11 @@ const plugin = {
   register: function (server, /* options: */ {
     resources = defaultProtocolResources,
     supportedProtocolContentVersions = defaultProtocolVersions,
-    supportedProtocolAcceptVersions = defaultProtocolVersions
+    supportedProtocolAcceptVersions = defaultProtocolVersions,
+    apiType = API_TYPES.fspiop
   }) {
+    checkApiType(apiType)
+
     server.ext('onPostAuth', (request, h) => {
       // First, extract the resource type from the path
       const resource = request.path.replace(/^\//, '').split('/')[0]
@@ -71,7 +81,7 @@ const plugin = {
         if (request.headers.accept === undefined) {
           throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_ACCEPT_HEADER)
         }
-        const accept = parseAcceptHeader(resource, request.headers.accept)
+        const accept = parseAcceptHeader(resource, request.headers.accept, apiType)
         if (!accept.valid) {
           throw createFSPIOPError(
             Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX,
@@ -94,7 +104,7 @@ const plugin = {
       if (request.headers['content-type'] === undefined) {
         throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_CONTENT_TYPE_HEADER)
       }
-      const contentType = parseContentTypeHeader(resource, request.headers['content-type'])
+      const contentType = parseContentTypeHeader(resource, request.headers['content-type'], apiType)
       if (!contentType.valid) {
         throw createFSPIOPError(
           Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX,
