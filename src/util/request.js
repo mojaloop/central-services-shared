@@ -139,7 +139,17 @@ const sendRequest = async ({
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    logger.warn('error in request.sendRequest:', error)
+    logger.error('error in request.sendRequest:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+      method,
+      url,
+      source,
+      destination,
+      status: error.response?.status,
+      data: error.response?.data
+    })
     const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },
@@ -150,7 +160,6 @@ const sendRequest = async ({
     ]
     const extensions = []
     if (error.response) {
-      logger.verbose('error.response.data:', error.response.data)
       extensionArray.push({ key: 'status', value: error.response?.status })
       extensionArray.push({ key: 'response', value: error.response?.data })
       extensions.push({ key: 'status', value: error.response?.status })
