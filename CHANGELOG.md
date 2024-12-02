@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.12.1](https://github.com/mojaloop/central-services-shared/compare/v18.12.0...v18.12.1) (2024-12-02)
+
+
+### Chore
+
+* **moja-tools-bot:** update license md file ([#406](https://github.com/mojaloop/central-services-shared/issues/406)) ([dddff62](https://github.com/mojaloop/central-services-shared/commit/dddff625c50307bf833f8de49168f576040f2bc9))
+
 ## [18.12.0](https://github.com/mojaloop/central-services-shared/compare/v18.11.3...v18.12.0) (2024-11-29)
 
 
