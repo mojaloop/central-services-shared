@@ -115,7 +115,8 @@
       "swagger2openapi": "7.0.8"
     },
     "markdown-it": "12.3.2",
-    "trim": "0.0.3"
+    "trim": "0.0.3",
+    "cross-spawn": "6.0.6"
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": ">=13.x.x",
