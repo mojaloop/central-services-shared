@@ -63,7 +63,7 @@
     "@mojaloop/inter-scheme-proxy-cache-lib": "2.3.0",
     "axios": "1.7.8",
     "clone": "2.1.2",
-    "dotenv": "16.4.5",
+    "dotenv": "16.4.6",
     "env-var": "7.5.0",
     "event-stream": "4.0.1",
     "fast-safe-stringify": "^2.1.1",
@@ -114,7 +114,8 @@
       "markdown-it": "12.3.2",
       "swagger2openapi": "7.0.8"
     },
-    "markdown-it": "12.3.2"
+    "markdown-it": "12.3.2",
+    "trim": "0.0.3"
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": ">=13.x.x",
