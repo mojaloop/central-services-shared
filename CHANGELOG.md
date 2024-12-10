@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.13.0](https://github.com/mojaloop/central-services-shared/compare/v18.12.1...v18.13.0) (2024-12-10)
+
+
+### Features
+
+* **csi-927:** added loggingPlugin to util/hapi ([#421](https://github.com/mojaloop/central-services-shared/issues/421)) ([1676221](https://github.com/mojaloop/central-services-shared/commit/1676221faecfbb28d4838268099c7eeb0c2d836f))
+
 ### [18.12.1](https://github.com/mojaloop/central-services-shared/compare/v18.12.0...v18.12.1) (2024-12-02)
 
 
