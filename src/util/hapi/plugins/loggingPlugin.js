@@ -22,12 +22,13 @@
  * Eugen Klymniuk <eugen.klymniuk@infitx.com>
  --------------
  **********/
+/* istanbul ignore file */
 
 const { env } = require('node:process')
 const { asyncStorage } = require('@mojaloop/central-services-logger/src/contextLogger')
 const { logger } = require('../../../logger')
 
-const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(',') : ['/health', '/metrics']
+const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(',') : ['/health', '/metrics', '/ready']
 const TRACE_ID_HEADER = env.LOG_TRACE_ID_HEADER ?? 'traceid'
 
 const loggingPlugin = {
@@ -62,7 +63,6 @@ const loggingPlugin = {
         const requestId = request.info.id = `${request.info.id}__${headers[traceIdHeader]}`
         asyncStorage.enterWith({ requestId })
 
-        /* istanbul ignore next */
         if (shouldLog(path)) {
           log.info(`[==> req] ${method.toUpperCase()} ${path}`, { headers, payload, query, remoteAddress })
         }
@@ -73,7 +73,6 @@ const loggingPlugin = {
     server.ext({
       type: 'onPreResponse',
       method: (request, h) => {
-        /* istanbul ignore next */
         if (shouldLog(request.path)) {
           const { path, method, payload, response } = request
           const { received } = request.info
