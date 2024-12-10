@@ -66,7 +66,7 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
   let server
   let log
 
-  const sendMockRequest = (url = '/') => server.inject({ url })
+  const sendMockRequest = (url = '/', headers = {}) => server.inject({ url, headers })
 
   pluginTests.beforeEach(t => {
     log = sinon.spy(logger)
@@ -147,6 +147,18 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     server = await createHapiServer({ log: spyLog })
     await sendMockRequest()
     t.true(spyLog.info.callCount === 0, 'no logs to be output')
+  }))
+
+  pluginTests.test('should add traceid header to requestId, and log it', tryCatchEndTest(async t => {
+    const traceid = 'x-123456'
+    const mlLogger = sinon.spy(log.mlLogger) // actual logger used to output logs
+    server = await createHapiServer({ log })
+    await sendMockRequest('/', { traceid })
+
+    t.true(mlLogger.info.callCount === 2, 'log req/res')
+    const ctx = JSON.parse(mlLogger.info.firstCall.firstArg.split(' - ').pop())
+    t.true(ctx.requestId.endsWith(`__${traceid}`), 'log traceid as part of requestId')
+    // requestId: "1733825870277:eugen-laptop:930049:m4ib5nli:10000__x-123456"
   }))
 
   pluginTests.end()

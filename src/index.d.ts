@@ -1,4 +1,5 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
+import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 
 declare namespace CentralServicesShared {
   interface ReturnCode {
@@ -662,6 +663,12 @@ declare namespace CentralServicesShared {
   type ProtocolVersions = (string | symbol)[]
   type ApiTypeValues = 'fspiop' | 'iso20022'
 
+  type LoggingPluginOptions = {
+    log?: ILogger,
+    internalRoutes?: string[],
+    traceIdHeader?: string
+  }
+
   type HapiUtil = {
     HapiRawPayload: {
       plugin: {
@@ -686,6 +693,10 @@ declare namespace CentralServicesShared {
       defaultProtocolResources: ProtocolResources
       defaultProtocolVersions: ProtocolVersions
     };
+    loggingPlugin: {
+      name: string,
+      register: (server: Server, options?: LoggingPluginOptions) => Promise<void>
+    }
     API_TYPES: Record<ApiTypeValues, ApiTypeValues>;
   }
   // todo: define the rest of the types

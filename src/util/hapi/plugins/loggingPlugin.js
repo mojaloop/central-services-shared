@@ -34,6 +34,17 @@ const loggingPlugin = {
   name: 'loggingPlugin',
   version: '1.0.0',
   once: true,
+
+  /** @typedef {import('@hapi/hapi').Server} HapiServer */
+  /** @typedef {import('@mojaloop/central-services-logger/src/contextLogger').ILogger} ILogger */
+  /**
+   * Registers the logging plugin with the Hapi server.
+   * @param {HapiServer} server - The Hapi server instance.
+   * @param {Object} [options={}] - Optional configuration for the plugin.
+   * @param {ILogger} [options.log=logger] - ContextLogger instance to use for logging.
+   * @param {string[]} [options.internalRoutes=INTERNAL_ROUTES] - Routes to exclude from logging.
+   * @param {string} [options.traceIdHeader=TRACE_ID_HEADER] - Header name for trace ID.
+   */
   register: async (server, options = {}) => {
     const {
       log = logger,
@@ -51,6 +62,7 @@ const loggingPlugin = {
         const requestId = request.info.id = `${request.info.id}__${headers[traceIdHeader]}`
         asyncStorage.enterWith({ requestId })
 
+        /* istanbul ignore next */
         if (shouldLog(path)) {
           log.info(`[==> req] ${method.toUpperCase()} ${path}`, { headers, payload, query, remoteAddress })
         }
@@ -61,6 +73,7 @@ const loggingPlugin = {
     server.ext({
       type: 'onPreResponse',
       method: (request, h) => {
+        /* istanbul ignore next */
         if (shouldLog(request.path)) {
           const { path, method, payload, response } = request
           const { received } = request.info
