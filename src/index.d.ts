@@ -257,7 +257,7 @@ declare namespace CentralServicesShared {
     EVENT = 'event',
     FULFIL = 'fulfil',
     FX_QUOTE = 'fxquote',
-    FX_TRANSFER = 'fx-transfer',
+    FX_TRANSFER = 'fxtransfer',
     GET = 'get',
     NOTIFICATION = 'notification',
     ORACLE = 'oracle',
