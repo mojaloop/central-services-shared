@@ -131,6 +131,13 @@ const sendRequest = async ({
     if (span) {
       requestOptions = span.injectContextToHttpRequest(requestOptions)
       const { data, ...rest } = requestOptions
+      if (typeof payload === 'string') {
+        try {
+          payload = JSON.parse(payload)
+        } catch (e) {
+          // do nothing
+        }
+      }
       span.audit({ ...rest, payload }, EventSdk.AuditEventAction.egress)
     }
     logger.debug('sendRequest::requestOptions:', { requestOptions })
