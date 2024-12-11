@@ -40,6 +40,7 @@ const Event = {
     EVENT: 'event',
     FULFIL: 'fulfil',
     FX_QUOTE: 'fxquote',
+    FX_TRANSFER: 'fxtransfer',
     GET: 'get',
     NOTIFICATION: 'notification',
     ORACLE: 'oracle',
