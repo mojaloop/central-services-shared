@@ -130,7 +130,8 @@ const sendRequest = async ({
 
     if (span) {
       requestOptions = span.injectContextToHttpRequest(requestOptions)
-      span.audit(requestOptions, EventSdk.AuditEventAction.egress)
+      const { data, ...rest } = requestOptions
+      span.audit({ ...rest, payload }, EventSdk.AuditEventAction.egress)
     }
     logger.debug('sendRequest::requestOptions:', { requestOptions })
     const response = await request(requestOptions)
