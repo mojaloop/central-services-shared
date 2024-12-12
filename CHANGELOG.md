@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.14.1](https://github.com/mojaloop/central-services-shared/compare/v18.14.0...v18.14.1) (2024-12-12)
+
+
+### Chore
+
+* standardize egress audit key ([#423](https://github.com/mojaloop/central-services-shared/issues/423)) ([fa5ff1e](https://github.com/mojaloop/central-services-shared/commit/fa5ff1e9f428815db6d3cbea89d0e9a760fd6c27))
+
 ## [18.14.0](https://github.com/mojaloop/central-services-shared/compare/v18.13.0...v18.14.0) (2024-12-11)
 
 
