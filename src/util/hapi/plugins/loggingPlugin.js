@@ -28,7 +28,7 @@ const { env } = require('node:process')
 const { asyncStorage } = require('@mojaloop/central-services-logger/src/contextLogger')
 const { logger } = require('../../../logger')
 
-const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(',') : ['/health', '/metrics', '/ready']
+const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(',') : ['/health', '/metrics', '/live']
 const TRACE_ID_HEADER = env.LOG_TRACE_ID_HEADER ?? 'traceid'
 
 const loggingPlugin = {
