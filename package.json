@@ -60,9 +60,16 @@
   "dependencies": {
     "@hapi/catbox": "12.1.1",
     "@hapi/catbox-memory": "5.0.1",
+    "@mojaloop/central-services-error-handling": ">=13.x.x",
+    "@mojaloop/central-services-logger": ">=11.5.x",
+    "@mojaloop/central-services-metrics": ">=12.x.x",
+    "@mojaloop/event-sdk": "workspace:*",
     "@mojaloop/inter-scheme-proxy-cache-lib": "2.3.1",
+    "ajv": "8.x.x",
+    "ajv-keywords": "5.x.x",
     "axios": "1.7.9",
     "clone": "2.1.2",
+    "convict": "6.2.4",
     "dotenv": "16.4.7",
     "env-var": "7.5.0",
     "event-stream": "4.0.1",
@@ -121,12 +128,6 @@
     "markdown-it": "12.3.2"
   },
   "peerDependencies": {
-    "@mojaloop/central-services-error-handling": ">=13.x.x",
-    "@mojaloop/central-services-logger": ">=11.5.x",
-    "@mojaloop/central-services-metrics": ">=12.x.x",
-    "@mojaloop/event-sdk": ">=14.1.1",
-    "ajv": "8.x.x",
-    "ajv-keywords": "5.x.x"
   },
   "peerDependenciesMeta": {
     "@mojaloop/central-services-error-handling": {
