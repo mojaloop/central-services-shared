@@ -49,6 +49,7 @@ const OpenapiBackend = require('./openapiBackend')
 const id = require('./id')
 const config = require('../config')
 const { loggerFactory } = require('@mojaloop/central-services-logger/src/contextLogger')
+const rethrow = require('./rethrow')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -265,5 +266,6 @@ module.exports = {
   Schema,
   OpenapiBackend,
   id,
-  resourceVersions: Helpers.resourceVersions
+  resourceVersions: Helpers.resourceVersions,
+  rethrow
 }

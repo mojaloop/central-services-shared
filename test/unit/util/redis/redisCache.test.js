@@ -1,6 +1,7 @@
 const Test = require('tapes')(require('tape'))
 const sinon = require('sinon')
 const RedisCache = require('../../../../src/util/redis/redisCache')
+const { constructSystemExtensionError } = require('../../../../src/util/rethrow')
 
 Test('RedisCache', redisCacheTest => {
   let sandbox, redisClientStub, redisCache
@@ -118,7 +119,7 @@ Test('RedisCache', redisCacheTest => {
       await redisCache.get('key')
       t.fail('Expected error to be thrown')
     } catch (err) {
-      t.equal(err, error, 'Error thrown and rethrown correctly')
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
     }
     t.end()
   })
@@ -130,7 +131,7 @@ Test('RedisCache', redisCacheTest => {
       await redisCache.set('key', 'value', 60)
       t.fail('Expected error to be thrown')
     } catch (err) {
-      t.equal(err, error, 'Error thrown and rethrown correctly')
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
     }
     t.end()
   })
@@ -142,7 +143,7 @@ Test('RedisCache', redisCacheTest => {
       await redisCache.delete('key')
       t.fail('Expected error to be thrown')
     } catch (err) {
-      t.equal(err, error, 'Error thrown and rethrown correctly')
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
     }
     t.end()
   })
@@ -154,7 +155,7 @@ Test('RedisCache', redisCacheTest => {
       await redisCache.clearCache()
       t.fail('Expected error to be thrown')
     } catch (err) {
-      t.equal(err, error, 'Error thrown and rethrown correctly')
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
     }
     t.end()
   })
