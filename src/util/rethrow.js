@@ -18,11 +18,7 @@
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
  * Infitx
- - Vijay Kumar Guthi <vijaya.guthi@infitx.com>
  - Kevin Leyow <kevin.leyow@infitx.com>
- - Kalin Krustev <kalin.krustev@infitx.com>
- - Steven Oderayi <steven.oderayi@infitx.com>
- - Eugen Klymniuk <eugen.klymniuk@infitx.com>
  --------------
  ******/
 
