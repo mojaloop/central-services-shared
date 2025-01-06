@@ -40,7 +40,7 @@ const { logger } = require('../logger')
 const rethrowAndCountFspiopError = (error, options = {}) => {
   const { operation, step, loggerOverride } = options
   const log = loggerOverride || logger
-  log.error(error)
+  log.error(`rethrow fspiop error: ${error?.message}`)
 
   const fspiopError = ErrorHandler.Factory.reformatFSPIOPError(error)
   const extensions = fspiopError.extensions || []
@@ -78,7 +78,7 @@ const constructSystemExtensionError = (error, system) => {
 const rethrowError = (error, options = {}, system) => {
   const { loggerOverride } = options
   const log = loggerOverride || logger
-  log.error(error)
+  log.error(`rethrow fspiop error: ${error?.message}`)
   throw constructSystemExtensionError(error, system)
 }
 
