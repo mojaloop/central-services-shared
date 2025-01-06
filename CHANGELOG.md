@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.15.0](https://github.com/mojaloop/central-services-shared/compare/v18.14.2...v18.15.0) (2025-01-06)
+
+
+### Features
+
+* add rethrow functions ([#425](https://github.com/mojaloop/central-services-shared/issues/425)) ([82758d4](https://github.com/mojaloop/central-services-shared/commit/82758d4a3ffcd9cefadfcd1d22b5e2dab6aa3358))
+
 ### [18.14.2](https://github.com/mojaloop/central-services-shared/compare/v18.14.1...v18.14.2) (2024-12-20)
 
 
