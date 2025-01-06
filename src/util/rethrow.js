@@ -58,7 +58,6 @@ const rethrowAndCountFspiopError = (error, options = {}) => {
     log.error('Metrics error counter not initialized', error)
   }
 
-  log.error(`rethrowFspiopError: ${error?.message}`, { fspiopError })
   throw fspiopError
 }
 
