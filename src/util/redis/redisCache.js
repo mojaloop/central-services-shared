@@ -1,8 +1,8 @@
 const Redis = require('ioredis')
 const { createLogger } = require('../index')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
-
 const isClusterConfig = (config) => { return 'cluster' in config }
+const { rethrowRedisError } = require('../rethrow')
 
 class RedisCache {
   constructor (config, client) {
@@ -78,7 +78,7 @@ class RedisCache {
       return await this.redisClient.get(key)
     } catch (err) {
       this.log.error('Error getting key from Redis:', err)
-      throw err
+      rethrowRedisError(err)
     }
   }
 
@@ -91,7 +91,7 @@ class RedisCache {
       }
     } catch (err) {
       this.log.error('Error setting key in Redis:', err)
-      throw err
+      rethrowRedisError(err)
     }
   }
 
@@ -100,7 +100,7 @@ class RedisCache {
       await this.redisClient.del(key)
     } catch (err) {
       this.log.error('Error deleting key from Redis:', err)
-      throw err
+      rethrowRedisError(err)
     }
   }
 
@@ -112,7 +112,7 @@ class RedisCache {
       await pipeline.exec()
     } catch (err) {
       this.log.error('Error clearing Redis cache:', err)
-      throw err
+      rethrowRedisError(err)
     }
   }
 }

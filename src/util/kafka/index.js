@@ -38,7 +38,7 @@ const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const EventSdk = require('@mojaloop/event-sdk')
-
+const { rethrowKafkaError } = require('../rethrow')
 /**
  * @function ParticipantTopicTemplate
  *
@@ -59,8 +59,7 @@ const participantTopicTemplate = (template, participantName, functionality, acti
       action
     })
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(err)
-    throw ErrorHandler.Factory.reformatFSPIOPError(err)
+    rethrowKafkaError(err)
   }
 }
 
@@ -79,8 +78,7 @@ const generalTopicTemplate = (template, functionality, action) => {
   try {
     return Mustache.render(template, { functionality, action })
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(err)
-    throw ErrorHandler.Factory.reformatFSPIOPError(err)
+    rethrowKafkaError(err)
   }
 }
 
@@ -102,8 +100,7 @@ const transformGeneralTopicName = (template, functionality, action) => {
     }
     return generalTopicTemplate(template, functionality, action)
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(err)
-    throw ErrorHandler.Factory.reformatFSPIOPError(err)
+    rethrowKafkaError(err)
   }
 }
 
@@ -123,8 +120,7 @@ const transformAccountToTopicName = (template, participantName, functionality, a
   try {
     return participantTopicTemplate(template, participantName, functionality, action)
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(err)
-    throw ErrorHandler.Factory.reformatFSPIOPError(err)
+    rethrowKafkaError(err)
   }
 }
 
@@ -148,7 +144,8 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
     actionObject.config.logger = Logger
     return actionObject.config
   } catch (err) {
-    throw ErrorHandler.Factory.createInternalServerFSPIOPError(`No config found for flow='${flow}', functionality='${functionality}', action='${action}'`, err)
+    const error = ErrorHandler.Factory.createInternalServerFSPIOPError(`No config found for flow='${flow}', functionality='${functionality}', action='${action}'`, err)
+    rethrowKafkaError(error)
   }
 }
 
@@ -280,8 +277,7 @@ const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
       await consumer.commitMessageSync(message)
     } catch (err) {
       Logger.isDebugEnabled && Logger.debug(`No consumer found for topic ${kafkaTopic}`)
-      Logger.isErrorEnabled && Logger.error(err)
-      throw err
+      rethrowKafkaError(err)
     }
   }
 }
@@ -307,7 +303,8 @@ const proceed = async (defaultKafkaConfig, params, opts) => {
     message.value.to = message.value.from
 
     if (!opts.hubName) {
-      throw ErrorHandler.Factory.createInternalServerFSPIOPError('No hubName found in opts')
+      const error = ErrorHandler.Factory.createInternalServerFSPIOPError('No hubName found in opts')
+      rethrowKafkaError(error)
     }
 
     message.value.from = opts.hubName
