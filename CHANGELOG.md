@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.15.1](https://github.com/mojaloop/central-services-shared/compare/v18.15.0...v18.15.1) (2025-01-07)
+
+
+### Chore
+
+* fix vulnerabilities and clean audit-ci.jsonc ([#426](https://github.com/mojaloop/central-services-shared/issues/426)) ([d6728eb](https://github.com/mojaloop/central-services-shared/commit/d6728ebe4cae3d1b0d12eb547d9962c6c4a08098))
+
 ## [18.15.0](https://github.com/mojaloop/central-services-shared/compare/v18.14.2...v18.15.0) (2025-01-06)
 
 
