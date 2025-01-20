@@ -106,7 +106,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: '/unconfigured',
       headers: {
         accept: generateAcceptHeader(resource, [1]),
-        'content-type': generateContentTypeHeader(resource, 1)
+        'content-type': generateContentTypeHeader(resource, 1),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, 202)
@@ -119,7 +120,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       method: 'get',
       url: `/${resource}`,
       headers: {
-        'content-type': generateContentTypeHeader(resource, 1)
+        'content-type': generateContentTypeHeader(resource, 1),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, fspiopCode.httpStatusCode)
@@ -132,7 +134,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
     const opts = {
       url: `/${resource}`,
       headers: {
-        'content-type': generateContentTypeHeader(resource, 1)
+        'content-type': generateContentTypeHeader(resource, 1),
+        date: new Date().toUTCString()
       }
     }
     await Promise.all(['post', 'put'].map(async method => {
@@ -150,7 +153,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
-        accept: 'hello'
+        accept: 'hello',
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, fspiopCode.httpStatusCode)
@@ -167,7 +171,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
-        accept: generateAcceptHeader(resource, [5])
+        accept: generateAcceptHeader(resource, [5]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, fspiopCode.httpStatusCode)
@@ -185,7 +190,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}`,
       headers: {
         'content-type': 'application/json',
-        accept: generateAcceptHeader(resource, [1])
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, fspiopCode.httpStatusCode)
@@ -202,7 +208,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 5),
-        accept: generateAcceptHeader(resource, [1])
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, fspiopCode.httpStatusCode)
@@ -219,7 +226,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}/MSISDN/12346`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
-        accept: generateAcceptHeader(resource, [1])
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, 202)
@@ -233,7 +241,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}/MSISDN/12346`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 5),
-        accept: generateAcceptHeader(resource, [1])
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.statusCode, fspiopCode.httpStatusCode)
@@ -249,7 +258,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
-        accept: generateAcceptHeader(resource, [1])
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.payload, '')
@@ -263,7 +273,41 @@ Test('headerValidation plugin test', async (pluginTest) => {
       url: `/${resource}`,
       headers: {
         'content-type': generateContentTypeHeader(resource, 1),
-        accept: `application/vnd.interoperability.${resource}+json`
+        accept: `application/vnd.interoperability.${resource}+json`,
+        date: new Date().toUTCString()
+      }
+    })
+    t.is(res.payload, '')
+    t.is(res.statusCode, 202)
+    t.end()
+  })
+
+  pluginTest.test('MALFORMED_SYNTAX/INVALID_DATE_HEADER', async t => {
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX
+    const res = await server.inject({
+      method: 'put',
+      url: `/${resource}`,
+      headers: {
+        'content-type': generateContentTypeHeader(resource, 1),
+        accept: generateAcceptHeader(resource, [1]),
+        date: 'invalid-date'
+      }
+    })
+    t.is(res.statusCode, fspiopCode.httpStatusCode)
+    const payload = JSON.parse(res.payload)
+    t.is(payload.apiErrorCode.code, fspiopCode.code)
+    t.is(payload.message, 'Invalid date header')
+    t.end()
+  })
+
+  pluginTest.test('accepts valid date header', async t => {
+    const res = await server.inject({
+      method: 'put',
+      url: `/${resource}`,
+      headers: {
+        'content-type': generateContentTypeHeader(resource, 1),
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
       }
     })
     t.is(res.payload, '')
