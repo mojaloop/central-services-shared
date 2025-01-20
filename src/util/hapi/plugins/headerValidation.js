@@ -6,7 +6,10 @@
 // accuracy of this statement has not been thoroughly tested.
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
-const { API_TYPES } = require('../../../constants')
+const RootJoi = require('@hapi/joi')
+const DateExtension = require('@hapi/joi-date')
+const Joi = RootJoi.extend(DateExtension)
+const { API_TYPES, MAX_CONTENT_LENGTH } = require('../../../constants')
 const {
   checkApiType,
   parseAcceptHeader,
@@ -100,10 +103,25 @@ const plugin = {
         }
       }
 
+      const dateSchema = Joi.date().format('ddd, DD MMM YYYY HH:mm:ss [GMT]').required()
+      const dateHeader = request.headers.date
+      const { error } = dateSchema.validate(dateHeader)
+
+      if (error) {
+        throw createFSPIOPError(Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX, 'Invalid date header')
+      }
+
+      if (request.headers['content-length'] > MAX_CONTENT_LENGTH) {
+        throw createFSPIOPError(
+          Enums.FSPIOPErrorCodes.TOO_LARGE_PAYLOAD, 'Payload size is too large.'
+        )
+      }
+
       // Always validate the content-type header
       if (request.headers['content-type'] === undefined) {
         throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_CONTENT_TYPE_HEADER)
       }
+
       const contentType = parseContentTypeHeader(resource, request.headers['content-type'], apiType)
       if (!contentType.valid) {
         throw createFSPIOPError(
