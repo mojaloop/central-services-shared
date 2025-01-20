@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.15.2](https://github.com/mojaloop/central-services-shared/compare/v18.15.1...v18.15.2) (2025-01-20)
+
+
+### Chore
+
+* add date validation ([#427](https://github.com/mojaloop/central-services-shared/issues/427)) ([96b3e34](https://github.com/mojaloop/central-services-shared/commit/96b3e34cf9732178b197daa488079f1bb7ea6bf9))
+
 ### [18.15.1](https://github.com/mojaloop/central-services-shared/compare/v18.15.0...v18.15.1) (2025-01-07)
 
 
