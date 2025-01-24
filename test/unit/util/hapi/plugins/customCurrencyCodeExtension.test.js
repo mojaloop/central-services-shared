@@ -24,7 +24,7 @@
  ******/
 
 const Test = require('tape')
-const BaseJoi = require('@hapi/joi')
+const BaseJoi = require('joi')
 const currencyExtension = require('../../../../../src/util/hapi/plugins/customCurrencyCodeExtension')
 const Joi = BaseJoi.extend(currencyExtension)
 

@@ -6,7 +6,7 @@
 // accuracy of this statement has not been thoroughly tested.
 
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
-const RootJoi = require('@hapi/joi')
+const RootJoi = require('joi')
 const DateExtension = require('@hapi/joi-date')
 const Joi = RootJoi.extend(DateExtension)
 const { API_TYPES, MAX_CONTENT_LENGTH } = require('../../../constants')

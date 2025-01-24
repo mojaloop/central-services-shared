@@ -27,7 +27,7 @@
 const Hapi = require('@hapi/hapi')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Joi = require('@hapi/joi')
+const Joi = require('joi')
 const StreamingProtocol = require('../../../../../src/util').StreamingProtocol
 
 const init = async (options) => {
