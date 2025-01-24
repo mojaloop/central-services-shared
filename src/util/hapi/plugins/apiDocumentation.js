@@ -27,7 +27,7 @@ const APIDocBuilder = require('../../documentation').APIDocBuilder
 
 /**
  * Hapi plugin to add '/swagger.json' and '/documentation' endpoints.
- * It generates API documenation from supplied OpenAPI spec (json or yaml).
+ * It generates API documentation from supplied OpenAPI spec (json or yaml).
  *
  * options.documentPath - Full path to the OpenAPI (fka Swagger) document (JSON or YAML). Mutually exclusive to `document` option.
  * options.document     - OpenAPI document as string. Mutually exclusive to `documentPath` option.

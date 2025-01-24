@@ -1,4 +1,5 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
+import { Joi } from 'joi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 
 declare namespace CentralServicesShared {
@@ -663,6 +664,9 @@ declare namespace CentralServicesShared {
   type ProtocolResources = string[]
   type ProtocolVersions = (string | symbol)[]
   type ApiTypeValues = 'fspiop' | 'iso20022'
+  type APIDocumentationPluginOptions = 
+  | { documentPath: string; document?: never }
+  | { document?: string; documentPath?: never }
 
   type LoggingPluginOptions = {
     log?: ILogger,
@@ -694,10 +698,40 @@ declare namespace CentralServicesShared {
       defaultProtocolResources: ProtocolResources
       defaultProtocolVersions: ProtocolVersions
     };
+    OpenapiBackendValidator: {
+      plugin: {
+        name: string,
+        register: (server: Server) => void
+      }
+    };
+    HapiEventPlugin: {
+      plugin: {
+        name: string,
+        register: (server: Server) => void
+      }      
+    };
+    customCurrencyCodeValidation: (joi: Joi) => {
+      base: Joi.StringSchema;
+      type: string;
+      messages: {
+        'currency.base': string;
+      };
+      rules: {
+        currency: {
+          validate: (value: string, helpers: any) => string | any;
+        };
+      };
+    };
+    APIDocumentation: {
+      plugin: {
+        name: string,
+        register: (server: Server, options: APIDocumentationPluginOptions) => void
+      }
+    };
     loggingPlugin: {
       name: string,
       register: (server: Server, options?: LoggingPluginOptions) => Promise<void>
-    }
+    };
     API_TYPES: Record<ApiTypeValues, ApiTypeValues>;
   }
   // todo: define the rest of the types

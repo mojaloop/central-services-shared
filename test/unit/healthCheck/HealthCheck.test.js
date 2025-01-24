@@ -26,7 +26,7 @@
 
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Joi = require('@hapi/joi')
+const Joi = require('joi')
 
 const HealthCheck = require('../../../src/healthCheck').HealthCheck
 
