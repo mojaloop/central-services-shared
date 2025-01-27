@@ -1,4 +1,5 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
+import { Joi } from 'joi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 
 declare namespace CentralServicesShared {
