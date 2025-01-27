@@ -1,5 +1,4 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
-import { Joi } from 'joi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 
 declare namespace CentralServicesShared {
@@ -710,8 +709,8 @@ declare namespace CentralServicesShared {
         register: (server: Server) => void
       }      
     };
-    customCurrencyCodeValidation: (joi: Joi) => {
-      base: Joi.StringSchema;
+    customCurrencyCodeValidation: (joi: any) => {
+      base: any;
       type: string;
       messages: {
         'currency.base': string;
