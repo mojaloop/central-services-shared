@@ -63,7 +63,7 @@
     "@hapi/hapi": "21.3.12",
     "@hapi/joi-date": "2.0.1",
     "@mojaloop/inter-scheme-proxy-cache-lib": "2.3.1",
-    "@mojaloop/sdk-standard-components": "19.6.3",
+    "@mojaloop/sdk-standard-components": "19.6.4",
     "axios": "1.7.9",
     "clone": "2.1.2",
     "dotenv": "16.4.7",
@@ -127,7 +127,6 @@
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": ">=13.x.x",
-    "@mojaloop/central-services-logger": ">=11.5.x",
     "@mojaloop/central-services-metrics": ">=12.x.x",
     "@mojaloop/event-sdk": ">=14.1.1",
     "ajv": "8.x.x",

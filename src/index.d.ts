@@ -710,8 +710,8 @@ declare namespace CentralServicesShared {
         register: (server: Server) => void
       }      
     };
-    customCurrencyCodeValidation: (joi: Joi) => {
-      base: Joi.StringSchema;
+    customCurrencyCodeValidation: (joi: any) => {
+      base: any;
       type: string;
       messages: {
         'currency.base': string;
