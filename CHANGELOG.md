@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.17.0](https://github.com/mojaloop/central-services-shared/compare/v18.16.2...v18.17.0) (2025-01-30)
+
+
+### Features
+
+* throw better error for missing date header ([#431](https://github.com/mojaloop/central-services-shared/issues/431)) ([1125b1e](https://github.com/mojaloop/central-services-shared/commit/1125b1e48d2a0918188563386eb69495f0521a9c))
+
 ### [18.16.2](https://github.com/mojaloop/central-services-shared/compare/v18.16.1...v18.16.2) (2025-01-27)
 
 
