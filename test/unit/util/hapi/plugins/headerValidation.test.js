@@ -315,5 +315,21 @@ Test('headerValidation plugin test', async (pluginTest) => {
     t.end()
   })
 
+  pluginTest.test('throws missing element error on missing date header', async t => {
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MISSING_ELEMENT
+    const res = await server.inject({
+      method: 'put',
+      url: `/${resource}`,
+      headers: {
+        'content-type': generateContentTypeHeader(resource, 1),
+        accept: generateAcceptHeader(resource, [1])
+      }
+    })
+    t.is(res.statusCode, fspiopCode.httpStatusCode)
+    const payload = JSON.parse(res.payload)
+    t.is(payload.apiErrorCode.code, fspiopCode.code)
+    t.end()
+  })
+
   await pluginTest.end()
 })

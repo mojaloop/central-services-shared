@@ -105,8 +105,10 @@ const plugin = {
 
       const dateSchema = Joi.date().format('ddd, DD MMM YYYY HH:mm:ss [GMT]').required()
       const dateHeader = request.headers.date
+      if (dateHeader === undefined) {
+        throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, 'Missing required date header')
+      }
       const { error } = dateSchema.validate(dateHeader)
-
       if (error) {
         throw createFSPIOPError(Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX, 'Invalid date header')
       }
