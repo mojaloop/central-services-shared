@@ -130,7 +130,7 @@ const sendRequest = async ({
 
     if (span) {
       requestOptions = span.injectContextToHttpRequest(requestOptions)
-      const { data, ...rest } = requestOptions
+      const { data, httpAgent, ...rest } = requestOptions
       if (typeof payload === 'string') {
         try {
           payload = JSON.parse(payload)

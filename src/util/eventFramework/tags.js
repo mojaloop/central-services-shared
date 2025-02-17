@@ -77,7 +77,28 @@ const getSpanTags = (transactionType, transactionAction, transactionId, source, 
   }
 }
 
+/**
+ * Method to get query tags
+ *
+ * @param serviceName name of the service
+ * @param auditType type of the audit message
+ * @param contentType type of the content field kafka or http request etc
+ * @param operation operation being performed
+ * @param additionalTags additional tags to be added to the span
+ * @returns tags object to be applied to a span
+ */
+const getQueryTags = (serviceName, auditType, contentType, operation, additionalTags = {}) => {
+  return {
+    serviceName,
+    auditType,
+    contentType,
+    operation,
+    ...additionalTags
+  }
+}
+
 module.exports = {
   getTransferSpanTags,
-  getSpanTags
+  getSpanTags,
+  getQueryTags
 }

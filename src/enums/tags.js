@@ -26,6 +26,47 @@ const RouteTags = {
   SAMPLED: 'sampled'
 }
 
-module.exports = {
-  RouteTags
+const QueryTags = {
+  serviceName: {
+    accountLookupService: 'account-lookup-service',
+    accountLookupServiceAdmin: 'account-lookup-service-admin',
+  },
+  auditType: {
+    transactionFlow: 'transactionFlow',
+    partyOnboarding: 'partyOnboarding',
+    oracleAdmin: 'oracleAdmin',
+  },
+  contentType: {
+    kafkaMessage: 'kafkaMessage',
+    httpRequest: 'httpRequest',
+  },
+  operation: {
+    getParticipantsByTypeAndID: 'getParticipantsByTypeAndID',
+    putParticipantsByTypeAndID: 'putParticipantsByTypeAndID',
+    postParticipantsByTypeAndID: 'postParticipantsByTypeAndID',
+    deleteParticipantsByTypeAndID: 'deleteParticipantsByTypeAndID',
+    postParticipantsBatch: 'postParticipantsBatch',
+    getPartiesByTypeAndID: 'getPartiesByTypeAndID',
+    putPartiesByTypeAndID: 'putPartiesByTypeAndID',
+    getPartiesByTypeIDAndSubID: 'getPartiesByTypeIDAndSubID',
+    putPartiesByTypeIDAndSubID: 'putPartiesByTypeIDAndSubID',
+    putPartiesErrorByTypeAndID: 'putPartiesErrorByTypeAndID',
+    putPartiesErrorByTypeIDAndSubID: 'putPartiesErrorByTypeIDAndSubID',
+    putParticipantsErrorByTypeAndID: 'putParticipantsErrorByTypeAndID',
+    getParticipantsByTypeIdAndSubID: 'getParticipantsByTypeIdAndSubID',
+    putParticipantsByTypeIDAndSubID: 'putParticipantsByTypeIDAndSubID',
+    postParticipantsByTypeIDAndSubID: 'postParticipantsByTypeIDAndSubID',
+    deleteParticipantsByTypeIDAndSubID: 'deleteParticipantsByTypeIDAndSubID',
+    timeoutInterschemePartiesLookups: 'timeoutInterschemePartiesLookups',
+    getOracle: 'getOracle',
+    createOracle: 'createOracle',
+    updateOracle: 'updateOracle',
+    deleteOracle: 'deleteOracle',
+  },
 }
+
+module.exports = {
+  RouteTags,
+  QueryTags
+}
+
