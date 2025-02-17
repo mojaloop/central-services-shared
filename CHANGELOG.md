@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.18.0](https://github.com/mojaloop/central-services-shared/compare/v18.17.0...v18.18.0) (2025-02-17)
+
+
+### Features
+
+* align audits ALS ([#432](https://github.com/mojaloop/central-services-shared/issues/432)) ([1a7bd9c](https://github.com/mojaloop/central-services-shared/commit/1a7bd9c26a5d2c6b052950a1ff8450a8caead305))
+
 ## [18.17.0](https://github.com/mojaloop/central-services-shared/compare/v18.16.2...v18.17.0) (2025-01-30)
 
 
