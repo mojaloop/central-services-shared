@@ -28,6 +28,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Util = require('../../../../src/util')
+const Enum = require('../../../../src/enums')
 
 const headers = {
   'FSPIOP-Source': 'source',
@@ -107,5 +108,29 @@ Test('Get tags tests', test => {
     assert.deepEqual(result, expectations, 'tags match')
     assert.end()
   })
+
+  test.test('should get query tags', assert => {
+    const result = Util.EventFramework.Tags.getQueryTags(
+      Enum.Tags.QueryTags.serviceName.accountLookupService,
+      Enum.Tags.QueryTags.auditType.transactionFlow,
+      Enum.Tags.QueryTags.contentType.httpRequest,
+      Enum.Tags.QueryTags.operation.putPartiesByTypeAndID,
+      {
+        tag1: 'value1'
+      }
+    )
+
+    const expectations = {
+      serviceName: Enum.Tags.QueryTags.serviceName.accountLookupService,
+      auditType: Enum.Tags.QueryTags.auditType.transactionFlow,
+      contentType: Enum.Tags.QueryTags.contentType.httpRequest,
+      operation: Enum.Tags.QueryTags.operation.putPartiesByTypeAndID,
+      tag1: 'value1'
+    }
+
+    assert.deepEqual(result, expectations, 'tags match')
+    assert.end()
+  })
+
   test.end()
 })
