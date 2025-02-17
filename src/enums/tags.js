@@ -29,16 +29,16 @@ const RouteTags = {
 const QueryTags = {
   serviceName: {
     accountLookupService: 'account-lookup-service',
-    accountLookupServiceAdmin: 'account-lookup-service-admin',
+    accountLookupServiceAdmin: 'account-lookup-service-admin'
   },
   auditType: {
     transactionFlow: 'transactionFlow',
     partyOnboarding: 'partyOnboarding',
-    oracleAdmin: 'oracleAdmin',
+    oracleAdmin: 'oracleAdmin'
   },
   contentType: {
     kafkaMessage: 'kafkaMessage',
-    httpRequest: 'httpRequest',
+    httpRequest: 'httpRequest'
   },
   operation: {
     getParticipantsByTypeAndID: 'getParticipantsByTypeAndID',
@@ -61,12 +61,11 @@ const QueryTags = {
     getOracle: 'getOracle',
     createOracle: 'createOracle',
     updateOracle: 'updateOracle',
-    deleteOracle: 'deleteOracle',
-  },
+    deleteOracle: 'deleteOracle'
+  }
 }
 
 module.exports = {
   RouteTags,
   QueryTags
 }
-
