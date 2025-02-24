@@ -33,7 +33,9 @@ const RouteTags = {
 const QueryTags = {
   serviceName: {
     accountLookupService: 'account-lookup-service',
-    accountLookupServiceAdmin: 'account-lookup-service-admin'
+    accountLookupServiceAdmin: 'account-lookup-service-admin',
+    mlApiAdapterService: 'ml-api-adapter-service',
+    mlNotificationHandler: 'ml-notification-handler'
   },
   auditType: {
     transactionFlow: 'transactionFlow',
@@ -65,7 +67,15 @@ const QueryTags = {
     getOracle: 'getOracle',
     createOracle: 'createOracle',
     updateOracle: 'updateOracle',
-    deleteOracle: 'deleteOracle'
+    deleteOracle: 'deleteOracle',
+    getTransferByID: 'getTransferByID',
+    prepareTransfer: 'prepareTransfer',
+    fulfilTransfer: 'fulfilTransfer',
+    fulfilTransferError: 'fulfilTransferError',
+    getFxTransferByID: 'getFxTransferByID',
+    prepareFxTransfer: 'prepareFxTransfer',
+    fulfilFxTransfer: 'fulfilFxTransfer',
+    fulfilFxTransferError: 'fulfilFxTransferError'
   }
 }
 
