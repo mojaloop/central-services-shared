@@ -88,7 +88,6 @@ const sendRequest = async ({
   params,
   responseType = enums.Http.ResponseTypes.JSON,
   span = undefined,
-  auditQueryTags = undefined,
   jwsSigner = undefined,
   protocolVersions = undefined,
   apiType = API_TYPES.fspiop,
@@ -104,9 +103,6 @@ const sendRequest = async ({
   if (span) {
     sendRequestSpan = span.getChild(`${span.getContext().service}_sendRequest`)
     sendRequestSpan.setTags({ source, destination, method, url })
-    if (auditQueryTags) {
-      sendRequestSpan.setTags(auditQueryTags)
-    }
   }
   let requestOptions
   if (!url || !method || !headers || (method !== enums.Http.RestMethods.GET && method !== enums.Http.RestMethods.DELETE && !payload) || !source || !hubNameRegex) {

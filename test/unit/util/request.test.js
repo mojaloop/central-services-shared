@@ -109,7 +109,6 @@ Test('ParticipantEndpoint Model Test', modelTest => {
         return Helper.getEndPointsResponse
       }
       const span = EventSdk.Tracer.createSpan('test-span')
-      const auditQueryTags = { serviceName: 'test-service' }
       Model = proxyquire('../../../src/util/request', { axios: requestFunction })
 
       try {
@@ -121,7 +120,6 @@ Test('ParticipantEndpoint Model Test', modelTest => {
           method: Enum.Http.RestMethods.GET,
           responseType: Enum.Http.ResponseTypes.JSON,
           span,
-          auditQueryTags,
           hubNameRegex
         })
         test.deepEqual(result, Helper.getEndPointsResponse, 'The results match')
