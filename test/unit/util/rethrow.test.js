@@ -142,5 +142,31 @@ Test('rethrow.js', rethrowTest => {
     t.end()
   })
 
+  rethrowTest.test('countFspiopError should log the error and return a reformatted FSPIOP error', t => {
+    const error = new Error('Test error')
+    const fspiopError = {
+      apiErrorCode: { code: '1234' },
+      extensions: [{ key: 'system', value: 'testSystem' }]
+    }
+    ErrorHandler.Factory.reformatFSPIOPError.returns(fspiopError)
+
+    const result = rethrow.countFspiopError(error, { operation: 'testOp', step: 'testStep' })
+    t.equal(result, fspiopError, 'Error reformatted correctly')
+    t.end()
+  })
+
+  rethrowTest.test('countFspiopError should log the error and return a reformatted FSPIOP error with no options specified', t => {
+    const error = new Error('Test error')
+    const fspiopError = {
+      apiErrorCode: { code: '1234' },
+      extensions: [{ key: 'system', value: 'testSystem' }]
+    }
+    ErrorHandler.Factory.reformatFSPIOPError.returns(fspiopError)
+
+    const result = rethrow.countFspiopError(error)
+    t.equal(result, fspiopError, 'Error reformatted correctly')
+    t.end()
+  })
+
   rethrowTest.end()
 })
