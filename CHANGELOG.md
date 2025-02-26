@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.20.0](https://github.com/mojaloop/central-services-shared/compare/v18.19.0...v18.20.0) (2025-02-26)
+
+
+### Features
+
+* **csi-1194:** add audit query tags for ml-api ([#435](https://github.com/mojaloop/central-services-shared/issues/435)) ([6ffc75d](https://github.com/mojaloop/central-services-shared/commit/6ffc75de3bf50b7da072a25ff1bea8e317c21695))
+
 ## [18.19.0](https://github.com/mojaloop/central-services-shared/compare/v18.18.2...v18.19.0) (2025-02-25)
 
 
