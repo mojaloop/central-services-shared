@@ -92,8 +92,6 @@ const QueryTags = {
     abortDuplicateFxTransfer: 'abortDuplicateFxTransfer',
     fulfilTransfer: 'fulfilTransfer',
     fulfilFxTransfer: 'fulfilFxTransfer',
-    fulfilTransferError: 'fulfilTransferError',
-    fulfilFxTransferError: 'fulfilFxTransferError',
     fulfilDuplicateTransfer: 'fulfilDuplicateTransfer',
     fulfilDuplicateFxTransfer: 'fulfilDuplicateFxTransfer',
     timeoutReceived: 'timeoutReceived',
