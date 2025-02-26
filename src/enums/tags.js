@@ -33,7 +33,9 @@ const RouteTags = {
 const QueryTags = {
   serviceName: {
     accountLookupService: 'account-lookup-service',
-    accountLookupServiceAdmin: 'account-lookup-service-admin'
+    accountLookupServiceAdmin: 'account-lookup-service-admin',
+    mlApiAdapterService: 'ml-api-adapter-service',
+    mlNotificationHandler: 'ml-notification-handler'
   },
   auditType: {
     transactionFlow: 'transactionFlow',
@@ -65,7 +67,40 @@ const QueryTags = {
     getOracle: 'getOracle',
     createOracle: 'createOracle',
     updateOracle: 'updateOracle',
-    deleteOracle: 'deleteOracle'
+    deleteOracle: 'deleteOracle',
+    getTransferByID: 'getTransferByID',
+    getFxTransferByID: 'getFxTransferByID',
+    prepareTransfer: 'prepareTransfer',
+    prepareFxTransfer: 'prepareFxTransfer',
+    prepareTransferError: 'prepareTransferError',
+    prepareFxTransferError: 'prepareFxTransferError',
+    prepareTransferDuplicate: 'prepareTransferDuplicate',
+    prepareFxTransferDuplicate: 'prepareFxTransferDuplicate',
+    commitTransfer: 'commitTransfer',
+    commitFxTransfer: 'commitFxTransfer',
+    reserveTransfer: 'reserveTransfer',
+    reserveFxTransfer: 'reserveFxTransfer',
+    reservedAbortedTransfer: 'reservedAbortedTransfer',
+    reservedAbortedFxTransfer: 'reservedAbortedFxTransfer',
+    rejectTransfer: 'rejectTransfer',
+    rejectFxTransfer: 'rejectFxTransfer',
+    abortTransfer: 'abortTransfer',
+    abortFxTransfer: 'abortFxTransfer',
+    abortTransferValidation: 'abortTransferValidation',
+    abortFxTransferValidation: 'abortFxTransferValidation',
+    abortDuplicateTransfer: 'abortDuplicateTransfer',
+    abortDuplicateFxTransfer: 'abortDuplicateFxTransfer',
+    fulfilTransfer: 'fulfilTransfer',
+    fulfilFxTransfer: 'fulfilFxTransfer',
+    fulfilDuplicateTransfer: 'fulfilDuplicateTransfer',
+    fulfilDuplicateFxTransfer: 'fulfilDuplicateFxTransfer',
+    timeoutReceived: 'timeoutReceived',
+    fxTimeoutReceived: 'fxTimeoutReceived',
+    timeoutReserved: 'timeoutReserved',
+    fxTimeoutReserved: 'fxTimeoutReserved',
+    forwardedTransfer: 'forwardedTransfer',
+    forwardedFxTransfer: 'forwardedFxTransfer',
+    notifyFxTransfer: 'notifyFxTransfer'
   }
 }
 

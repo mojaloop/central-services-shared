@@ -64,7 +64,7 @@
     "@hapi/joi-date": "2.0.1",
     "@mojaloop/inter-scheme-proxy-cache-lib": "2.3.3",
     "@mojaloop/sdk-standard-components": "19.7.0",
-    "axios": "1.7.9",
+    "axios": "1.8.1",
     "clone": "2.1.2",
     "dotenv": "16.4.7",
     "env-var": "7.5.0",
