@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.19.0](https://github.com/mojaloop/central-services-shared/compare/v18.18.2...v18.19.0) (2025-02-25)
+
+
+### Features
+
+* add option to count error only ([#436](https://github.com/mojaloop/central-services-shared/issues/436)) ([7703a67](https://github.com/mojaloop/central-services-shared/commit/7703a671d85021c2954d686fb3317d3c1bc18e78))
+
 ### [18.18.2](https://github.com/mojaloop/central-services-shared/compare/v18.18.1...v18.18.2) (2025-02-21)
 
 

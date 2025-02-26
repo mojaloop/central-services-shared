@@ -38,9 +38,14 @@ const { logger } = require('../logger')
  * @throws {Error} - Throws the reformatted FSPIOP error.
  */
 const rethrowAndCountFspiopError = (error, options = {}) => {
+  const fspiopError = countFspiopError(error, options)
+  throw fspiopError
+}
+
+const countFspiopError = (error, options = {}) => {
   const { operation, step, loggerOverride } = options
   const log = loggerOverride || logger
-  log.error(`rethrow fspiop error: ${error?.message}`)
+  log.error(`fspiop error: ${error?.message}`)
 
   const fspiopError = ErrorHandler.Factory.reformatFSPIOPError(error)
   const extensions = fspiopError.extensions || []
@@ -57,8 +62,7 @@ const rethrowAndCountFspiopError = (error, options = {}) => {
   } catch (error) {
     log.error('Metrics error counter not initialized', error)
   }
-
-  throw fspiopError
+  return fspiopError
 }
 
 const constructSystemExtensionError = (error, system) => {
@@ -108,5 +112,6 @@ module.exports = {
   rethrowRedisError,
   rethrowKafkaError,
   rethrowCacheError,
-  constructSystemExtensionError
+  constructSystemExtensionError,
+  countFspiopError
 }
