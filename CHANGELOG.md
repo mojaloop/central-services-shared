@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.21.0](https://github.com/mojaloop/central-services-shared/compare/v18.20.0...v18.21.0) (2025-02-28)
+
+
+### Features
+
+* added enums for audit tags ([#437](https://github.com/mojaloop/central-services-shared/issues/437)) ([06a2f6c](https://github.com/mojaloop/central-services-shared/commit/06a2f6cfcf2d6dbab4ea71e3d1c43edf6147f5b3))
+
 ## [18.20.0](https://github.com/mojaloop/central-services-shared/compare/v18.19.0...v18.20.0) (2025-02-26)
 
 
