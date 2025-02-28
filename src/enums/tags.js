@@ -35,7 +35,9 @@ const QueryTags = {
     accountLookupService: 'account-lookup-service',
     accountLookupServiceAdmin: 'account-lookup-service-admin',
     mlApiAdapterService: 'ml-api-adapter-service',
-    mlNotificationHandler: 'ml-notification-handler'
+    mlNotificationHandler: 'ml-notification-handler',
+    quotingService: 'quoting-service',
+    quotingServiceHandler: 'quoting-service-handler'
   },
   auditType: {
     transactionFlow: 'transactionFlow',
@@ -100,7 +102,19 @@ const QueryTags = {
     fxTimeoutReserved: 'fxTimeoutReserved',
     forwardedTransfer: 'forwardedTransfer',
     forwardedFxTransfer: 'forwardedFxTransfer',
-    notifyFxTransfer: 'notifyFxTransfer'
+    notifyFxTransfer: 'notifyFxTransfer',
+    postQuotes: 'postQuotes',
+    putQuotesByID: 'putQuotesByID',
+    putQuotesErrorByID: 'putQuotesErrorByID',
+    getQuotesByID: 'getQuotesByID',
+    postFxQuotes: 'postFxQuotes',
+    putFxQuotesByID: 'putFxQuotesByID',
+    putFxQuotesErrorByID: 'putFxQuotesErrorByID',
+    getFxQuotesByID: 'getFxQuotesByID',
+    postBulkQuotes: 'postBulkQuotes',
+    putBulkQuotesByID: 'putBulkQuotesByID',
+    putBulkQuotesErrorByID: 'putBulkQuotesErrorByID',
+    getBulkQuotesByID: 'getBulkQuotesByID'
   }
 }
 
