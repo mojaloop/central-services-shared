@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.21.0",
+  "version": "18.22.0-snapshot.0",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -42,6 +42,7 @@
     "lint:fix": "npm run standard:fix",
     "test": "npm run test:unit",
     "test:header": "npx tape 'test/unit/util/headerValidation/**/*.test.js'",
+    "test:logging": "npx tape 'test/unit/util/hapi/plugins/loggingPlugin.test.js'",
     "test:trans": "npx tape 'test/unit/util/headers/transformer.test.js'",
     "test:unit": "npx tape 'test/unit/**/*.test.js' | tap-spec",
     "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
