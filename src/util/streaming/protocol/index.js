@@ -218,7 +218,6 @@ const createEventState = (status, code, description) => {
  *
  * @return {string} - Returns base64 encoded data  URI string
  */
-
 const encodePayload = (input, mimeType) => {
   if (allowedRegexForMimeTypes.test(mimeType)) {
     return (input instanceof Buffer)
@@ -308,7 +307,6 @@ const decodePayload = (input, { asParsed = true } = {}) => {
  *
  * @returns {(Protocol~Message\|Protocol~Message[])} - messages with decoded payload
  */
-
 const decodeMessages = (messages) => {
   const decodeMessage = (message) => {
     const decodedMessage = clone(message)

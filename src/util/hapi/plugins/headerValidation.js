@@ -114,9 +114,7 @@ const plugin = {
       }
 
       if (request.headers['content-length'] > MAX_CONTENT_LENGTH) {
-        throw createFSPIOPError(
-          Enums.FSPIOPErrorCodes.TOO_LARGE_PAYLOAD, 'Payload size is too large.'
-        )
+        throw createFSPIOPError(Enums.FSPIOPErrorCodes.TOO_LARGE_PAYLOAD, 'Payload size is too large')
       }
 
       // Always validate the content-type header

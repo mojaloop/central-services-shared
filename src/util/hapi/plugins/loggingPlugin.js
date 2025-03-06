@@ -83,9 +83,10 @@ const loggingPlugin = {
           const statusCode = response instanceof Error
             ? response.output?.statusCode
             : response.statusCode
+          const { output } = response
           const respTimeSec = ((Date.now() - received) / 1000).toFixed(1)
 
-          log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path} [${respTimeSec} sec]`, { payload })
+          log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path} [${respTimeSec} sec]`, { payload, output })
         }
         return h.continue
       }
