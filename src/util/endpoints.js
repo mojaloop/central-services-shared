@@ -31,17 +31,19 @@
 
 const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const Metrics = require('@mojaloop/central-services-metrics')
+const proxyLib = require('@mojaloop/inter-scheme-proxy-cache-lib')
 const Catbox = require('@hapi/catbox')
 const CatboxMemory = require('@hapi/catbox-memory')
+const Mustache = require('mustache')
 const { Map } = require('immutable')
+
 const Enum = require('../enums')
 const Http = require('./http')
 const request = require('./request')
+
 const partition = 'endpoint-cache'
 const clientOptions = { partition }
-const Mustache = require('mustache')
-const Metrics = require('@mojaloop/central-services-metrics')
-const proxyLib = require('@mojaloop/inter-scheme-proxy-cache-lib')
 
 let client
 let policy

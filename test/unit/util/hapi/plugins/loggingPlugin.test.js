@@ -99,20 +99,20 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     server = await createHapiServer({
       log,
       handler: async () => {
-        logger.info('test log message', { x: 1 }) // should have access to asyncLocalStorage
+        logger.info('inside handler') // should have access to asyncLocalStorage
         return true
       }
     })
 
     await Promise.all([
-      sendMockRequest(),
-      sendMockRequest()
+      sendMockRequest('/1', { traceid: '1111' }),
+      sendMockRequest('/2')
     ])
 
     t.true(log.info.callCount === 6, 'logged both requests')
     log.info.args.forEach((arg) => {
       const logMeta = arg[1] // 2nd param, passed as object to log.info()
-      t.equal(logMeta.requestId, undefined, 'no requestId passed to 2nd param of log.info()')
+      t.equal(logMeta?.requestId, undefined, 'no requestId passed to 2nd param of log.info()')
     })
 
     const actualContexts = mlLogger.info.args.map((arg) => {
@@ -128,12 +128,13 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
   pluginTests.test('should log error status code in case of failed request handler', tryCatchEndTest(async t => {
     server = await createHapiServer({
       log,
-      handler: async () => { throw new Error('Test Eerror') }
+      handler: async () => { throw new Error('Test Error') }
     })
     const { statusCode } = await sendMockRequest()
     t.true(statusCode === 500, 'handler failed')
     t.true(log.info.callCount === 2, 'log request/response')
     t.true(log.info.lastCall.firstArg.startsWith('[<== 500]'), 'error code is logged')
+    t.ok(log.info.lastCall.lastArg.output.payload, 'error output is logged')
   }))
 
   pluginTests.test('should not log requests on internal routes', tryCatchEndTest(async t => {
