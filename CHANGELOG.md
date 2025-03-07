@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.22.1](https://github.com/mojaloop/central-services-shared/compare/v18.22.0...v18.22.1) (2025-03-07)
+
+
+### Bug Fixes
+
+* **csi-1297:** used logger.child() to create a new logger ([#439](https://github.com/mojaloop/central-services-shared/issues/439)) ([3e25d16](https://github.com/mojaloop/central-services-shared/commit/3e25d163b63147b93def4058b9bb8aecb6716bf9))
+
 ## [18.22.0](https://github.com/mojaloop/central-services-shared/compare/v18.21.0...v18.22.0) (2025-03-06)
 
 
