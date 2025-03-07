@@ -31,6 +31,9 @@
 'use strict'
 
 const _ = require('lodash')
+const { logger } = require('../logger')
+const config = require('../config')
+
 const Kafka = require('./kafka')
 const Endpoints = require('./endpoints')
 const Participants = require('./participants')
@@ -51,8 +54,6 @@ const EventFramework = require('./eventFramework')
 const Schema = require('./schema')
 const OpenapiBackend = require('./openapiBackend')
 const id = require('./id')
-const config = require('../config')
-const { loggerFactory } = require('@mojaloop/central-services-logger/src/contextLogger')
 const rethrow = require('./rethrow')
 
 const omitNil = (object) => {
@@ -225,8 +226,8 @@ const filterExtensions = (extensionsArray, exclKeysArray, exclValuesArray) => {
   })
 }
 
-const createLogger = (context) => {
-  const log = loggerFactory(context)
+const createLogger = (component) => {
+  const log = logger.child({ component })
   log.setLevel(config.get('logLevel'))
   return log
 }
