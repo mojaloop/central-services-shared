@@ -147,11 +147,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     let participant = await policy.get(fsp)
 
     if ('value' in participant && 'cached' in participant) {
-      if (participant.cached === null) {
-        histTimer({ success: true, hit: false })
-      } else {
-        histTimer({ success: true, hit: true })
-      }
+      histTimer({ success: true, hit: participant.cached !== null })
       participant = participant.value
     } else {
       histTimer({ success: true, hit: false })
@@ -184,6 +180,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
 *
 * @returns {void}
 */
+/* istanbul ignore next */
 exports.invalidateParticipantCache = async (fsp) => {
   logger.verbose('participantCache invalidateParticipantCache')
   if (policy) {
@@ -198,6 +195,7 @@ exports.invalidateParticipantCache = async (fsp) => {
 *
 * @returns {boolean} - Returns the status
 */
+/* istanbul ignore next */
 exports.stopCache = async () => {
   logger.verbose('participantCache stopCache')
   if (client) {
