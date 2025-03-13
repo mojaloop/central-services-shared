@@ -85,14 +85,14 @@ const fetchParticipant = async (fsp) => {
       hubNameRegex
     })
     const participant = response.data
-    log.verbose('returning the participant', { participant })
+    log.verbose('fetchParticipant is done', { participant })
     histTimer({ success: true })
 
     return participant
   } catch (err) {
     histTimer({ success: false })
     // We're logging this as a "warning" rather than "error" because the participant might be a proxied participant
-    log.warn(`error in fetchParticipants: ${err?.message}'`, err)
+    log.warn('error in fetchParticipants: ', err)
   }
 }
 
@@ -168,7 +168,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     return participant
   } catch (err) {
     histTimer({ success: false, hit: false })
-    log.error(`error in getParticipant: ${err?.message}`, err)
+    log.error('error in getParticipant: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }

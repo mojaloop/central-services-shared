@@ -96,12 +96,12 @@ const fetchEndpoints = async (fsp) => {
         endpointMap[item.type] = item.value
       })
     }
-    log.debug('returning the endpoints:', { endpointMap })
+    log.verbose('fetchEndpoints is done', { endpointMap })
     histTimer({ success: true })
 
     return endpointMap
   } catch (err) {
-    log.error(`error in fetchEndpoints: ${err?.message}`, err)
+    log.error('error in fetchEndpoints: ', err)
   }
 }
 
@@ -129,7 +129,7 @@ exports.initializeCache = async (policyOptions, config) => {
     logger.verbose('initializeCache is done successfully', { hubName, hubNameRegex })
     return true
   } catch (err) {
-    logger.error(`error in initializeCache: ${err?.message}`, err)
+    logger.error('error in initializeCache: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -199,7 +199,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     return result(Mustache.render(endpoint, options))
   } catch (err) {
     histTimer({ success: false, hit: false })
-    log.error(`error in getEndpoint: ${err?.message}`, err)
+    log.error('error in getEndpoint: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -233,7 +233,7 @@ exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', o
     return endpoint
   } catch (err) {
     histTimer({ success: false })
-    log.error(`error in getEndpointAndRender: ${err?.message}`, err)
+    log.error('error in getEndpointAndRender: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }

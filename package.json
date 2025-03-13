@@ -85,7 +85,7 @@
     "yaml": "2.7.0"
   },
   "devDependencies": {
-    "@mojaloop/sdk-standard-components": "19.10.1",
+    "@mojaloop/sdk-standard-components": "19.10.3",
     "@types/hapi__joi": "17.1.15",
     "audit-ci": "7.1.0",
     "base64url": "3.0.1",
