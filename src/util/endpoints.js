@@ -29,7 +29,6 @@
 
 'use strict'
 
-const Logger = require('@mojaloop/central-services-logger')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
 const proxyLib = require('@mojaloop/inter-scheme-proxy-cache-lib')
@@ -38,6 +37,7 @@ const CatboxMemory = require('@hapi/catbox-memory')
 const Mustache = require('mustache')
 const { Map } = require('immutable')
 
+const logger = require('../logger').logger.child({ component: 'participantEndpointCache' })
 const Enum = require('../enums')
 const Http = require('./http')
 const request = require('./request')
@@ -66,8 +66,9 @@ const fetchEndpoints = async (fsp) => {
     'fetchParticipants - Metrics for fetchParticipants',
     ['success']
   ).startTimer()
+  const log = logger.child({ fsp, method: 'fetchEndpoints' })
   try {
-    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Refreshing the cache for FSP: ${fsp}`)
+    log.debug('refreshing the cache for FSP')
     if (!hubName) {
       throw Error('"hubName" is not initialized. Initialize the cache first.')
     }
@@ -76,7 +77,8 @@ const fetchEndpoints = async (fsp) => {
     }
     const defaultHeaders = Http.SwitchDefaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName)
     const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp })
-    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := URL for FSP: ${url}`)
+    log.verbose('url for PARTICIPANT_ENDPOINTS_GET', { url })
+
     const response = await request.sendRequest({
       url,
       headers: defaultHeaders,
@@ -84,8 +86,9 @@ const fetchEndpoints = async (fsp) => {
       destination: hubName,
       hubNameRegex
     })
-    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ Model::participantEndpoint::fetchEndpoints := successful with body: ${JSON.stringify(response.data)}`)
     const endpoints = response.data
+    log.debug('fetchEndpoints raw response.data:', { endpoints })
+
     const endpointMap = {}
     if (Array.isArray(endpoints)) {
       endpoints.forEach(item => {
@@ -93,12 +96,12 @@ const fetchEndpoints = async (fsp) => {
         endpointMap[item.type] = item.value
       })
     }
-    Logger.isDebugEnabled && Logger.debug(`[fsp=${fsp}] ~ participantEndpointCache::fetchEndpoints := Returning the endpoints: ${JSON.stringify(endpointMap)}`)
+    log.verbose('fetchEndpoints is done', { endpointMap })
     histTimer({ success: true })
+
     return endpointMap
-  } catch (e) {
-    histTimer({ success: false })
-    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::fetchEndpoints:: ERROR:'${e}'`)
+  } catch (err) {
+    log.error('error in fetchEndpoints: ', err)
   }
 }
 
@@ -116,18 +119,17 @@ const fetchEndpoints = async (fsp) => {
  */
 exports.initializeCache = async (policyOptions, config) => {
   try {
-    Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
+    logger.debug('initializeCache start', { clientOptions, policyOptions })
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
     policyOptions.generateFunc = fetchEndpoints
-    Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
     policy = new Catbox.Policy(policyOptions, client, partition)
-    Logger.isDebugEnabled && Logger.debug('participantEndpointCache::initializeCache::Cache initialized successfully')
     hubName = config.hubName
     hubNameRegex = config.hubNameRegex
+    logger.verbose('initializeCache is done successfully', { hubName, hubNameRegex })
     return true
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::Cache error:: ERROR:'${err}'`)
+    logger.error('error in initializeCache: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -152,9 +154,11 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     ['success', 'hit']
   ).startTimer()
   switchEndpoint = switchUrl
-  Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpoint::endpointType - ${endpointType}`)
+  const log = logger.child({ fsp, endpointType, method: 'getEndpoint' })
+  log.debug('getEndpoint start', { switchUrl })
   let proxyId
   const result = url => proxyConfig?.enabled ? { url, proxyId } : url
+
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
@@ -168,7 +172,11 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       proxyId = await proxy.lookupProxyByDfspId(fsp)
       endpoints = proxyId && await policy.get(proxyId)
     }
-    if (!endpoints) throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
+    if (!endpoints) {
+      log.warn('no endpoints found for fsp')
+      throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
+    }
+
     if ('value' in endpoints && 'cached' in endpoints) {
       if (endpoints.cached === null) {
         histTimer({ success: true, hit: false })
@@ -182,6 +190,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       }
       return result(Mustache.render(endpoint, options))
     }
+
     let endpoint = new Map(endpoints).get(endpointType)
     if (renderOptions.path) {
       endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
@@ -190,7 +199,7 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
     return result(Mustache.render(endpoint, options))
   } catch (err) {
     histTimer({ success: false, hit: false })
-    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpoint:: ERROR:'${err}'`)
+    log.error('error in getEndpoint: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -215,7 +224,8 @@ exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', o
     ['success']
   ).startTimer()
   switchEndpoint = switchUrl
-  Logger.isDebugEnabled && Logger.debug(`participantEndpointCache::getEndpointAndRender::endpointType - ${endpointType}`)
+  const log = logger.child({ fsp, endpointType })
+  log.debug('getEndpointAndRender start', { switchUrl, path })
 
   try {
     const endpoint = exports.getEndpoint(switchUrl, fsp, endpointType, options, { path })
@@ -223,7 +233,7 @@ exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', o
     return endpoint
   } catch (err) {
     histTimer({ success: false })
-    Logger.isErrorEnabled && Logger.error(`participantEndpointCache::getEndpointAndRender:: ERROR:'${err}'`)
+    log.error('error in getEndpointAndRender: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -236,7 +246,7 @@ exports.getEndpointAndRender = async (switchUrl, fsp, endpointType, path = '', o
  * @returns {boolean} - Returns the status
  */
 exports.stopCache = async () => {
-  Logger.isDebugEnabled && Logger.debug('participantEndpointCache::stopCache::Stopping the cache')
+  logger.verbose('stopping the cache')
   if (client) {
     return client.stop()
   }
@@ -252,6 +262,7 @@ exports.stopCache = async () => {
 exports.stopProxy = async () => {
   const result = await proxy?.disconnect()
   proxy = undefined
+  logger.verbose('proxy disconnected')
   return result
 }
 

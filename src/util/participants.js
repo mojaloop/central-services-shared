@@ -28,17 +28,19 @@
 
 'use strict'
 
-const Logger = require('@mojaloop/central-services-logger')
-const Catbox = require('@hapi/catbox')
-const CatboxMemory = require('@hapi/catbox-memory')
-const Http = require('./http')
-const Enum = require('../enums')
-const partition = 'participant-cache'
-const clientOptions = { partition }
-const Mustache = require('mustache')
-const request = require('./request')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
+const Catbox = require('@hapi/catbox')
+const CatboxMemory = require('@hapi/catbox-memory')
+const Mustache = require('mustache')
+
+const logger = require('../logger').logger.child({ component: 'participantCache' })
+const Enum = require('../enums')
+const Http = require('./http')
+const request = require('./request')
+
+const partition = 'participant-cache'
+const clientOptions = { partition }
 
 let client
 let policy
@@ -61,8 +63,10 @@ const fetchParticipant = async (fsp) => {
     'fetchParticipant - Metrics for fetchParticipant',
     ['success']
   ).startTimer()
+  const log = logger.child({ fsp, method: 'fetchParticipant' })
+
   try {
-    Logger.isDebugEnabled && Logger.debug('participantCache::fetchParticipant := Refreshing participant cache')
+    log.debug('refreshing participant cache', { hubName })
     if (!hubName) {
       throw Error('"hubName" is not initialized. Initialize the cache first.')
     }
@@ -71,7 +75,8 @@ const fetchParticipant = async (fsp) => {
     }
     const defaultHeaders = Http.SwitchDefaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName)
     const url = Mustache.render(switchEndpoint + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
-    Logger.isDebugEnabled && Logger.debug(`participantCache::fetchParticipant := URL: ${url}`)
+    log.verbose('url for PARTICIPANTS_GET', { url })
+
     const response = await request.sendRequest({
       url,
       headers: defaultHeaders,
@@ -80,12 +85,14 @@ const fetchParticipant = async (fsp) => {
       hubNameRegex
     })
     const participant = response.data
+    log.verbose('fetchParticipant is done', { participant })
     histTimer({ success: true })
+
     return participant
-  } catch (e) {
+  } catch (err) {
     histTimer({ success: false })
     // We're logging this as a "warning" rather than "error" because the participant might be a proxied participant
-    Logger.isWarnEnabled && Logger.warn(`participantCache::fetchParticipants:: WARNING:'${e}'`)
+    log.warn('error in fetchParticipants: ', err)
   }
 }
 
@@ -99,18 +106,17 @@ const fetchParticipant = async (fsp) => {
 */
 exports.initializeCache = async (policyOptions, config) => {
   try {
-    Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
+    logger.debug('participantCache::initializeCache start', { clientOptions, policyOptions })
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
     policyOptions.generateFunc = fetchParticipant
-    Logger.isDebugEnabled && Logger.debug(`participantCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
     policy = new Catbox.Policy(policyOptions, client, partition)
-    Logger.isDebugEnabled && Logger.debug('participantCache::initializeCache::Cache initialized successfully')
     hubName = config.hubName
     hubNameRegex = config.hubNameRegex
+    logger.verbose('participantCache::initializeCache is done', { hubName })
     return true
   } catch (err) {
-    Logger.isErrorEnabled && Logger.error(`participantCache::Cache error:: ERROR:'${err}'`)
+    logger.error(`error in participantCache::initializeCache: ${err?.message}`, err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -132,7 +138,8 @@ exports.getParticipant = async (switchUrl, fsp) => {
     ['success', 'hit']
   ).startTimer()
   switchEndpoint = switchUrl
-  Logger.isDebugEnabled && Logger.debug('participantCache::getParticipant')
+  const log = logger.child({ fsp, method: 'getParticipant' })
+  log.debug('getParticipant start', { switchUrl })
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
     // { value, cached, report } is returned, where value is the cached value,
@@ -140,11 +147,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     let participant = await policy.get(fsp)
 
     if ('value' in participant && 'cached' in participant) {
-      if (participant.cached === null) {
-        histTimer({ success: true, hit: false })
-      } else {
-        histTimer({ success: true, hit: true })
-      }
+      histTimer({ success: true, hit: participant.cached !== null })
       participant = participant.value
     } else {
       histTimer({ success: true, hit: false })
@@ -152,9 +155,10 @@ exports.getParticipant = async (switchUrl, fsp) => {
 
     /* istanbul ignore next */
     if (!participant) {
-      Logger.isWarnEnabled && Logger.warn('participantCache::getParticipant - no participant found')
+      log.warn('no participant found')
       return null
     }
+    log.verbose('getParticipant result:', { participant })
 
     if (participant.errorInformation) {
       // Drop error from cache
@@ -164,7 +168,7 @@ exports.getParticipant = async (switchUrl, fsp) => {
     return participant
   } catch (err) {
     histTimer({ success: false, hit: false })
-    Logger.isErrorEnabled && Logger.error(`participantCache::getParticipant:: ERROR:'${err}'`)
+    log.error('error in getParticipant: ', err)
     throw ErrorHandler.Factory.reformatFSPIOPError(err)
   }
 }
@@ -176,8 +180,9 @@ exports.getParticipant = async (switchUrl, fsp) => {
 *
 * @returns {void}
 */
+/* istanbul ignore next */
 exports.invalidateParticipantCache = async (fsp) => {
-  Logger.isDebugEnabled && Logger.debug('participantCache::invalidateParticipantCache::Invalidating the cache')
+  logger.verbose('participantCache invalidateParticipantCache')
   if (policy) {
     return policy.drop(fsp)
   }
@@ -190,8 +195,9 @@ exports.invalidateParticipantCache = async (fsp) => {
 *
 * @returns {boolean} - Returns the status
 */
+/* istanbul ignore next */
 exports.stopCache = async () => {
-  Logger.isDebugEnabled && Logger.debug('participantCache::stopCache::Stopping the cache')
+  logger.verbose('participantCache stopCache')
   if (client) {
     return client.stop()
   }
