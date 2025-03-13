@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.22.4](https://github.com/mojaloop/central-services-shared/compare/v18.22.3...v18.22.4) (2025-03-13)
+
+
+### Chore
+
+* **csi-1233:** improved participantEndpointCache logging ([#440](https://github.com/mojaloop/central-services-shared/issues/440)) ([94eb898](https://github.com/mojaloop/central-services-shared/commit/94eb898a0d3cb9152390162d5fefca24a6c6082e))
+
 ### [18.22.3](https://github.com/mojaloop/central-services-shared/compare/v18.22.2...v18.22.3) (2025-03-12)
 
 
