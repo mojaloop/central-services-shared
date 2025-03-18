@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.23.0](https://github.com/mojaloop/central-services-shared/compare/v18.22.4...v18.23.0) (2025-03-18)
+
+
+### Features
+
+* add context and expected labels to errorCount metric ([#443](https://github.com/mojaloop/central-services-shared/issues/443)) ([f794188](https://github.com/mojaloop/central-services-shared/commit/f794188b8a37dfcf35f7df858e672d1f2e075454))
+
 ### [18.22.4](https://github.com/mojaloop/central-services-shared/compare/v18.22.3...v18.22.4) (2025-03-13)
 
 
