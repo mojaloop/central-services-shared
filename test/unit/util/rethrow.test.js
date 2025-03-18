@@ -32,7 +32,7 @@ const { propagation, context } = require('@opentelemetry/api')
 Test('rethrow.js', rethrowTest => {
   let sandbox
 
-  metrics.setup({defaultMetrics: false})
+  metrics.setup({ defaultMetrics: false })
 
   rethrowTest.beforeEach(t => {
     sandbox = sinon.createSandbox()

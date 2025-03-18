@@ -136,7 +136,7 @@
     "yargs-parser": "21.1.1"
   },
   "peerDependencies": {
-    "@mojaloop/central-services-logger": ">=11.x.x",
+    "@mojaloop/central-services-logger": "^11.6.2",
     "@mojaloop/central-services-error-handling": ">=13.x.x",
     "@mojaloop/central-services-metrics": "^12.5.0",
     "@mojaloop/event-sdk": ">=14.1.1",
