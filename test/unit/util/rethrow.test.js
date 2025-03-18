@@ -26,9 +26,13 @@ const Test = require('tapes')(require('tape'))
 const sinon = require('sinon')
 const rethrow = require('../../../src/util/rethrow')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
+const metrics = require('@mojaloop/central-services-metrics')
+const { propagation, context } = require('@opentelemetry/api')
 
 Test('rethrow.js', rethrowTest => {
   let sandbox
+
+  metrics.setup({defaultMetrics: false})
 
   rethrowTest.beforeEach(t => {
     sandbox = sinon.createSandbox()
@@ -165,6 +169,43 @@ Test('rethrow.js', rethrowTest => {
 
     const result = rethrow.countFspiopError(error)
     t.equal(result, fspiopError, 'Error reformatted correctly')
+    t.end()
+  })
+
+  rethrowTest.test('countFspiopError should count expected errors', t => {
+    const error = new Error()
+    const fspiopError = {
+      apiErrorCode: { code: '1234' },
+      extensions: [{ key: 'system', value: 'testSystem' }]
+    }
+    ErrorHandler.Factory.reformatFSPIOPError.returns(fspiopError)
+
+    require('@opentelemetry/auto-instrumentations-node/register')
+    context.with(propagation.setBaggage(
+      context.active(),
+      propagation.createBaggage({ errorExpect: { value: 'test.1234' } })
+    ), () => {
+      const result = rethrow.with('test').countFspiopError(error)
+      t.equal(result, fspiopError, 'Error reformatted correctly')
+    })
+    t.end()
+  })
+
+  rethrowTest.test('countFspiopError should count unexpected errors', t => {
+    const error = new Error()
+    const fspiopError = {
+      apiErrorCode: { code: '1234' },
+      extensions: [{ key: 'system', value: 'testSystem' }]
+    }
+    ErrorHandler.Factory.reformatFSPIOPError.returns(fspiopError)
+
+    context.with(propagation.setBaggage(
+      context.active(),
+      propagation.createBaggage({ errorExpect: { value: 'test.1000' } })
+    ), () => {
+      const result = rethrow.with('test').countFspiopError(error)
+      t.equal(result, fspiopError, 'Error reformatted correctly')
+    })
     t.end()
   })
 

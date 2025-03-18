@@ -88,8 +88,9 @@
   "devDependencies": {
     "@mojaloop/central-services-logger": "^11.6.2",
     "@mojaloop/central-services-error-handling": "^13.0.7",
-    "@mojaloop/central-services-metrics": "^12.4.5",
+    "@mojaloop/central-services-metrics": "^12.5.0",
     "@mojaloop/event-sdk": "^14.3.2",
+    "@opentelemetry/auto-instrumentations-node": "^0.56.1",
     "ajv": "^8.17.1",
     "ajv-keywords": "^5.1.0",
     "ajv-formats": "^3.0.1",
@@ -137,7 +138,7 @@
   "peerDependencies": {
     "@mojaloop/central-services-logger": ">=11.x.x",
     "@mojaloop/central-services-error-handling": ">=13.x.x",
-    "@mojaloop/central-services-metrics": ">=12.x.x",
+    "@mojaloop/central-services-metrics": "^12.5.0",
     "@mojaloop/event-sdk": ">=14.1.1",
     "ajv": "8.x.x",
     "ajv-formats": "3.x.x",

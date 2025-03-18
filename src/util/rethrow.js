@@ -46,6 +46,7 @@ const rethrowAndCountFspiopError = (error, options = {}, context) => {
 const countFspiopError = (error, options = {}, context) => {
   const { operation, step, loggerOverride } = options
   const log = loggerOverride || logger
+  if (error?.message) log.error(error?.message, error)
 
   const fspiopError = ErrorHandler.Factory.reformatFSPIOPError(error)
   const extensions = fspiopError.extensions || []
@@ -62,14 +63,6 @@ const countFspiopError = (error, options = {}, context) => {
 
   try {
     const errorCounter = Metrics.getCounter('errorCount')
-    console.log({
-      code: fspiopError?.apiErrorCode.code,
-      context,
-      expected,
-      system,
-      operation,
-      step
-    })
     errorCounter.inc({
       code: fspiopError?.apiErrorCode.code,
       context,
