@@ -24,6 +24,7 @@
 
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
+const { propagation } = require('@opentelemetry/api')
 
 const { logger } = require('../logger')
 
@@ -37,24 +38,35 @@ const { logger } = require('../logger')
  * @param {Object} [options.loggerOverride] - An optional logger to override the default logger.
  * @throws {Error} - Throws the reformatted FSPIOP error.
  */
-const rethrowAndCountFspiopError = (error, options = {}) => {
-  const fspiopError = countFspiopError(error, options)
+const rethrowAndCountFspiopError = (error, options = {}, context) => {
+  const fspiopError = countFspiopError(error, options, context)
   throw fspiopError
 }
 
-const countFspiopError = (error, options = {}) => {
+const countFspiopError = (error, options = {}, context) => {
   const { operation, step, loggerOverride } = options
   const log = loggerOverride || logger
-  log.error(`fspiop error: ${error?.message}`)
+  if (error?.message) log.error(error?.message, error)
 
   const fspiopError = ErrorHandler.Factory.reformatFSPIOPError(error)
   const extensions = fspiopError.extensions || []
   const system = extensions.find((element) => element.key === 'system')?.value || ''
 
+  const errorExpect = propagation.getActiveBaggage()?.getEntry('errorExpect')
+  let expected = 0
+  if (fspiopError?.apiErrorCode?.code && context) {
+    if (errorExpect) {
+      const expectedCode = `${context}.${fspiopError.apiErrorCode.code}`
+      if (errorExpect.value.split('|').includes(expectedCode)) expected = 1
+    }
+  }
+
   try {
     const errorCounter = Metrics.getCounter('errorCount')
     errorCounter.inc({
       code: fspiopError?.apiErrorCode.code,
+      context,
+      expected,
       system,
       operation,
       step
@@ -113,5 +125,10 @@ module.exports = {
   rethrowKafkaError,
   rethrowCacheError,
   constructSystemExtensionError,
-  countFspiopError
+  countFspiopError,
+  with: context => ({
+    ...module.exports,
+    countFspiopError: (error, options) => countFspiopError(error, options, context),
+    rethrowAndCountFspiopError: (error, options) => rethrowAndCountFspiopError(error, options, context)
+  })
 }

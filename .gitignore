@@ -53,3 +53,5 @@ yarn.lock
 
 # Ignore test results
 **/test/results/*
+
+.rush
