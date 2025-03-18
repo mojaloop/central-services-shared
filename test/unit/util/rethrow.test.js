@@ -68,7 +68,7 @@ Test('rethrow.js', rethrowTest => {
     ErrorHandler.Factory.reformatFSPIOPError.returns(fspiopError)
 
     try {
-      rethrow.rethrowAndCountFspiopError(error, { operation: 'testOp', step: 'testStep' })
+      rethrow.with('context').rethrowAndCountFspiopError(error, { operation: 'testOp', step: 'testStep' })
       t.fail('Expected error to be thrown')
     } catch (err) {
       t.equal(err, fspiopError, 'Error rethrown correctly')
