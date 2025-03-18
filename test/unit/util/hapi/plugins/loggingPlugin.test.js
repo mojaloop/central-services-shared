@@ -116,7 +116,7 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     })
 
     const actualContexts = mlLogger.info.args.map((arg) => {
-      const ctx = JSON.parse(arg[0].split(' - ').pop())
+      const ctx = arg[1]
       // Actual log string looks like: [==> req] GET / - {"context":"CSSh","headers":{"host":"localhost:11000","user-agent":"shot"},"query":{},"remoteAddress":"127.0.0.1","requestId":"1733823072333:eugen-laptop:485486:m4i9hooy:10000__undefined"}
       // So we need to parse the last part of the string (after " - ") to get the context
       t.true(typeof ctx.requestId === 'string', 'requestId is added to logs using asyncLocalStorage')
@@ -160,7 +160,7 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     await sendMockRequest('/', { traceid })
 
     t.true(mlLogger.info.callCount === 2, 'log req/res')
-    const ctx = JSON.parse(mlLogger.info.firstCall.firstArg.split(' - ').pop())
+    const ctx = mlLogger.info.firstCall.args[1]
     t.true(ctx.requestId.endsWith(`__${traceid}`), 'log traceid as part of requestId')
     // requestId: "1733825870277:eugen-laptop:930049:m4ib5nli:10000__x-123456"
   }))

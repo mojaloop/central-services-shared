@@ -30,7 +30,7 @@
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const OpenAPIBackend = require('openapi-backend').default
 const Ajv = require('ajv')
-const addFormats = require("ajv-formats")
+const addFormats = require('ajv-formats')
 
 /// The below custom OpenAPIValidator is no longer needed when using AJV v8.x as it supports unicode by default - https://ajv.js.org/v6-to-v8-migration.html. Keeping this code snippet if we need to downgrade to AJV v6.x.
 // const OpenAPIValidator = require('openapi-backend').OpenAPIValidator

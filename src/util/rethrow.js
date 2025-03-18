@@ -53,9 +53,9 @@ const countFspiopError = (error, options = {}, context) => {
 
   const errorExpect = propagation.getActiveBaggage()?.getEntry('errorExpect')
   let expected = 0
-  if (fspiopError?.apiErrorCode.code && context) {
+  if (fspiopError?.apiErrorCode?.code && context) {
     if (errorExpect) {
-      const expectedCode = `${context}.${fspiopError?.apiErrorCode.code}`
+      const expectedCode = `${context}.${fspiopError.apiErrorCode.code}`
       if (errorExpect.value.split('|').includes(expectedCode)) expected = 1
     }
   }
