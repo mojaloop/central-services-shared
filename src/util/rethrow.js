@@ -46,7 +46,7 @@ const rethrowAndCountFspiopError = (error, options = {}, context) => {
 const countFspiopError = (error, options = {}, context) => {
   const { operation, step, loggerOverride } = options
   const log = loggerOverride || logger
-  if (error?.message) log.error(error?.message, error)
+  if (error?.message) log.warn('countFspiopError: ', error)
 
   const fspiopError = ErrorHandler.Factory.reformatFSPIOPError(error)
   const extensions = fspiopError.extensions || []
