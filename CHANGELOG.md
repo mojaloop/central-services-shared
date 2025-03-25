@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.23.1](https://github.com/mojaloop/central-services-shared/compare/v18.23.0...v18.23.1) (2025-03-25)
+
+
+### Chore
+
+* **csi-1266:** fixed logging in countFspiopError ([#444](https://github.com/mojaloop/central-services-shared/issues/444)) ([2d9f8dd](https://github.com/mojaloop/central-services-shared/commit/2d9f8dd4d952b507ced988ab4d1e49de2aa7d863))
+
 ## [18.23.0](https://github.com/mojaloop/central-services-shared/compare/v18.22.4...v18.23.0) (2025-03-18)
 
 
