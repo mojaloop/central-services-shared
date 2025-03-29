@@ -128,6 +128,7 @@ const sendRequest = async ({
       httpAgent: new http.Agent({ keepAlive: true }),
       ...axiosRequestOptionsOverride
     }
+    requestOptions.httpAgent.toJSON = () => ({})
     // if jwsSigner is passed then sign the request
     if (jwsSigner != null && typeof (jwsSigner) === 'object') {
       requestOptions.headers['fspiop-signature'] = jwsSigner.getSignature(requestOptions)
