@@ -31,7 +31,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Proxyquire = require('proxyquire')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('@mojaloop/central-services-logger').createLogger()
 
 Test('Duplicate check comparator', dccTest => {
   let sandbox

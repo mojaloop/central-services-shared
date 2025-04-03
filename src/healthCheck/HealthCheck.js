@@ -31,7 +31,7 @@
 const {
   statusEnum
 } = require('./HealthCheckEnums')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('@mojaloop/central-services-logger').createLogger()
 
 /**
  * @class HealthCheck

@@ -1,5 +1,6 @@
 # Add a TODO comment indicating the reason for each rejected dependency upgrade added to this list, and what should be done to resolve it (i.e. handle it through a story, etc).
 reject: [
   # TODO: Added "@hapi/catbox-memory" to ncurc for dep:check to ignore updates due to breaking changes which should be handled by another story
-  "@hapi/catbox-memory"
+  "@hapi/catbox-memory",
+  "@mojaloop/central-services-logger" # Need to use snapshot for now
 ]

@@ -30,7 +30,7 @@
 
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('@mojaloop/central-services-logger').createLogger()
 const Model = require('../../../src/util/time')
 
 const execDelayCoef = 1.5

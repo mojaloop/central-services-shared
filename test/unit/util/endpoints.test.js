@@ -3,7 +3,7 @@
 const Test = require('tapes')(require('tape'))
 const Mustache = require('mustache')
 const Catbox = require('@hapi/catbox')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('@mojaloop/central-services-logger').createLogger()
 const Sinon = require('sinon')
 const Proxyquire = require('proxyquire')
 

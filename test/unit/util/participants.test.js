@@ -11,7 +11,7 @@ const Http = require(`${src}/util`).Http
 const Enum = require(`${src}`).Enum
 const Mustache = require('mustache')
 const Helper = require('../../util/helper')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('@mojaloop/central-services-logger').createLogger()
 const Metrics = require('@mojaloop/central-services-metrics')
 
 Test('Participants Cache Test', participantsCacheTest => {
