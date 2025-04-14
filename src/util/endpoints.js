@@ -96,7 +96,7 @@ const fetchEndpoints = async (fsp) => {
         endpointMap[item.type] = item.value
       })
     }
-    log.verbose('fetchEndpoints is done', { endpointMap })
+    log.verbose('fetchEndpoints is done')
     histTimer({ success: true })
 
     return endpointMap
