@@ -22,7 +22,7 @@
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
 
- * Kevin Leyow <kevin.leyow@modusbox.com>
+ * Kevin Leyow <kevin.leyow@infitx.com>
 
  --------------
  ******/
