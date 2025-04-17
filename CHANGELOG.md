@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.24.0](https://github.com/mojaloop/central-services-shared/compare/v18.23.3...v18.24.0) (2025-04-17)
+
+
+### Features
+
+* add pub sub class ([#447](https://github.com/mojaloop/central-services-shared/issues/447)) ([10f5edf](https://github.com/mojaloop/central-services-shared/commit/10f5edf5377715e0193bb295536ef56b06fcb14e))
+
 ### [18.23.3](https://github.com/mojaloop/central-services-shared/compare/v18.23.2...v18.23.3) (2025-04-15)
 
 
