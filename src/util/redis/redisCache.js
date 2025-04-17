@@ -1,5 +1,5 @@
 const Redis = require('ioredis')
-const { createLogger } = require('../index')
+const { createLogger } = require('../createLogger')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')

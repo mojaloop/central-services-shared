@@ -29,7 +29,7 @@
 
 'use strict'
 const Redis = require('ioredis')
-const { createLogger } = require('../index')
+const { createLogger } = require('../createLogger')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')

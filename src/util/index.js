@@ -31,8 +31,6 @@
 'use strict'
 
 const _ = require('lodash')
-const { logger } = require('../logger')
-const config = require('../config')
 
 const Kafka = require('./kafka')
 const Endpoints = require('./endpoints')
@@ -55,6 +53,8 @@ const Schema = require('./schema')
 const OpenapiBackend = require('./openapiBackend')
 const id = require('./id')
 const rethrow = require('./rethrow')
+const Redis = require('./redis')
+const createLogger = require('./createLogger')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -226,12 +226,6 @@ const filterExtensions = (extensionsArray, exclKeysArray, exclValuesArray) => {
   })
 }
 
-const createLogger = (component) => {
-  const log = logger.child({ component })
-  log.setLevel(config.get('logLevel'))
-  return log
-}
-
 module.exports = {
   createLogger,
   assign,
@@ -272,5 +266,6 @@ module.exports = {
   OpenapiBackend,
   id,
   resourceVersions: Helpers.resourceVersions,
-  rethrow
+  rethrow,
+  Redis
 }
