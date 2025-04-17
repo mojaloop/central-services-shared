@@ -22,6 +22,17 @@ class PubSub {
       : new Redis(this.config)
   }
 
+  async connect () {
+    try {
+      await this.redisClient.connect()
+      await this.subscriberClient.connect()
+      this.log.info('Redis clients connected successfully')
+    } catch (err) {
+      this.log.error('Error connecting Redis clients:', err)
+      rethrowRedisError(err)
+    }
+  }
+
   addEventListeners (client) {
     client.on('connect', () => this.log.info('Redis client connected'))
     client.on('error', (err) => this.log.error('Redis client error:', err))
@@ -46,6 +57,7 @@ class PubSub {
         }
       })
       this.log.info(`Subscribed to channel: ${channel}`)
+      return channel
     } catch (err) {
       this.log.error('Error subscribing to channel:', err)
       rethrowRedisError(err)

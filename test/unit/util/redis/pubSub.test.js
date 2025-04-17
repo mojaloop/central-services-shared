@@ -152,5 +152,91 @@ Test('PubSub', (t) => {
     t.end()
   })
 
+  t.test('should connect Redis clients successfully', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.redisClient, 'connect').resolves()
+    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
+
+    await pubSub.connect()
+
+    t.ok(pubSub.redisClient.connect.calledOnce, 'redisClient connect called once')
+    t.ok(pubSub.subscriberClient.connect.calledOnce, 'subscriberClient connect called once')
+    t.end()
+  })
+
+  t.test('should handle error when connecting Redis clients', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+    const error = new Error('Connect error')
+
+    sandbox.stub(pubSub.redisClient, 'connect').rejects(error)
+    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
+
+    try {
+      await pubSub.connect()
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should create a Redis Cluster client when cluster config is provided', (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+
+    t.ok(pubSub.redisClient instanceof Redis.Cluster, 'redisClient is an instance of Redis.Cluster')
+    t.ok(pubSub.subscriberClient instanceof Redis.Cluster, 'subscriberClient is an instance of Redis.Cluster')
+    t.end()
+  })
+
+  t.test('should connect Redis Cluster clients successfully', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.redisClient, 'connect').resolves()
+    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
+
+    await pubSub.connect()
+
+    t.ok(pubSub.redisClient.connect.calledOnce, 'redisClient connect called once')
+    t.ok(pubSub.subscriberClient.connect.calledOnce, 'subscriberClient connect called once')
+    t.end()
+  })
+
+  t.test('should handle error when connecting Redis Cluster clients', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const error = new Error('Cluster connect error')
+
+    sandbox.stub(pubSub.redisClient, 'connect').rejects(error)
+    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
+
+    try {
+      await pubSub.connect()
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should not call callback if subscribedChannel does not match channel', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+    const channel = 'test-channel'
+    const callback = sinon.stub()
+    const message = JSON.stringify({ key: 'value' })
+    const otherChannel = 'other-channel'
+
+    await pubSub.subscribe(channel, callback)
+    pubSub.subscriberClient.on.callArgWith(1, otherChannel, message)
+
+    t.ok(pubSub.subscriberClient.subscribe.calledWith(channel), 'subscribe called with correct channel')
+    t.notOk(callback.called, 'callback not called when subscribedChannel does not match channel')
+    t.end()
+  })
   t.end()
 })
