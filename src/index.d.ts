@@ -764,7 +764,7 @@ declare namespace CentralServicesShared {
 
   interface Redis {
     PubSub: PubSub;
-    Cache: RedisCache;
+    RedisCache: RedisCache;
   }
 
   interface Util {
