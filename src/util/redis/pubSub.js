@@ -36,6 +36,12 @@ const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants'
 
 class PubSub {
   constructor (config, publisherClient, subscriberClient) {
+    // prepare redis connection instances
+    // once the client enters the subscribed state it is not supposed to issue
+    // any other commands, except for additional SUBSCRIBE, PSUBSCRIBE,
+    // UNSUBSCRIBE, PUNSUBSCRIBE, PING and QUIT commands.
+    // So we create two clients, one for subscribing another for
+    // and publishing
     this.config = config
     this.isCluster = isClusterConfig(config)
     this.log = createLogger(this.constructor.name)
