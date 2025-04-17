@@ -1,3 +1,31 @@
+/*****
+ License
+ --------------
+ Copyright © 2020-2025 Mojaloop Foundation
+ The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+ Contributors
+ --------------
+ This is the official list of the Mojaloop project contributors for this file.
+ Names of the original copyright holders (individuals or organizations)
+ should be listed with a '*' in the first column. People who have
+ contributed from an organization can be listed under the organization
+ that actually holds the copyright for their contributions (see the
+ Mojaloop Foundation for an example). Those individuals should have
+ their names indented and be marked with a '-'. Email address can be added
+ optionally within square brackets <email>.
+
+ * Mojaloop Foundation
+ - Name Surname <name.surname@mojaloop.io>
+
+ * Kevin Leyow <kevin.leyow@modusbox.com>
+
+ --------------
+ ******/
 const Test = require('tapes')(require('tape'))
 const sinon = require('sinon')
 const Redis = require('ioredis')
@@ -25,7 +53,7 @@ Test('PubSub', (t) => {
   t.test('should create a Redis client and subscriber', (t) => {
     const config = { lazyConnect: true }
     const pubSub = new PubSub(config)
-    t.ok(pubSub.redisClient instanceof Redis, 'redisClient is an instance of Redis')
+    t.ok(pubSub.publisherClient instanceof Redis, 'publisherClient is an instance of Redis')
     t.ok(pubSub.subscriberClient instanceof Redis, 'subscriberClient is an instance of Redis')
     t.end()
   })
@@ -37,7 +65,7 @@ Test('PubSub', (t) => {
     const message = { key: 'value' }
     await pubSub.publish(channel, message)
 
-    t.ok(pubSub.redisClient.publish.calledWith(channel, JSON.stringify(message)), 'publish called with correct arguments')
+    t.ok(pubSub.publisherClient.publish.calledWith(channel, JSON.stringify(message)), 'publish called with correct arguments')
     t.end()
   })
 
@@ -48,7 +76,7 @@ Test('PubSub', (t) => {
     const message = { key: 'value' }
     const error = new Error('Publish error')
 
-    pubSub.redisClient.publish.rejects(error)
+    pubSub.publisherClient.publish.rejects(error)
 
     try {
       await pubSub.publish(channel, message)
@@ -128,9 +156,9 @@ Test('PubSub', (t) => {
 
     await pubSub.broadcast(channels, message)
 
-    t.ok(pubSub.redisClient.publish.calledTwice, 'publish called twice')
-    t.ok(pubSub.redisClient.publish.firstCall.calledWith(channels[0], JSON.stringify(message)), 'publish called with first channel and message')
-    t.ok(pubSub.redisClient.publish.secondCall.calledWith(channels[1], JSON.stringify(message)), 'publish called with second channel and message')
+    t.ok(pubSub.publisherClient.publish.calledTwice, 'publish called twice')
+    t.ok(pubSub.publisherClient.publish.firstCall.calledWith(channels[0], JSON.stringify(message)), 'publish called with first channel and message')
+    t.ok(pubSub.publisherClient.publish.secondCall.calledWith(channels[1], JSON.stringify(message)), 'publish called with second channel and message')
     t.end()
   })
 
@@ -141,7 +169,7 @@ Test('PubSub', (t) => {
     const message = { key: 'value' }
     const error = new Error('Broadcast error')
 
-    pubSub.redisClient.publish.onFirstCall().rejects(error)
+    pubSub.publisherClient.publish.onFirstCall().rejects(error)
 
     try {
       await pubSub.broadcast(channels, message)
@@ -156,12 +184,12 @@ Test('PubSub', (t) => {
     const config = {}
     const pubSub = new PubSub(config)
 
-    sandbox.stub(pubSub.redisClient, 'connect').resolves()
+    sandbox.stub(pubSub.publisherClient, 'connect').resolves()
     sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
 
     await pubSub.connect()
 
-    t.ok(pubSub.redisClient.connect.calledOnce, 'redisClient connect called once')
+    t.ok(pubSub.publisherClient.connect.calledOnce, 'publisherClient connect called once')
     t.ok(pubSub.subscriberClient.connect.calledOnce, 'subscriberClient connect called once')
     t.end()
   })
@@ -171,7 +199,7 @@ Test('PubSub', (t) => {
     const pubSub = new PubSub(config)
     const error = new Error('Connect error')
 
-    sandbox.stub(pubSub.redisClient, 'connect').rejects(error)
+    sandbox.stub(pubSub.publisherClient, 'connect').rejects(error)
     sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
 
     try {
@@ -187,7 +215,7 @@ Test('PubSub', (t) => {
     const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
     const pubSub = new PubSub(config)
 
-    t.ok(pubSub.redisClient instanceof Redis.Cluster, 'redisClient is an instance of Redis.Cluster')
+    t.ok(pubSub.publisherClient instanceof Redis.Cluster, 'publisherClient is an instance of Redis.Cluster')
     t.ok(pubSub.subscriberClient instanceof Redis.Cluster, 'subscriberClient is an instance of Redis.Cluster')
     t.end()
   })
@@ -196,12 +224,12 @@ Test('PubSub', (t) => {
     const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
     const pubSub = new PubSub(config)
 
-    sandbox.stub(pubSub.redisClient, 'connect').resolves()
+    sandbox.stub(pubSub.publisherClient, 'connect').resolves()
     sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
 
     await pubSub.connect()
 
-    t.ok(pubSub.redisClient.connect.calledOnce, 'redisClient connect called once')
+    t.ok(pubSub.publisherClient.connect.calledOnce, 'publisherClient connect called once')
     t.ok(pubSub.subscriberClient.connect.calledOnce, 'subscriberClient connect called once')
     t.end()
   })
@@ -211,7 +239,7 @@ Test('PubSub', (t) => {
     const pubSub = new PubSub(config)
     const error = new Error('Cluster connect error')
 
-    sandbox.stub(pubSub.redisClient, 'connect').rejects(error)
+    sandbox.stub(pubSub.publisherClient, 'connect').rejects(error)
     sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
 
     try {
