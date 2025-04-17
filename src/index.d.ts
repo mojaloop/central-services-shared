@@ -738,7 +738,7 @@ declare namespace CentralServicesShared {
 
   interface PubSub {
     (config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
-    new (config: object, publisherClient: IORedis, subscriberClient: IORedis): PubSub;
+    new (config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
     connect(): Promise<void>;
     disconnect(): Promise<boolean>;
     healthCheck(): Promise<boolean>;
