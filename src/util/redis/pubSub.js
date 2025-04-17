@@ -32,6 +32,7 @@ const Redis = require('ioredis')
 const { createLogger } = require('../index')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
+const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
 
 class PubSub {
   constructor (config, publisherClient, subscriberClient) {
@@ -60,6 +61,43 @@ class PubSub {
       this.log.error('Error connecting Redis clients:', err)
       rethrowRedisError(err)
     }
+  }
+
+  async disconnect () {
+    try {
+      const publisherResponse = await this.publisherClient.quit()
+      const subscriberResponse = await this.subscriberClient.quit()
+      const isDisconnected = publisherResponse === REDIS_SUCCESS && subscriberResponse === REDIS_SUCCESS
+      this.subscriberClient.removeAllListeners()
+      this.log.info('Redis clients disconnected successfully')
+      return isDisconnected
+    } catch (err) {
+      this.log.error('Error disconnecting Redis clients:', err)
+      rethrowRedisError(err)
+    }
+  }
+
+  async healthCheck () {
+    try {
+      const publisherStatus = await this.publisherClient.ping()
+      const subscriberStatus = await this.subscriberClient.ping()
+      const isHealthy = publisherStatus === 'PONG' && subscriberStatus === 'PONG'
+      this.log.debug(`Redis health check: ${isHealthy ? 'Healthy' : 'Unhealthy'}`)
+      return isHealthy
+    } catch (err) {
+      this.log.error('Error performing Redis health check:', err)
+      return false
+    }
+  }
+
+  get isConnected () {
+    const publisherConnected = REDIS_IS_CONNECTED_STATUSES.includes(this.publisherClient.status)
+    const subscriberConnected = REDIS_IS_CONNECTED_STATUSES.includes(this.subscriberClient.status)
+    this.log.debug('Redis connection status', {
+      publisherConnected,
+      subscriberConnected
+    })
+    return { publisherConnected, subscriberConnected }
   }
 
   addEventListeners (client) {

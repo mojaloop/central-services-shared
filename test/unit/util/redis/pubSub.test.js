@@ -266,5 +266,110 @@ Test('PubSub', (t) => {
     t.notOk(callback.called, 'callback not called when subscribedChannel does not match channel')
     t.end()
   })
+
+  t.test('should disconnect Redis clients successfully', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.publisherClient, 'quit').resolves()
+    sandbox.stub(pubSub.subscriberClient, 'quit').resolves()
+    sandbox.stub(pubSub.subscriberClient, 'removeAllListeners').resolves()
+
+    await pubSub.disconnect()
+
+    t.ok(pubSub.publisherClient.quit.calledOnce, 'publisherClient quit called once')
+    t.ok(pubSub.subscriberClient.quit.calledOnce, 'subscriberClient quit called once')
+    t.ok(pubSub.subscriberClient.removeAllListeners.calledOnce, 'subscriberClient removeAllListeners called once')
+    t.end()
+  })
+
+  t.test('should handle error when disconnecting Redis clients', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+    const error = new Error('Disconnect error')
+
+    sandbox.stub(pubSub.publisherClient, 'quit').rejects(error)
+    sandbox.stub(pubSub.subscriberClient, 'quit').resolves()
+
+    try {
+      await pubSub.disconnect()
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should perform health check and return true if both clients are healthy', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.publisherClient, 'ping').resolves('PONG')
+    sandbox.stub(pubSub.subscriberClient, 'ping').resolves('PONG')
+
+    const isHealthy = await pubSub.healthCheck()
+
+    t.equal(isHealthy, true, 'healthCheck returns true when both clients are healthy')
+    t.ok(pubSub.publisherClient.ping.calledOnce, 'publisherClient ping called once')
+    t.ok(pubSub.subscriberClient.ping.calledOnce, 'subscriberClient ping called once')
+    t.end()
+  })
+
+  t.test('should perform health check and return false if any client is unhealthy', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.publisherClient, 'ping').resolves('PONG')
+    sandbox.stub(pubSub.subscriberClient, 'ping').resolves('ERROR')
+
+    const isHealthy = await pubSub.healthCheck()
+
+    t.equal(isHealthy, false, 'healthCheck returns false when any client is unhealthy')
+    t.ok(pubSub.publisherClient.ping.calledOnce, 'publisherClient ping called once')
+    t.ok(pubSub.subscriberClient.ping.calledOnce, 'subscriberClient ping called once')
+    t.end()
+  })
+
+  t.test('should handle error during health check and return false', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+    const error = new Error('Health check error')
+
+    sandbox.stub(pubSub.publisherClient, 'ping').rejects(error)
+    sandbox.stub(pubSub.subscriberClient, 'ping').resolves('PONG')
+
+    const isHealthy = await pubSub.healthCheck()
+
+    t.equal(isHealthy, false, 'healthCheck returns false when an error occurs')
+    t.ok(pubSub.publisherClient.ping.calledOnce, 'publisherClient ping called once')
+    t.notOk(pubSub.subscriberClient.ping.calledOnce, 'subscriberClient ping not called once')
+    t.end()
+  })
+
+  t.test('should return correct connection statuses for isConnected', (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.publisherClient, 'status').value('ready')
+    sandbox.stub(pubSub.subscriberClient, 'status').value('ready')
+
+    const connectionStatus = pubSub.isConnected
+
+    t.deepEqual(connectionStatus, { publisherConnected: true, subscriberConnected: true }, 'isConnected returns correct statuses')
+    t.end()
+  })
+
+  t.test('should return false connection statuses for isConnected when clients are not connected', (t) => {
+    const config = {}
+    const pubSub = new PubSub(config)
+
+    sandbox.stub(pubSub.publisherClient, 'status').value('disconnected')
+    sandbox.stub(pubSub.subscriberClient, 'status').value('disconnected')
+
+    const connectionStatus = pubSub.isConnected
+
+    t.deepEqual(connectionStatus, { publisherConnected: false, subscriberConnected: false }, 'isConnected returns false statuses when clients are not connected')
+    t.end()
+  })
   t.end()
 })
