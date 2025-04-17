@@ -1,5 +1,6 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
+import IORedis from 'ioredis';
 
 declare namespace CentralServicesShared {
   interface ReturnCode {
@@ -663,7 +664,7 @@ declare namespace CentralServicesShared {
   type ProtocolResources = string[]
   type ProtocolVersions = (string | symbol)[]
   type ApiTypeValues = 'fspiop' | 'iso20022'
-  type APIDocumentationPluginOptions = 
+  type APIDocumentationPluginOptions =
   | { documentPath: string; document?: never }
   | { document?: string; documentPath?: never }
 
@@ -707,7 +708,7 @@ declare namespace CentralServicesShared {
       plugin: {
         name: string,
         register: (server: Server) => void
-      }      
+      }
     };
     customCurrencyCodeValidation: (joi: any) => {
       base: any;
@@ -735,6 +736,37 @@ declare namespace CentralServicesShared {
   }
   // todo: define the rest of the types
 
+  interface PubSub {
+    (config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
+    new (config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
+    connect(): Promise<void>;
+    disconnect(): Promise<boolean>;
+    healthCheck(): Promise<boolean>;
+    isConnected: { publisherConnected: boolean; subscriberConnected: boolean };
+    publish(channel: string, message: any): Promise<void>;
+    subscribe(channel: string, callback: (message: any) => void): Promise<string>;
+    unsubscribe(channel: string): Promise<void>;
+    broadcast(channels: string[], message: any): Promise<void>;
+  }
+
+  interface RedisCache {
+    (config: object, client?: IORedis): RedisCache;
+    new (config: object, client?: IORedis): RedisCache;
+    connect(): Promise<boolean>;
+    disconnect(): Promise<boolean>;
+    healthCheck(): Promise<boolean>;
+    isConnected: boolean;
+    get(key: string): Promise<string | null>;
+    set(key: string, value: string, ttl?: number): Promise<void>;
+    delete(key: string): Promise<void>;
+    clearCache(): Promise<void>;
+  }
+
+  interface Redis {
+    PubSub: PubSub;
+    RedisCache: RedisCache;
+  }
+
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
@@ -745,6 +777,7 @@ declare namespace CentralServicesShared {
     Request: Request;
     StreamingProtocol: StreamingProtocol;
     HeaderValidation: HeaderValidation;
+    Redis: Redis;
   }
 
   const Enum: Enum
