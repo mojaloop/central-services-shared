@@ -34,6 +34,7 @@
  */
 const Mustache = require('mustache')
 const Logger = require('@mojaloop/central-services-logger')
+const { ContextLogger } = require('@mojaloop/central-services-logger/src/contextLogger')
 const Enum = require('../../enums')
 const StreamingProtocol = require('../streaming/protocol')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
@@ -136,12 +137,20 @@ const transformAccountToTopicName = (template, participantName, functionality, a
  *
  * @returns {string} - Returns topic name to be created, throws error if failure occurs
  */
-const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
+const getKafkaConfig = (kafkaConfig, flow, functionality, action, context = functionality) => {
   try {
     const flowObject = kafkaConfig[flow]
     const functionalityObject = flowObject[functionality]
     const actionObject = action ? functionalityObject[action] : functionalityObject
-    actionObject.config.logger = Logger
+    actionObject.config.logger = new ContextLogger({
+      context,
+      method: `${functionality}.${action}`.toLowerCase(),
+      system: 'kafka',
+      type: {
+        [Enum.Kafka.Config.CONSUMER]: 'receive',
+        [Enum.Kafka.Config.PRODUCER]: 'send'
+      }[flow.toLowerCase()]
+    })
     return actionObject.config
   } catch (err) {
     const error = ErrorHandler.Factory.createInternalServerFSPIOPError(`No config found for flow='${flow}', functionality='${functionality}', action='${action}'`, err)
