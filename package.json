@@ -87,10 +87,10 @@
     "yaml": "2.7.1"
   },
   "devDependencies": {
-    "@mojaloop/central-services-error-handling": "^13.0.7",
-    "@mojaloop/central-services-logger": "^11.8.1",
-    "@mojaloop/central-services-metrics": "^12.5.0",
-    "@mojaloop/event-sdk": "^14.4.0",
+    "@mojaloop/central-services-error-handling": "13.0.7",
+    "@mojaloop/central-services-logger": "11.8.1",
+    "@mojaloop/central-services-metrics": "12.5.0",
+    "@mojaloop/event-sdk": "14.4.0",
     "@mojaloop/sdk-standard-components": "19.14.0",
     "@opentelemetry/auto-instrumentations-node": "^0.58.1",
     "@types/hapi__joi": "17.1.15",
@@ -116,8 +116,9 @@
     "tapes": "4.1.0"
   },
   "overrides": {
+    "nanoid": "5.1.5",
     "postcss": {
-      "nanoid": "3.3.8"
+      "nanoid": "5.1.5"
     },
     "shins": {
       "ejs": "3.1.10",
@@ -136,10 +137,10 @@
     "yargs-parser": "21.1.1"
   },
   "peerDependencies": {
-    "@mojaloop/central-services-error-handling": ">=13.x.x",
-    "@mojaloop/central-services-logger": "^11.6.2",
-    "@mojaloop/central-services-metrics": "^12.5.0",
-    "@mojaloop/event-sdk": ">=14.1.1",
+    "@mojaloop/central-services-error-handling": "13.0.7",
+    "@mojaloop/central-services-logger": "11.8.1",
+    "@mojaloop/central-services-metrics": "12.5.0",
+    "@mojaloop/event-sdk": "14.4.0",
     "ajv": "8.x.x",
     "ajv-formats": "3.x.x",
     "ajv-keywords": "5.x.x"
