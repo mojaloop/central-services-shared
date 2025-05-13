@@ -22,502 +22,486 @@
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
 
- * Kevin Leyow <kevin.leyow@modusbox.com>
+ * Kevin Leyow <kevin.leyow@infitx.com>
 
  --------------
  ******/
 const Test = require('tapes')(require('tape'))
 const sinon = require('sinon')
-const Redis = require('ioredis')
-const PubSub = require('../../../../src/util/redis/pubSub')
-const { constructSystemExtensionError } = require('../../../../src/util/rethrow')
+let PubSub = require('../../../../src/util/redis/pubSub')
+const proxyquire = require('proxyquire')
 
-Test('PubSub', (t) => {
-  let sandbox
+Test('PubSub', pubSubTest => {
+  let sandbox, publisherStub, subscriberStub, pubSub, logStub
 
-  t.beforeEach((t) => {
+  pubSubTest.beforeEach(t => {
     sandbox = sinon.createSandbox()
-    sandbox.stub(Redis.prototype, 'publish')
-    sandbox.stub(Redis.prototype, 'subscribe')
-    sandbox.stub(Redis.prototype, 'unsubscribe')
-    sandbox.stub(Redis.prototype, 'on')
-    sandbox.stub(Redis.Cluster.prototype, 'on')
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    publisherStub = {
+      connect: sandbox.stub().resolves(),
+      quit: sandbox.stub().resolves(),
+      ping: sandbox.stub().resolves('PONG'),
+      publish: sandbox.stub().resolves(),
+      spublish: undefined,
+      isOpen: true,
+      on: sandbox.stub().returnsThis(),
+      removeAllListeners: sandbox.stub()
+    }
+    subscriberStub = {
+      connect: sandbox.stub().resolves(),
+      quit: sandbox.stub().resolves(),
+      ping: sandbox.stub().resolves('PONG'),
+      subscribe: sandbox.stub().resolves(),
+      unsubscribe: sandbox.stub().resolves(),
+      ssubscribe: undefined,
+      sunsubscribe: undefined,
+      isOpen: true,
+      on: sandbox.stub().returnsThis(),
+      removeAllListeners: sandbox.stub()
+    }
+    sandbox.stub(require('../../../../src/util/createLogger'), 'createLogger').returns(logStub)
     t.end()
   })
 
-  t.afterEach((t) => {
+  pubSubTest.afterEach(t => {
     sandbox.restore()
     t.end()
   })
 
-  t.test('should create a Redis client and subscriber', (t) => {
-    const config = { lazyConnect: true }
-    const pubSub = new PubSub(config)
-    t.ok(pubSub.publisherClient instanceof Redis, 'publisherClient is an instance of Redis')
-    t.ok(pubSub.subscriberClient instanceof Redis, 'subscriberClient is an instance of Redis')
-    t.end()
-  })
-
-  t.test('should publish a message to a channel', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-    const message = { key: 'value' }
-    await pubSub.publish(channel, message)
-
-    t.ok(pubSub.publisherClient.publish.calledWith(channel, JSON.stringify(message)), 'publish called with correct arguments')
-    t.end()
-  })
-
-  t.test('should handle error when publishing a message', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-    const message = { key: 'value' }
-    const error = new Error('Publish error')
-
-    pubSub.publisherClient.publish.rejects(error)
-
-    try {
-      await pubSub.publish(channel, message)
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-    }
-    t.end()
-  })
-
-  t.test('should subscribe to a channel and handle messages', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-    const callback = sinon.stub()
-    const message = JSON.stringify({ key: 'value' })
-
-    await pubSub.subscribe(channel, callback)
-    pubSub.subscriberClient.on.callArgWith(1, channel, message)
-
-    t.ok(pubSub.subscriberClient.subscribe.calledWith(channel), 'subscribe called with correct channel')
-    t.ok(callback.calledWith(JSON.parse(message)), 'callback called with parsed message')
-    t.end()
-  })
-
-  t.test('should handle error when subscribing to a channel', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-    const callback = sinon.stub()
-    const error = new Error('Subscribe error')
-
-    pubSub.subscriberClient.subscribe.rejects(error)
-
-    try {
-      await pubSub.subscribe(channel, callback)
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-    }
-    t.end()
-  })
-
-  t.test('should unsubscribe from a channel', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-
-    await pubSub.unsubscribe(channel)
-
-    t.ok(pubSub.subscriberClient.unsubscribe.calledWith(channel), 'unsubscribe called with correct channel')
-    t.end()
-  })
-
-  t.test('should handle error when unsubscribing from a channel', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-    const error = new Error('Unsubscribe error')
-
-    pubSub.subscriberClient.unsubscribe.rejects(error)
-
-    try {
-      await pubSub.unsubscribe(channel)
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-    }
-    t.end()
-  })
-
-  t.test('should broadcast a message to multiple channels', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channels = ['channel1', 'channel2']
-    const message = { key: 'value' }
-
-    await pubSub.broadcast(channels, message)
-
-    t.ok(pubSub.publisherClient.publish.calledTwice, 'publish called twice')
-    t.ok(pubSub.publisherClient.publish.firstCall.calledWith(channels[0], JSON.stringify(message)), 'publish called with first channel and message')
-    t.ok(pubSub.publisherClient.publish.secondCall.calledWith(channels[1], JSON.stringify(message)), 'publish called with second channel and message')
-    t.end()
-  })
-
-  t.test('should handle error when broadcasting a message', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channels = ['channel1', 'channel2']
-    const message = { key: 'value' }
-    const error = new Error('Broadcast error')
-
-    pubSub.publisherClient.publish.onFirstCall().rejects(error)
-
-    try {
-      await pubSub.broadcast(channels, message)
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-    }
-    t.end()
-  })
-
-  t.test('should connect Redis clients successfully', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-
-    sandbox.stub(pubSub.publisherClient, 'connect').resolves()
-    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
+  pubSubTest.test('should connect publisher and subscriber clients', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
     await pubSub.connect()
-
-    t.ok(pubSub.publisherClient.connect.calledOnce, 'publisherClient connect called once')
-    t.ok(pubSub.subscriberClient.connect.calledOnce, 'subscriberClient connect called once')
+    t.ok(publisherStub.connect.called, 'publisher connect called')
+    t.ok(subscriberStub.connect.called, 'subscriber connect called')
     t.end()
   })
 
-  t.test('should handle error when connecting Redis clients', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const error = new Error('Connect error')
-
-    sandbox.stub(pubSub.publisherClient, 'connect').rejects(error)
-    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
-
-    try {
-      await pubSub.connect()
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-    }
-    t.end()
-  })
-
-  t.test('should create a Redis Cluster client when cluster config is provided', (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-
-    t.ok(pubSub.publisherClient instanceof Redis.Cluster, 'publisherClient is an instance of Redis.Cluster')
-    t.ok(pubSub.subscriberClient instanceof Redis.Cluster, 'subscriberClient is an instance of Redis.Cluster')
-    t.end()
-  })
-
-  t.test('should connect Redis Cluster clients successfully', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-
-    sandbox.stub(pubSub.publisherClient, 'connect').resolves()
-    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
-
-    await pubSub.connect()
-
-    t.ok(pubSub.publisherClient.connect.calledOnce, 'publisherClient connect called once')
-    t.ok(pubSub.subscriberClient.connect.calledOnce, 'subscriberClient connect called once')
-    t.end()
-  })
-
-  t.test('should handle error when connecting Redis Cluster clients', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const error = new Error('Cluster connect error')
-
-    sandbox.stub(pubSub.publisherClient, 'connect').rejects(error)
-    sandbox.stub(pubSub.subscriberClient, 'connect').resolves()
-
-    try {
-      await pubSub.connect()
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-    }
-    t.end()
-  })
-
-  t.test('should not call callback if subscribedChannel does not match channel', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const channel = 'test-channel'
-    const callback = sinon.stub()
-    const message = JSON.stringify({ key: 'value' })
-    const otherChannel = 'other-channel'
-
-    await pubSub.subscribe(channel, callback)
-    pubSub.subscriberClient.on.callArgWith(1, otherChannel, message)
-
-    t.ok(pubSub.subscriberClient.subscribe.calledWith(channel), 'subscribe called with correct channel')
-    t.notOk(callback.called, 'callback not called when subscribedChannel does not match channel')
-    t.end()
-  })
-
-  t.test('should disconnect Redis clients successfully', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-
-    sandbox.stub(pubSub.publisherClient, 'quit').resolves()
-    sandbox.stub(pubSub.subscriberClient, 'quit').resolves()
-    sandbox.stub(pubSub.subscriberClient, 'removeAllListeners').resolves()
+  pubSubTest.test('should disconnect publisher and subscriber clients', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
     await pubSub.disconnect()
-
-    t.ok(pubSub.publisherClient.quit.calledOnce, 'publisherClient quit called once')
-    t.ok(pubSub.subscriberClient.quit.calledOnce, 'subscriberClient quit called once')
-    t.ok(pubSub.subscriberClient.removeAllListeners.calledOnce, 'subscriberClient removeAllListeners called once')
+    t.ok(publisherStub.quit.called, 'publisher quit called')
+    t.ok(subscriberStub.quit.called, 'subscriber quit called')
+    t.ok(subscriberStub.removeAllListeners.called, 'subscriber removeAllListeners called')
     t.end()
   })
 
-  t.test('should handle error when disconnecting Redis clients', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const error = new Error('Disconnect error')
+  pubSubTest.test('should return true on healthy healthCheck', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
-    sandbox.stub(pubSub.publisherClient, 'quit').rejects(error)
-    sandbox.stub(pubSub.subscriberClient, 'quit').resolves()
+    const result = await pubSub.healthCheck()
+    t.equal(result, true, 'healthCheck returns true')
+    t.ok(publisherStub.ping.called, 'publisher ping called')
+    t.ok(subscriberStub.ping.called, 'subscriber ping called')
+    t.end()
+  })
 
+  pubSubTest.test('should return false on unhealthy healthCheck', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    publisherStub.ping.rejects(new Error('fail'))
+    const result = await pubSub.healthCheck()
+    t.equal(result, false, 'healthCheck returns false')
+    t.end()
+  })
+
+  pubSubTest.test('should return isConnected status', t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    const status = pubSub.isConnected
+    t.deepEqual(status, { publisherConnected: true, subscriberConnected: true }, 'isConnected returns correct status')
+    t.end()
+  })
+
+  pubSubTest.test('should publish message to channel', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    await pubSub.publish('test-channel', { foo: 'bar' })
+    t.ok(publisherStub.publish.calledWith('test-channel', JSON.stringify({ foo: 'bar' })), 'publish called with correct args')
+    t.end()
+  })
+
+  pubSubTest.test('should publish message using spublish in cluster mode', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    pubSub.isCluster = true
+    publisherStub.spublish = sandbox.stub().resolves()
+    await pubSub.publish('test-channel', { foo: 'bar' })
+    t.ok(publisherStub.spublish.calledWith('test-channel', JSON.stringify({ foo: 'bar' })), 'spublish called with correct args')
+    t.end()
+  })
+
+  pubSubTest.test('should subscribe to channel', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    const callback = sandbox.stub()
+    await pubSub.subscribe('test-channel', callback)
+    t.ok(subscriberStub.subscribe.called, 'subscribe called')
+    t.end()
+  })
+
+  pubSubTest.test('should subscribe using ssubscribe in cluster mode', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    pubSub.isCluster = true
+    subscriberStub.ssubscribe = sandbox.stub().resolves()
+    const callback = sandbox.stub()
+    await pubSub.subscribe('test-channel', callback)
+    t.ok(subscriberStub.ssubscribe.called, 'ssubscribe called')
+    t.end()
+  })
+
+  pubSubTest.test('should unsubscribe from channel', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    await pubSub.unsubscribe('test-channel')
+    t.ok(subscriberStub.unsubscribe.calledWith('test-channel'), 'unsubscribe called')
+    t.end()
+  })
+
+  pubSubTest.test('should unsubscribe using sunsubscribe in cluster mode', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    pubSub.isCluster = true
+    subscriberStub.sunsubscribe = sandbox.stub().resolves()
+    await pubSub.unsubscribe('test-channel')
+    t.ok(subscriberStub.sunsubscribe.calledWith('test-channel'), 'sunsubscribe called')
+    t.end()
+  })
+
+  pubSubTest.test('should broadcast message to multiple channels', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    sandbox.stub(pubSub, 'publish').resolves()
+    await pubSub.broadcast(['a', 'b'], { foo: 'bar' })
+    t.ok(pubSub.publish.calledTwice, 'publish called for each channel')
+    t.end()
+  })
+
+  pubSubTest.test('should handle error on connect', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    publisherStub.connect.rejects(new Error('connect error'))
+    try {
+      await pubSub.connect()
+      t.fail('Expected error not thrown')
+    } catch (err) {
+      t.match(err.message, /connect error/, 'throws error on connect failure')
+    }
+    t.end()
+  })
+
+  pubSubTest.test('should handle error on disconnect', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    publisherStub.quit.rejects(new Error('disconnect error'))
     try {
       await pubSub.disconnect()
-      t.fail('Should have thrown an error')
+      t.fail('Expected error not thrown')
     } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.match(err.message, /disconnect error/, 'throws error on disconnect failure')
     }
     t.end()
   })
 
-  t.test('should perform health check and return true if both clients are healthy', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
+  pubSubTest.test('should handle error on publish', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
-    sandbox.stub(pubSub.publisherClient, 'ping').resolves('PONG')
-    sandbox.stub(pubSub.subscriberClient, 'ping').resolves('PONG')
-
-    const isHealthy = await pubSub.healthCheck()
-
-    t.equal(isHealthy, true, 'healthCheck returns true when both clients are healthy')
-    t.ok(pubSub.publisherClient.ping.calledOnce, 'publisherClient ping called once')
-    t.ok(pubSub.subscriberClient.ping.calledOnce, 'subscriberClient ping called once')
-    t.end()
-  })
-
-  t.test('should perform health check and return false if any client is unhealthy', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-
-    sandbox.stub(pubSub.publisherClient, 'ping').resolves('PONG')
-    sandbox.stub(pubSub.subscriberClient, 'ping').resolves('ERROR')
-
-    const isHealthy = await pubSub.healthCheck()
-
-    t.equal(isHealthy, false, 'healthCheck returns false when any client is unhealthy')
-    t.ok(pubSub.publisherClient.ping.calledOnce, 'publisherClient ping called once')
-    t.ok(pubSub.subscriberClient.ping.calledOnce, 'subscriberClient ping called once')
-    t.end()
-  })
-
-  t.test('should handle error during health check and return false', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-    const error = new Error('Health check error')
-
-    sandbox.stub(pubSub.publisherClient, 'ping').rejects(error)
-    sandbox.stub(pubSub.subscriberClient, 'ping').resolves('PONG')
-
-    const isHealthy = await pubSub.healthCheck()
-
-    t.equal(isHealthy, false, 'healthCheck returns false when an error occurs')
-    t.ok(pubSub.publisherClient.ping.calledOnce, 'publisherClient ping called once')
-    t.notOk(pubSub.subscriberClient.ping.calledOnce, 'subscriberClient ping not called once')
-    t.end()
-  })
-
-  t.test('should return correct connection statuses for isConnected', (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-
-    sandbox.stub(pubSub.publisherClient, 'status').value('ready')
-    sandbox.stub(pubSub.subscriberClient, 'status').value('ready')
-
-    const connectionStatus = pubSub.isConnected
-
-    t.deepEqual(connectionStatus, { publisherConnected: true, subscriberConnected: true }, 'isConnected returns correct statuses')
-    t.end()
-  })
-
-  t.test('should return false connection statuses for isConnected when clients are not connected', (t) => {
-    const config = {}
-    const pubSub = new PubSub(config)
-
-    sandbox.stub(pubSub.publisherClient, 'status').value('disconnected')
-    sandbox.stub(pubSub.subscriberClient, 'status').value('disconnected')
-
-    const connectionStatus = pubSub.isConnected
-
-    t.deepEqual(connectionStatus, { publisherConnected: false, subscriberConnected: false }, 'isConnected returns false statuses when clients are not connected')
-    t.end()
-  })
-  t.test('should publish a message to a channel using spublish when isCluster is true', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
-    const message = { key: 'cluster-value' }
-
-    sandbox.stub(pubSub.publisherClient, 'spublish').resolves()
-
-    await pubSub.publish(channel, message)
-
-    t.ok(pubSub.publisherClient.spublish.calledWith(channel, JSON.stringify(message)), 'spublish called with correct arguments')
-    t.end()
-  })
-
-  t.test('should handle error when publishing a message with spublish in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
-    const message = { key: 'cluster-value' }
-    const error = new Error('Cluster spublish error')
-
-    sandbox.stub(pubSub.publisherClient, 'spublish').rejects(error)
-
+    publisherStub.publish.rejects(new Error('publish error'))
     try {
-      await pubSub.publish(channel, message)
-      t.fail('Should have thrown an error')
+      await pubSub.publish('chan', { a: 1 })
+      t.fail('Expected error not thrown')
     } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.match(err.message, /publish error/, 'throws error on publish failure')
     }
     t.end()
   })
 
-  t.test('should subscribe to a channel and handle smessage in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
-    const callback = sinon.stub()
-    const message = JSON.stringify({ key: 'cluster-value' })
+  pubSubTest.test('should handle error on subscribe', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
-    sandbox.stub(pubSub.subscriberClient, 'ssubscribe').resolves()
-    pubSub.subscriberClient.on.withArgs('smessage').yields(channel, message)
-
-    await pubSub.subscribe(channel, callback)
-
-    t.ok(pubSub.subscriberClient.ssubscribe.calledWith(channel), 'ssubscribe called with correct channel')
-    t.ok(callback.calledWith(JSON.parse(message)), 'callback called with parsed message')
-    t.end()
-  })
-
-  t.test('should not call callback if smessage subscribedChannel does not match channel in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
-    const callback = sinon.stub()
-    const message = JSON.stringify({ key: 'cluster-value' })
-    const otherChannel = 'other-cluster-channel'
-
-    sandbox.stub(pubSub.subscriberClient, 'ssubscribe').resolves()
-    pubSub.subscriberClient.on.withArgs('smessage').yields(otherChannel, message)
-
-    await pubSub.subscribe(channel, callback)
-
-    t.ok(pubSub.subscriberClient.ssubscribe.calledWith(channel), 'ssubscribe called with correct channel')
-    t.notOk(callback.called, 'callback not called when smessage channel does not match')
-    t.end()
-  })
-
-  t.test('should handle error when subscribing to a channel in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
-    const callback = sinon.stub()
-    const error = new Error('Cluster subscribe error')
-
-    sandbox.stub(pubSub.subscriberClient, 'ssubscribe').rejects(error)
-
+    subscriberStub.subscribe.rejects(new Error('subscribe error'))
     try {
-      await pubSub.subscribe(channel, callback)
-      t.fail('Should have thrown an error')
+      await pubSub.subscribe('chan', () => {})
+      t.fail('Expected error not thrown')
     } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.match(err.message, /subscribe error/, 'throws error on subscribe failure')
     }
     t.end()
   })
 
-  t.test('should unsubscribe from a channel using sunsubscribe in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
+  pubSubTest.test('should handle error on unsubscribe', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
-    sandbox.stub(pubSub.subscriberClient, 'sunsubscribe').resolves()
-
-    await pubSub.unsubscribe(channel)
-
-    t.ok(pubSub.subscriberClient.sunsubscribe.calledWith(channel), 'sunsubscribe called with correct channel')
-    t.end()
-  })
-
-  t.test('should handle error when unsubscribing from a channel in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channel = 'cluster-channel'
-    const error = new Error('Cluster unsubscribe error')
-
-    sandbox.stub(pubSub.subscriberClient, 'sunsubscribe').rejects(error)
-
+    subscriberStub.unsubscribe.rejects(new Error('unsubscribe error'))
     try {
-      await pubSub.unsubscribe(channel)
-      t.fail('Should have thrown an error')
+      await pubSub.unsubscribe('chan')
+      t.fail('Expected error not thrown')
     } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.match(err.message, /unsubscribe error/, 'throws error on unsubscribe failure')
     }
     t.end()
   })
 
-  t.test('should broadcast a message to multiple channels using spublish in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channels = ['cluster1', 'cluster2']
-    const message = { key: 'cluster-broadcast' }
+  pubSubTest.test('should handle error on broadcast', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
 
-    sandbox.stub(pubSub.publisherClient, 'spublish').resolves()
-
-    await pubSub.broadcast(channels, message)
-
-    t.ok(pubSub.publisherClient.spublish.calledTwice, 'spublish called twice')
-    t.ok(pubSub.publisherClient.spublish.firstCall.calledWith(channels[0], JSON.stringify(message)), 'spublish called with first channel and message')
-    t.ok(pubSub.publisherClient.spublish.secondCall.calledWith(channels[1], JSON.stringify(message)), 'spublish called with second channel and message')
-    t.end()
-  })
-
-  t.test('should handle error when broadcasting a message in cluster mode', async (t) => {
-    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
-    const pubSub = new PubSub(config)
-    const channels = ['cluster1', 'cluster2']
-    const message = { key: 'cluster-broadcast' }
-    const error = new Error('Cluster broadcast error')
-
-    sandbox.stub(pubSub.publisherClient, 'spublish').onFirstCall().rejects(error)
-
+    sandbox.stub(pubSub, 'publish').rejects(new Error('broadcast error'))
     try {
-      await pubSub.broadcast(channels, message)
-      t.fail('Should have thrown an error')
+      await pubSub.broadcast(['a', 'b'], { foo: 'bar' })
+      t.fail('Expected error not thrown')
     } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.match(err.message, /broadcast error/, 'throws error on broadcast failure')
     }
     t.end()
   })
-  t.end()
+
+  pubSubTest.test('should call callback with parsed message on subscribe', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    let received
+    subscriberStub.subscribe.callsFake(async (channel, cb) => {
+      cb(JSON.stringify({ test: 1 }), channel)
+    })
+    await pubSub.subscribe('chan', msg => { received = msg })
+    t.same(received, { test: 1 }, 'callback called with parsed message')
+    t.end()
+  })
+
+  pubSubTest.test('should call callback with parsed message on ssubscribe in cluster mode', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    pubSub.isCluster = true
+    let received
+    subscriberStub.ssubscribe = sandbox.stub().callsFake(async (channel, cb) => {
+      cb(JSON.stringify({ test: 2 }), channel)
+    })
+    await pubSub.subscribe('chan', msg => { received = msg })
+    t.same(received, { test: 2 }, 'callback called with parsed message')
+    t.end()
+  })
+
+  pubSubTest.test('should not call callback if subscribedChannel does not match', async t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    let called = false
+    subscriberStub.subscribe.callsFake(async (channel, cb) => {
+      cb(JSON.stringify({ test: 3 }), 'other-channel')
+    })
+    await pubSub.subscribe('chan', () => { called = true })
+    t.notOk(called, 'callback not called for other channel')
+    t.end()
+  })
+
+  pubSubTest.test('should add event listeners to publisher and subscriber clients', t => {
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+
+    // The event listeners are added in the constructor
+    // We check that .on was called with the correct events for both clients
+    const expectedEvents = ['connect', 'ready', 'end', 'error']
+    for (const event of expectedEvents) {
+      t.ok(
+        publisherStub.on.calledWith(event, sinon.match.func),
+        `publisherStub.on called with event '${event}'`
+      )
+      t.ok(
+        subscriberStub.on.calledWith(event, sinon.match.func),
+        `subscriberStub.on called with event '${event}'`
+      )
+    }
+    t.end()
+  })
+
+  pubSubTest.test('should create publisher and subscriber clients if not provided', t => {
+    // Arrange
+    const config = { host: 'localhost', port: 6379 }
+    // Stub createClient and createLogger
+    const createClientStub = sandbox.stub(require('redis'), 'createClient').returns({
+      connect: sandbox.stub().resolves(),
+      quit: sandbox.stub().resolves(),
+      ping: sandbox.stub().resolves('PONG'),
+      publish: sandbox.stub().resolves(),
+      isOpen: true,
+      on: sandbox.stub().returnsThis(),
+      removeAllListeners: sandbox.stub()
+    })
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      redis: {
+        createClient: createClientStub
+      }
+    })
+    // Act
+    const pubSub = new PubSub(config)
+    // Assert
+    t.ok(createClientStub.calledTwice, 'createClient called for both publisher and subscriber')
+    t.ok(pubSub.publisherClient, 'publisherClient is created')
+    t.ok(pubSub.subscriberClient, 'subscriberClient is created')
+    t.end()
+  })
+
+  pubSubTest.test('should create cluster clients if cluster config is provided and clients not provided', async t => {
+    // Arrange
+    const clusterConfig = { cluster: [{ host: 'c1', port: 7000 }, { host: 'c2', port: 7001 }] }
+    const createClusterStub = sandbox.stub().callsFake(() => ({
+      connect: sandbox.stub().resolves(),
+      quit: sandbox.stub().resolves(),
+      ping: sandbox.stub().resolves('PONG'),
+      spublish: sandbox.stub().resolves(),
+      ssubscribe: sandbox.stub().resolves(),
+      sunsubscribe: sandbox.stub().resolves(),
+      isOpen: true,
+      on: sandbox.stub().returnsThis(),
+      removeAllListeners: sandbox.stub()
+    }))
+
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      redis: {
+        createCluster: createClusterStub
+      }
+    })
+
+    // Act
+    const pubSubCluster = new PubSub(clusterConfig)
+    // Assert
+    t.ok(createClusterStub.calledTwice, 'createCluster called for both publisher and subscriber')
+    t.ok(pubSubCluster.isCluster, 'isCluster is true')
+    t.end()
+  })
+
+  pubSubTest.test('should log info on publisher client connect event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    // Find the connect event handler
+    const connectHandler = publisherStub.on.getCalls().find(call => call.args[0] === 'connect').args[1]
+    connectHandler()
+    t.ok(logStub.info.calledWith('Redis client connecting'), 'logs info on connect')
+    t.end()
+  })
+
+  pubSubTest.test('should log info on publisher client ready event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const readyHandler = publisherStub.on.getCalls().find(call => call.args[0] === 'ready').args[1]
+    readyHandler()
+    t.ok(logStub.info.calledWith('Redis client ready'), 'logs info on ready')
+    t.end()
+  })
+
+  pubSubTest.test('should log info on publisher client end event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const endHandler = publisherStub.on.getCalls().find(call => call.args[0] === 'end').args[1]
+    endHandler()
+    t.ok(logStub.info.calledWith('Redis client connection closed'), 'logs info on end')
+    t.end()
+  })
+
+  pubSubTest.test('should log error on publisher client error event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const errorHandler = publisherStub.on.getCalls().find(call => call.args[0] === 'error').args[1]
+    const err = new Error('test error')
+    errorHandler(err)
+    t.ok(logStub.error.calledWith('Redis client error:', err), 'logs error on error event')
+    t.end()
+  })
+
+  pubSubTest.test('should log info on subscriber client connect event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const connectHandler = subscriberStub.on.getCalls().find(call => call.args[0] === 'connect').args[1]
+    connectHandler()
+    t.ok(logStub.info.calledWith('Redis client connecting'), 'logs info on subscriber connect')
+    t.end()
+  })
+
+  pubSubTest.test('should log info on subscriber client ready event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const readyHandler = subscriberStub.on.getCalls().find(call => call.args[0] === 'ready').args[1]
+    readyHandler()
+    t.ok(logStub.info.calledWith('Redis client ready'), 'logs info on subscriber ready')
+    t.end()
+  })
+
+  pubSubTest.test('should log info on subscriber client end event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const endHandler = subscriberStub.on.getCalls().find(call => call.args[0] === 'end').args[1]
+    endHandler()
+    t.ok(logStub.info.calledWith('Redis client connection closed'), 'logs info on subscriber end')
+    t.end()
+  })
+
+  pubSubTest.test('should log error on subscriber client error event', t => {
+    logStub = {
+      info: sandbox.stub(),
+      error: sandbox.stub(),
+      debug: sandbox.stub()
+    }
+    PubSub = proxyquire('../../../../src/util/redis/pubSub', {
+      '../createLogger': { createLogger: sandbox.stub().returns(logStub) }
+    })
+    pubSub = new PubSub({ host: 'localhost', port: 6379 }, publisherStub, subscriberStub)
+    const errorHandler = subscriberStub.on.getCalls().find(call => call.args[0] === 'error').args[1]
+    const err = new Error('subscriber error')
+    errorHandler(err)
+    t.ok(logStub.error.calledWith('Redis client error:', err), 'logs error on subscriber error event')
+    t.end()
+  })
+  pubSubTest.end()
 })
