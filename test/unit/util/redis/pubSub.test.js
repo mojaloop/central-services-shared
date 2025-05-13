@@ -371,5 +371,153 @@ Test('PubSub', (t) => {
     t.deepEqual(connectionStatus, { publisherConnected: false, subscriberConnected: false }, 'isConnected returns false statuses when clients are not connected')
     t.end()
   })
+  t.test('should publish a message to a channel using spublish when isCluster is true', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+    const message = { key: 'cluster-value' }
+
+    sandbox.stub(pubSub.publisherClient, 'spublish').resolves()
+
+    await pubSub.publish(channel, message)
+
+    t.ok(pubSub.publisherClient.spublish.calledWith(channel, JSON.stringify(message)), 'spublish called with correct arguments')
+    t.end()
+  })
+
+  t.test('should handle error when publishing a message with spublish in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+    const message = { key: 'cluster-value' }
+    const error = new Error('Cluster spublish error')
+
+    sandbox.stub(pubSub.publisherClient, 'spublish').rejects(error)
+
+    try {
+      await pubSub.publish(channel, message)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should subscribe to a channel and handle smessage in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+    const callback = sinon.stub()
+    const message = JSON.stringify({ key: 'cluster-value' })
+
+    sandbox.stub(pubSub.subscriberClient, 'ssubscribe').resolves()
+    pubSub.subscriberClient.on.withArgs('smessage').yields(channel, message)
+
+    await pubSub.subscribe(channel, callback)
+
+    t.ok(pubSub.subscriberClient.ssubscribe.calledWith(channel), 'ssubscribe called with correct channel')
+    t.ok(callback.calledWith(JSON.parse(message)), 'callback called with parsed message')
+    t.end()
+  })
+
+  t.test('should not call callback if smessage subscribedChannel does not match channel in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+    const callback = sinon.stub()
+    const message = JSON.stringify({ key: 'cluster-value' })
+    const otherChannel = 'other-cluster-channel'
+
+    sandbox.stub(pubSub.subscriberClient, 'ssubscribe').resolves()
+    pubSub.subscriberClient.on.withArgs('smessage').yields(otherChannel, message)
+
+    await pubSub.subscribe(channel, callback)
+
+    t.ok(pubSub.subscriberClient.ssubscribe.calledWith(channel), 'ssubscribe called with correct channel')
+    t.notOk(callback.called, 'callback not called when smessage channel does not match')
+    t.end()
+  })
+
+  t.test('should handle error when subscribing to a channel in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+    const callback = sinon.stub()
+    const error = new Error('Cluster subscribe error')
+
+    sandbox.stub(pubSub.subscriberClient, 'ssubscribe').rejects(error)
+
+    try {
+      await pubSub.subscribe(channel, callback)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should unsubscribe from a channel using sunsubscribe in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+
+    sandbox.stub(pubSub.subscriberClient, 'sunsubscribe').resolves()
+
+    await pubSub.unsubscribe(channel)
+
+    t.ok(pubSub.subscriberClient.sunsubscribe.calledWith(channel), 'sunsubscribe called with correct channel')
+    t.end()
+  })
+
+  t.test('should handle error when unsubscribing from a channel in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channel = 'cluster-channel'
+    const error = new Error('Cluster unsubscribe error')
+
+    sandbox.stub(pubSub.subscriberClient, 'sunsubscribe').rejects(error)
+
+    try {
+      await pubSub.unsubscribe(channel)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should broadcast a message to multiple channels using spublish in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channels = ['cluster1', 'cluster2']
+    const message = { key: 'cluster-broadcast' }
+
+    sandbox.stub(pubSub.publisherClient, 'spublish').resolves()
+
+    await pubSub.broadcast(channels, message)
+
+    t.ok(pubSub.publisherClient.spublish.calledTwice, 'spublish called twice')
+    t.ok(pubSub.publisherClient.spublish.firstCall.calledWith(channels[0], JSON.stringify(message)), 'spublish called with first channel and message')
+    t.ok(pubSub.publisherClient.spublish.secondCall.calledWith(channels[1], JSON.stringify(message)), 'spublish called with second channel and message')
+    t.end()
+  })
+
+  t.test('should handle error when broadcasting a message in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const pubSub = new PubSub(config)
+    const channels = ['cluster1', 'cluster2']
+    const message = { key: 'cluster-broadcast' }
+    const error = new Error('Cluster broadcast error')
+
+    sandbox.stub(pubSub.publisherClient, 'spublish').onFirstCall().rejects(error)
+
+    try {
+      await pubSub.broadcast(channels, message)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
   t.end()
 })
