@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.25.0](https://github.com/mojaloop/central-services-shared/compare/v18.24.0...v18.25.0) (2025-05-13)
+
+
+### Features
+
+* bump up node to v22.15.0 ([#449](https://github.com/mojaloop/central-services-shared/issues/449)) ([8000922](https://github.com/mojaloop/central-services-shared/commit/8000922127549f1699850c1d5049f5328942b838))
+
 ## [18.24.0](https://github.com/mojaloop/central-services-shared/compare/v18.23.3...v18.24.0) (2025-04-17)
 
 
