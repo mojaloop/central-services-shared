@@ -28,20 +28,13 @@
  ******/
 
 'use strict'
-const Redis = require('ioredis')
+const { createClient, createCluster } = require('redis')
 const { createLogger } = require('../createLogger')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
-const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
 
 class PubSub {
   constructor (config, publisherClient, subscriberClient) {
-    // prepare redis connection instances
-    // once the client enters the subscribed state it is not supposed to issue
-    // any other commands, except for additional SUBSCRIBE, PSUBSCRIBE,
-    // UNSUBSCRIBE, PUNSUBSCRIBE, PING and QUIT commands.
-    // So we create two clients, one for subscribing another for
-    // and publishing
     this.config = config
     this.isCluster = isClusterConfig(config)
     this.log = createLogger(this.constructor.name)
@@ -52,10 +45,19 @@ class PubSub {
   }
 
   createRedisClient () {
-    this.config.lazyConnect ??= true
-    return this.isCluster
-      ? new Redis.Cluster(this.config.cluster, { ...this.config, shardedSubscribers: true })
-      : new Redis(this.config)
+    if (this.isCluster) {
+      // node-redis cluster config expects rootNodes: [{url: 'redis://host:port'}]
+      const rootNodes = this.config.cluster.map(
+        node => ({ url: `redis://${node.host}:${node.port}` })
+      )
+      return createCluster({ rootNodes })
+    } else {
+      // node-redis expects url: 'redis://host:port'
+      const url = this.config.host && this.config.port
+        ? `redis://${this.config.host}:${this.config.port}`
+        : undefined
+      return createClient({ url, ...this.config })
+    }
   }
 
   async connect () {
@@ -71,12 +73,12 @@ class PubSub {
 
   async disconnect () {
     try {
-      const publisherResponse = await this.publisherClient.quit()
-      const subscriberResponse = await this.subscriberClient.quit()
-      const isDisconnected = publisherResponse === REDIS_SUCCESS && subscriberResponse === REDIS_SUCCESS
-      this.subscriberClient.removeAllListeners()
+      await this.publisherClient.quit()
+      await this.subscriberClient.quit()
+      this.subscriberClient.removeAllListeners && this.subscriberClient.removeAllListeners()
       this.log.info('Redis clients disconnected successfully')
-      return isDisconnected
+      // node-redis returns 'OK' on quit
+      return true
     } catch (err) {
       this.log.error('Error disconnecting Redis clients:', err)
       rethrowRedisError(err)
@@ -97,8 +99,9 @@ class PubSub {
   }
 
   get isConnected () {
-    const publisherConnected = REDIS_IS_CONNECTED_STATUSES.includes(this.publisherClient.status)
-    const subscriberConnected = REDIS_IS_CONNECTED_STATUSES.includes(this.subscriberClient.status)
+    // node-redis: status is 'ready' when connected
+    const publisherConnected = this.publisherClient.isOpen
+    const subscriberConnected = this.subscriberClient.isOpen
     this.log.debug('Redis connection status', {
       publisherConnected,
       subscriberConnected
@@ -107,18 +110,21 @@ class PubSub {
   }
 
   addEventListeners (client) {
-    client.on('connect', () => this.log.info('Redis client connected'))
+    client.on('connect', () => this.log.info('Redis client connecting'))
+    client.on('ready', () => this.log.info('Redis client ready'))
+    client.on('end', () => this.log.info('Redis client connection closed'))
     client.on('error', (err) => this.log.error('Redis client error:', err))
   }
 
   async publish (channel, message) {
     try {
-      if (this.isCluster) {
+      if (this.isCluster && typeof this.publisherClient.spublish === 'function') {
         await this.publisherClient.spublish(channel, JSON.stringify(message))
+        this.log.info(`Message SPUBLISHED to channel: ${channel}`)
       } else {
         await this.publisherClient.publish(channel, JSON.stringify(message))
+        this.log.info(`Message published to channel: ${channel}`)
       }
-      this.log.info(`Message published to channel: ${channel}`)
     } catch (err) {
       this.log.error('Error publishing message:', err)
       rethrowRedisError(err)
@@ -127,22 +133,21 @@ class PubSub {
 
   async subscribe (channel, callback) {
     try {
-      if (this.isCluster) {
-        await this.subscriberClient.ssubscribe(channel)
-        this.subscriberClient.on('smessage', (subscribedChannel, message) => {
+      if (this.isCluster && typeof this.subscriberClient.ssubscribe === 'function') {
+        await this.subscriberClient.ssubscribe(channel, (message, subscribedChannel) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
           }
         })
+        this.log.info(`SSUBSCRIBED to channel: ${channel}`)
       } else {
-        await this.subscriberClient.subscribe(channel)
-        this.subscriberClient.on('message', (subscribedChannel, message) => {
+        await this.subscriberClient.subscribe(channel, (message, subscribedChannel) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
           }
         })
+        this.log.info(`Subscribed to channel: ${channel}`)
       }
-      this.log.info(`Subscribed to channel: ${channel}`)
       return channel
     } catch (err) {
       this.log.error('Error subscribing to channel:', err)
@@ -152,12 +157,13 @@ class PubSub {
 
   async unsubscribe (channel) {
     try {
-      if (this.isCluster) {
+      if (this.isCluster && typeof this.subscriberClient.sunsubscribe === 'function') {
         await this.subscriberClient.sunsubscribe(channel)
+        this.log.info(`SUNSUBSCRIBED from channel: ${channel}`)
       } else {
         await this.subscriberClient.unsubscribe(channel)
+        this.log.info(`Unsubscribed from channel: ${channel}`)
       }
-      this.log.info(`Unsubscribed from channel: ${channel}`)
     } catch (err) {
       this.log.error('Error unsubscribing from channel:', err)
       rethrowRedisError(err)
