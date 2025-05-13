@@ -54,7 +54,7 @@ class PubSub {
   createRedisClient () {
     this.config.lazyConnect ??= true
     return this.isCluster
-      ? new Redis.Cluster(this.config.cluster, this.config)
+      ? new Redis.Cluster(this.config.cluster, { ...this.config, shardedSubscribers: true })
       : new Redis(this.config)
   }
 
@@ -113,7 +113,11 @@ class PubSub {
 
   async publish (channel, message) {
     try {
-      await this.publisherClient.publish(channel, JSON.stringify(message))
+      if (this.isCluster) {
+        await this.publisherClient.spublish(channel, JSON.stringify(message))
+      } else {
+        await this.publisherClient.publish(channel, JSON.stringify(message))
+      }
       this.log.info(`Message published to channel: ${channel}`)
     } catch (err) {
       this.log.error('Error publishing message:', err)
@@ -123,12 +127,21 @@ class PubSub {
 
   async subscribe (channel, callback) {
     try {
-      await this.subscriberClient.subscribe(channel)
-      this.subscriberClient.on('message', (subscribedChannel, message) => {
-        if (subscribedChannel === channel) {
-          callback(JSON.parse(message))
-        }
-      })
+      if (this.isCluster) {
+        await this.subscriberClient.ssubscribe(channel)
+        this.subscriberClient.on('smessage', (subscribedChannel, message) => {
+          if (subscribedChannel === channel) {
+            callback(JSON.parse(message))
+          }
+        })
+      } else {
+        await this.subscriberClient.subscribe(channel)
+        this.subscriberClient.on('message', (subscribedChannel, message) => {
+          if (subscribedChannel === channel) {
+            callback(JSON.parse(message))
+          }
+        })
+      }
       this.log.info(`Subscribed to channel: ${channel}`)
       return channel
     } catch (err) {
