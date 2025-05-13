@@ -53,9 +53,7 @@ class PubSub {
       return createCluster({ rootNodes })
     } else {
       // node-redis expects url: 'redis://host:port'
-      const url = this.config.host && this.config.port
-        ? `redis://${this.config.host}:${this.config.port}`
-        : undefined
+      const url = `redis://${this.config.host}:${this.config.port}`
       return createClient({ url, ...this.config })
     }
   }
@@ -118,7 +116,7 @@ class PubSub {
 
   async publish (channel, message) {
     try {
-      if (this.isCluster && typeof this.publisherClient.spublish === 'function') {
+      if (this.isCluster) {
         await this.publisherClient.spublish(channel, JSON.stringify(message))
         this.log.info(`Message SPUBLISHED to channel: ${channel}`)
       } else {
@@ -133,7 +131,7 @@ class PubSub {
 
   async subscribe (channel, callback) {
     try {
-      if (this.isCluster && typeof this.subscriberClient.ssubscribe === 'function') {
+      if (this.isCluster) {
         await this.subscriberClient.ssubscribe(channel, (message, subscribedChannel) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
@@ -157,7 +155,7 @@ class PubSub {
 
   async unsubscribe (channel) {
     try {
-      if (this.isCluster && typeof this.subscriberClient.sunsubscribe === 'function') {
+      if (this.isCluster) {
         await this.subscriberClient.sunsubscribe(channel)
         this.log.info(`SUNSUBSCRIBED from channel: ${channel}`)
       } else {
