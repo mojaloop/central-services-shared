@@ -116,13 +116,8 @@ class PubSub {
 
   async publish (channel, message) {
     try {
-      if (this.isCluster) {
-        await this.publisherClient.spublish(channel, JSON.stringify(message))
-        this.log.info(`Message SPUBLISHED to channel: ${channel}`)
-      } else {
-        await this.publisherClient.publish(channel, JSON.stringify(message))
-        this.log.info(`Message published to channel: ${channel}`)
-      }
+      await this.publisherClient.publish(channel, JSON.stringify(message))
+      this.log.info(`Message published to channel: ${channel}`)
     } catch (err) {
       this.log.error('Error publishing message:', err)
       rethrowRedisError(err)
@@ -131,21 +126,12 @@ class PubSub {
 
   async subscribe (channel, callback) {
     try {
-      if (this.isCluster) {
-        await this.subscriberClient.ssubscribe(channel, (message, subscribedChannel) => {
-          if (subscribedChannel === channel) {
-            callback(JSON.parse(message))
-          }
-        })
-        this.log.info(`SSUBSCRIBED to channel: ${channel}`)
-      } else {
-        await this.subscriberClient.subscribe(channel, (message, subscribedChannel) => {
-          if (subscribedChannel === channel) {
-            callback(JSON.parse(message))
-          }
-        })
-        this.log.info(`Subscribed to channel: ${channel}`)
-      }
+      await this.subscriberClient.subscribe(channel, (message, subscribedChannel) => {
+        if (subscribedChannel === channel) {
+          callback(JSON.parse(message))
+        }
+      })
+      this.log.info(`Subscribed to channel: ${channel}`)
       return channel
     } catch (err) {
       this.log.error('Error subscribing to channel:', err)
@@ -155,13 +141,8 @@ class PubSub {
 
   async unsubscribe (channel) {
     try {
-      if (this.isCluster) {
-        await this.subscriberClient.sunsubscribe(channel)
-        this.log.info(`SUNSUBSCRIBED from channel: ${channel}`)
-      } else {
-        await this.subscriberClient.unsubscribe(channel)
-        this.log.info(`Unsubscribed from channel: ${channel}`)
-      }
+      await this.subscriberClient.unsubscribe(channel)
+      this.log.info(`Unsubscribed from channel: ${channel}`)
     } catch (err) {
       this.log.error('Error unsubscribing from channel:', err)
       rethrowRedisError(err)
