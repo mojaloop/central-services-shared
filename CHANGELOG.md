@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.26.0](https://github.com/mojaloop/central-services-shared/compare/v18.25.0...v18.26.0) (2025-05-13)
+
+
+### Features
+
+* add sharded pubsub support ([#450](https://github.com/mojaloop/central-services-shared/issues/450)) ([d98675c](https://github.com/mojaloop/central-services-shared/commit/d98675c4d403ad835f462affc06cbab55344958d))
+
 ## [18.25.0](https://github.com/mojaloop/central-services-shared/compare/v18.24.0...v18.25.0) (2025-05-13)
 
 
