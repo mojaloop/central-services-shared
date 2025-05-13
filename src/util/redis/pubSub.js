@@ -152,7 +152,11 @@ class PubSub {
 
   async unsubscribe (channel) {
     try {
-      await this.subscriberClient.unsubscribe(channel)
+      if (this.isCluster) {
+        await this.subscriberClient.sunsubscribe(channel)
+      } else {
+        await this.subscriberClient.unsubscribe(channel)
+      }
       this.log.info(`Unsubscribed from channel: ${channel}`)
     } catch (err) {
       this.log.error('Error unsubscribing from channel:', err)
