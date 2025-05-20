@@ -1,6 +1,17 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
+import { Knex } from 'knex';
 import IORedis from 'ioredis';
+
+declare class KnexWrapper {
+  constructor(deps: KnexWrapperDeps);
+  knex: Knex;
+  isConnected: boolean;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  executeWithErrorCount(queryFn: Function, operation?: string, step?: string): Promise<unknown>;
+  handleError(error: unknown, operation?: string, step?: string, needRethrow?: boolean): void;
+}
 
 declare namespace CentralServicesShared {
   interface ReturnCode {
@@ -422,6 +433,7 @@ declare namespace CentralServicesShared {
   enum AdminNotificationActionsEnum {
     LIMIT_ADJUSTMENT = 'limit-adjustment'
   }
+
   interface Enum {
     Http: HttpEnum;
     EndPoints: EndPointsEnum;
@@ -778,11 +790,37 @@ declare namespace CentralServicesShared {
     StreamingProtocol: StreamingProtocol;
     HeaderValidation: HeaderValidation;
     Redis: Redis;
+    mysql: {
+      KnexWrapper: KnexWrapper
+    };
   }
 
   const Enum: Enum
   const Util: Util
   const HealthCheck: any
+}
+
+type KnexWrapperDeps = {
+  knexOptions: Knex.Config;
+  metrics: MetricsClient;
+  logger: ILogger;
+  retryOptions?: RetryConnOptions;
+  context?: string;
+}
+
+type MetricsClient = { // Wrapper for prom-client from @mojaloop/central-services-metrics
+  getCounter(name: string): {
+    inc(details: Record<string, unknown>): void;
+  };
+}
+
+interface RetryConnOptions { // see opts from https://www.npmjs.com/package/async-retry#api
+  retries?: number;
+  factor?: number;
+  minTimeout?: number;
+  maxTimeout?: number;
+  randomize?: boolean;
+  onRetry?: (error: Error) => void;
 }
 
 export = CentralServicesShared
