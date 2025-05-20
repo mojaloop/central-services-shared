@@ -25,6 +25,9 @@
  --------------
  ******/
 
+/* istanbul ignore file */
+// todo: improve test coverage
+
 const knex = require('knex')
 const retry = require('async-retry')
 const exitHook = require('async-exit-hook')
