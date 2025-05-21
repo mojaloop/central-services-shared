@@ -55,7 +55,6 @@ const id = require('./id')
 const rethrow = require('./rethrow')
 const Redis = require('./redis')
 const createLogger = require('./createLogger')
-const mysql = require('./mysql')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -268,6 +267,5 @@ module.exports = {
   id,
   resourceVersions: Helpers.resourceVersions,
   rethrow,
-  Redis,
-  mysql
+  Redis
 }
