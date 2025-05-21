@@ -3,16 +3,6 @@ import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 import { Knex } from 'knex';
 import IORedis from 'ioredis';
 
-declare class KnexWrapper {
-  constructor(deps: KnexWrapperDeps);
-  knex: Knex;
-  isConnected: boolean;
-  connect(): Promise<void>;
-  disconnect(): Promise<void>;
-  executeWithErrorCount(queryFn: Function, operation?: string, step?: string): Promise<unknown>;
-  handleError(error: unknown, operation?: string, step?: string, needRethrow?: boolean): void;
-}
-
 declare namespace CentralServicesShared {
   interface ReturnCode {
     CODE: number;
@@ -790,14 +780,23 @@ declare namespace CentralServicesShared {
     StreamingProtocol: StreamingProtocol;
     HeaderValidation: HeaderValidation;
     Redis: Redis;
-    mysql: {
-      KnexWrapper: KnexWrapper
-    };
   }
 
   const Enum: Enum
   const Util: Util
   const HealthCheck: any
+
+  namespace mysql {
+    class KnexWrapper {
+      constructor(deps: KnexWrapperDeps);
+      knex: Knex;
+      isConnected: boolean;
+      connect(): Promise<void>;
+      disconnect(): Promise<void>;
+      executeWithErrorCount(queryFn: Function, operation?: string, step?: string): Promise<unknown>;
+      handleError(error: unknown, operation?: string, step?: string, needRethrow?: boolean): void;
+    }
+  }
 }
 
 type KnexWrapperDeps = {

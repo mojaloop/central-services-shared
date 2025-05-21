@@ -28,7 +28,7 @@
 const Tape = require('tapes')(require('tape'))
 // const sinon = require('sinon')
 
-const { KnexWrapper } = require('#src/util/mysql/index')
+const { KnexWrapper } = require('#src/mysql/index')
 const { logger } = require('#src/logger')
 const { tryCatchEndTest } = require('#test/util/helper')
 
