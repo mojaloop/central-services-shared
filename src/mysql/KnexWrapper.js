@@ -25,9 +25,6 @@
  --------------
  ******/
 
-/* istanbul ignore file */
-// todo: improve test coverage
-
 const knex = require('knex')
 const retry = require('async-retry')
 const exitHook = require('async-exit-hook')
@@ -86,7 +83,7 @@ class KnexWrapper {
     this.log.info('Database disconnected')
   }
 
-  async executeWithErrorCount (queryFn, operation = queryFn.name || 'runQuery', step = '') {
+  async executeWithErrorCount (queryFn, operation = queryFn.name, step = '') {
     try {
       if (!this.isConnected) this.log.warn('Database is not connected')
       const result = await queryFn(this.knex)
@@ -98,14 +95,15 @@ class KnexWrapper {
     }
   }
 
-  handleError (error, operation, step = '', needRethrow = true) {
-    const code = this.#defineErrorCode(error)
+  handleError (error, operation = 'db_query', step = '', needRethrow = true) {
+    const code = this.defineErrorCode(error)
     this.#incrementErrorCounter({ code, operation, step })
     if (needRethrow) throw error
     else return null
   }
 
-  #defineErrorCode (error) {
+  /* istanbul ignore next */
+  defineErrorCode (error) {
     if (error instanceof knex.KnexTimeoutError) {
       return 'conn_timeout'
     }
@@ -124,7 +122,7 @@ class KnexWrapper {
     return 'unknown_db_error'
   }
 
-  #incrementErrorCounter ({ code, operation = 'db_query', step = '' }) {
+  #incrementErrorCounter ({ code, operation, step }) {
     const { log, context } = this
     try {
       const errorCounter = this.metrics.getCounter('errorCount')
