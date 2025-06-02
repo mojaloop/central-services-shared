@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.27.0](https://github.com/mojaloop/central-services-shared/compare/v18.26.2...v18.27.0) (2025-06-02)
+
+
+### Features
+
+* **csi-1470:** added KnexWrapper ([#454](https://github.com/mojaloop/central-services-shared/issues/454)) ([3f2d54c](https://github.com/mojaloop/central-services-shared/commit/3f2d54ccf72c140fd7623a81ddb2e3fbc022a43f))
+
 ### [18.26.2](https://github.com/mojaloop/central-services-shared/compare/v18.26.1...v18.26.2) (2025-05-20)
 
 
