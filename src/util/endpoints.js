@@ -157,7 +157,20 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
   const log = logger.child({ fsp, endpointType, method: 'getEndpoint' })
   log.debug('getEndpoint start', { switchUrl })
   let proxyId
-  const result = url => proxyConfig?.enabled ? { url, proxyId } : url
+
+  const renderEndpoint = (endpointsData) => {
+    let endpoint = new Map(endpointsData).get(endpointType)
+    if (renderOptions.path) {
+      endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
+    }
+    if (!endpoint) {
+      const errMessage = `no ${endpointType} endpoint for DFSP ${fsp}`
+      log.warn(errMessage)
+      throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, errMessage)
+    }
+    const url = Mustache.render(endpoint, options)
+    return proxyConfig?.enabled ? { url, proxyId } : url
+  }
 
   try {
     // If a service passes in `getDecoratedValue` as true, then an object
@@ -172,31 +185,22 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       proxyId = await proxy.lookupProxyByDfspId(fsp)
       endpoints = proxyId && await policy.get(proxyId)
     }
+
     if (!endpoints) {
-      log.warn('no endpoints found for fsp')
-      throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.PARTY_NOT_FOUND)
+      const errMessage = 'no endpoints found for fsp'
+      log.warn(errMessage)
+      throw ErrorHandler.CreateFSPIOPError(ErrorHandler.Enums.FSPIOPErrorCodes.DESTINATION_COMMUNICATION_ERROR, errMessage)
     }
 
+    let hit = false
     if ('value' in endpoints && 'cached' in endpoints) {
-      if (endpoints.cached === null) {
-        histTimer({ success: true, hit: false })
-      } else {
-        histTimer({ success: true, hit: true })
-      }
-      const endpoint = new Map(endpoints.value).get(endpointType)
-      if (renderOptions.path) {
-        const renderedEndpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
-        return result(Mustache.render(renderedEndpoint, options))
-      }
-      return result(Mustache.render(endpoint, options))
+      hit = endpoints.cached !== null
+      endpoints = endpoints.value
     }
 
-    let endpoint = new Map(endpoints).get(endpointType)
-    if (renderOptions.path) {
-      endpoint = (endpoint === undefined) ? endpoint : endpoint + renderOptions.path
-    }
-    histTimer({ success: true, hit: false })
-    return result(Mustache.render(endpoint, options))
+    const result = renderEndpoint(endpoints)
+    histTimer({ success: true, hit })
+    return result
   } catch (err) {
     histTimer({ success: false, hit: false })
     log.error('error in getEndpoint: ', err)
