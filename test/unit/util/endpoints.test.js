@@ -3,12 +3,13 @@
 const Test = require('tapes')(require('tape'))
 const Mustache = require('mustache')
 const Catbox = require('@hapi/catbox')
-const Logger = require('@mojaloop/central-services-logger')
 const Sinon = require('sinon')
 const Proxyquire = require('proxyquire')
+const Logger = require('@mojaloop/central-services-logger')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 const src = '../../../src'
-const Cache = Proxyquire(`${src}/util/endpoints`, {
+const endpointsUtil = Proxyquire(`${src}/util/endpoints`, {
   '@mojaloop/inter-scheme-proxy-cache-lib': {
     createProxyCache () {
       return {
@@ -26,16 +27,16 @@ const Cache = Proxyquire(`${src}/util/endpoints`, {
     }
   }
 })
+
 const request = require(`${src}/util/request`)
 const Config = require('../../util/config')
 const Http = require(`${src}/util`).Http
 const Enum = require(`${src}`).Enum
 const Helper = require('../../util/helper')
-const FSPIOP_CALLBACK_URL_TRANSFER_PUT =
-  Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
-const Metrics = require('@mojaloop/central-services-metrics')
 
-Test('Cache Test', (cacheTest) => {
+const FSPIOP_CALLBACK_URL_TRANSFER_PUT = Enum.EndPoints.FspEndpointTypes.FSPIOP_CALLBACK_URL_TRANSFER_PUT
+
+Test('endpointsUtil Test', (cacheTest) => {
   let sandbox
   const hubName = 'Hub'
   const hubNameRegex = /^Hub$/i
@@ -81,7 +82,7 @@ Test('Cache Test', (cacheTest) => {
       const expected =
         'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
+      await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
         hubName, hubNameRegex
       })
       request.sendRequest
@@ -89,7 +90,7 @@ Test('Cache Test', (cacheTest) => {
         .returns(Promise.resolve(Helper.getEndPointsResponse))
 
       try {
-        const result = await Cache.getEndpoint(
+        const result = await endpointsUtil.getEndpoint(
           Config.ENDPOINT_SOURCE_URL,
           fsp,
           endpointType,
@@ -97,7 +98,7 @@ Test('Cache Test', (cacheTest) => {
         )
         test.equal(result, expected, 'The results match')
 
-        const result2 = await Cache.getEndpoint(
+        const result2 = await endpointsUtil.getEndpoint(
           Config.ENDPOINT_SOURCE_URL,
           fsp,
           endpointType,
@@ -106,13 +107,40 @@ Test('Cache Test', (cacheTest) => {
         )
         test.equal(result2, `${expected}/additionalPath`, 'The results match')
 
-        await Cache.stopCache()
+        await endpointsUtil.stopCache()
         test.end()
       } catch (err) {
         test.fail('Error thrown', err)
         test.end()
       }
     })
+
+    getEndpointTest.test('should throw custom error if no endpoints found', Helper.tryCatchEndTest(async (test) => {
+      const fsp = 'fsp123'
+      const url = Mustache.render(
+        Config.ENDPOINT_SOURCE_URL +
+        Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET,
+        { fsp }
+      )
+      const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
+
+      await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+      request.sendRequest
+        .withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex })
+        .returns(Promise.resolve({ data: [] }))
+
+      const result = await endpointsUtil.getEndpoint(
+        Config.ENDPOINT_SOURCE_URL,
+        fsp,
+        endpointType
+      ).catch(err => err)
+      test.true(result instanceof Error, 'The result is Error')
+      test.true(result.name === 'FSPIOPError', 'The result is FSPIOPError')
+      test.true(result.apiErrorCode.code === '1001', 'The result is FSPIOPError with code 1001')
+      test.true(result.message === `no ${endpointType} endpoint for DFSP ${fsp}`, 'The error has proper message')
+
+      await endpointsUtil.stopCache()
+    }))
 
     getEndpointTest.test('return the endpoint using proxy', async (test) => {
       const fsp = 'fsp'
@@ -133,7 +161,7 @@ Test('Cache Test', (cacheTest) => {
         proxyId: 'fsp'
       }
 
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
+      await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
         hubName, hubNameRegex
       })
       request.sendRequest
@@ -144,10 +172,10 @@ Test('Cache Test', (cacheTest) => {
         .rejects(new Error('Not found'))
 
       try {
-        test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy if not created')
-        test.equal(await Cache.stopProxy(), undefined, 'Stop proxy if not created')
+        test.equal(await endpointsUtil.healthCheckProxy(), true, 'Health check proxy if not created')
+        test.equal(await endpointsUtil.stopProxy(), undefined, 'Stop proxy if not created')
 
-        const result = await Cache.getEndpoint(
+        const result = await endpointsUtil.getEndpoint(
           Config.ENDPOINT_SOURCE_URL,
           proxiedFsp,
           endpointType,
@@ -156,10 +184,10 @@ Test('Cache Test', (cacheTest) => {
           { enabled: true }
         )
         test.deepEqual(result, expected, 'The results match')
-        test.equal(await Cache.healthCheckProxy(), true, 'Health check proxy')
-        test.equal(await Cache.stopProxy(), true, 'Stop proxy')
+        test.equal(await endpointsUtil.healthCheckProxy(), true, 'Health check proxy')
+        test.equal(await endpointsUtil.stopProxy(), true, 'Stop proxy')
 
-        await Cache.stopCache()
+        await endpointsUtil.stopCache()
         test.end()
       } catch (err) {
         test.fail('Error thrown', err)
@@ -180,7 +208,7 @@ Test('Cache Test', (cacheTest) => {
         const expected =
           'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
-        await Cache.initializeCache(
+        await endpointsUtil.initializeCache(
           { ...Config.ENDPOINT_CACHE_CONFIG, getDecoratedValue: true },
           { hubName, hubNameRegex }
         )
@@ -189,7 +217,7 @@ Test('Cache Test', (cacheTest) => {
           .returns(Promise.resolve(Helper.getEndPointsResponse))
 
         try {
-          const result = await Cache.getEndpoint(
+          const result = await endpointsUtil.getEndpoint(
             Config.ENDPOINT_SOURCE_URL,
             fsp,
             endpointType,
@@ -197,7 +225,7 @@ Test('Cache Test', (cacheTest) => {
           )
           test.equal(result, expected, 'The results match')
 
-          const result2 = await Cache.getEndpoint(
+          const result2 = await endpointsUtil.getEndpoint(
             Config.ENDPOINT_SOURCE_URL,
             fsp,
             endpointType,
@@ -210,7 +238,7 @@ Test('Cache Test', (cacheTest) => {
             'The results match'
           )
 
-          await Cache.stopCache()
+          await endpointsUtil.stopCache()
           test.end()
         } catch (err) {
           test.fail('Error thrown', err)
@@ -232,7 +260,7 @@ Test('Cache Test', (cacheTest) => {
         const expected =
           'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
-        await Cache.initializeCache(
+        await endpointsUtil.initializeCache(
           { ...Config.ENDPOINT_CACHE_CONFIG, getDecoratedValue: true },
           { hubName, hubNameRegex }
         )
@@ -241,14 +269,14 @@ Test('Cache Test', (cacheTest) => {
           .returns(Promise.resolve(Helper.getEndPointsResponse))
 
         try {
-          const result = await Cache.getEndpoint(
+          const result = await endpointsUtil.getEndpoint(
             Config.ENDPOINT_SOURCE_URL,
             fsp,
             endpointType,
             { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }
           )
           test.equal(result, expected, 'The results match')
-          await Cache.stopCache()
+          await endpointsUtil.stopCache()
           test.end()
         } catch (err) {
           test.fail('Error thrown', err)
@@ -268,7 +296,7 @@ Test('Cache Test', (cacheTest) => {
         )
         const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
-        await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
+        await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
           hubNameRegex
         })
         request.sendRequest
@@ -276,7 +304,7 @@ Test('Cache Test', (cacheTest) => {
           .returns(Promise.resolve({ data: {} }))
 
         try {
-          await Cache.getEndpoint(
+          await endpointsUtil.getEndpoint(
             Config.ENDPOINT_SOURCE_URL,
             fsp,
             endpointType,
@@ -286,7 +314,7 @@ Test('Cache Test', (cacheTest) => {
         } catch (e) {
           test.ok(e instanceof Error)
         }
-        await Cache.stopCache()
+        await endpointsUtil.stopCache()
         test.end()
       }
     )
@@ -300,20 +328,20 @@ Test('Cache Test', (cacheTest) => {
       )
       const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
-      await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
+      await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
         hubNameRegex
       })
       request.sendRequest
         .withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex })
         .throws(new Error())
       try {
-        await Cache.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType)
+        await endpointsUtil.getEndpoint(Config.ENDPOINT_SOURCE_URL, fsp, endpointType)
         test.fail('should throw error')
-        await Cache.stopCache()
+        await endpointsUtil.stopCache()
         test.end()
       } catch (e) {
         test.ok(e instanceof Error)
-        await Cache.stopCache()
+        await endpointsUtil.stopCache()
         test.end()
       }
     })
@@ -337,7 +365,7 @@ Test('Cache Test', (cacheTest) => {
           const expected =
             'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
-          await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
+          await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, {
             hubName, hubNameRegex
           })
           request.sendRequest
@@ -345,7 +373,7 @@ Test('Cache Test', (cacheTest) => {
             .returns(Promise.resolve(Helper.getEndpointAndRenderResponse))
 
           try {
-            const result = await Cache.getEndpointAndRender(
+            const result = await endpointsUtil.getEndpointAndRender(
               Config.ENDPOINT_SOURCE_URL,
               fsp,
               endpointType,
@@ -353,7 +381,7 @@ Test('Cache Test', (cacheTest) => {
               { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }
             )
             test.equal(result, expected, 'The results match')
-            await Cache.stopCache()
+            await endpointsUtil.stopCache()
             test.end()
           } catch (err) {
             test.fail('Error thrown', err)
@@ -375,7 +403,7 @@ Test('Cache Test', (cacheTest) => {
           const expected =
             'http://localhost:1080/transfers/97b01bd3-b223-415b-b37b-ab5bef9bdbed'
 
-          await Cache.initializeCache(
+          await endpointsUtil.initializeCache(
             { ...Config.ENDPOINT_CACHE_CONFIG, getDecoratedValue: true },
             { hubName, hubNameRegex }
           )
@@ -384,7 +412,7 @@ Test('Cache Test', (cacheTest) => {
             .returns(Promise.resolve(Helper.getEndpointAndRenderResponse))
 
           try {
-            const result = await Cache.getEndpointAndRender(
+            const result = await endpointsUtil.getEndpointAndRender(
               Config.ENDPOINT_SOURCE_URL,
               fsp,
               endpointType,
@@ -392,7 +420,7 @@ Test('Cache Test', (cacheTest) => {
               { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }
             )
             test.equal(result, expected, 'The results match')
-            await Cache.stopCache()
+            await endpointsUtil.stopCache()
             test.end()
           } catch (err) {
             test.fail('Error thrown', err)
@@ -412,13 +440,13 @@ Test('Cache Test', (cacheTest) => {
           )
           const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
-          await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+          await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
           request.sendRequest
             .withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex })
             .returns(Promise.resolve({ data: {} }))
 
           try {
-            await Cache.getEndpointAndRender(
+            await endpointsUtil.getEndpointAndRender(
               Config.ENDPOINT_SOURCE_URL,
               fsp,
               endpointType,
@@ -426,11 +454,11 @@ Test('Cache Test', (cacheTest) => {
               { transferId: '97b01bd3-b223-415b-b37b-ab5bef9bdbed' }
             )
             test.fail('should throw error')
-            await Cache.stopCache()
+            await endpointsUtil.stopCache()
             test.end()
           } catch (e) {
             test.ok(e instanceof Error)
-            await Cache.stopCache()
+            await endpointsUtil.stopCache()
             test.end()
           }
         }
@@ -445,22 +473,22 @@ Test('Cache Test', (cacheTest) => {
         )
         const endpointType = FSPIOP_CALLBACK_URL_TRANSFER_PUT
 
-        await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+        await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
         request.sendRequest
           .withArgs({ url, headers: Helper.defaultHeaders(), source: hubName, destination: hubName, hubNameRegex })
           .throws(new Error())
         try {
-          await Cache.getEndpointAndRender(
+          await endpointsUtil.getEndpointAndRender(
             Config.ENDPOINT_SOURCE_URL,
             fsp,
             endpointType
           )
           test.fail('should throw error')
-          await Cache.stopCache()
+          await endpointsUtil.stopCache()
           test.end()
         } catch (e) {
           test.ok(e instanceof Error)
-          await Cache.stopCache()
+          await endpointsUtil.stopCache()
           test.end()
         }
       })
@@ -474,12 +502,12 @@ Test('Cache Test', (cacheTest) => {
       'initializeCache cache and return true',
       async (test) => {
         try {
-          const result = await Cache.initializeCache(
+          const result = await endpointsUtil.initializeCache(
             Config.ENDPOINT_CACHE_CONFIG,
             { hubName, hubNameRegex }
           )
           test.equal(result, true, 'The results match')
-          await Cache.stopCache()
+          await endpointsUtil.stopCache()
           test.end()
         } catch (err) {
           test.fail('Error thrown', err)
@@ -491,7 +519,7 @@ Test('Cache Test', (cacheTest) => {
     initializeCacheTest.test('should throw error', async (test) => {
       try {
         sandbox.stub(Catbox, 'Client').throws(new Error())
-        await Cache.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
+        await endpointsUtil.initializeCache(Config.ENDPOINT_CACHE_CONFIG, { hubName, hubNameRegex })
         test.fail('should throw')
         test.end()
       } catch (err) {
