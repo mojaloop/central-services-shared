@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.28.0](https://github.com/mojaloop/central-services-shared/compare/v18.27.0...v18.28.0) (2025-06-10)
+
+
+### Features
+
+* **csi-1562:** throw a custom error if endpoint is empty ([#455](https://github.com/mojaloop/central-services-shared/issues/455)) ([e0013ae](https://github.com/mojaloop/central-services-shared/commit/e0013aea0dc9b3d3a53d56c20a53d85ad8cff087))
+
 ## [18.27.0](https://github.com/mojaloop/central-services-shared/compare/v18.26.2...v18.27.0) (2025-06-02)
 
 
