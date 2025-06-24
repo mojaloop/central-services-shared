@@ -19,6 +19,15 @@ declare namespace CentralServicesShared {
         URI: string;
       };
     };
+    HeaderResources: {
+      PARTICIPANTS: string;
+      ORACLE: string;
+      TRANSFERS: string;
+      FX_TRANSFERS: string;
+      QUOTES: string;
+      FX_QUOTES: string;
+      PARTIES: string;
+    };
     ReturnCodes: {
       OK: ReturnCode;
       ACCEPTED: ReturnCode;
