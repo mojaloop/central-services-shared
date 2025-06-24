@@ -127,7 +127,8 @@ const HeaderResources = {
   TRANSFERS: 'transfers',
   FX_TRANSFERS: 'fxTransfers',
   QUOTES: 'quotes',
-  FX_QUOTES: 'fxQuotes'
+  FX_QUOTES: 'fxQuotes',
+  PARTIES: 'parties'
 }
 
 const ServiceType = {
