@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.28.3](https://github.com/mojaloop/central-services-shared/compare/v18.28.2...v18.28.3) (2025-06-24)
+
+
+### Chore
+
+* add parties to header resources ([#459](https://github.com/mojaloop/central-services-shared/issues/459)) ([5092d84](https://github.com/mojaloop/central-services-shared/commit/5092d84125e72257ecb9bdcff1441274c253ca04))
+
 ### [18.28.2](https://github.com/mojaloop/central-services-shared/compare/v18.28.1...v18.28.2) (2025-06-12)
 
 
