@@ -55,6 +55,7 @@ const id = require('./id')
 const rethrow = require('./rethrow')
 const Redis = require('./redis')
 const createLogger = require('./createLogger')
+const distLock = require('./distLock')
 
 const omitNil = (object) => {
   return _.omitBy(object, _.isNil)
@@ -267,5 +268,6 @@ module.exports = {
   id,
   resourceVersions: Helpers.resourceVersions,
   rethrow,
-  Redis
+  Redis,
+  distLock
 }
