@@ -2,7 +2,6 @@ const DEFAULT_RETRY_ATTEMPTS = 3
 const DEFAULT_RETRY_DELAY_MS = 200
 
 async function retryCommand (fn, attempts, delay, log) {
-  console.log('hello from retryCommand')
   let lastError
   for (let i = 0; i < attempts; i++) {
     try {

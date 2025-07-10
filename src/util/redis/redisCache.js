@@ -83,7 +83,6 @@ class RedisCache {
 
   async disconnect () {
     try {
-      console.log('hello from disconnect')
       const response = await retryCommand(() => this.redisClient.quit(), this.retryAttempts, this.retryDelayMs, this.log)
       const isDisconnected = response === REDIS_SUCCESS
       this.redisClient.removeAllListeners()

@@ -190,5 +190,209 @@ Test('RedisCache', redisCacheTest => {
     }
     t.end()
   })
+
+  redisCacheTest.test('should set lazyConnect to true if not set in config', t => {
+    const config = { cluster: [{ host: 'localhost', port: 6379 }] }
+    delete config.lazyConnect
+    const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
+      './shared': { retryCommand: retryCommandStub }
+    })
+    const redisCacheLocal = new RedisCacheWithStub(config)
+    t.equal(redisCacheLocal.config.lazyConnect, true, 'lazyConnect set to true')
+    t.end()
+  })
+
+  redisCacheTest.test('should use Redis.Cluster when cluster config is present', t => {
+    const RedisStub = {
+      Cluster: sinon.stub().returns(redisClientStub)
+    }
+    const config = { cluster: [{ host: 'localhost', port: 6379 }] }
+    const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
+      ioredis: RedisStub,
+      './shared': { retryCommand: retryCommandStub }
+    })
+    const redisCache = new RedisCacheWithStub(config)
+    t.ok(redisCache)
+    t.ok(RedisStub.Cluster.called, 'Redis.Cluster constructor called')
+    t.end()
+  })
+
+  redisCacheTest.test('should use Redis when cluster config is not present', t => {
+    const RedisStub = sinon.stub().returns(redisClientStub)
+    const config = { host: 'localhost', port: 6379 }
+    const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
+      ioredis: RedisStub,
+      './shared': { retryCommand: retryCommandStub }
+    })
+    const redisCache = new RedisCacheWithStub(config)
+    t.ok(redisCache, 'RedisCache instance created')
+    t.ok(RedisStub.called, 'Redis constructor called')
+    t.end()
+  })
+
+  redisCacheTest.test('should add event listeners to redis client', t => {
+    const log = {
+      error: sinon.stub(),
+      info: sinon.stub(),
+      warn: sinon.stub(),
+      verbose: sinon.stub()
+    }
+    const redisClient = {
+      on: sinon.stub().returnsThis()
+    }
+    const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
+      './shared': { retryCommand: retryCommandStub },
+      '../createLogger': { createLogger: () => log }
+    })
+    const redisCache = new RedisCacheWithStub({ cluster: [{}] }, redisClient)
+    t.ok(redisCache, 'RedisCache instance created')
+    t.equal(redisClient.on.callCount, 6, 'All listeners attached')
+    t.end()
+  })
+
+  redisCacheTest.test('should return false for isConnected if status is not connected', t => {
+    redisClientStub.status = 'end'
+    const result = redisCache.isConnected
+    t.equal(result, false, 'isConnected returns false')
+    t.end()
+  })
+
+  redisCacheTest.test('addEventListeners attaches all expected event handlers', t => {
+    const log = {
+      error: sinon.stub(),
+      info: sinon.stub(),
+      warn: sinon.stub(),
+      verbose: sinon.stub()
+    }
+    const redisClient = {
+      on: sinon.stub().returnsThis()
+    }
+    const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
+      './shared': { retryCommand: retryCommandStub },
+      '../createLogger': { createLogger: () => log }
+    })
+    const redisCache = new RedisCacheWithStub({ cluster: [{}] }, redisClient)
+    t.ok(redisCache, 'RedisCache instance created')
+    // Should attach 6 listeners: error, close, end, reconnecting, connect, ready
+    t.equal(redisClient.on.callCount, 6, 'All expected event listeners attached')
+    t.ok(redisClient.on.calledWith('error'), 'error event attached')
+    t.ok(redisClient.on.calledWith('close'), 'close event attached')
+    t.ok(redisClient.on.calledWith('end'), 'end event attached')
+    t.ok(redisClient.on.calledWith('reconnecting'), 'reconnecting event attached')
+    t.ok(redisClient.on.calledWith('connect'), 'connect event attached')
+    t.ok(redisClient.on.calledWith('ready'), 'ready event attached')
+    t.end()
+  })
+
+  redisCacheTest.test('event listeners trigger correct logger methods', t => {
+    const log = {
+      error: sinon.stub(),
+      info: sinon.stub(),
+      warn: sinon.stub(),
+      verbose: sinon.stub(),
+      debug: sinon.stub()
+    }
+    // We'll store the handlers for each event
+    const eventHandlers = {}
+    const redisClient = {
+      on: function (event, handler) {
+        eventHandlers[event] = handler
+        return this
+      }
+    }
+    const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
+      './shared': { retryCommand: retryCommandStub },
+      '../createLogger': { createLogger: () => log }
+    })
+    // Instantiating will attach listeners
+    const redisCache = new RedisCacheWithStub({ cluster: [{}] }, redisClient)
+    t.ok(redisCache, 'RedisCache instance created')
+    // Simulate events
+    eventHandlers.error && eventHandlers.error('err')
+    t.ok(log.error.calledWith('redis connection error', 'err'), 'error logger called on error event')
+
+    eventHandlers.close && eventHandlers.close()
+    t.ok(log.info.calledWith('redis connection closed'), 'info logger called on close event')
+
+    eventHandlers.end && eventHandlers.end()
+    t.ok(log.warn.calledWith('redis connection ended'), 'warn logger called on end event')
+
+    eventHandlers.reconnecting && eventHandlers.reconnecting(1234)
+    t.ok(log.info.calledWith('redis connection reconnecting', { ms: 1234 }), 'info logger called on reconnecting event')
+
+    eventHandlers.connect && eventHandlers.connect()
+    t.ok(log.verbose.calledWith('redis connection is established'), 'verbose logger called on connect event')
+
+    eventHandlers.ready && eventHandlers.ready()
+    t.ok(log.verbose.calledWith('redis connection is ready'), 'verbose logger called on ready event')
+
+    t.end()
+  })
+
+  redisCacheTest.test('should throw an error when connect fails', async t => {
+    const error = new Error('Redis connect error')
+    retryCommandStub.callsFake(async () => { throw error })
+    // Unstub ensureConnected for connect test
+    redisCache.ensureConnected.restore && redisCache.ensureConnected.restore()
+    redisClientStub.status = 'end'
+    try {
+      await redisCache.connect()
+      t.fail('Expected error to be thrown')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly on connect')
+    }
+    t.end()
+  })
+
+  redisCacheTest.test('should throw an error when disconnect fails', async t => {
+    const error = new Error('Redis disconnect error')
+    retryCommandStub.callsFake(async () => { throw error })
+    try {
+      await redisCache.disconnect()
+      t.fail('Expected error to be thrown')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly on disconnect')
+    }
+    t.end()
+  })
+
+  redisCacheTest.test('ensureConnected does not reconnect if already connected', async t => {
+    // status is 'ready', which is in REDIS_IS_CONNECTED_STATUSES
+    redisClientStub.status = 'ready'
+    await redisCache.ensureConnected(redisClientStub)
+    t.ok(redisClientStub.connect.notCalled, 'connect not called when already connected')
+    t.end()
+  })
+
+  redisCacheTest.test('ensureConnected reconnects if not connected', async t => {
+    // Restore the original ensureConnected method to test actual logic
+    if (redisCache.ensureConnected.restore) redisCache.ensureConnected.restore()
+    // Reset retryCommandStub to default behavior for this test
+    retryCommandStub.resetBehavior()
+    retryCommandStub.callsFake(async (fn) => fn())
+    redisClientStub.connect.resetHistory && redisClientStub.connect.resetHistory()
+    redisClientStub.status = 'end' // not in REDIS_IS_CONNECTED_STATUSES
+    await redisCache.ensureConnected(redisClientStub)
+    t.ok(retryCommandStub.called, 'retryCommand called for connect')
+    t.ok(redisClientStub.connect.called, 'connect called on Redis client')
+    t.end()
+  })
+
+  redisCacheTest.test('ensureConnected throws error if reconnect fails', async t => {
+    if (redisCache.ensureConnected.restore) redisCache.ensureConnected.restore()
+    // Reset retryCommandStub to ensure correct behavior for this test
+    retryCommandStub.resetBehavior()
+    redisClientStub.connect.resetHistory && redisClientStub.connect.resetHistory()
+    redisClientStub.status = 'end'
+    const error = new Error('Reconnect failed')
+    retryCommandStub.callsFake(async () => { throw error })
+    try {
+      await redisCache.ensureConnected(redisClientStub)
+      t.fail('Expected error to be thrown')
+    } catch (err) {
+      t.equal(err, error, 'Error thrown when reconnect fails')
+    }
+    t.end()
+  })
   redisCacheTest.end()
 })
