@@ -394,5 +394,58 @@ Test('RedisCache', redisCacheTest => {
     }
     t.end()
   })
+
+  redisCacheTest.test('ensureConnected uses default client if none provided', async t => {
+    // Restore the original ensureConnected method to test actual logic
+    if (redisCache.ensureConnected.restore) redisCache.ensureConnected.restore()
+    // Set redisClientStub.status to 'end' to force reconnect
+    redisClientStub.status = 'end'
+    // Reset retryCommandStub to default behavior
+    retryCommandStub.resetBehavior()
+    retryCommandStub.callsFake(async (fn) => fn())
+    redisClientStub.connect.resetHistory && redisClientStub.connect.resetHistory()
+    await redisCache.ensureConnected()
+    t.ok(retryCommandStub.called, 'retryCommand called for connect')
+    t.ok(redisClientStub.connect.called, 'connect called on default redisClient')
+    t.end()
+  })
+
+  redisCacheTest.test('ensureConnected does not reconnect if provided client is already connected', async t => {
+    // Restore the original ensureConnected method to test actual logic
+    if (redisCache.ensureConnected.restore) redisCache.ensureConnected.restore()
+    // Set status to 'ready' (connected)
+    const customClient = { status: 'ready', connect: sinon.stub() }
+    await redisCache.ensureConnected(customClient)
+    t.ok(customClient.connect.notCalled, 'connect not called on provided client when already connected')
+    t.end()
+  })
+
+  redisCacheTest.test('ensureConnected reconnects if provided client is not connected', async t => {
+    // Restore the original ensureConnected method to test actual logic
+    if (redisCache.ensureConnected.restore) redisCache.ensureConnected.restore()
+    // Set status to 'end' (not connected)
+    const customClient = { status: 'end', connect: sinon.stub().resolves() }
+    // Reset retryCommandStub to default behavior
+    retryCommandStub.resetBehavior()
+    retryCommandStub.callsFake(async (fn) => fn())
+    await redisCache.ensureConnected(customClient)
+    t.ok(retryCommandStub.called, 'retryCommand called for connect')
+    t.ok(customClient.connect.called, 'connect called on provided client')
+    t.end()
+  })
+
+  redisCacheTest.test('ensureConnected throws error if provided client reconnect fails', async t => {
+    if (redisCache.ensureConnected.restore) redisCache.ensureConnected.restore()
+    const customClient = { status: 'end', connect: sinon.stub().rejects(new Error('fail')) }
+    retryCommandStub.resetBehavior()
+    retryCommandStub.callsFake(async () => { throw new Error('fail') })
+    try {
+      await redisCache.ensureConnected(customClient)
+      t.fail('Expected error to be thrown')
+    } catch (err) {
+      t.equal(err.message, 'fail', 'Error thrown when reconnect fails on provided client')
+    }
+    t.end()
+  })
   redisCacheTest.end()
 })
