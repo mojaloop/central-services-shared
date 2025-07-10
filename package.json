@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.28.2",
+  "version": "18.29.0",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -41,6 +41,7 @@
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
     "test": "npm run test:unit",
+    "test:distLock": "npx tape 'test/unit/util/distLock/**/*.test.js'",
     "test:header": "npx tape 'test/unit/util/headerValidation/**/*.test.js'",
     "test:logging": "npx tape 'test/unit/util/hapi/plugins/loggingPlugin.test.js'",
     "test:endpoints": "npx tape 'test/unit/util/endpoints.test.js'",
@@ -85,6 +86,7 @@
     "openapi-backend": "5.13.0",
     "raw-body": "3.0.0",
     "rc": "1.2.8",
+    "redlock": "5.0.0-beta.2",
     "shins": "2.6.0",
     "ulidx": "2.4.1",
     "uuid4": "2.0.3",

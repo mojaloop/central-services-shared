@@ -778,6 +778,42 @@ declare namespace CentralServicesShared {
     RedisCache: RedisCache;
   }
 
+  type RedisInstanceConfig = 
+    | {
+        type: 'redis';
+        host: string;
+        port: number;
+      }
+    | {
+        type: 'redis-cluster';
+        cluster: Array<{ host: string; port: number }>;
+      };
+
+  interface DistributedLockConfig {
+    redisConfigs: RedisInstanceConfig[];
+    driftFactor?: number;
+    retryCount?: number;
+    retryDelay?: number;
+    retryJitter?: number;
+    lockTimeout?: number;
+  }
+
+  interface LockInterface {
+    acquire(key: string, ttl: number, acquireTimeout?: number): Promise<string>;
+    release(): Promise<boolean>;
+    extend(ttl: number): Promise<string>;
+  }
+
+  interface DistributedLock extends LockInterface {
+    config: DistributedLockConfig;
+    logger: ILogger;
+    redisInstances: IORedis[];
+  }
+
+  interface DistLock {
+    createLock(config: DistributedLockConfig, logger?: ILogger): DistributedLock;
+  }
+
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
@@ -789,6 +825,7 @@ declare namespace CentralServicesShared {
     StreamingProtocol: StreamingProtocol;
     HeaderValidation: HeaderValidation;
     Redis: Redis;
+    distLock: DistLock;
   }
 
   const Enum: Enum
