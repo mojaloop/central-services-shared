@@ -52,6 +52,8 @@ class PubSub {
     this.addEventListeners(this.subscriberClient)
     this.retryAttempts = options.retryAttempts ?? DEFAULT_RETRY_ATTEMPTS
     this.retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS
+    // Track event listeners for each channel to allow removal
+    this._channelListeners = new Map()
   }
 
   createRedisClient () {
@@ -78,6 +80,7 @@ class PubSub {
       const subscriberResponse = await retryCommand(() => this.subscriberClient.quit(), this.retryAttempts, this.retryDelayMs, this.log)
       const isDisconnected = publisherResponse === REDIS_SUCCESS && subscriberResponse === REDIS_SUCCESS
       this.subscriberClient.removeAllListeners()
+      this._channelListeners.clear()
       this.log.info('Redis clients disconnected successfully')
       return isDisconnected
     } catch (err) {
@@ -134,20 +137,25 @@ class PubSub {
   async subscribe (channel, callback) {
     try {
       await this.ensureConnected(this.subscriberClient)
+      let listener
       if (this.isCluster) {
         await retryCommand(() => this.subscriberClient.ssubscribe(channel), this.retryAttempts, this.retryDelayMs, this.log)
-        this.subscriberClient.on('smessage', (subscribedChannel, message) => {
+        listener = (subscribedChannel, message) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
           }
-        })
+        }
+        this.subscriberClient.on('smessage', listener)
+        this._channelListeners.set(channel, { event: 'smessage', listener })
       } else {
         await retryCommand(() => this.subscriberClient.subscribe(channel), this.retryAttempts, this.retryDelayMs, this.log)
-        this.subscriberClient.on('message', (subscribedChannel, message) => {
+        listener = (subscribedChannel, message) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
           }
-        })
+        }
+        this.subscriberClient.on('message', listener)
+        this._channelListeners.set(channel, { event: 'message', listener })
       }
       this.log.info(`Subscribed to channel: ${channel}`)
       return channel
@@ -160,6 +168,12 @@ class PubSub {
   async unsubscribe (channel) {
     try {
       await this.ensureConnected(this.subscriberClient)
+      // Remove the event listener for this channel if it exists
+      const listenerObj = this._channelListeners.get(channel)
+      if (listenerObj) {
+        this.subscriberClient.removeListener(listenerObj.event, listenerObj.listener)
+        this._channelListeners.delete(channel)
+      }
       if (this.isCluster) {
         await retryCommand(() => this.subscriberClient.sunsubscribe(channel), this.retryAttempts, this.retryDelayMs, this.log)
       } else {
