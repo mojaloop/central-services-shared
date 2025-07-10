@@ -60,6 +60,7 @@ Test('PubSub', (t) => {
       connect: sandbox.stub().resolves(),
       quit: sandbox.stub().resolves(),
       removeAllListeners: sandbox.stub().resolves(),
+      removeListener: sandbox.stub(),
       status: 'ready'
     }
 
@@ -609,6 +610,176 @@ Test('PubSub', (t) => {
     } catch (err) {
       t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
     }
+    t.end()
+  })
+
+  t.test('should set lazyConnect to true if not provided in config when creating Redis client', (t) => {
+    // Arrange
+    const config = {}
+    // We want to test the createRedisClient method directly, so we need a real PubSub instance
+    // but we will stub Redis and Redis.Cluster constructors to observe their arguments
+    const redisStub = sandbox.stub()
+    const redisClusterStub = sandbox.stub()
+    const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
+      ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
+      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
+      './shared': { retryCommand: retryCommandStub }
+    })
+
+    // Act
+    const pubSub = new PubSubWithRedisStub(config)
+    pubSub.isCluster = false // force non-cluster mode
+    pubSub.createRedisClient()
+
+    // Assert
+    t.equal(config.lazyConnect, true, 'lazyConnect is set to true in config')
+    t.end()
+  })
+
+  t.test('should not overwrite lazyConnect if already set in config', (t) => {
+    // Arrange
+    const config = { lazyConnect: false }
+    const redisStub = sandbox.stub()
+    const redisClusterStub = sandbox.stub()
+    const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
+      ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
+      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
+      './shared': { retryCommand: retryCommandStub }
+    })
+
+    // Act
+    const pubSub = new PubSubWithRedisStub(config)
+    pubSub.isCluster = false // force non-cluster mode
+    pubSub.createRedisClient()
+
+    // Assert
+    t.equal(config.lazyConnect, false, 'lazyConnect remains false in config')
+    t.end()
+  })
+
+  t.test('should use Redis.Cluster constructor when isCluster is true', (t) => {
+    // Arrange
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const redisStub = sandbox.stub()
+    const redisClusterClient = { on: sandbox.stub().returnsThis() }
+    const redisClusterStub = sandbox.stub().returns(redisClusterClient)
+    const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
+      ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
+      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
+      './shared': { retryCommand: retryCommandStub }
+    })
+
+    // Act
+    const pubSub = new PubSubWithRedisStub(config)
+    pubSub.isCluster = true // force cluster mode
+    pubSub.createRedisClient()
+
+    // Assert
+    t.ok(pubSub.publisherClient instanceof redisClusterClient.constructor, 'Redis.Cluster constructor called')
+    t.ok(pubSub.subscriberClient instanceof redisClusterClient.constructor, 'Redis.Cluster constructor called for subscriber')
+    t.end()
+  })
+
+  t.test('should use Redis constructor when isCluster is false', (t) => {
+    // Arrange
+    const config = {}
+    const redisStub = sandbox.stub()
+    const redisClusterStub = sandbox.stub()
+    const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
+      ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
+      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
+      './shared': { retryCommand: retryCommandStub }
+    })
+
+    // Act
+    const pubSub = new PubSubWithRedisStub(config)
+    pubSub.isCluster = false // force non-cluster mode
+    pubSub.createRedisClient()
+
+    // Assert
+    t.ok(pubSub.publisherClient instanceof redisStub, 'Redis constructor called for publisher')
+    t.ok(pubSub.subscriberClient instanceof redisStub, 'Redis constructor called for subscriber')
+    t.end()
+  })
+
+  t.test('should call connect on client if not connected in ensureConnected', async (t) => {
+    const config = {}
+    const notConnectedClient = {
+      ...publisherClientStub,
+      status: 'disconnected',
+      connect: sandbox.stub().resolves()
+    }
+    const pubSub = new PubSub(config, notConnectedClient, subscriberClientStub)
+    await pubSub.ensureConnected(notConnectedClient)
+    t.ok(notConnectedClient.connect.calledOnce, 'connect called when client is not connected')
+    t.end()
+  })
+
+  t.test('should not call connect on client if already connected in ensureConnected', async (t) => {
+    const config = {}
+    const connectedClient = {
+      ...publisherClientStub,
+      status: 'ready',
+      connect: sandbox.stub().resolves()
+    }
+    const pubSub = new PubSub(config, connectedClient, subscriberClientStub)
+    await pubSub.ensureConnected(connectedClient)
+    t.notOk(connectedClient.connect.called, 'connect not called when client is already connected')
+    t.end()
+  })
+
+  t.test('should handle error in ensureConnected and rethrow', async (t) => {
+    const config = {}
+    const error = new Error('Reconnect error')
+    const notConnectedClient = {
+      ...publisherClientStub,
+      status: 'disconnected',
+      connect: sandbox.stub().rejects(error)
+    }
+    const pubSub = new PubSub(config, notConnectedClient, subscriberClientStub)
+    // Patch retryCommand to throw
+    retryCommandStub.callsFake(async () => { throw error })
+    try {
+      await pubSub.ensureConnected(notConnectedClient)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.equal(err, error, 'Error is rethrown from ensureConnected')
+    }
+    t.end()
+  })
+
+  t.test('should remove event listener object from _channelListeners on unsubscribe', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config, publisherClientStub, subscriberClientStub)
+    const channel = 'test-channel'
+    const callback = sinon.stub()
+    // Subscribe to add listener
+    await pubSub.subscribe(channel, callback)
+    t.ok(pubSub._channelListeners.has(channel), '_channelListeners has channel after subscribe')
+    // Unsubscribe should remove listener object
+    await pubSub.unsubscribe(channel)
+    t.notOk(pubSub._channelListeners.has(channel), '_channelListeners does not have channel after unsubscribe')
+    t.end()
+  })
+
+  t.test('should remove event listener object from _channelListeners on unsubscribe in cluster mode', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const subscriberClient = {
+      ...subscriberClientStub,
+      ssubscribe: sandbox.stub().resolves(),
+      sunsubscribe: sandbox.stub().resolves(),
+      on: sandbox.stub().returnsThis(),
+      removeListener: sandbox.stub()
+    }
+    const pubSub = new PubSub(config, publisherClientStub, subscriberClient)
+    const channel = 'cluster-channel'
+    const callback = sinon.stub()
+    // Subscribe to add listener
+    await pubSub.subscribe(channel, callback)
+    t.ok(pubSub._channelListeners.has(channel), '_channelListeners has channel after subscribe (cluster)')
+    // Unsubscribe should remove listener object
+    await pubSub.unsubscribe(channel)
+    t.notOk(pubSub._channelListeners.has(channel), '_channelListeners does not have channel after unsubscribe (cluster)')
     t.end()
   })
   t.end()
