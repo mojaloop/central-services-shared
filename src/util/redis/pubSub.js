@@ -33,7 +33,7 @@ const { createLogger } = require('../createLogger')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
-const { retryCommand, DEFAULT_RETRY_ATTEMPTS, DEFAULT_RETRY_DELAY_MS } = require('./shared')
+const { retryCommand } = require('./shared')
 
 class PubSub {
   /**
@@ -50,8 +50,8 @@ class PubSub {
     this.subscriberClient = subscriberClient || this.createRedisClient()
     this.addEventListeners(this.publisherClient)
     this.addEventListeners(this.subscriberClient)
-    this.retryAttempts = options.retryAttempts ?? DEFAULT_RETRY_ATTEMPTS
-    this.retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS
+    this.retryAttempts = options.retryAttempts ?? undefined
+    this.retryDelayMs = options.retryDelayMs ?? undefined
     // Track event listeners for each channel to allow removal
     this._channelListeners = new Map()
   }

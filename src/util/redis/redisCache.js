@@ -32,7 +32,7 @@ const { createLogger } = require('../createLogger')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
-const { retryCommand, DEFAULT_RETRY_ATTEMPTS, DEFAULT_RETRY_DELAY_MS } = require('./shared')
+const { retryCommand } = require('./shared')
 
 class RedisCache {
   constructor (config, client, options = {}) {
@@ -41,8 +41,8 @@ class RedisCache {
     this.log = createLogger(this.constructor.name)
     this.redisClient = client || this.createRedisClient()
     this.addEventListeners(this.redisClient)
-    this.retryAttempts = options.retryAttempts ?? DEFAULT_RETRY_ATTEMPTS
-    this.retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS
+    this.retryAttempts = options.retryAttempts ?? undefined
+    this.retryDelayMs = options.retryDelayMs ?? undefined
   }
 
   createRedisClient () {
