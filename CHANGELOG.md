@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.30.0](https://github.com/mojaloop/central-services-shared/compare/v18.29.0...v18.30.0) (2025-07-11)
+
+
+### Features
+
+* add retry and connection check to redis classes ([#463](https://github.com/mojaloop/central-services-shared/issues/463)) ([4b6d172](https://github.com/mojaloop/central-services-shared/commit/4b6d172b25fe44b0f7628227663a5ca11c975791))
+
 ## [18.29.0](https://github.com/mojaloop/central-services-shared/compare/v18.28.3...v18.29.0) (2025-07-03)
 
 
