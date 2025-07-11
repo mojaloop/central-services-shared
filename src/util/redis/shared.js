@@ -1,5 +1,5 @@
 const DEFAULT_RETRY_ATTEMPTS = 3
-const DEFAULT_RETRY_DELAY_MS = 200
+const DEFAULT_RETRY_DELAY_MS = 100
 
 async function retryCommand (fn, log, attempts = DEFAULT_RETRY_ATTEMPTS, delay = DEFAULT_RETRY_DELAY_MS) {
   let lastError
