@@ -32,18 +32,19 @@ const { createLogger } = require('../createLogger')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
+const { retryCommand } = require('./shared')
 
 class RedisCache {
-  constructor (config, client) {
+  constructor (config, client, options = {}) {
     this.config = config
     this.isCluster = isClusterConfig(config)
     this.log = createLogger(this.constructor.name)
-    /* istanbul ignore next */
     this.redisClient = client || this.createRedisClient()
     this.addEventListeners(this.redisClient)
+    this.retryAttempts = options.retryAttempts ?? undefined
+    this.retryDelayMs = options.retryDelayMs ?? undefined
   }
 
-  /* istanbul ignore next */
   createRedisClient () {
     this.config.lazyConnect ??= true
     const redisClient = isClusterConfig(this.config)
@@ -53,7 +54,6 @@ class RedisCache {
     return redisClient
   }
 
-  /* istanbul ignore next */
   addEventListeners (redisClient) {
     const { log } = this
     redisClient
@@ -70,23 +70,33 @@ class RedisCache {
       this.log.warn('proxyCache is already connected')
       return true
     }
-    await this.redisClient.connect()
-    const { status } = this.redisClient
-    this.log.verbose('proxyCache is connected', { status })
-    return true
+    try {
+      await retryCommand(() => this.redisClient.connect(), this.log, this.retryAttempts, this.retryDelayMs)
+      const { status } = this.redisClient
+      this.log.verbose('proxyCache is connected', { status })
+      return true
+    } catch (err) {
+      this.log.error('Error connecting Redis client:', err)
+      rethrowRedisError(err)
+    }
   }
 
   async disconnect () {
-    const response = await this.redisClient.quit()
-    const isDisconnected = response === REDIS_SUCCESS
-    this.redisClient.removeAllListeners()
-    this.log.info('proxyCache is disconnected', { isDisconnected, response })
-    return isDisconnected
+    try {
+      const response = await retryCommand(() => this.redisClient.quit(), this.log, this.retryAttempts, this.retryDelayMs)
+      const isDisconnected = response === REDIS_SUCCESS
+      this.redisClient.removeAllListeners()
+      this.log.info('proxyCache is disconnected', { isDisconnected, response })
+      return isDisconnected
+    } catch (err) {
+      this.log.error('Error disconnecting Redis client:', err)
+      rethrowRedisError(err)
+    }
   }
 
   async healthCheck () {
     try {
-      const response = await this.redisClient.ping()
+      const response = await retryCommand(() => this.redisClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
       const isHealthy = response === 'PONG'
       this.log.debug('healthCheck ping response', { isHealthy, response })
       return isHealthy
@@ -102,9 +112,17 @@ class RedisCache {
     return isConnected
   }
 
+  async ensureConnected (client = this.redisClient) {
+    if (!REDIS_IS_CONNECTED_STATUSES.includes(client.status)) {
+      this.log.warn('Redis client not connected, attempting to reconnect...')
+      await retryCommand(() => client.connect(), this.log, this.retryAttempts, this.retryDelayMs)
+    }
+  }
+
   async get (key) {
     try {
-      return await this.redisClient.get(key)
+      await this.ensureConnected()
+      return await retryCommand(() => this.redisClient.get(key), this.log, this.retryAttempts, this.retryDelayMs)
     } catch (err) {
       this.log.error('Error getting key from Redis:', err)
       rethrowRedisError(err)
@@ -113,10 +131,11 @@ class RedisCache {
 
   async set (key, value, ttl) {
     try {
+      await this.ensureConnected()
       if (ttl) {
-        await this.redisClient.set(key, value, 'EX', ttl)
+        await retryCommand(() => this.redisClient.set(key, value, 'EX', ttl), this.log, this.retryAttempts, this.retryDelayMs)
       } else {
-        await this.redisClient.set(key, value)
+        await retryCommand(() => this.redisClient.set(key, value), this.log, this.retryAttempts, this.retryDelayMs)
       }
     } catch (err) {
       this.log.error('Error setting key in Redis:', err)
@@ -126,7 +145,8 @@ class RedisCache {
 
   async delete (key) {
     try {
-      await this.redisClient.del(key)
+      await this.ensureConnected()
+      await retryCommand(() => this.redisClient.del(key), this.log, this.retryAttempts, this.retryDelayMs)
     } catch (err) {
       this.log.error('Error deleting key from Redis:', err)
       rethrowRedisError(err)
@@ -135,7 +155,8 @@ class RedisCache {
 
   async clearCache () {
     try {
-      const keys = await this.redisClient.keys('*')
+      await this.ensureConnected()
+      const keys = await retryCommand(() => this.redisClient.keys('*'), this.log, this.retryAttempts, this.retryDelayMs)
       const pipeline = this.redisClient.pipeline()
       keys.forEach(key => pipeline.del(key))
       await pipeline.exec()

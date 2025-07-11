@@ -33,15 +33,16 @@ const { createLogger } = require('../createLogger')
 const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
+const { retryCommand } = require('./shared')
 
 class PubSub {
-  constructor (config, publisherClient, subscriberClient) {
-    // prepare redis connection instances
-    // once the client enters the subscribed state it is not supposed to issue
-    // any other commands, except for additional SUBSCRIBE, PSUBSCRIBE,
-    // UNSUBSCRIBE, PUNSUBSCRIBE, PING and QUIT commands.
-    // So we create two clients, one for subscribing another for
-    // and publishing
+  /**
+   * @param {object} config - Redis config
+   * @param {object} [publisherClient]
+   * @param {object} [subscriberClient]
+   * @param {object} [options] - { retryAttempts, retryDelayMs }
+   */
+  constructor (config, publisherClient, subscriberClient, options = {}) {
     this.config = config
     this.isCluster = isClusterConfig(config)
     this.log = createLogger(this.constructor.name)
@@ -49,6 +50,10 @@ class PubSub {
     this.subscriberClient = subscriberClient || this.createRedisClient()
     this.addEventListeners(this.publisherClient)
     this.addEventListeners(this.subscriberClient)
+    this.retryAttempts = options.retryAttempts ?? undefined
+    this.retryDelayMs = options.retryDelayMs ?? undefined
+    // Track event listeners for each channel to allow removal
+    this._channelListeners = new Map()
   }
 
   createRedisClient () {
@@ -60,8 +65,8 @@ class PubSub {
 
   async connect () {
     try {
-      await this.publisherClient.connect()
-      await this.subscriberClient.connect()
+      await retryCommand(() => this.publisherClient.connect(), this.log, this.retryAttempts, this.retryDelayMs)
+      await retryCommand(() => this.subscriberClient.connect(), this.log, this.retryAttempts, this.retryDelayMs)
       this.log.info('Redis clients connected successfully')
     } catch (err) {
       this.log.error('Error connecting Redis clients:', err)
@@ -71,10 +76,11 @@ class PubSub {
 
   async disconnect () {
     try {
-      const publisherResponse = await this.publisherClient.quit()
-      const subscriberResponse = await this.subscriberClient.quit()
+      const publisherResponse = await retryCommand(() => this.publisherClient.quit(), this.log, this.retryAttempts, this.retryDelayMs)
+      const subscriberResponse = await retryCommand(() => this.subscriberClient.quit(), this.log, this.retryAttempts, this.retryDelayMs)
       const isDisconnected = publisherResponse === REDIS_SUCCESS && subscriberResponse === REDIS_SUCCESS
       this.subscriberClient.removeAllListeners()
+      this._channelListeners.clear()
       this.log.info('Redis clients disconnected successfully')
       return isDisconnected
     } catch (err) {
@@ -85,8 +91,8 @@ class PubSub {
 
   async healthCheck () {
     try {
-      const publisherStatus = await this.publisherClient.ping()
-      const subscriberStatus = await this.subscriberClient.ping()
+      const publisherStatus = await retryCommand(() => this.publisherClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
+      const subscriberStatus = await retryCommand(() => this.subscriberClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
       const isHealthy = publisherStatus === 'PONG' && subscriberStatus === 'PONG'
       this.log.debug(`Redis health check: ${isHealthy ? 'Healthy' : 'Unhealthy'}`)
       return isHealthy
@@ -109,14 +115,17 @@ class PubSub {
   addEventListeners (client) {
     client.on('connect', () => this.log.info('Redis client connected'))
     client.on('error', (err) => this.log.error('Redis client error:', err))
+    client.on('close', () => this.log.warn('Redis client connection closed'))
+    client.on('reconnecting', () => this.log.warn('Redis client reconnecting'))
   }
 
   async publish (channel, message) {
     try {
+      await this.ensureConnected(this.publisherClient)
       if (this.isCluster) {
-        await this.publisherClient.spublish(channel, JSON.stringify(message))
+        await retryCommand(() => this.publisherClient.spublish(channel, JSON.stringify(message)), this.log, this.retryAttempts, this.retryDelayMs)
       } else {
-        await this.publisherClient.publish(channel, JSON.stringify(message))
+        await retryCommand(() => this.publisherClient.publish(channel, JSON.stringify(message)), this.log, this.retryAttempts, this.retryDelayMs)
       }
       this.log.info(`Message published to channel: ${channel}`)
     } catch (err) {
@@ -127,20 +136,26 @@ class PubSub {
 
   async subscribe (channel, callback) {
     try {
+      await this.ensureConnected(this.subscriberClient)
+      let listener
       if (this.isCluster) {
-        await this.subscriberClient.ssubscribe(channel)
-        this.subscriberClient.on('smessage', (subscribedChannel, message) => {
+        await retryCommand(() => this.subscriberClient.ssubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
+        listener = (subscribedChannel, message) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
           }
-        })
+        }
+        this.subscriberClient.on('smessage', listener)
+        this._channelListeners.set(channel, { event: 'smessage', listener })
       } else {
-        await this.subscriberClient.subscribe(channel)
-        this.subscriberClient.on('message', (subscribedChannel, message) => {
+        await retryCommand(() => this.subscriberClient.subscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
+        listener = (subscribedChannel, message) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
           }
-        })
+        }
+        this.subscriberClient.on('message', listener)
+        this._channelListeners.set(channel, { event: 'message', listener })
       }
       this.log.info(`Subscribed to channel: ${channel}`)
       return channel
@@ -152,10 +167,17 @@ class PubSub {
 
   async unsubscribe (channel) {
     try {
+      await this.ensureConnected(this.subscriberClient)
+      // Remove the event listener for this channel if it exists
+      const listenerObj = this._channelListeners.get(channel)
+      if (listenerObj) {
+        this.subscriberClient.removeListener(listenerObj.event, listenerObj.listener)
+        this._channelListeners.delete(channel)
+      }
       if (this.isCluster) {
-        await this.subscriberClient.sunsubscribe(channel)
+        await retryCommand(() => this.subscriberClient.sunsubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
       } else {
-        await this.subscriberClient.unsubscribe(channel)
+        await retryCommand(() => this.subscriberClient.unsubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
       }
       this.log.info(`Unsubscribed from channel: ${channel}`)
     } catch (err) {
@@ -173,6 +195,13 @@ class PubSub {
     } catch (err) {
       this.log.error('Error broadcasting message:', err)
       rethrowRedisError(err)
+    }
+  }
+
+  async ensureConnected (client) {
+    if (!REDIS_IS_CONNECTED_STATUSES.includes(client.status)) {
+      this.log.warn('Redis client not connected, attempting to reconnect...')
+      await retryCommand(() => client.connect(), this.log, this.retryAttempts, this.retryDelayMs)
     }
   }
 }
