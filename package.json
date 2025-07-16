@@ -123,6 +123,7 @@
     "tapes": "4.1.0"
   },
   "overrides": {
+    "brace-expansion": "2.0.2",
     "nanoid": "5.1.5",
     "postcss": {
       "nanoid": "5.1.5"
