@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.30.3](https://github.com/mojaloop/central-services-shared/compare/v18.30.2...v18.30.3) (2025-07-17)
+
+
+### Chore
+
+* update node version in circleci config ([#466](https://github.com/mojaloop/central-services-shared/issues/466)) ([718cfa1](https://github.com/mojaloop/central-services-shared/commit/718cfa1971a2864ba73cf97fc184c10f6e85685a))
+
 ### [18.30.2](https://github.com/mojaloop/central-services-shared/compare/v18.30.1...v18.30.2) (2025-07-17)
 
 
