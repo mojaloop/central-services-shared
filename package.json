@@ -98,7 +98,7 @@
     "@mojaloop/central-services-logger": "11.9.0",
     "@mojaloop/central-services-metrics": "12.6.0",
     "@mojaloop/event-sdk": "14.6.1",
-    "@mojaloop/sdk-standard-components": "19.16.0",
+    "@mojaloop/sdk-standard-components": "19.16.1",
     "@opentelemetry/auto-instrumentations-node": "^0.62.0",
     "@types/hapi__joi": "17.1.15",
     "ajv": "^8.17.1",
