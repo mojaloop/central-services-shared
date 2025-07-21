@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.30.3",
+  "version": "18.30.4",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
