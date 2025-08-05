@@ -28,10 +28,8 @@
 
 'use strict'
 
-const {
-  statusEnum
-} = require('./HealthCheckEnums')
-const Logger = require('@mojaloop/central-services-logger')
+const { logger } = require('../logger')
+const { statusEnum } = require('./HealthCheckEnums')
 
 /**
  * @class HealthCheck
@@ -82,6 +80,7 @@ class HealthCheck {
   constructor (packageJson, serviceChecks) {
     this.packageJson = packageJson
     this.serviceChecks = serviceChecks
+    this.log = logger.child({ component: this.constructor.name })
 
     this.getHealth = this.getHealth.bind(this)
   }
@@ -110,7 +109,7 @@ class HealthCheck {
         services
       }
     } catch (err) {
-      Logger.isErrorEnabled && Logger.error(`HealthCheck.getSubServiceHealth failed with error: ${err.message}`)
+      this.log.warn(`HealthCheck.getHealth failed with error: ${err?.message}`)
       isHealthy = false
     }
 

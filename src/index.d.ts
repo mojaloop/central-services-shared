@@ -778,7 +778,7 @@ declare namespace CentralServicesShared {
     RedisCache: RedisCache;
   }
 
-  type RedisInstanceConfig = 
+  type RedisInstanceConfig =
     | {
         type: 'redis';
         host: string;
@@ -830,7 +830,69 @@ declare namespace CentralServicesShared {
 
   const Enum: Enum
   const Util: Util
-  const HealthCheck: any
+
+  namespace HealthCheck {
+    enum StatusEnum {
+      OK = 'OK',
+      DOWN = 'DOWN'
+    }
+
+    enum ServiceNameEnum {
+      participantEndpointService = 'participantEndpointService',
+      smtpServer = 'smtpServer',
+      datastore = 'datastore',
+      broker = 'broker',
+      sidecar = 'sidecar',
+      cache = 'cache',
+      proxyCache = 'proxyCache'
+    }
+
+    enum ResponseCodeEnum {
+      success = 200,
+      gatewayTimeout = 502
+    }
+
+    interface SubServiceHealth {
+      status: StatusEnum;
+      service: ServiceNameEnum;
+    }
+
+    type ServiceCheckerFunc = (context?: any) => Promise<SubServiceHealth>;
+
+    interface HealthCheckResult {
+      status: StatusEnum;
+      uptime: number;
+      startTime: string;
+      versionNumber: string;
+      services?: SubServiceHealth[];
+    }
+
+    export const HealthCheckEnums: {
+      responseCode: {
+        success: ResponseCodeEnum.success;
+        gatewayTimeout: ResponseCodeEnum.gatewayTimeout;
+      };
+      serviceName: {
+        participantEndpointService: ServiceNameEnum.participantEndpointService;
+        smtpServer: ServiceNameEnum.smtpServer;
+        datastore: ServiceNameEnum.datastore;
+        broker: ServiceNameEnum.broker;
+        sidecar: ServiceNameEnum.sidecar;
+        cache: ServiceNameEnum.cache;
+        proxyCache: ServiceNameEnum.proxyCache;
+      };
+      statusEnum: {
+        OK: StatusEnum.OK;
+        DOWN: StatusEnum.DOWN;
+      };
+    }
+
+    export class HealthCheck {
+      constructor(packageJson: { version: string }, serviceChecks: ServiceCheckerFunc[]);
+      getHealth(context?: any): Promise<HealthCheckResult>;
+      static evaluateServiceHealth(services: SubServiceHealth[]): boolean;
+    }
+  }
 
   namespace mysql {
     class KnexWrapper {
