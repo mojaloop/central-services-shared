@@ -867,7 +867,7 @@ declare namespace CentralServicesShared {
       services?: SubServiceHealth[];
     }
 
-    export interface HealthCheckEnums {
+    export const HealthCheckEnums: {
       responseCode: {
         success: ResponseCodeEnum.success;
         gatewayTimeout: ResponseCodeEnum.gatewayTimeout;

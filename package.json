@@ -91,7 +91,7 @@
     "ulidx": "2.4.1",
     "uuid4": "2.0.3",
     "widdershins": "4.0.1",
-    "yaml": "2.8.0"
+    "yaml": "2.8.1"
   },
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.1.0",
