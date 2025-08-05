@@ -887,7 +887,7 @@ declare namespace CentralServicesShared {
       };
     }
 
-    export class HealthCheckClass {
+    export class HealthCheck {
       constructor(packageJson: { version: string }, serviceChecks: ServiceCheckerFunc[]);
       getHealth(context?: any): Promise<HealthCheckResult>;
       static evaluateServiceHealth(services: SubServiceHealth[]): boolean;
