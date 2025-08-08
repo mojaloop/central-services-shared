@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.30.7](https://github.com/mojaloop/central-services-shared/compare/v18.30.6...v18.30.7) (2025-08-08)
+
+
+### Bug Fixes
+
+* http keep alive new object ([#473](https://github.com/mojaloop/central-services-shared/issues/473)) ([ef4b287](https://github.com/mojaloop/central-services-shared/commit/ef4b2871d6f0c39319d55efa8e512de5d9483cff))
+
 ### [18.30.6](https://github.com/mojaloop/central-services-shared/compare/v18.30.5...v18.30.6) (2025-07-23)
 
 
