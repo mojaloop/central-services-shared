@@ -193,7 +193,7 @@ const sendRequest = async ({
           errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.ID_NOT_FOUND
           errorMessage = responseData?.message || 'The requested resource could not be found'
         } else if (error.response.status === 403) {
-          errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.PERMISSION_DENIED
+          errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.CLIENT_ERROR
           errorMessage = responseData?.message || 'Permission denied'
         }
 
