@@ -475,7 +475,8 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       test.end()
     })
 
-    getEndpointTest.test('handle span with string payload that can be parsed as JSON', async (test) => {
+    // Helper function to test span string payload handling
+    const testSpanStringPayload = async (test, payloadStr, expectedPayload, description) => {
       const fsp = 'fsp'
       const spanFinishStub = sandbox.stub()
       const spanAuditStub = sandbox.stub()
@@ -489,70 +490,36 @@ Test('ParticipantEndpoint Model Test', modelTest => {
         audit: spanAuditStub
       }
 
-      const requestOptions = {
-        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
-        method: 'post'
-      }
-      const payload = '{"test": "data"}'
-
       request = sandbox.stub().returns(Helper.getEndPointsResponse)
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       await Model.sendRequest({
-        url: requestOptions.url,
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
         headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
         source: hubName,
         destination: hubName,
-        method: requestOptions.method,
-        payload,
+        method: 'post',
+        payload: payloadStr,
         span,
         hubNameRegex
       })
 
       test.ok(spanAuditStub.calledOnce, 'Span audit is called')
       const auditCallArgs = spanAuditStub.getCall(0).args[0]
-      test.deepEqual(auditCallArgs.payload, { test: 'data' }, 'String payload is parsed to JSON for audit')
+      if (typeof expectedPayload === 'object') {
+        test.deepEqual(auditCallArgs.payload, expectedPayload, description)
+      } else {
+        test.equal(auditCallArgs.payload, expectedPayload, description)
+      }
       test.end()
+    }
+
+    getEndpointTest.test('handle span with string payload that can be parsed as JSON', async (test) => {
+      await testSpanStringPayload(test, '{"test": "data"}', { test: 'data' }, 'String payload is parsed to JSON for audit')
     })
 
     getEndpointTest.test('handle span with string payload that cannot be parsed as JSON', async (test) => {
-      const fsp = 'fsp'
-      const spanFinishStub = sandbox.stub()
-      const spanAuditStub = sandbox.stub()
-      const span = {
-        getChild: sandbox.stub().returns({
-          setTags: sandbox.stub(),
-          finish: spanFinishStub
-        }),
-        getContext: sandbox.stub().returns({ service: 'test' }),
-        injectContextToHttpRequest: sandbox.stub(requestOptions => requestOptions),
-        audit: spanAuditStub
-      }
-
-      const requestOptions = {
-        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
-        method: 'post'
-      }
-      const payload = 'not valid json'
-
-      request = sandbox.stub().returns(Helper.getEndPointsResponse)
-      Model = proxyquire('../../../src/util/request', { axios: request })
-
-      await Model.sendRequest({
-        url: requestOptions.url,
-        headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
-        source: hubName,
-        destination: hubName,
-        method: requestOptions.method,
-        payload,
-        span,
-        hubNameRegex
-      })
-
-      test.ok(spanAuditStub.calledOnce, 'Span audit is called')
-      const auditCallArgs = spanAuditStub.getCall(0).args[0]
-      test.equal(auditCallArgs.payload, 'not valid json', 'String payload remains as string when not parseable')
-      test.end()
+      await testSpanStringPayload(test, 'not valid json', 'not valid json', 'String payload remains as string when not parseable')
     })
 
     getEndpointTest.test('handle 403 error without errorInformation', async (test) => {
@@ -623,7 +590,8 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       test.end()
     })
 
-    getEndpointTest.test('handle error with errorInformation and span', async (test) => {
+    // Helper function to test error handling with span
+    const testErrorWithSpan = async (test, errorConfig, expectedCode) => {
       const fsp = 'fsp1'
       const spanFinishStub = sandbox.stub()
       const spanErrorStub = sandbox.stub()
@@ -639,79 +607,12 @@ Test('ParticipantEndpoint Model Test', modelTest => {
         audit: sandbox.stub()
       }
 
-      const requestOptions = {
-        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
-        method: 'get'
-      }
-
-      const customError = new Error('Request failed with status code 400')
-      customError.response = {
-        status: 400,
-        data: {
-          errorInformation: {
-            errorCode: '3200',
-            errorDescription: 'FSP not found'
-          }
-        }
-      }
-
-      request = sandbox.stub().throws(customError)
+      request = sandbox.stub().throws(errorConfig)
       Model = proxyquire('../../../src/util/request', { axios: request })
 
       try {
         await Model.sendRequest({
-          url: requestOptions.url,
-          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
-          source: hubName,
-          destination: hubName,
-          span,
-          hubNameRegex
-        })
-        test.fail('should throw error')
-      } catch (e) {
-        test.ok(spanErrorStub.calledOnce, 'Span error is called')
-        test.ok(spanFinishStub.calledOnce, 'Span finish is called')
-        const errorArg = spanErrorStub.getCall(0).args[0]
-        test.equal(errorArg.apiErrorCode.code, '3200', 'Error passed to span has correct code')
-      }
-      test.end()
-    })
-
-    getEndpointTest.test('handle 4xx error without errorInformation and with span', async (test) => {
-      const fsp = 'fsp1'
-      const spanFinishStub = sandbox.stub()
-      const spanErrorStub = sandbox.stub()
-      const sendRequestSpan = {
-        setTags: sandbox.stub(),
-        finish: spanFinishStub,
-        error: spanErrorStub
-      }
-      const span = {
-        getChild: sandbox.stub().returns(sendRequestSpan),
-        getContext: sandbox.stub().returns({ service: 'test' }),
-        injectContextToHttpRequest: sandbox.stub(requestOptions => requestOptions),
-        audit: sandbox.stub()
-      }
-
-      const requestOptions = {
-        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
-        method: 'get'
-      }
-
-      const customError = new Error('Request failed with status code 403')
-      customError.response = {
-        status: 403,
-        data: {
-          message: 'Forbidden'
-        }
-      }
-
-      request = sandbox.stub().throws(customError)
-      Model = proxyquire('../../../src/util/request', { axios: request })
-
-      try {
-        await Model.sendRequest({
-          url: requestOptions.url,
+          url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
           headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
           source: hubName,
           destination: hubName,
@@ -724,58 +625,39 @@ Test('ParticipantEndpoint Model Test', modelTest => {
         test.ok(spanFinishStub.called, 'Span finish is called')
         if (spanErrorStub.callCount > 0) {
           const errorArg = spanErrorStub.getCall(0).args[0]
-          test.equal(errorArg.apiErrorCode.code, '3000', 'Error passed to span has correct code')
+          test.equal(errorArg.apiErrorCode.code, expectedCode, `Error code ${expectedCode} passed to span`)
         }
       }
       test.end()
+    }
+
+    getEndpointTest.test('handle error with errorInformation and span', async (test) => {
+      const customError = new Error('Request failed with status code 400')
+      customError.response = {
+        status: 400,
+        data: {
+          errorInformation: {
+            errorCode: '3200',
+            errorDescription: 'FSP not found'
+          }
+        }
+      }
+      await testErrorWithSpan(test, customError, '3200')
+    })
+
+    getEndpointTest.test('handle 4xx error without errorInformation and with span', async (test) => {
+      const customError = new Error('Request failed with status code 403')
+      customError.response = {
+        status: 403,
+        data: { message: 'Forbidden' }
+      }
+      await testErrorWithSpan(test, customError, '3000')
     })
 
     getEndpointTest.test('handle network error with span', async (test) => {
-      const fsp = 'fsp1'
-      const spanFinishStub = sandbox.stub()
-      const spanErrorStub = sandbox.stub()
-      const sendRequestSpan = {
-        setTags: sandbox.stub(),
-        finish: spanFinishStub,
-        error: spanErrorStub
-      }
-      const span = {
-        getChild: sandbox.stub().returns(sendRequestSpan),
-        getContext: sandbox.stub().returns({ service: 'test' }),
-        injectContextToHttpRequest: sandbox.stub(requestOptions => requestOptions),
-        audit: sandbox.stub()
-      }
-
-      const requestOptions = {
-        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
-        method: 'get'
-      }
-
       const customError = new Error('ECONNREFUSED')
       customError.code = 'ECONNREFUSED'
-
-      request = sandbox.stub().throws(customError)
-      Model = proxyquire('../../../src/util/request', { axios: request })
-
-      try {
-        await Model.sendRequest({
-          url: requestOptions.url,
-          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
-          source: hubName,
-          destination: hubName,
-          span,
-          hubNameRegex
-        })
-        test.fail('should throw error')
-      } catch (e) {
-        test.ok(spanErrorStub.called, 'Span error is called for network error')
-        test.ok(spanFinishStub.called, 'Span finish is called for network error')
-        if (spanErrorStub.callCount > 0) {
-          const errorArg = spanErrorStub.getCall(0).args[0]
-          test.equal(errorArg.apiErrorCode.code, '1001', 'Network error passed to span as DESTINATION_COMMUNICATION_ERROR')
-        }
-      }
-      test.end()
+      await testErrorWithSpan(test, customError, '1001')
     })
 
     getEndpointTest.end()
