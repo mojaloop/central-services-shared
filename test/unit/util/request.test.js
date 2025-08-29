@@ -293,6 +293,150 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       }
     })
 
+    getEndpointTest.test('preserve 400 error with errorInformation from downstream service', async (test) => {
+      const fsp = 'nonexistentfsp'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+
+      const customError = new Error('Request failed with status code 400')
+      customError.code = 'ERR_BAD_REQUEST'
+      customError.response = {
+        status: 400,
+        data: {
+          errorInformation: {
+            errorCode: '3200',
+            errorDescription: 'FSP not found'
+          }
+        }
+      }
+      request = sandbox.stub().throws(customError)
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      try {
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
+        test.fail('should throw error')
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error, 'Error was thrown')
+        test.equal(e.apiErrorCode.code, '3200', 'Error code is preserved from errorInformation')
+        test.equal(e.message, 'FSP not found', 'Error message is preserved from errorInformation')
+        test.notEqual(e.apiErrorCode.code, '1001', 'Error is not converted to DESTINATION_COMMUNICATION_ERROR')
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('handle 404 error without errorInformation', async (test) => {
+      const fsp = 'notfound'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+
+      const customError = new Error('Request failed with status code 404')
+      customError.code = 'ERR_BAD_REQUEST'
+      customError.response = {
+        status: 404,
+        data: {
+          message: 'Resource not found'
+        }
+      }
+      request = sandbox.stub().throws(customError)
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      try {
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
+        test.fail('should throw error')
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error, 'Error was thrown')
+        test.equal(e.apiErrorCode.code, '3200', 'Error code is ID_NOT_FOUND for 404')
+        test.equal(e.message, 'Resource not found', 'Error message is preserved')
+        test.notEqual(e.apiErrorCode.code, '1001', 'Error is not converted to DESTINATION_COMMUNICATION_ERROR')
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('handle network error as DESTINATION_COMMUNICATION_ERROR', async (test) => {
+      const fsp = 'fsp1'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+
+      const customError = new Error('ECONNREFUSED')
+      customError.code = 'ECONNREFUSED'
+      // No response property for network errors
+      request = sandbox.stub().throws(customError)
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      try {
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
+        test.fail('should throw error')
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error, 'Error was thrown')
+        test.equal(e.apiErrorCode.code, '1001', 'Network error is converted to DESTINATION_COMMUNICATION_ERROR')
+        test.equal(e.message, 'Failed to send HTTP request to host', 'Generic error message for network errors')
+        test.end()
+      }
+    })
+
+    getEndpointTest.test('handle 500 error as DESTINATION_COMMUNICATION_ERROR', async (test) => {
+      const fsp = 'fsp1'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+
+      const customError = new Error('Request failed with status code 500')
+      customError.code = 'ERR_BAD_RESPONSE'
+      customError.response = {
+        status: 500,
+        data: {
+          message: 'Internal Server Error'
+        }
+      }
+      request = sandbox.stub().throws(customError)
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      try {
+        await Model.sendRequest({
+          url: requestOptions.url,
+          headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+          source: hubName,
+          destination: hubName,
+          hubNameRegex
+        })
+        test.fail('should throw error')
+        test.end()
+      } catch (e) {
+        test.ok(e instanceof Error, 'Error was thrown')
+        test.equal(e.apiErrorCode.code, '1001', '5xx error is converted to DESTINATION_COMMUNICATION_ERROR')
+        test.equal(e.message, 'Failed to send HTTP request to host', 'Generic error message for server errors')
+        test.end()
+      }
+    })
+
     getEndpointTest.test('sign with JWS signature when JwsSigner object is passed', async (test) => {
       const fsp = 'payerfsp'
       const payeefsp = 'payeefsp'
