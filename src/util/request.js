@@ -162,6 +162,59 @@ const sendRequest = async ({
       status: error.response?.status,
       data: error.response?.data
     })
+
+    // Check if this is an HTTP response error (4xx or 5xx) vs a network/connection error
+    if (error.response) {
+      // For HTTP errors, check if the response contains FSPIOP error information
+      const responseData = error.response.data
+
+      // If the response contains a valid errorInformation object, use it directly
+      if (responseData?.errorInformation) {
+        const fspiopError = ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(responseData.errorInformation)
+        if (sendRequestSpan) {
+          const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, fspiopError.apiErrorCode.code, fspiopError.apiErrorCode.message)
+          await sendRequestSpan.error(fspiopError, state)
+          await sendRequestSpan.finish(fspiopError.message, state)
+        }
+        histTimerEnd({ success: false, source, destination, method })
+        throw fspiopError
+      }
+
+      // For other 4xx errors without errorInformation, create appropriate FSPIOP error
+      if (error.response.status >= 400 && error.response.status < 500) {
+        let errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.CLIENT_ERROR
+        let errorMessage = 'Client error'
+
+        // Map specific HTTP status codes to FSPIOP error codes
+        if (error.response.status === 400) {
+          errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.CLIENT_ERROR
+          errorMessage = responseData?.message || 'Bad Request'
+        } else if (error.response.status === 404) {
+          errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.ID_NOT_FOUND
+          errorMessage = responseData?.message || 'The requested resource could not be found'
+        } else if (error.response.status === 403) {
+          errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.CLIENT_ERROR
+          errorMessage = responseData?.message || 'Permission denied'
+        }
+
+        const extensions = [
+          { key: 'url', value: url },
+          { key: 'status', value: error.response.status },
+          { key: 'response', value: stringify(responseData) }
+        ]
+
+        const fspiopError = ErrorHandler.Factory.createFSPIOPError(errorCode, errorMessage, error, source, extensions)
+        if (sendRequestSpan) {
+          const state = new EventSdk.EventStateMetadata(EventSdk.EventStatusType.failed, fspiopError.apiErrorCode.code, fspiopError.apiErrorCode.message)
+          await sendRequestSpan.error(fspiopError, state)
+          await sendRequestSpan.finish(fspiopError.message, state)
+        }
+        histTimerEnd({ success: false, source, destination, method })
+        throw fspiopError
+      }
+    }
+
+    // For network errors or 5xx errors, use DESTINATION_COMMUNICATION_ERROR
     const extensionArray = [
       { key: 'url', value: url },
       { key: 'sourceFsp', value: source },
