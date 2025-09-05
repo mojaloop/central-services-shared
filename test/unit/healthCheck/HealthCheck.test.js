@@ -178,11 +178,9 @@ Test('HealthCheck test', healthCheckTest => {
 
     metricsTest.beforeEach(t => {
       metricsMock = {
-        getGauge: Sinon.stub().returns({ set: Sinon.spy() }),
         getCounter: Sinon.stub().returns({ inc: Sinon.spy() })
       }
       // Mock Metrics
-      sandbox.stub(Metrics, 'getGauge').callsFake(metricsMock.getGauge)
       sandbox.stub(Metrics, 'getCounter').callsFake(metricsMock.getCounter)
       t.end()
     })
@@ -192,21 +190,7 @@ Test('HealthCheck test', healthCheckTest => {
       t.end()
     })
 
-    metricsTest.test('sets app-critical gauge to 0 when healthy', async test => {
-      // Arrange
-      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
-        async () => ({ status: 'OK', name: 'datastore' })
-      ])
-      // Act
-      await healthCheck.getHealth()
-      // Assert
-      test.ok(metricsMock.getGauge.calledWith('app-critical'), 'getGauge called')
-      test.deepEqual(metricsMock.getGauge().set.firstCall.args, [{ service: 'datastore' }, 0], 'gauge set to 0 for datastore service')
-      test.deepEqual(metricsMock.getGauge().set.secondCall.args, [{ service: 'general' }, 0], 'gauge set to 0 for general service')
-      test.end()
-    })
-
-    metricsTest.test('sets app-critical gauge to 1 and increments counter when unhealthy', async test => {
+    metricsTest.test('increments counter when unhealthy', async test => {
       // Arrange
       const healthCheck = new HealthCheck({ version: '1.0.0' }, [
         async () => ({ status: 'DOWN', name: 'datastore' })
@@ -214,11 +198,6 @@ Test('HealthCheck test', healthCheckTest => {
       // Act
       await healthCheck.getHealth()
       // Assert
-      test.ok(metricsMock.getGauge.calledWith('app-critical'), 'getGauge called')
-      // Subservice gauge should be set to 1 for unhealthy subservice
-      test.deepEqual(metricsMock.getGauge().set.firstCall.args, [{ service: 'datastore' }, 1], 'gauge set to 1 for datastore service')
-      // General gauge should be set to 1 for unhealthy overall status
-      test.deepEqual(metricsMock.getGauge().set.secondCall.args, [{ service: 'general' }, 1], 'gauge set to 1 for general service')
       test.ok(metricsMock.getCounter.calledWith('app-critical-total'), 'getCounter called')
       // Subservice counter should be incremented
       test.deepEqual(metricsMock.getCounter().inc.firstCall.args, [{ service: 'datastore' }], 'counter incremented for datastore service')
@@ -227,7 +206,7 @@ Test('HealthCheck test', healthCheckTest => {
       test.end()
     })
 
-    metricsTest.test('sets metrics correctly for multiple sub-services with mixed health', async test => {
+    metricsTest.test('increments counter for multiple sub-services with mixed health', async test => {
       // Arrange
       const healthCheck = new HealthCheck({ version: '1.0.0' }, [
         async () => ({ status: 'OK', name: 'datastore' }),
@@ -237,16 +216,11 @@ Test('HealthCheck test', healthCheckTest => {
       // Act
       await healthCheck.getHealth()
       // Assert
-      // Subservice gauges
-      test.deepEqual(metricsMock.getGauge().set.getCall(0).args, [{ service: 'datastore' }, 0], 'gauge set to 0 for datastore')
-      test.deepEqual(metricsMock.getGauge().set.getCall(1).args, [{ service: 'broker' }, 1], 'gauge set to 1 for broker')
-      test.deepEqual(metricsMock.getGauge().set.getCall(2).args, [{ service: 'cache' }, 0], 'gauge set to 0 for cache')
-      // General gauge
-      test.deepEqual(metricsMock.getGauge().set.getCall(3).args, [{ service: 'general' }, 1], 'gauge set to 1 for general service')
       // Subservice counter incremented for DOWN service
       test.deepEqual(metricsMock.getCounter().inc.firstCall.args, [{ service: 'broker' }], 'counter incremented for broker')
       // General counter incremented
       test.deepEqual(metricsMock.getCounter().inc.secondCall.args, [{ service: 'general' }], 'counter incremented for general service')
+      test.equal(metricsMock.getCounter().inc.callCount, 2, 'getCounter.inc called for each DOWN service and general')
       test.end()
     })
 
@@ -297,6 +271,26 @@ Test('HealthCheck test', healthCheckTest => {
       test.deepEqual(metricsMock.getCounter().inc.getCall(1).args, [{ service: 'cache' }], 'counter incremented for cache')
       test.deepEqual(metricsMock.getCounter().inc.getCall(2).args, [{ service: 'general' }], 'counter incremented for general')
       test.equal(metricsMock.getCounter().inc.callCount, 3, 'getCounter.inc called for each DOWN service and general')
+      test.end()
+    })
+
+    metricsTest.test('handles errors thrown in setSubServiceMetrics gracefully', async test => {
+      // Arrange
+      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
+        async () => ({ status: 'DOWN', name: 'datastore' })
+      ])
+      // Stub Metrics.getCounter to throw when called
+      sandbox.restore() // Remove previous stubs
+      const getCounterStub = sandbox.stub(Metrics, 'getCounter').throws(new Error('Subservice metrics error'))
+      // Stub Logger.error to spy on error logging
+      const loggerErrorStub = sandbox.stub(require('@mojaloop/central-services-logger'), 'error')
+      // Act
+      await healthCheck.getHealth()
+      // Assert
+      test.ok(getCounterStub.called, 'getCounter called and throws')
+      test.ok(loggerErrorStub.called, 'Logger.error called when setSubServiceMetrics throws')
+      test.ok(loggerErrorStub.firstCall.args[0].includes('Failed to set subservice metrics'), 'Correct error message logged')
+      loggerErrorStub.restore()
       test.end()
     })
     metricsTest.end()
