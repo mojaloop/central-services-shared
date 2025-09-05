@@ -32,6 +32,7 @@ const {
   statusEnum
 } = require('./HealthCheckEnums')
 const Logger = require('@mojaloop/central-services-logger')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 /**
  * @class HealthCheck
@@ -116,6 +117,20 @@ class HealthCheck {
 
     if (!isHealthy) {
       status = statusEnum.DOWN
+    }
+
+    try {
+      const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
+      if (metrics && typeof metrics.getGauge === 'function') {
+        const criticalGauge = metrics.getGauge('app-critical', 'App critical health status: 1=critical, 0=not critical', ['general'])
+        criticalGauge.set(isHealthy ? 0 : 1)
+      }
+      if (!isHealthy && metrics && typeof metrics.getCounter === 'function') {
+        const criticalCounter = metrics.getCounter('app-critical-total', 'Total times app entered critical health', ['general'])
+        criticalCounter.inc()
+      }
+    } catch (err) {
+      Logger.isErrorEnabled && Logger.error(`Failed to set app-critical metrics: ${err.message}`)
     }
 
     return {
