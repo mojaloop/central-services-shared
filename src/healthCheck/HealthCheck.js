@@ -110,6 +110,9 @@ class HealthCheck {
       subServices = {
         services
       }
+
+      // Set per-subservice metrics
+      this.setSubServiceMetrics(services)
     } catch (err) {
       Logger.isErrorEnabled && Logger.error(`HealthCheck.getSubServiceHealth failed with error: ${err.message}`)
       isHealthy = false
@@ -119,19 +122,8 @@ class HealthCheck {
       status = statusEnum.DOWN
     }
 
-    try {
-      const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
-      if (metrics && typeof metrics.getGauge === 'function') {
-        const criticalGauge = metrics.getGauge('app-critical', 'App critical health status: 1=critical, 0=not critical', ['general'])
-        criticalGauge.set(isHealthy ? 0 : 1)
-      }
-      if (!isHealthy && metrics && typeof metrics.getCounter === 'function') {
-        const criticalCounter = metrics.getCounter('app-critical-total', 'Total times app entered critical health', ['general'])
-        criticalCounter.inc()
-      }
-    } catch (err) {
-      Logger.isErrorEnabled && Logger.error(`Failed to set app-critical metrics: ${err.message}`)
-    }
+    // Set general app-critical metrics
+    this.setGeneralMetrics(isHealthy)
 
     return {
       status,
@@ -139,6 +131,52 @@ class HealthCheck {
       startTime,
       versionNumber,
       ...subServices
+    }
+  }
+
+  setSubServiceMetrics(services) {
+    try {
+      const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
+      if (metrics) {
+        services.forEach(service => {
+          // Gauge for subservice health
+          if (typeof metrics.getGauge === 'function') {
+            const subGauge = metrics.getGauge(
+              'app-critical',
+              'App critical health status: 1=down, 0=ok',
+              ['service']
+            )
+            subGauge.set({ service: service.name }, service.status === statusEnum.DOWN ? 1 : 0)
+          }
+          // Counter for subservice critical events
+          if (typeof metrics.getCounter === 'function' && service.status === statusEnum.DOWN) {
+            const subCounter = metrics.getCounter(
+              'app-critical-total',
+              'Total times app entered critical health',
+              ['service']
+            )
+            subCounter.inc({ service: service.name })
+          }
+        })
+      }
+    } catch (err) {
+      Logger.isErrorEnabled && Logger.error(`Failed to set subservice metrics: ${err.message}`)
+    }
+  }
+
+  setGeneralMetrics(isHealthy) {
+    try {
+      const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
+      if (metrics && typeof metrics.getGauge === 'function') {
+        const criticalGauge = metrics.getGauge('app-critical', 'App critical health status: 1=critical, 0=not critical', ['service'])
+        criticalGauge.set({ service: 'general' }, isHealthy ? 0 : 1)
+      }
+      if (!isHealthy && metrics && typeof metrics.getCounter === 'function') {
+        const criticalCounter = metrics.getCounter('app-critical-total', 'Total times app entered critical health', ['service'])
+        criticalCounter.inc({ service: 'general' })
+      }
+    } catch (err) {
+      Logger.isErrorEnabled && Logger.error(`Failed to set app-critical metrics: ${err.message}`)
     }
   }
 
