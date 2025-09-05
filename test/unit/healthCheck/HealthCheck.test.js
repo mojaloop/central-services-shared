@@ -31,6 +31,7 @@
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Joi = require('joi')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 const HealthCheck = require('../../../src/healthCheck').HealthCheck
 
@@ -172,5 +173,54 @@ Test('HealthCheck test', healthCheckTest => {
     evaluateServiceHealthTest.end()
   })
 
+  healthCheckTest.test('getHealth metrics', metricsTest => {
+    let metricsMock
+
+    metricsTest.beforeEach(t => {
+      metricsMock = {
+        getGauge: Sinon.stub().returns({ set: Sinon.spy() }),
+        getCounter: Sinon.stub().returns({ inc: Sinon.spy() })
+      }
+      // Mock Metrics
+      sandbox.stub(Metrics, 'getGauge').callsFake(metricsMock.getGauge)
+      sandbox.stub(Metrics, 'getCounter').callsFake(metricsMock.getCounter)
+      t.end()
+    })
+
+    metricsTest.afterEach(t => {
+      sandbox.restore()
+      t.end()
+    })
+
+    metricsTest.test('sets app-critical gauge to 0 when healthy', async test => {
+      // Arrange
+      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
+        async () => ({ status: 'OK', name: 'datastore' })
+      ])
+      // Act
+      await healthCheck.getHealth()
+      // Assert
+      test.ok(metricsMock.getGauge.calledWith('app-critical'), 'getGauge called')
+      test.equal(metricsMock.getGauge().set.firstCall.args[0], 0, 'gauge set to 0')
+      test.end()
+    })
+
+    metricsTest.test('sets app-critical gauge to 1 and increments counter when unhealthy', async test => {
+      // Arrange
+      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
+        async () => ({ status: 'DOWN', name: 'datastore' })
+      ])
+      // Act
+      await healthCheck.getHealth()
+      // Assert
+      test.ok(metricsMock.getGauge.calledWith('app-critical'), 'getGauge called')
+      test.equal(metricsMock.getGauge().set.firstCall.args[0], 1, 'gauge set to 1')
+      test.ok(metricsMock.getCounter.calledWith('app-critical-total'), 'getCounter called')
+      test.ok(metricsMock.getCounter().inc.calledOnce, 'counter incremented')
+      test.end()
+    })
+
+    metricsTest.end()
+  })
   healthCheckTest.end()
 })
