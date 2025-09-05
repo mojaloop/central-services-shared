@@ -142,16 +142,15 @@ class HealthCheck {
     try {
       services.forEach(service => {
         // Gauge for subservice health
-        if (typeof Metrics.getGauge === 'function') {
-          const subGauge = Metrics.getGauge(
-            'app-critical',
-            'App critical health status: 1=down, 0=ok',
-            ['service']
-          )
-          subGauge.set({ service: service.name }, service.status === statusEnum.DOWN ? 1 : 0)
-        }
+        const subGauge = Metrics.getGauge(
+          'app-critical',
+          'App critical health status: 1=down, 0=ok',
+          ['service']
+        )
+        subGauge.set({ service: service.name }, service.status === statusEnum.DOWN ? 1 : 0)
+
         // Counter for subservice critical events
-        if (typeof Metrics.getCounter === 'function' && service.status === statusEnum.DOWN) {
+        if (service.status === statusEnum.DOWN) {
           const subCounter = Metrics.getCounter(
             'app-critical-total',
             'Total times app entered critical health',
@@ -167,11 +166,10 @@ class HealthCheck {
 
   setGeneralMetrics (isHealthy) {
     try {
-      if (Metrics && typeof Metrics.getGauge === 'function') {
-        const criticalGauge = Metrics.getGauge('app-critical', 'App critical health status: 1=critical, 0=not critical', ['service'])
-        criticalGauge.set({ service: 'general' }, isHealthy ? 0 : 1)
-      }
-      if (!isHealthy && Metrics && typeof Metrics.getCounter === 'function') {
+      const criticalGauge = Metrics.getGauge('app-critical', 'App critical health status: 1=critical, 0=not critical', ['service'])
+      criticalGauge.set({ service: 'general' }, isHealthy ? 0 : 1)
+
+      if (!isHealthy) {
         const criticalCounter = Metrics.getCounter('app-critical-total', 'Total times app entered critical health', ['service'])
         criticalCounter.inc({ service: 'general' })
       }
