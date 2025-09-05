@@ -134,7 +134,7 @@ class HealthCheck {
     }
   }
 
-  setSubServiceMetrics(services) {
+  setSubServiceMetrics (services) {
     try {
       const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
       if (metrics) {
@@ -164,7 +164,7 @@ class HealthCheck {
     }
   }
 
-  setGeneralMetrics(isHealthy) {
+  setGeneralMetrics (isHealthy) {
     try {
       const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
       if (metrics && typeof metrics.getGauge === 'function') {

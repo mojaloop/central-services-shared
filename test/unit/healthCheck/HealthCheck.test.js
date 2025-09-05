@@ -230,9 +230,9 @@ Test('HealthCheck test', healthCheckTest => {
     metricsTest.test('sets metrics correctly for multiple sub-services with mixed health', async test => {
       // Arrange
       const healthCheck = new HealthCheck({ version: '1.0.0' }, [
-      async () => ({ status: 'OK', name: 'datastore' }),
-      async () => ({ status: 'DOWN', name: 'broker' }),
-      async () => ({ status: 'OK', name: 'cache' })
+        async () => ({ status: 'OK', name: 'datastore' }),
+        async () => ({ status: 'DOWN', name: 'broker' }),
+        async () => ({ status: 'OK', name: 'cache' })
       ])
       // Act
       await healthCheck.getHealth()
