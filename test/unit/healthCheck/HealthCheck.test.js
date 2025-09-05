@@ -250,6 +250,55 @@ Test('HealthCheck test', healthCheckTest => {
       test.end()
     })
 
+    metricsTest.test('handles errors thrown in setGeneralMetrics gracefully', async test => {
+      // Arrange
+      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
+      async () => ({ status: 'OK', name: 'datastore' })
+      ])
+      // Patch setGeneralMetrics to throw
+      const origSetGeneralMetrics = healthCheck.setGeneralMetrics
+      healthCheck.setGeneralMetrics = () => { throw new Error('General metrics error') }
+      // Act & Assert
+      try {
+      await healthCheck.getHealth()
+      test.pass('No error thrown when setGeneralMetrics throws')
+      } catch (err) {
+      test.fail('Should not throw when setGeneralMetrics throws')
+      }
+      // Restore
+      healthCheck.setGeneralMetrics = origSetGeneralMetrics
+      test.end()
+    })
+
+    metricsTest.test('does not call getCounter if no subservice is DOWN', async test => {
+      // Arrange
+      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
+      async () => ({ status: 'OK', name: 'datastore' }),
+      async () => ({ status: 'OK', name: 'broker' })
+      ])
+      // Act
+      await healthCheck.getHealth()
+      // Assert
+      test.equal(metricsMock.getCounter().inc.callCount, 0, 'getCounter.inc not called when all services are healthy')
+      test.end()
+    })
+
+    metricsTest.test('calls getCounter only for DOWN subservices', async test => {
+      // Arrange
+      const healthCheck = new HealthCheck({ version: '1.0.0' }, [
+      async () => ({ status: 'DOWN', name: 'datastore' }),
+      async () => ({ status: 'OK', name: 'broker' }),
+      async () => ({ status: 'DOWN', name: 'cache' })
+      ])
+      // Act
+      await healthCheck.getHealth()
+      // Assert
+      test.deepEqual(metricsMock.getCounter().inc.getCall(0).args, [{ service: 'datastore' }], 'counter incremented for datastore')
+      test.deepEqual(metricsMock.getCounter().inc.getCall(1).args, [{ service: 'cache' }], 'counter incremented for cache')
+      test.deepEqual(metricsMock.getCounter().inc.getCall(2).args, [{ service: 'general' }], 'counter incremented for general')
+      test.equal(metricsMock.getCounter().inc.callCount, 3, 'getCounter.inc called for each DOWN service and general')
+      test.end()
+    })
     metricsTest.end()
   })
   healthCheckTest.end()
