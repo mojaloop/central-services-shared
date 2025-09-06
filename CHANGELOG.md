@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.32.0](https://github.com/mojaloop/central-services-shared/compare/v18.31.0...v18.32.0) (2025-09-06)
+
+
+### Features
+
+* add sub service app-critical metrics on healthcheck ([#476](https://github.com/mojaloop/central-services-shared/issues/476)) ([6b57358](https://github.com/mojaloop/central-services-shared/commit/6b57358fa66388c605ba7dd3fb8111f86a6a52fc))
+
 ## [18.31.0](https://github.com/mojaloop/central-services-shared/compare/v18.30.8...v18.31.0) (2025-09-05)
 
 
