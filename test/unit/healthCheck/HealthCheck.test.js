@@ -198,7 +198,7 @@ Test('HealthCheck test', healthCheckTest => {
       // Act
       await healthCheck.getHealth()
       // Assert
-      test.ok(metricsMock.getCounter.calledWith('app-critical-total'), 'getCounter called')
+      test.ok(metricsMock.getCounter.calledWith('app_critical_total'), 'getCounter called')
       // Subservice counter should be incremented
       test.deepEqual(metricsMock.getCounter().inc.firstCall.args, [{ service: 'datastore' }], 'counter incremented for datastore service')
       // General counter should be incremented

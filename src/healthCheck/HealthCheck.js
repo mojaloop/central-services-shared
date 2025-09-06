@@ -144,7 +144,7 @@ class HealthCheck {
         // Counter for subservice critical events
         if (service.status === statusEnum.DOWN) {
           const subCounter = Metrics.getCounter(
-            'app-critical-total',
+            'app_critical_total',
             'Total times app entered critical health',
             ['service']
           )
@@ -159,7 +159,7 @@ class HealthCheck {
   setGeneralMetrics (isHealthy) {
     try {
       if (!isHealthy) {
-        const criticalCounter = Metrics.getCounter('app-critical-total', 'Total times app entered critical health', ['service'])
+        const criticalCounter = Metrics.getCounter('app_critical_total', 'Total times app entered critical health', ['service'])
         criticalCounter.inc({ service: 'general' })
       }
     } catch (err) {
