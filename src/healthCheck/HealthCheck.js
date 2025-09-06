@@ -148,7 +148,7 @@ class HealthCheck {
             'Total times app entered critical health',
             ['service']
           )
-          subCounter.inc({ service: service.name })
+          subCounter.inc({ service: service?.name })
         }
       })
     } catch (err) {
