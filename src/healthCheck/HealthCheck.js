@@ -110,6 +110,9 @@ class HealthCheck {
       subServices = {
         services
       }
+
+      // Set per-subservice metrics
+      this.setSubServiceMetrics(services)
     } catch (err) {
       Logger.isErrorEnabled && Logger.error(`HealthCheck.getSubServiceHealth failed with error: ${err.message}`)
       isHealthy = false
@@ -120,17 +123,10 @@ class HealthCheck {
     }
 
     try {
-      const metrics = Metrics.getInstance ? Metrics.getInstance() : Metrics
-      if (metrics && typeof metrics.getGauge === 'function') {
-        const criticalGauge = metrics.getGauge('app-critical', 'App critical health status: 1=critical, 0=not critical', ['general'])
-        criticalGauge.set(isHealthy ? 0 : 1)
-      }
-      if (!isHealthy && metrics && typeof metrics.getCounter === 'function') {
-        const criticalCounter = metrics.getCounter('app-critical-total', 'Total times app entered critical health', ['general'])
-        criticalCounter.inc()
-      }
+      // Set general app-critical metrics
+      this.setGeneralMetrics(isHealthy)
     } catch (err) {
-      Logger.isErrorEnabled && Logger.error(`Failed to set app-critical metrics: ${err.message}`)
+      Logger.isErrorEnabled && Logger.error(`Failed to set general app-critical metrics: ${err.message}`)
     }
 
     return {
@@ -139,6 +135,35 @@ class HealthCheck {
       startTime,
       versionNumber,
       ...subServices
+    }
+  }
+
+  setSubServiceMetrics (services) {
+    try {
+      services.forEach(service => {
+        // Counter for subservice critical events
+        if (service.status === statusEnum.DOWN) {
+          const subCounter = Metrics.getCounter(
+            'app_critical_total',
+            'Total times app entered critical health',
+            ['service']
+          )
+          subCounter.inc({ service: service?.name })
+        }
+      })
+    } catch (err) {
+      Logger.isErrorEnabled && Logger.error(`Failed to set subservice metrics: ${err.message}`)
+    }
+  }
+
+  setGeneralMetrics (isHealthy) {
+    try {
+      if (!isHealthy) {
+        const criticalCounter = Metrics.getCounter('app_critical_total', 'Total times app entered critical health', ['service'])
+        criticalCounter.inc({ service: 'general' })
+      }
+    } catch (err) {
+      Logger.isErrorEnabled && Logger.error(`Failed to set app-critical metrics: ${err.message}`)
     }
   }
 
