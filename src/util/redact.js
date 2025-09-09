@@ -42,54 +42,37 @@
  * // redacted: { password: '[REDACTED]', user: 'alice', nested: { token: '[REDACTED]' } }
  */
 function redact (obj, extraKeys = [], extraPatterns = []) {
-  const DEFAULT_SENSITIVE_KEYS = [
-    'APP_OAUTH_CLIENT_KEY',
-    'APP_OAUTH_CLIENT_SECRET',
-    'TOTP_ADMIN_AUTH_USER',
-    'TOTP_ADMIN_AUTH_PASSWORD',
-    'WSO2_MANAGER_SERVICE_USER',
-    'WSO2_MANAGER_SERVICE_PASSWORD',
-    'DATABASE_USER',
-    'DATABASE_PASSWORD',
-    'OAUTH_RESET_PASSWORD_AUTH_PASSWORD',
+  const SENSITIVE_SUBSTRINGS = [
     'token',
-    'access_token',
-    'refresh_token',
-    'id_token',
-    'auth_token',
-    'authorization',
-    'api_key',
-    'apikey',
+    'auth',
+    'api',
     'secret',
-    'client_secret',
-    'client_id',
+    'client',
     'password',
     'passphrase',
-    'private_key',
-    'rsa_private_key',
+    'private',
     'jwt',
-    'sessionid',
-    'session_id',
+    'session',
     'cookie',
-    'set-cookie',
-    'RSA PRIVATE KEY'
-  ]
-
-  const SENSITIVE_KEYS = DEFAULT_SENSITIVE_KEYS.concat(extraKeys)
+    'key',
+    'credential',
+    'access',
+    'refresh',
+    'pin',
+    'ssn',
+    'creditcard',
+    'cardnumber',
+    'cvv',
+    'iban',
+    'bic',
+    'accountnumber',
+    'routingnumber',
+    'securityanswer'
+  ].concat(extraKeys.map(k => k.toLowerCase()))
 
   function isSensitiveKey (key = '') {
     const lowerKey = key.toLowerCase()
-    return (
-      SENSITIVE_KEYS.map(k => k.toLowerCase()).includes(lowerKey) ||
-      lowerKey.includes('secret') ||
-      lowerKey.includes('password') ||
-      lowerKey.includes('private') ||
-      lowerKey.includes('token') ||
-      lowerKey.includes('key') ||
-      lowerKey.includes('auth') ||
-      lowerKey.includes('session') ||
-      lowerKey.includes('cookie')
-    )
+    return SENSITIVE_SUBSTRINGS.some(sub => lowerKey.includes(sub))
   }
 
   function isSensitiveValue (val) {
@@ -105,7 +88,24 @@ function redact (obj, extraKeys = [], extraPatterns = []) {
       /key/i,
       /bearer\s+[a-z0-9-_.]+/i,
       /sessionid/i,
-      /cookie/i
+      /cookie/i,
+      /api[_-]?key/i,
+      /access[_-]?token/i,
+      /refresh[_-]?token/i,
+      /client[_-]?secret/i,
+      /client[_-]?id/i,
+      /auth[_-]?token/i,
+      /credential/i,
+      /\b\d{12,19}\b/, // possible credit card numbers
+      /\b\d{3,4}\b/, // possible CVV
+      /\b\d{9}\b/, // possible SSN
+      /pin/i,
+      /passphrase/i,
+      /account[_-]?number/i,
+      /routing[_-]?number/i,
+      /iban/i,
+      /bic/i,
+      /security[_-]?answer/i
     ].concat(extraPatterns)
     return patterns.some(pattern => pattern.test(val))
   }

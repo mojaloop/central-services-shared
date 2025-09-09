@@ -300,5 +300,41 @@ Test('redact', redactTest => {
     test.end()
   })
 
+  // New test: should redact arrays at root level with sensitive keys/values
+  redactTest.test('should redact arrays at root level with sensitive keys/values', test => {
+    const input = [
+      { password: '1234', user: 'alice' },
+      { token: 'abcd', value: 'ok' },
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      'hello'
+    ]
+    const expected = [
+      { password: '[REDACTED]', user: 'alice' },
+      { token: '[REDACTED]', value: 'ok' },
+      '[REDACTED]',
+      'hello'
+    ]
+    test.deepEqual(redact(input), expected, 'redacts arrays at root level')
+    test.end()
+  })
+
+  // New test: should redact sensitive values in arrays of primitives
+  redactTest.test('should redact sensitive values in arrays of primitives', test => {
+    const input = [
+      'normal',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      'Bearer abcdef123456',
+      'something else'
+    ]
+    const expected = [
+      'normal',
+      '[REDACTED]',
+      '[REDACTED]',
+      'something else'
+    ]
+    test.deepEqual(redact(input), expected, 'redacts sensitive values in arrays of primitives')
+    test.end()
+  })
+
   redactTest.end()
 })
