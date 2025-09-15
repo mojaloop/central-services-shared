@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.32.1](https://github.com/mojaloop/central-services-shared/compare/v18.32.0...v18.32.1) (2025-09-15)
+
+
+### Chore
+
+* axios update ([#478](https://github.com/mojaloop/central-services-shared/issues/478)) ([1dcee1b](https://github.com/mojaloop/central-services-shared/commit/1dcee1b1e33911197c9ef000db6992e3b22552d6))
+
 ## [18.32.0](https://github.com/mojaloop/central-services-shared/compare/v18.31.0...v18.32.0) (2025-09-06)
 
 
