@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.33.2](https://github.com/mojaloop/central-services-shared/compare/v18.33.1...v18.33.2) (2025-09-17)
+
+
+### Chore
+
+* reverted ioredis ([#481](https://github.com/mojaloop/central-services-shared/issues/481)) ([d5d5098](https://github.com/mojaloop/central-services-shared/commit/d5d509808715741a18293a9a1fc76494e81b63d7))
+
 ### [18.33.1](https://github.com/mojaloop/central-services-shared/compare/v18.33.0...v18.33.1) (2025-09-17)
 
 
