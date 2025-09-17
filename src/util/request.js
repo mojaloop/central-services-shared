@@ -46,8 +46,11 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
 delete request.defaults.headers.common.Accept
 
+const keepAlive = process.env.HTTP_AGENT_KEEP_ALIVE === 'true'
+logger.verbose('http keepAlive:', { keepAlive })
+
 // Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive: true })
+request.defaults.httpAgent = new http.Agent({ keepAlive })
 request.defaults.httpAgent.toJSON = () => ({})
 
 /**
