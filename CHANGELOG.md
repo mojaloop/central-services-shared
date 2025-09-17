@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.33.1](https://github.com/mojaloop/central-services-shared/compare/v18.33.0...v18.33.1) (2025-09-17)
+
+
+### Chore
+
+* make keepAlive configurable ([#480](https://github.com/mojaloop/central-services-shared/issues/480)) ([91beb9c](https://github.com/mojaloop/central-services-shared/commit/91beb9c0d7078a99a8bc249a9c28ab6670aa08a3))
+
 ## [18.33.0](https://github.com/mojaloop/central-services-shared/compare/v18.32.1...v18.33.0) (2025-09-15)
 
 
