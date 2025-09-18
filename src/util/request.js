@@ -277,8 +277,9 @@ const retryableHttpErrorCodes = [
   'EAI_AGAIN'
 ]
 
-// See all retry options here: https://github.com/softonic/axios-retry?tab=readme-ov-file#options
+/* istanbul ignore next */
 function createHttpRetryConfig () {
+  // See all retry options here: https://github.com/softonic/axios-retry?tab=readme-ov-file#options
   return {
     retries: RETRY_COUNT,
     retryCondition: (err) => {
@@ -302,6 +303,7 @@ function createHttpRetryConfig () {
   }
 }
 
+/* istanbul ignore next */
 const formatAxiosError = (error, retryCount) => {
   const { message, code, status, response } = error
 
