@@ -29,12 +29,15 @@
  ******/
 'use strict'
 
+const { env } = require('node:process')
 const http = require('node:http')
-const request = require('axios')
+const axios = require('axios')
+const axiosRetry = require('axios-retry')
 const stringify = require('fast-safe-stringify')
 const EventSdk = require('@mojaloop/event-sdk')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
+
 const Headers = require('./headers/transformer')
 const enums = require('../enums')
 const { logger } = require('../logger')
@@ -44,14 +47,20 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
 // Delete the default headers that the `axios` module inserts as they can brake our conventions.
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
-delete request.defaults.headers.common.Accept
+delete axios.defaults.headers.common.Accept
 
-const keepAlive = process.env.HTTP_AGENT_KEEP_ALIVE === 'true'
-logger.verbose('http keepAlive:', { keepAlive })
+const keepAlive = (env.HTTP_AGENT_KEEP_ALIVE ?? 'true') === 'true'
+const TIMEOUT = env.HTTP_REQUEST_TIMEOUT_MS ? parseInt(env.HTTP_REQUEST_TIMEOUT_MS, 10) : 25_000
+const RETRY_COUNT = env.HTTP_RETRY_COUNT ? parseInt(env.HTTP_RETRY_COUNT, 10) : 0
+const RETRY_DELAY = env.HTTP_RETRY_DELAY_MS ? parseInt(env.HTTP_RETRY_DELAY_MS, 10) : 100
+logger.info('http keepAlive, RETRY_COUNT and TIMEOUT:', { keepAlive, RETRY_COUNT, TIMEOUT })
 
 // Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive })
-request.defaults.httpAgent.toJSON = () => ({})
+axios.defaults.httpAgent = new http.Agent({ keepAlive })
+axios.defaults.httpAgent.toJSON = () => ({})
+
+if (RETRY_COUNT > 0) axiosRetry.default(axios, createHttpRetryConfig())
+// think, if we need to be able to set retry per request
 
 /**
  * @function sendRequest
@@ -76,6 +85,7 @@ request.defaults.httpAgent.toJSON = () => ({})
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
  * @param {'fspiop' | 'iso20022'} apiType the API type of the request being sent
  * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
+ * @param {ContextLogger} log instance of ContextLogger
  * @param {regex} hubNameRegex hubName Regex
  *
  *@return {Promise<any>} The response for the request being sent or error object with response included
@@ -94,7 +104,8 @@ const sendRequest = async ({
   jwsSigner = undefined,
   protocolVersions = undefined,
   apiType = API_TYPES.fspiop,
-  axiosRequestOptionsOverride = {},
+  axiosRequestOptionsOverride = defaultAxiosConfig(),
+  log = logger.child({ component: 'CSSh-request' }),
   hubNameRegex
 }) => {
   const histTimerEnd = Metrics.getHistogram(
@@ -122,13 +133,13 @@ const sendRequest = async ({
       apiType
     })
     requestOptions = {
+      ...axiosRequestOptionsOverride,
       url,
       method,
       headers: transformedHeaders,
       data: payload, // todo: think, if it's better to transform to ISO format here (based on apiType)
       params,
-      responseType,
-      ...axiosRequestOptionsOverride
+      responseType
     }
     // if jwsSigner is passed then sign the request
     if (jwsSigner != null && typeof (jwsSigner) === 'object') {
@@ -147,14 +158,14 @@ const sendRequest = async ({
       }
       span.audit({ ...rest, payload }, EventSdk.AuditEventAction.egress)
     }
-    logger.debug('sendRequest::requestOptions:', { requestOptions })
-    const response = await request(requestOptions)
+    log.debug('sendRequest::requestOptions:', { requestOptions })
+    const response = await axios(requestOptions)
 
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    logger.error('error in request.sendRequest:', {
+    log.error('error in request.sendRequest:', {
       code: error.code,
       message: error.message,
       stack: error.stack,
@@ -242,6 +253,64 @@ const sendRequest = async ({
     }
     histTimerEnd({ success: false, source, destination, method })
     throw fspiopError
+  }
+}
+
+// See more options here: https://axios-http.com/docs/req_config
+const defaultAxiosConfig = () => Object.freeze({
+  timeout: TIMEOUT,
+  // validateStatus: status => (status >= 200 && status < 300), // default
+  transitional: {
+    clarifyTimeoutError: true // to set ETIMEDOUT error code on timeout instead of ECONNABORTED
+  }
+})
+
+const retryableStatusCodes = [
+  // 408,
+  // 429,
+  // 502,
+  503
+]
+
+const retryableHttpErrorCodes = [
+  // 'ETIMEDOUT',
+  'EAI_AGAIN'
+]
+
+// See all retry options here: https://github.com/softonic/axios-retry?tab=readme-ov-file#options
+function createHttpRetryConfig () {
+  return {
+    retries: RETRY_COUNT,
+    retryCondition: (err) => {
+      const needRetry = retryableStatusCodes.includes(err.status) ||
+        retryableHttpErrorCodes.includes(err.code)
+      // axiosRetry.isNetworkOrIdempotentRequestError(err) ||
+      // axiosRetry.isRetryableError(err)
+      logger.debug(`retryCondition is evaluated to ${needRetry}`, formatAxiosError(err))
+      return needRetry
+    },
+    retryDelay: (retryCount) => {
+      logger.debug('http retryDelay...', { RETRY_DELAY, retryCount })
+      return RETRY_DELAY
+    },
+    onRetry: (retryCount, err) => {
+      logger.verbose(`retrying HTTP request...  [reason: ${err?.message}]`, formatAxiosError(err, retryCount))
+    },
+    onMaxRetryTimesExceeded: (err, retryCount) => {
+      logger.info('max retries exceeded for HTTP request!', formatAxiosError(err, retryCount))
+    }
+  }
+}
+
+const formatAxiosError = (error, retryCount) => {
+  const { message, code, status, response } = error
+
+  return {
+    message,
+    code,
+    status,
+    ...(response?.data && { errorResponseData: response.data }),
+    ...(retryCount && { retryCount })
   }
 }
 
