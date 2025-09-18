@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 import { Knex } from 'knex';
@@ -113,8 +114,6 @@ declare namespace CentralServicesShared {
     TP_CB_URL_ACCOUNTS_PUT = 'TP_CB_URL_ACCOUNTS_PUT',
     TP_CB_URL_ACCOUNTS_PUT_ERROR = 'TP_CB_URL_ACCOUNTS_PUT_ERROR',
     TP_CB_URL_SERVICES_GET = 'TP_CB_URL_SERVICES_GET',
-    TP_CB_URL_SERVICES_PUT = 'TP_CB_URL_SERVICES_PUT',
-    TP_CB_URL_SERVICES_PUT_ERROR = 'TP_CB_URL_SERVICES_PUT_ERROR',
     TP_CB_URL_SERVICES_PUT = 'TP_CB_URL_SERVICES_PUT',
     TP_CB_URL_SERVICES_PUT_ERROR = 'TP_CB_URL_SERVICES_PUT_ERROR',
     TP_CB_URL_ACCOUNT_REQUEST_POST = 'TP_CB_URL_ACCOUNT_REQUEST_POST',
@@ -658,7 +657,23 @@ declare namespace CentralServicesShared {
     accept: string
   }
 
-  type RequestParams = { url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, hubNameRegex: RegExp, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType }
+  type RequestParams = {
+    url: string,
+    headers: HapiUtil.Dictionary<string>,
+    source: string,
+    destination: string,
+    hubNameRegex: RegExp,
+    method?: RestMethodsEnum,
+    payload?: any,
+    params?: any,
+    responseType?: string,
+    span?: any,
+    jwsSigner?: any,
+    protocolVersions?: ProtocolVersionsType,
+    apiType?: 'fspiop' | 'iso20022',
+    axiosRequestOptionsOverride?: AxiosRequestConfig,
+    log?: ILogger,
+  }
   interface Request {
     sendRequest(params: RequestParams): Promise<any>
   }
@@ -790,7 +805,7 @@ declare namespace CentralServicesShared {
     RedisCache: RedisCache;
   }
 
-  type RedisInstanceConfig = 
+  type RedisInstanceConfig =
     | {
         type: 'redis';
         host: string;
