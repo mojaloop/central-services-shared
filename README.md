@@ -7,6 +7,22 @@
 
 Shared code for central services
 
+## Environment Variables
+
+The following environment variables can be used to configure HTTP behavior:
+
+### HTTP Request Configuration
+- `HTTP_REQUEST_TIMEOUT_MS` - HTTP request timeout in milliseconds (default: 25000)
+- `HTTP_AGENT_KEEP_ALIVE` - Enable HTTP keep-alive connections (default: 'true')
+
+### HTTP Retry Configuration
+- `HTTP_RETRY_COUNT` - Number of retry attempts for failed HTTP requests (default: 0, no retries)
+- `HTTP_RETRY_DELAY_MS` - Delay between retry attempts in milliseconds (default: 100)
+
+**Note**: HTTP retries are only enabled when `HTTP_RETRY_COUNT` > 0. The retry logic applies to:
+- HTTP 503 (Service Unavailable) responses
+- `EAI_AGAIN` DNS resolution errors
+
 ## Auditing Dependencies
 
 We use `audit-ci` along with `npm audit` to check dependencies for node vulnerabilities, and keep track of resolved dependencies with an `audit-ci.jsonc` file.
