@@ -34,6 +34,7 @@ const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
 const { retryCommand } = require('./shared')
+const RECREATE_RE = /Cannot read properties of undefined \(reading 'getInstance'\)|Too many Cluster redirections/
 
 class PubSub {
   /**
@@ -61,6 +62,36 @@ class PubSub {
     return this.isCluster
       ? new Redis.Cluster(this.config.cluster, { ...this.config, shardedSubscribers: true })
       : new Redis(this.config)
+  }
+
+  retry (client, fn, log, retryAttempts, retryDelayMs) {
+    return retryCommand(
+      async () => {
+        try {
+          return await fn()
+        } catch (err) {
+          if (RECREATE_RE.test(err.message)) {
+            if (client === 'publisher') {
+              const duplicateClient = this.publisherClient.duplicate()
+              log.warn('Recreated publisher due to error: ' + err.message)
+              this.publisherClient.quit()
+              this.publisherClient = duplicateClient
+              this.addEventListeners(duplicateClient)
+            } else if (client === 'subscriber') {
+              const duplicateClient = this.subscriberClient.duplicate()
+              log.warn('Recreated subscriber due to error: ' + err.message)
+              this.subscriberClient.quit()
+              this.subscriberClient = duplicateClient
+              this.addEventListeners(duplicateClient)
+            }
+          }
+          throw err
+        }
+      },
+      log,
+      retryAttempts,
+      retryDelayMs
+    )
   }
 
   async connect () {
@@ -91,8 +122,8 @@ class PubSub {
 
   async healthCheck () {
     try {
-      const publisherStatus = await retryCommand(() => this.publisherClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
-      const subscriberStatus = await retryCommand(() => this.subscriberClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
+      const publisherStatus = await this.retry('publisher', () => this.publisherClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
+      const subscriberStatus = await this.retry('subscriber', () => this.subscriberClient.ping(), this.log, this.retryAttempts, this.retryDelayMs)
       const isHealthy = publisherStatus === 'PONG' && subscriberStatus === 'PONG'
       this.log.debug(`Redis health check: ${isHealthy ? 'Healthy' : 'Unhealthy'}`)
       return isHealthy
@@ -123,9 +154,9 @@ class PubSub {
     try {
       await this.ensureConnected(this.publisherClient)
       if (this.isCluster) {
-        await retryCommand(() => this.publisherClient.spublish(channel, JSON.stringify(message)), this.log, this.retryAttempts, this.retryDelayMs)
+        await this.retry('publisher', () => this.publisherClient.spublish(channel, JSON.stringify(message)), this.log, this.retryAttempts, this.retryDelayMs)
       } else {
-        await retryCommand(() => this.publisherClient.publish(channel, JSON.stringify(message)), this.log, this.retryAttempts, this.retryDelayMs)
+        await this.retry('publisher', () => this.publisherClient.publish(channel, JSON.stringify(message)), this.log, this.retryAttempts, this.retryDelayMs)
       }
       this.log.info(`Message published to channel: ${channel}`)
     } catch (err) {
@@ -139,7 +170,7 @@ class PubSub {
       await this.ensureConnected(this.subscriberClient)
       let listener
       if (this.isCluster) {
-        await retryCommand(() => this.subscriberClient.ssubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
+        await this.retry('subscriber', () => this.subscriberClient.ssubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
         listener = (subscribedChannel, message) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
@@ -148,7 +179,7 @@ class PubSub {
         this.subscriberClient.on('smessage', listener)
         this._channelListeners.set(channel, { event: 'smessage', listener })
       } else {
-        await retryCommand(() => this.subscriberClient.subscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
+        await this.retry('subscriber', () => this.subscriberClient.subscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
         listener = (subscribedChannel, message) => {
           if (subscribedChannel === channel) {
             callback(JSON.parse(message))
@@ -175,9 +206,9 @@ class PubSub {
         this._channelListeners.delete(channel)
       }
       if (this.isCluster) {
-        await retryCommand(() => this.subscriberClient.sunsubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
+        await this.retry('subscriber', () => this.subscriberClient.sunsubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
       } else {
-        await retryCommand(() => this.subscriberClient.unsubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
+        await this.retry('subscriber', () => this.subscriberClient.unsubscribe(channel), this.log, this.retryAttempts, this.retryDelayMs)
       }
       this.log.info(`Unsubscribed from channel: ${channel}`)
     } catch (err) {
