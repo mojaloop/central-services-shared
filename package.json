@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.33.2",
+  "version": "18.33.3-snapshot.0",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -95,7 +95,7 @@
   },
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.1.2",
-    "@mojaloop/central-services-logger": "11.9.3",
+    "@mojaloop/central-services-logger": "11.10.0",
     "@mojaloop/central-services-metrics": "12.7.1",
     "@mojaloop/event-sdk": "14.7.0",
     "@mojaloop/sdk-standard-components": "19.17.0",
@@ -107,7 +107,7 @@
     "audit-ci": "7.1.0",
     "base64url": "3.0.1",
     "chance": "1.1.13",
-    "npm-check-updates": "18.1.1",
+    "npm-check-updates": "18.3.0",
     "nyc": "17.1.0",
     "portfinder": "1.0.38",
     "pre-commit": "1.2.2",
