@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.33.4](https://github.com/mojaloop/central-services-shared/compare/v18.33.3...v18.33.4) (2025-09-23)
+
+
+### Bug Fixes
+
+* recreate redis clients on specific errors ([#484](https://github.com/mojaloop/central-services-shared/issues/484)) ([2b15867](https://github.com/mojaloop/central-services-shared/commit/2b158676c1aee4f47ea0bd43a5449b154dbaa073))
+
 ### [18.33.3](https://github.com/mojaloop/central-services-shared/compare/v18.33.2...v18.33.3) (2025-09-22)
 
 
