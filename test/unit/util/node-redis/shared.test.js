@@ -1,6 +1,6 @@
 const Test = require('tapes')(require('tape'))
 const sinon = require('sinon')
-const shared = require('../../../../src/util/redis/shared')
+const shared = require('../../../../src/util/node-redis/shared')
 
 Test('shared.js', (t) => {
   t.test('should export retryCommand', (assert) => {
