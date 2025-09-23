@@ -48,6 +48,7 @@ Test('PubSub', (t) => {
       connect: sandbox.stub().resolves(),
       quit: sandbox.stub().resolves(),
       on: sandbox.stub().returnsThis(),
+      duplicate: sandbox.stub().returnsThis(),
       status: 'ready'
     }
     subscriberClientStub = {
@@ -61,6 +62,7 @@ Test('PubSub', (t) => {
       quit: sandbox.stub().resolves(),
       removeAllListeners: sandbox.stub().resolves(),
       removeListener: sandbox.stub(),
+      duplicate: sandbox.stub().returnsThis(),
       status: 'ready'
     }
 
@@ -110,6 +112,25 @@ Test('PubSub', (t) => {
       t.fail('Should have thrown an error')
     } catch (err) {
       t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should recreate publisher when publishing throws a specific error', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config, publisherClientStub, subscriberClientStub)
+    const channel = 'test-channel'
+    const message = { key: 'value' }
+    const error = new Error('Too many Cluster redirections')
+
+    pubSub.publisherClient.publish.rejects(error)
+
+    try {
+      await pubSub.publish(channel, message)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.ok(pubSub.publisherClient.duplicate.calledOnce, 'publisherClient duplicate called')
     }
     t.end()
   })
@@ -203,6 +224,25 @@ Test('PubSub', (t) => {
       t.fail('Should have thrown an error')
     } catch (err) {
       t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should recreate published broadcasting a message throws a specific error', async (t) => {
+    const config = {}
+    const pubSub = new PubSub(config, publisherClientStub, subscriberClientStub)
+    const channels = ['channel1', 'channel2']
+    const message = { key: 'value' }
+    const error = new Error('Cannot read properties of undefined (reading \'getInstance\')')
+
+    pubSub.publisherClient.publish.onFirstCall().rejects(error)
+
+    try {
+      await pubSub.broadcast(channels, message)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.ok(pubSub.publisherClient.duplicate.calledOnce, 'publisherClient duplicate called')
     }
     t.end()
   })
