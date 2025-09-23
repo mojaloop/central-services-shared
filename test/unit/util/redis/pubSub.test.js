@@ -228,25 +228,6 @@ Test('PubSub', (t) => {
     t.end()
   })
 
-  t.test('should recreate published broadcasting a message throws a specific error', async (t) => {
-    const config = {}
-    const pubSub = new PubSub(config, publisherClientStub, subscriberClientStub)
-    const channels = ['channel1', 'channel2']
-    const message = { key: 'value' }
-    const error = new Error('Cannot read properties of undefined (reading \'getInstance\')')
-
-    pubSub.publisherClient.publish.onFirstCall().rejects(error)
-
-    try {
-      await pubSub.broadcast(channels, message)
-      t.fail('Should have thrown an error')
-    } catch (err) {
-      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
-      t.ok(pubSub.publisherClient.duplicate.calledOnce, 'publisherClient duplicate called')
-    }
-    t.end()
-  })
-
   t.test('should connect Redis clients successfully', async (t) => {
     const config = {}
     const pubSub = new PubSub(config, publisherClientStub, subscriberClientStub)
@@ -576,6 +557,27 @@ Test('PubSub', (t) => {
       t.fail('Should have thrown an error')
     } catch (err) {
       t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+    }
+    t.end()
+  })
+
+  t.test('should recreate subscriber when subscribing to a channel throws specific error', async (t) => {
+    const config = { cluster: [{ host: '127.0.0.1', port: 6379 }] }
+    const error = new Error('Cannot read properties of undefined (reading \'getInstance\')')
+    const subscriberClient = {
+      ...subscriberClientStub,
+      ssubscribe: sandbox.stub().rejects(error)
+    }
+    const pubSub = new PubSub(config, publisherClientStub, subscriberClient)
+    const channel = 'cluster-channel'
+    const callback = sinon.stub()
+
+    try {
+      await pubSub.subscribe(channel, callback)
+      t.fail('Should have thrown an error')
+    } catch (err) {
+      t.deepEqual(err, constructSystemExtensionError(error, '["redis"]'), 'Error thrown and rethrown correctly')
+      t.ok(pubSub.subscriberClient.duplicate.calledOnce, 'subscriberClient duplicate called')
     }
     t.end()
   })
