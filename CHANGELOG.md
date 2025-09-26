@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.34.0](https://github.com/mojaloop/central-services-shared/compare/v18.33.4...v18.34.0) (2025-09-26)
+
+
+### Features
+
+* add grype src scan plus update deps ([#486](https://github.com/mojaloop/central-services-shared/issues/486)) ([08b0b3b](https://github.com/mojaloop/central-services-shared/commit/08b0b3ba00cf7271524ab0a3295ac6ff304addc0))
+
 ### [18.33.4](https://github.com/mojaloop/central-services-shared/compare/v18.33.3...v18.33.4) (2025-09-23)
 
 
