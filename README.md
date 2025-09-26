@@ -7,6 +7,10 @@
 
 Shared code for central services
 
+## CI/CD
+
+This repository uses the [mojaloop/build](https://github.com/mojaloop/ci-config-orb-build) CircleCI orb for standardized CI/CD workflows, including automated Grype vulnerability scanning for source code security.
+
 ## Auditing Dependencies
 
 We use `audit-ci` along with `npm audit` to check dependencies for node vulnerabilities, and keep track of resolved dependencies with an `audit-ci.jsonc` file.
