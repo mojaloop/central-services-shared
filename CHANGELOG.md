@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.34.2](https://github.com/mojaloop/central-services-shared/compare/v18.34.1...v18.34.2) (2025-10-10)
+
+
+### Bug Fixes
+
+* **csi-1259:** update getAllProxiesNames to return only isActive proxies ([#488](https://github.com/mojaloop/central-services-shared/issues/488)) ([5d05786](https://github.com/mojaloop/central-services-shared/commit/5d05786a18740a90f851d4d80c8835fdde260a32))
+
 ### [18.34.1](https://github.com/mojaloop/central-services-shared/compare/v18.34.0...v18.34.1) (2025-10-06)
 
 
