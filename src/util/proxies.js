@@ -111,14 +111,13 @@ exports.initializeCache = async (policyOptions, config) => {
 }
 
 /**
-* @function getAllProxiesNames
-* @description It returns a list of allProxies names from the cache if the cache is still valid, otherwise it will refresh the cache and return the value
+* Returns a list of allProxies names from the cache if the cache is still valid, otherwise it will refresh the cache and return the value
 *
 * @param {string} switchUrl the endpoint for the switch
-*
+* @param {boolean} [onlyActive] if true, returns only active proxies (isActive === 1), defaults to false
 * @returns {string[]} - Returns list of allProxies names, throws error if failure occurs
 */
-exports.getAllProxiesNames = async (switchUrl) => {
+exports.getAllProxiesNames = async (switchUrl, onlyActive = false) => {
   const histTimer = Metrics.getHistogram(
     'getAllProxiesNames',
     'getAllProxiesNames - Metrics for getAllProxies with cache hit rate',
@@ -147,6 +146,9 @@ exports.getAllProxiesNames = async (switchUrl) => {
       // Drop error from cache
       await policy.drop(cacheKey)
       throw ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(proxies.errorInformation)
+    }
+    if (onlyActive) {
+      proxies = proxies.filter(p => p.isActive === 1)
     }
     return proxies.map(p => p.name)
   } catch (err) {
