@@ -647,7 +647,7 @@ declare namespace CentralServicesShared {
 
   type ProxyNames = string[]
   interface Proxies extends Cacheable {
-    getAllProxiesNames(switchUrl: string): Promise<ProxyNames>
+    getAllProxiesNames(switchUrl: string, onlyActive?: boolean): Promise<ProxyNames>
     invalidateProxiesCache(): Promise<void>
   }
 
