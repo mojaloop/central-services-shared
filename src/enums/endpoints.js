@@ -102,10 +102,10 @@ const FspEndpointTypes = {
   TP_CB_URL_SERVICES_GET: 'TP_CB_URL_SERVICES_GET',
   TP_CB_URL_SERVICES_PUT: 'TP_CB_URL_SERVICES_PUT',
   TP_CB_URL_SERVICES_PUT_ERROR: 'TP_CB_URL_SERVICES_PUT_ERROR',
-  TP_CB_URL_ACCOUNT_REQUEST_POST: 'TP_CB_URL_ACCOUNT_REQUEST_POST',
-  TP_CB_URL_ACCOUNT_REQUEST_PUT: 'TP_CB_URL_ACCOUNT_REQUEST_PUT',
-  TP_CB_URL_ACCOUNT_REQUEST_PUT_ERROR: 'TP_CB_URL_ACCOUNT_REQUEST_PUT_ERROR',
-  TP_CB_URL_ACCOUNT_REQUEST_GET: 'TP_CB_URL_ACCOUNT_REQUEST_GET'
+  TP_CB_URL_ACCOUNTS_REQUEST_POST: 'TP_CB_URL_ACCOUNTS_REQUEST_POST',
+  TP_CB_URL_ACCOUNTS_REQUEST_PUT: 'TP_CB_URL_ACCOUNTS_REQUEST_PUT',
+  TP_CB_URL_ACCOUNTS_REQUEST_PUT_ERROR: 'TP_CB_URL_ACCOUNTS_REQUEST_PUT_ERROR',
+  TP_CB_URL_ACCOUNTS_REQUEST_GET: 'TP_CB_URL_ACCOUNTS_REQUEST_GET'
 }
 
 const FspEndpointTemplates = {
@@ -162,16 +162,16 @@ const FspEndpointTemplates = {
   TP_CONSENT_PUT_ERROR: '/consents/{{ID}}/error',
   TP_CONSENT_GENERATE_CHALLENGE_POST: '/consents/{{ID}}/generateChallenge',
   TP_CONSENT_GENERATE_CHALLENGE_PUT_ERROR: '/consents/{{ID}}/generateChallenge/error',
-  TP_ACCOUNTS_GET: '/accounts/{{ID}}',
-  TP_ACCOUNTS_PUT: '/accounts/{{ID}}',
-  TP_ACCOUNTS_PUT_ERROR: '/accounts/{{ID}}/error',
+  TP_ACCOUNTS_GET: '/tppAccounts/{{accountRequestId}}/{{signedChallenge}}',
+  TP_ACCOUNTS_PUT: '/tppAccounts/{{accountRequestId}}',
+  TP_ACCOUNTS_PUT_ERROR: '/tppAccounts/{{accountRequestId}}/error',
   TP_SERVICES_GET: '/services/{{ServiceType}}',
   TP_SERVICES_PUT: '/services/{{ServiceType}}',
   TP_SERVICES_PUT_ERROR: '/services/{{ServiceType}}/error',
-  TP_ACCOUNT_REQUEST_POST: '/tppAccountRequest',
-  TP_ACCOUNT_REQUEST_PUT: '/tppAccountRequest/{{ID}}',
-  TP_ACCOUNT_REQUEST_PUT_ERROR: '/tppAccountRequest/{{ID}}/error',
-  TP_ACCOUNT_REQUEST_GET: '/tppAccountRequest/{{ID}}'
+  TP_ACCOUNT_REQUEST_POST: '/tppAccountsRequest',
+  TP_ACCOUNT_REQUEST_PUT: '/tppAccountsRequest/{{ID}}',
+  TP_ACCOUNT_REQUEST_PUT_ERROR: '/tppAccountsRequest/{{ID}}/error',
+  TP_ACCOUNT_REQUEST_GET: '/tppAccountsRequest/{{ID}}'
 }
 
 module.exports = {
