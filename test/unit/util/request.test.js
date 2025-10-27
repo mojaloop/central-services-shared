@@ -603,6 +603,60 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       await testErrorWithSpan(test, customError, '1001')
     })
 
+    getEndpointTest.test('should use default httpRequestTimeoutMs from config', async (test) => {
+      // Arrange
+      const fsp = 'fsp'
+      const requestOptions = {
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        method: 'get'
+      }
+      let receivedOptions
+      request = sandbox.stub().callsFake((options) => {
+        receivedOptions = options
+        return Helper.getEndPointsResponse
+      })
+      Model = proxyquire('../../../src/util/request', { axios: request })
+
+      // Act
+      await Model.sendRequest({
+        url: requestOptions.url,
+        headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+        source: hubName,
+        destination: hubName,
+        hubNameRegex
+      })
+
+      // Assert
+      test.equal(receivedOptions.timeout, require('../../../src/config').get('httpRequestTimeoutMs'), 'Timeout is set from config')
+      test.end()
+    })
+
+    getEndpointTest.test('should allow overriding httpRequestTimeoutMs via axiosRequestOptionsOverride', async (test) => {
+      // Arrange
+      const fsp = 'fsp'
+      const overrideTimeout = 12345
+      let receivedTimeout
+      const requestFunction = (requestOptions) => {
+        receivedTimeout = requestOptions.timeout
+        return Helper.getEndPointsResponse
+      }
+      Model = proxyquire('../../../src/util/request', { axios: requestFunction })
+
+      // Act
+      await Model.sendRequest({
+        url: Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANT_ENDPOINTS_GET, { fsp }),
+        headers: Helper.defaultHeaders(hubName, Enum.Http.HeaderResources.PARTICIPANTS, hubName),
+        source: hubName,
+        destination: hubName,
+        hubNameRegex,
+        axiosRequestOptionsOverride: { timeout: overrideTimeout }
+      })
+
+      // Assert
+      test.equal(receivedTimeout, overrideTimeout, 'Timeout is overridden by axiosRequestOptionsOverride')
+      test.end()
+    })
+
     getEndpointTest.end()
   })
 
