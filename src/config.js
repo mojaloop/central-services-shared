@@ -14,6 +14,12 @@ const config = convict({
     format: Number,
     default: 300,
     env: 'SHARED_CACHE_DEFAULT_TTL_SEC'
+  },
+  httpRequestTimeoutMs: {
+    doc: 'Timeout for HTTP requests in milliseconds.',
+    format: Number,
+    default: 20000,
+    env: 'SHARED_HTTP_REQUEST_TIMEOUT_MS'
   }
 })
 

@@ -39,6 +39,7 @@ const Headers = require('./headers/transformer')
 const enums = require('../enums')
 const { logger } = require('../logger')
 const { API_TYPES } = require('../constants')
+const config = require('../config')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -128,6 +129,7 @@ const sendRequest = async ({
       data: payload, // todo: think, if it's better to transform to ISO format here (based on apiType)
       params,
       responseType,
+      timeout: config.get('httpRequestTimeoutMs'),
       ...axiosRequestOptionsOverride
     }
     // if jwsSigner is passed then sign the request
