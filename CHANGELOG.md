@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.34.3](https://github.com/mojaloop/central-services-shared/compare/v18.34.2...v18.34.3) (2025-10-30)
+
+
+### Chore
+
+* add env config to control http timeout ([#491](https://github.com/mojaloop/central-services-shared/issues/491)) ([9249fb2](https://github.com/mojaloop/central-services-shared/commit/9249fb2b217cf8e337c42d8e3391cbe225984463))
+
 ### [18.34.2](https://github.com/mojaloop/central-services-shared/compare/v18.34.1...v18.34.2) (2025-10-10)
 
 
