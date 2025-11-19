@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.34.4](https://github.com/mojaloop/central-services-shared/compare/v18.34.3...v18.34.4) (2025-11-19)
+
+
+### Bug Fixes
+
+* update tpp endpoints ([#492](https://github.com/mojaloop/central-services-shared/issues/492)) ([8a2d30a](https://github.com/mojaloop/central-services-shared/commit/8a2d30a7486fe8c0cc900b65edd85eb30a4556da))
+
 ### [18.34.3](https://github.com/mojaloop/central-services-shared/compare/v18.34.2...v18.34.3) (2025-10-30)
 
 
