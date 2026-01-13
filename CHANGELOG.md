@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.34.6](https://github.com/mojaloop/central-services-shared/compare/v18.34.5...v18.34.6) (2026-01-13)
+
+
+### Bug Fixes
+
+* **csi-2027:** cache participant even if it wasn't found ([#496](https://github.com/mojaloop/central-services-shared/issues/496)) ([c61096a](https://github.com/mojaloop/central-services-shared/commit/c61096aa37ba3f9a13787f2653c13939752d9700))
+
 ### [18.34.5](https://github.com/mojaloop/central-services-shared/compare/v18.34.4...v18.34.5) (2025-12-08)
 
 
