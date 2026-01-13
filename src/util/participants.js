@@ -41,6 +41,7 @@ const request = require('./request')
 
 const partition = 'participant-cache'
 const clientOptions = { partition }
+const NOT_FOUND = '__NOT_FOUND__'
 
 let client
 let policy
@@ -83,6 +84,12 @@ const fetchParticipant = async (fsp) => {
       source: hubName,
       destination: hubName,
       hubNameRegex
+    }).catch(e => {
+      if (e?.apiErrorCode?.code === ErrorHandler.Enums.FSPIOPErrorCodes.ID_NOT_FOUND.code) {
+        log.warn('participant not exists')
+        return { data: { [NOT_FOUND]: true } }
+      }
+      throw e
     })
     const participant = response.data
     log.verbose('fetchParticipant is done', { participant })
@@ -154,8 +161,8 @@ exports.getParticipant = async (switchUrl, fsp) => {
     }
 
     /* istanbul ignore next */
-    if (!participant) {
-      log.warn('no participant found')
+    if (participant?.[NOT_FOUND]) {
+      log.info('no participant found')
       return null
     }
     log.verbose('getParticipant result:', { participant })

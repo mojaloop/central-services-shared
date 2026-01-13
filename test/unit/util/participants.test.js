@@ -1,18 +1,20 @@
 'use strict'
 
 const Test = require('tapes')(require('tape'))
-const src = '../../../src'
 const Sinon = require('sinon')
-const Cache = require(`${src}/util/participants`)
-const request = require(`${src}/util/request`)
 const Catbox = require('@hapi/catbox')
-const Config = require('../../util/config')
-const Http = require(`${src}/util`).Http
-const Enum = require(`${src}`).Enum
 const Mustache = require('mustache')
-const Helper = require('../../util/helper')
 const Logger = require('@mojaloop/central-services-logger')
 const Metrics = require('@mojaloop/central-services-metrics')
+const ErrorHandler = require('@mojaloop/central-services-error-handling')
+
+const Cache = require('#src/util/participants')
+const request = require('#src/util/request')
+const Http = require('#src/util/http')
+const Enum = require('#src/enums/index')
+
+const Config = require('#test/util/config')
+const Helper = require('#test/util/helper')
 
 Test('Participants Cache Test', participantsCacheTest => {
   let sandbox
@@ -158,6 +160,31 @@ Test('Participants Cache Test', participantsCacheTest => {
       }
     })
 
+    getParticipantTest.test('cache participant even if it was NOT found', async (test) => {
+      try {
+        const fsp = 'notExists'
+        const hubUrl = 'http://hub-url'
+        const errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.ID_NOT_FOUND
+        const fspiopError = ErrorHandler.Factory.createFSPIOPError(errorCode, 'errorMessage', new Error('Not Found'), 'source', [])
+        request.sendRequest.rejects(fspiopError)
+
+        await Cache.initializeCache(Config.PARTICIPANT_CACHE_CONFIG, { hubName, hubNameRegex })
+
+        const result1 = await Cache.getParticipant(hubUrl, fsp)
+        test.equal(result1, null, 'participant not exists (1)')
+        test.equal(request.sendRequest.callCount, 1)
+
+        const result2 = await Cache.getParticipant(hubUrl, fsp)
+        test.equal(result2, null, 'participant not exists (2)')
+        test.equal(request.sendRequest.callCount, 1, 'No new request was made')
+      } catch (e) {
+        test.fail('should not throw error: ' + e.message)
+      } finally {
+        await Cache.stopCache()
+        test.end()
+      }
+    })
+
     getParticipantTest.test('throw error', async (test) => {
       const fsp = 'fsp2'
       const url = Mustache.render(Config.ENDPOINT_SOURCE_URL + Enum.EndPoints.FspEndpointTemplates.PARTICIPANTS_GET, { fsp })
@@ -242,5 +269,6 @@ Test('Participants Cache Test', participantsCacheTest => {
 
     await participantsInitializeCacheTest.end()
   })
+
   participantsCacheTest.end()
 })
