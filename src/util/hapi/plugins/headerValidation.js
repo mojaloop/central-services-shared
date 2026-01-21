@@ -147,9 +147,11 @@ const plugin = {
   }
 }
 
+/* istanbul ignore next */
 const validateSourceHeader = (headers = {}) => {
   const source = headers[Headers.FSPIOP.SOURCE]
   const clientId = headers['x-client-id'] // think, if we need to have service-to-service calls, where no clientId
+  // x-client-id is added by oathkeeper during processing request from DFSP to hub extapi
 
   if (!source || source !== clientId) {
     const errMessage = errorMessages.INVALID_SOURCE_HEADER

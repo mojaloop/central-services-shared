@@ -388,6 +388,17 @@ Test('headerValidation plugin test', async (pluginTest) => {
       t.is(statusCode, 202)
     }))
 
+    sourceTests.test('should not throw error if needSourceValidation is false', tryCatchEndTest(async t => {
+      const testServer = await init(false)
+
+      const { statusCode } = await testServer.inject({
+        method: 'get',
+        url: `/${resource}`,
+        headers: headersDto({ xClientId: '123', source: 'xyz' })
+      })
+      t.is(statusCode, 202)
+    }))
+
     sourceTests.end()
   })
 
