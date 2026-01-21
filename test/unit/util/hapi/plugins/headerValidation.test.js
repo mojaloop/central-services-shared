@@ -28,24 +28,28 @@
  ******/
 'use strict'
 
-const Hapi = require('@hapi/hapi')
-const ErrorHandling = require('@mojaloop/central-services-error-handling')
 const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
-const { plugin, errorMessages } = require('../../../../../src/util/hapi/plugins/headerValidation')
+const Hapi = require('@hapi/hapi')
+const ErrorHandling = require('@mojaloop/central-services-error-handling')
+const { plugin } = require('../../../../../src/util/hapi/plugins/headerValidation')
 const { protocolVersionsMap } = require('../../../../../src/util/headerValidation')
+const { errorMessages } = require('#src/constants')
 const {
   generateAcceptHeader,
   generateContentTypeHeader
 } = require('../../headerValidation/support')
 
+const { defaultHeaders, tryCatchEndTest } = require('#test/util/helper')
+
 const resource = 'participants'
 
-const init = async () => {
+const init = async (needSourceValidation = false) => {
   const server = await new Hapi.Server()
 
   await server.register([{
-    plugin
+    plugin,
+    options: { needSourceValidation }
   }])
 
   // makes validation errors easier to inspect in server responses
@@ -88,6 +92,16 @@ const init = async () => {
 
   return server
 }
+
+const headersDto = ({
+  source,
+  destination = 'destination',
+  xClientId = source
+} = {}) => ({
+  ...defaultHeaders(destination, resource, source),
+  ...(xClientId && { 'x-client-id': xClientId }),
+  date: new Date().toUTCString()
+})
 
 Test('headerValidation plugin test', async (pluginTest) => {
   let sandbox
@@ -333,6 +347,48 @@ Test('headerValidation plugin test', async (pluginTest) => {
     const payload = JSON.parse(res.payload)
     t.is(payload.apiErrorCode.code, fspiopCode.code)
     t.end()
+  })
+
+  pluginTest.test('validateSourceHeader Tests', async sourceTests => {
+    const testServer = await init(true)
+
+    sourceTests.test('should throw error if xClientId does not match source-header', tryCatchEndTest(async t => {
+      const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.VALIDATION_ERROR
+
+      const { statusCode, result } = await testServer.inject({
+        method: 'get',
+        url: `/${resource}`,
+        headers: headersDto({ source: 'abc', xClientId: '123' })
+      })
+      t.is(statusCode, fspiopCode.httpStatusCode)
+      t.is(result?.apiErrorCode?.code, fspiopCode.code)
+      t.is(result?.message, errorMessages.INVALID_SOURCE_HEADER)
+    }))
+
+    sourceTests.test('should throw error if both xClientId and source-header undefined', tryCatchEndTest(async t => {
+      const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.VALIDATION_ERROR
+
+      const { statusCode, result } = await testServer.inject({
+        method: 'get',
+        url: `/${resource}`,
+        headers: headersDto({ xClientId: undefined, source: undefined })
+      })
+      t.is(statusCode, fspiopCode.httpStatusCode)
+      t.is(result?.message, errorMessages.INVALID_SOURCE_HEADER)
+    }))
+
+    sourceTests.test('should pass validation if xClientId equals source-header', tryCatchEndTest(async t => {
+      const dfpId = 'dfsp1'
+
+      const { statusCode } = await testServer.inject({
+        method: 'get',
+        url: `/${resource}`,
+        headers: headersDto({ xClientId: dfpId, source: dfpId })
+      })
+      t.is(statusCode, 202)
+    }))
+
+    sourceTests.end()
   })
 
   await pluginTest.end()
