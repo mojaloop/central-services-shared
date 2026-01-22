@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.35.0](https://github.com/mojaloop/central-services-shared/compare/v18.34.6...v18.35.0) (2026-01-22)
+
+
+### Features
+
+* **csi-2030:** added validateSourceHeader feature ([#499](https://github.com/mojaloop/central-services-shared/issues/499)) ([27ecf64](https://github.com/mojaloop/central-services-shared/commit/27ecf643136e6639320f24e0ba578e7b28f15bd0))
+
 ### [18.34.6](https://github.com/mojaloop/central-services-shared/compare/v18.34.5...v18.34.6) (2026-01-13)
 
 
