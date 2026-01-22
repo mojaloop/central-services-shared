@@ -369,7 +369,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
       const { statusCode } = await testServer.inject({
         method: 'get',
         url: `/${resource}`,
-        headers: headersDto({ xClientId: undefined, source: 'source' })
+        headers: headersDto({ xClientId: null, source: 'source' })
       })
       t.is(statusCode, 202)
     }))
