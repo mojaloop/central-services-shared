@@ -5,11 +5,13 @@
 // _appear_ to correctly validate the content of `string` + `pattern` headers at all, although the
 // accuracy of this statement has not been thoroughly tested.
 
+const { env } = require('node:process')
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
 const RootJoi = require('joi')
 const DateExtension = require('@hapi/joi-date')
-const Joi = RootJoi.extend(DateExtension)
-const { API_TYPES, MAX_CONTENT_LENGTH } = require('../../../constants')
+const { API_TYPES, MAX_CONTENT_LENGTH, CLIENT_ID_HEADER, errorMessages } = require('../../../constants')
+const { Headers } = require('../../../enums/http')
+const { logger } = require('../../../logger')
 const {
   checkApiType,
   parseAcceptHeader,
@@ -18,7 +20,14 @@ const {
   convertSupportedVersionToExtensionList
 } = require('../../headerValidation')
 
+const NEED_SOURCE_VALIDATION = (env.ENABLED_SOURCE_HEADER_VALIDATION ?? 'true') === 'true'
+
 // Some defaults
+
+const Joi = RootJoi.extend(DateExtension)
+const dateSchema = Joi.date()
+  .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')
+  .required()
 
 const defaultProtocolResources = [
   'parties',
@@ -39,15 +48,6 @@ const defaultProtocolVersions = [
   protocolVersions.anyVersion
 ]
 
-const errorMessages = {
-  REQUESTED_VERSION_NOT_SUPPORTED: 'The Client requested an unsupported version, see extension list for supported version(s).',
-  INVALID_ACCEPT_HEADER: 'Invalid accept header',
-  INVALID_CONTENT_TYPE_HEADER: 'Invalid content-type header',
-  REQUIRE_ACCEPT_HEADER: 'Accept is required',
-  REQUIRE_CONTENT_TYPE_HEADER: 'Content-type is required',
-  SUPPLIED_VERSION_NOT_SUPPORTED: 'Client supplied a protocol version which is not supported by the server'
-}
-
 /**
  * HAPI plugin to validate request headers per FSPIOP-API spec 1.0
  *
@@ -65,7 +65,8 @@ const plugin = {
     resources = defaultProtocolResources,
     supportedProtocolContentVersions = defaultProtocolVersions,
     supportedProtocolAcceptVersions = defaultProtocolVersions,
-    apiType = API_TYPES.fspiop
+    apiType = API_TYPES.fspiop,
+    needSourceValidation = NEED_SOURCE_VALIDATION
   }) {
     checkApiType(apiType)
 
@@ -77,6 +78,8 @@ const plugin = {
       if (!resources.includes(resource)) {
         return h.continue
       }
+
+      if (needSourceValidation) validateSourceHeader(request.headers)
 
       // Always validate the accept header for a get request, or optionally if it has been
       // supplied
@@ -103,7 +106,6 @@ const plugin = {
         }
       }
 
-      const dateSchema = Joi.date().format('ddd, DD MMM YYYY HH:mm:ss [GMT]').required()
       const dateHeader = request.headers.date
       if (dateHeader === undefined) {
         throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, 'Missing required date header')
@@ -145,9 +147,26 @@ const plugin = {
   }
 }
 
+/* istanbul ignore next */
+const validateSourceHeader = (headers = {}) => {
+  const source = headers[Headers.FSPIOP.SOURCE]
+  const clientId = headers[CLIENT_ID_HEADER]
+  // x-client-id is added by oathkeeper during processing request from DFSP to hub extapi
+
+  if (!clientId) { // internal service-to-service calls
+    logger.info('No x-client-id header found, skip source-header validation', { source })
+    return
+  }
+
+  if (source !== clientId) {
+    const errMessage = errorMessages.INVALID_SOURCE_HEADER
+    logger.error(errMessage, { clientId, source })
+    throw createFSPIOPError(Enums.FSPIOPErrorCodes.VALIDATION_ERROR, errMessage)
+  }
+}
+
 module.exports = {
   plugin,
-  errorMessages,
   defaultProtocolResources,
   defaultProtocolVersions
 }
