@@ -5,6 +5,8 @@ const API_TYPES = Object.freeze({
 
 const ISO_HEADER_PART = 'iso20022'
 
+const CLIENT_ID_HEADER = 'x-client-id'
+
 const REDIS_SUCCESS = 'OK'
 const REDIS_IS_CONNECTED_STATUSES = ['connect', 'ready']
 
@@ -21,6 +23,7 @@ const errorMessages = {
 module.exports = {
   API_TYPES,
   ISO_HEADER_PART,
+  CLIENT_ID_HEADER,
   REDIS_SUCCESS,
   REDIS_IS_CONNECTED_STATUSES,
   errorMessages

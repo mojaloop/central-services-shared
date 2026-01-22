@@ -32,15 +32,15 @@ const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Hapi = require('@hapi/hapi')
 const ErrorHandling = require('@mojaloop/central-services-error-handling')
-const { plugin } = require('../../../../../src/util/hapi/plugins/headerValidation')
-const { protocolVersionsMap } = require('../../../../../src/util/headerValidation')
-const { errorMessages } = require('#src/constants')
+
+const { plugin } = require('#src/util/hapi/plugins/headerValidation')
+const { protocolVersionsMap } = require('#src/util/headerValidation/index')
+const { CLIENT_ID_HEADER, errorMessages } = require('#src/constants')
+const { defaultHeaders, tryCatchEndTest } = require('#test/util/helper')
 const {
   generateAcceptHeader,
   generateContentTypeHeader
 } = require('../../headerValidation/support')
-
-const { defaultHeaders, tryCatchEndTest } = require('#test/util/helper')
 
 const resource = 'participants'
 
@@ -99,7 +99,7 @@ const headersDto = ({
   xClientId = source
 } = {}) => ({
   ...defaultHeaders(destination, resource, source),
-  ...(xClientId && { 'x-client-id': xClientId }),
+  ...(xClientId && { [CLIENT_ID_HEADER]: xClientId }),
   date: new Date().toUTCString()
 })
 

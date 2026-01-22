@@ -9,7 +9,7 @@ const { env } = require('node:process')
 const { Factory: { createFSPIOPError }, Enums } = require('@mojaloop/central-services-error-handling')
 const RootJoi = require('joi')
 const DateExtension = require('@hapi/joi-date')
-const { API_TYPES, MAX_CONTENT_LENGTH, errorMessages } = require('../../../constants')
+const { API_TYPES, MAX_CONTENT_LENGTH, CLIENT_ID_HEADER, errorMessages } = require('../../../constants')
 const { Headers } = require('../../../enums/http')
 const { logger } = require('../../../logger')
 const {
@@ -20,7 +20,7 @@ const {
   convertSupportedVersionToExtensionList
 } = require('../../headerValidation')
 
-const NEED_SOURCE_VALIDATION = env.ENABLED_SOURCE_HEADER_VLIDATION === 'true'
+const NEED_SOURCE_VALIDATION = (env.ENABLED_SOURCE_HEADER_VALIDATION ?? 'true') === 'true'
 
 // Some defaults
 
@@ -150,11 +150,11 @@ const plugin = {
 /* istanbul ignore next */
 const validateSourceHeader = (headers = {}) => {
   const source = headers[Headers.FSPIOP.SOURCE]
-  const clientId = headers['x-client-id'] // think, if we need to have service-to-service calls, where no clientId
+  const clientId = headers[CLIENT_ID_HEADER]
   // x-client-id is added by oathkeeper during processing request from DFSP to hub extapi
 
-  if (!clientId) {
-    logger.warn('No x-client-id header found, skip source-header validation')
+  if (!clientId) { // internal service-to-service calls
+    logger.info('No x-client-id header found, skip source-header validation', { source })
     return
   }
 
