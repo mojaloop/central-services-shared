@@ -167,7 +167,6 @@ const validateSourceHeader = (headers = {}) => {
 
 module.exports = {
   plugin,
-  errorMessages,
   defaultProtocolResources,
   defaultProtocolVersions
 }

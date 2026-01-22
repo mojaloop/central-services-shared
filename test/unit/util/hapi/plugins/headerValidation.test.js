@@ -375,12 +375,12 @@ Test('headerValidation plugin test', async (pluginTest) => {
     }))
 
     sourceTests.test('should pass validation if xClientId equals source-header', tryCatchEndTest(async t => {
-      const dfpId = 'dfsp1'
+      const dfspId = 'dfsp1'
 
       const { statusCode } = await testServer.inject({
         method: 'get',
         url: `/${resource}`,
-        headers: headersDto({ xClientId: dfpId, source: dfpId })
+        headers: headersDto({ xClientId: dfspId, source: dfspId })
       })
       t.is(statusCode, 202)
     }))
