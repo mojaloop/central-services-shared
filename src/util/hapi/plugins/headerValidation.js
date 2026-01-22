@@ -153,7 +153,12 @@ const validateSourceHeader = (headers = {}) => {
   const clientId = headers['x-client-id'] // think, if we need to have service-to-service calls, where no clientId
   // x-client-id is added by oathkeeper during processing request from DFSP to hub extapi
 
-  if (!source || source !== clientId) {
+  if (!clientId) {
+    logger.warn('No x-client-id header found, skip source-header validation')
+    return
+  }
+
+  if (source !== clientId) {
     const errMessage = errorMessages.INVALID_SOURCE_HEADER
     logger.error(errMessage, { clientId, source })
     throw createFSPIOPError(Enums.FSPIOPErrorCodes.VALIDATION_ERROR, errMessage)

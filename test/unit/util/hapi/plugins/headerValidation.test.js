@@ -349,7 +349,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
     t.end()
   })
 
-  pluginTest.test('validateSourceHeader Tests', async sourceTests => {
+  pluginTest.test('validateSourceHeader Tests -->', async sourceTests => {
     const testServer = await init(true)
 
     sourceTests.test('should throw error if xClientId does not match source-header', tryCatchEndTest(async t => {
@@ -365,16 +365,13 @@ Test('headerValidation plugin test', async (pluginTest) => {
       t.is(result?.message, errorMessages.INVALID_SOURCE_HEADER)
     }))
 
-    sourceTests.test('should throw error if both xClientId and source-header undefined', tryCatchEndTest(async t => {
-      const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.VALIDATION_ERROR
-
-      const { statusCode, result } = await testServer.inject({
+    sourceTests.test('should skip source-header validation if no xClientId', tryCatchEndTest(async t => {
+      const { statusCode } = await testServer.inject({
         method: 'get',
         url: `/${resource}`,
-        headers: headersDto({ xClientId: undefined, source: undefined })
+        headers: headersDto({ xClientId: undefined, source: 'source' })
       })
-      t.is(statusCode, fspiopCode.httpStatusCode)
-      t.is(result?.message, errorMessages.INVALID_SOURCE_HEADER)
+      t.is(statusCode, 202)
     }))
 
     sourceTests.test('should pass validation if xClientId equals source-header', tryCatchEndTest(async t => {
