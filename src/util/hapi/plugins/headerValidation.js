@@ -20,7 +20,7 @@ const {
   convertSupportedVersionToExtensionList
 } = require('../../headerValidation')
 
-const NEED_SOURCE_VALIDATION = (env.ENABLED_SOURCE_HEADER_VALIDATION ?? 'true') === 'true'
+const NEED_VALIDATION = (env.ENABLED_PROXY_SOURCE_HEADERS_VALIDATION ?? 'true') === 'true'
 
 // Some defaults
 
@@ -66,7 +66,7 @@ const plugin = {
     supportedProtocolContentVersions = defaultProtocolVersions,
     supportedProtocolAcceptVersions = defaultProtocolVersions,
     apiType = API_TYPES.fspiop,
-    needSourceValidation = NEED_SOURCE_VALIDATION
+    needProxySourceValidation = NEED_VALIDATION
   }) {
     checkApiType(apiType)
 
@@ -79,7 +79,7 @@ const plugin = {
         return h.continue
       }
 
-      if (needSourceValidation) validateSourceHeader(request.headers)
+      if (needProxySourceValidation) validateProxySourceHeaders(request.headers)
 
       // Always validate the accept header for a get request, or optionally if it has been
       // supplied
@@ -148,9 +148,9 @@ const plugin = {
 }
 
 /* istanbul ignore next */
-const validateSourceHeader = (headers = {}) => {
-  const source = headers[Headers.FSPIOP.SOURCE]
+const validateProxySourceHeaders = (headers = {}) => {
   const proxy = headers[Headers.FSPIOP.PROXY]
+  const source = headers[Headers.FSPIOP.SOURCE]
   const clientId = headers[CLIENT_ID_HEADER]
   // x-client-id is added by oathkeeper during processing request from DFSP to hub extapi
 
@@ -165,7 +165,7 @@ const validateSourceHeader = (headers = {}) => {
     throw createFSPIOPError(Enums.FSPIOPErrorCodes.VALIDATION_ERROR, errMessage)
   }
 
-  if (source !== clientId) {
+  if (!proxy && source !== clientId) {
     const errMessage = errorMessages.INVALID_SOURCE_HEADER
     logger.error(errMessage, { clientId, source })
     throw createFSPIOPError(Enums.FSPIOPErrorCodes.VALIDATION_ERROR, errMessage)
