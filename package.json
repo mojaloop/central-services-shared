@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.35.0",
+  "version": "18.35.1-snapshot.0",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -151,7 +151,8 @@
     "jws": "3.2.3",
     "validator": "13.15.22",
     "lodash": "4.17.23",
-    "lodash-es": "4.17.23"
+    "lodash-es": "4.17.23",
+    "undici": "7.18.2"
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": "13.x.x",

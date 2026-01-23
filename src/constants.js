@@ -15,6 +15,7 @@ const errorMessages = {
   INVALID_ACCEPT_HEADER: 'Invalid accept header',
   INVALID_CONTENT_TYPE_HEADER: 'Invalid content-type header',
   INVALID_SOURCE_HEADER: 'Invalid fspiop-source header',
+  INVALID_PROXY_HEADER: 'Invalid fspiop-proxy header',
   REQUIRE_ACCEPT_HEADER: 'Accept is required',
   REQUIRE_CONTENT_TYPE_HEADER: 'Content-type is required',
   SUPPLIED_VERSION_NOT_SUPPORTED: 'Client supplied a protocol version which is not supported by the server'
