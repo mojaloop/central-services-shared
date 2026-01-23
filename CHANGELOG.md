@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.35.1](https://github.com/mojaloop/central-services-shared/compare/v18.35.0...v18.35.1) (2026-01-23)
+
+
+### Bug Fixes
+
+* **csi-2030:** added logic to validate fspiop-proxy header ([#501](https://github.com/mojaloop/central-services-shared/issues/501)) ([b22dd5a](https://github.com/mojaloop/central-services-shared/commit/b22dd5a2bbc31ed6fb37b54df6d7b23185274c51))
+
 ## [18.35.0](https://github.com/mojaloop/central-services-shared/compare/v18.34.6...v18.35.0) (2026-01-22)
 
 
