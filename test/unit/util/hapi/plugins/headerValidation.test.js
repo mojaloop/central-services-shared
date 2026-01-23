@@ -412,7 +412,7 @@ Test('headerValidation plugin test', async (pluginTest) => {
       t.is(statusCode, 202)
     }))
 
-    vpshTests.test('should not throw error if needSourceValidation is false', tryCatchEndTest(async t => {
+    vpshTests.test('should not throw error if needProxySourceValidation is false', tryCatchEndTest(async t => {
       const testServer = await init(false)
 
       const { statusCode } = await testServer.inject({
