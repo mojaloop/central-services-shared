@@ -150,12 +150,19 @@ const plugin = {
 /* istanbul ignore next */
 const validateSourceHeader = (headers = {}) => {
   const source = headers[Headers.FSPIOP.SOURCE]
+  const proxy = headers[Headers.FSPIOP.PROXY]
   const clientId = headers[CLIENT_ID_HEADER]
   // x-client-id is added by oathkeeper during processing request from DFSP to hub extapi
 
   if (!clientId) { // internal service-to-service calls
     logger.info('No x-client-id header found, skip source-header validation', { source })
     return
+  }
+
+  if (proxy && proxy !== clientId) {
+    const errMessage = errorMessages.INVALID_PROXY_HEADER
+    logger.error(errMessage, { clientId, proxy, source })
+    throw createFSPIOPError(Enums.FSPIOPErrorCodes.VALIDATION_ERROR, errMessage)
   }
 
   if (source !== clientId) {

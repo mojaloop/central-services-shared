@@ -36,6 +36,7 @@ const ErrorHandling = require('@mojaloop/central-services-error-handling')
 const { plugin } = require('#src/util/hapi/plugins/headerValidation')
 const { protocolVersionsMap } = require('#src/util/headerValidation/index')
 const { CLIENT_ID_HEADER, errorMessages } = require('#src/constants')
+const { Headers } = require('#src/enums/http')
 const { defaultHeaders, tryCatchEndTest } = require('#test/util/helper')
 const {
   generateAcceptHeader,
@@ -96,9 +97,11 @@ const init = async (needSourceValidation = false) => {
 const headersDto = ({
   source,
   destination = 'destination',
+  proxy = '',
   xClientId = source
 } = {}) => ({
   ...defaultHeaders(destination, resource, source),
+  ...(proxy && { [Headers.FSPIOP.PROXY]: proxy }),
   ...(xClientId && { [CLIENT_ID_HEADER]: xClientId }),
   date: new Date().toUTCString()
 })
@@ -363,6 +366,19 @@ Test('headerValidation plugin test', async (pluginTest) => {
       t.is(statusCode, fspiopCode.httpStatusCode)
       t.is(result?.apiErrorCode?.code, fspiopCode.code)
       t.is(result?.message, errorMessages.INVALID_SOURCE_HEADER)
+    }))
+
+    sourceTests.test('should throw error if xClientId does not match proxy-header', tryCatchEndTest(async t => {
+      const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.VALIDATION_ERROR
+
+      const { statusCode, result } = await testServer.inject({
+        method: 'get',
+        url: `/${resource}`,
+        headers: headersDto({ source: 'abc', proxy: 'proxyId' })
+      })
+      t.is(statusCode, fspiopCode.httpStatusCode)
+      t.is(result?.apiErrorCode?.code, fspiopCode.code)
+      t.is(result?.message, errorMessages.INVALID_PROXY_HEADER)
     }))
 
     sourceTests.test('should skip source-header validation if no xClientId', tryCatchEndTest(async t => {
