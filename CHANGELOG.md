@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.35.2](https://github.com/mojaloop/central-services-shared/compare/v18.35.1...v18.35.2) (2026-01-28)
+
+
+### Bug Fixes
+
+* **iad-573:** fixed proxy-header validation ([#502](https://github.com/mojaloop/central-services-shared/issues/502)) ([4ac356f](https://github.com/mojaloop/central-services-shared/commit/4ac356f115bbb82a5a1b2ce781c954321958763a))
+
 ### [18.35.1](https://github.com/mojaloop/central-services-shared/compare/v18.35.0...v18.35.1) (2026-01-23)
 
 
