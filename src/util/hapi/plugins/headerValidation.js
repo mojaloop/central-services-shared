@@ -159,7 +159,7 @@ const validateProxySourceHeaders = (headers = {}) => {
     return
   }
 
-  if (proxy && proxy !== clientId) {
+  if (proxy && (proxy !== clientId || proxy === source)) {
     const errMessage = errorMessages.INVALID_PROXY_HEADER
     logger.error(errMessage, { clientId, proxy, source })
     throw createFSPIOPError(Enums.FSPIOPErrorCodes.VALIDATION_ERROR, errMessage)
