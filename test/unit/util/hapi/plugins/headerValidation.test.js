@@ -412,6 +412,20 @@ Test('headerValidation plugin test', async (pluginTest) => {
       t.is(statusCode, 202)
     }))
 
+    vpshTests.test('should throw error if proxy-header equals source-header', tryCatchEndTest(async t => {
+      const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.VALIDATION_ERROR
+      const sameId = 'dfspABC'
+
+      const { statusCode, result } = await testServer.inject({
+        method: 'get',
+        url: `/${resource}`,
+        headers: headersDto({ source: sameId, proxy: sameId, xClientId: sameId })
+      })
+      t.is(statusCode, fspiopCode.httpStatusCode)
+      t.is(result?.apiErrorCode?.code, fspiopCode.code)
+      t.is(result?.message, errorMessages.INVALID_PROXY_HEADER)
+    }))
+
     vpshTests.test('should not throw error if needProxySourceValidation is false', tryCatchEndTest(async t => {
       const testServer = await init(false)
 
