@@ -480,7 +480,7 @@ declare namespace CentralServicesShared {
     COUNTER_PARTY_FSP = 7
   }
 
-  enum PartyAccountTypesEnum {
+  enum PartyTypeEnum {
     MSISDN = 'MSISDN',
     EMAIL = 'EMAIL',
     PERSONAL_ID = 'PERSONAL_ID',
@@ -723,16 +723,16 @@ declare namespace CentralServicesShared {
         COUNTER_PARTY_FSP: TransferParticipantRoleTypeEnum.COUNTER_PARTY_FSP;
       };
       PartyAccountTypes: {
-        MSISDN: PartyAccountTypesEnum.MSISDN;
-        EMAIL: PartyAccountTypesEnum.EMAIL;
-        PERSONAL_ID: PartyAccountTypesEnum.PERSONAL_ID;
-        BUSINESS: PartyAccountTypesEnum.BUSINESS;
-        DEVICE: PartyAccountTypesEnum.DEVICE;
-        ACCOUNT_ID: PartyAccountTypesEnum.ACCOUNT_ID;
-        IBAN: PartyAccountTypesEnum.IBAN;
-        ALIAS: PartyAccountTypesEnum.ALIAS;
-        CONSENT: PartyAccountTypesEnum.CONSENT;
-        THIRD_PARTY_LINK: PartyAccountTypesEnum.THIRD_PARTY_LINK;
+        MSISDN: PartyTypeEnum.MSISDN;
+        EMAIL: PartyTypeEnum.EMAIL;
+        PERSONAL_ID: PartyTypeEnum.PERSONAL_ID;
+        BUSINESS: PartyTypeEnum.BUSINESS;
+        DEVICE: PartyTypeEnum.DEVICE;
+        ACCOUNT_ID: PartyTypeEnum.ACCOUNT_ID;
+        IBAN: PartyTypeEnum.IBAN;
+        ALIAS: PartyTypeEnum.ALIAS;
+        CONSENT: PartyTypeEnum.CONSENT;
+        THIRD_PARTY_LINK: PartyTypeEnum.THIRD_PARTY_LINK;
       };
     };
   }
