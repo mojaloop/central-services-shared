@@ -41,7 +41,7 @@ const { API_TYPES } = require('../constants')
 const config = require('../config')
 const enums = require('../enums')
 const Headers = require('./headers/transformer')
-const dto = require('./otelDto')
+const { outgoingRequestDto } = require('./otelDto')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -267,7 +267,7 @@ const sendRequest = async ({
     throw fspiopError
   } finally {
     const severity = (statusCode >= 200 && statusCode < 300) ? 'info' : 'warn'
-    log[severity]('outgoing HTTP request has completed: ', dto.outgoingRequestDto({
+    log[severity]('outgoing HTTP request has completed: ', outgoingRequestDto({
       method,
       url,
       statusCode,
