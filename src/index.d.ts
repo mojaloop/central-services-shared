@@ -722,7 +722,7 @@ declare namespace CentralServicesShared {
         INITIATING_FSP: TransferParticipantRoleTypeEnum.INITIATING_FSP;
         COUNTER_PARTY_FSP: TransferParticipantRoleTypeEnum.COUNTER_PARTY_FSP;
       };
-      PartyAccountTypes: {
+      PartyTypes: {
         MSISDN: PartyTypeEnum.MSISDN;
         EMAIL: PartyTypeEnum.EMAIL;
         PERSONAL_ID: PartyTypeEnum.PERSONAL_ID;
