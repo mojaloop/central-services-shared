@@ -266,7 +266,9 @@ const sendRequest = async ({
     histTimerEnd({ success: false, source, destination, method })
     throw fspiopError
   } finally {
-    const severity = (statusCode >= 200 && statusCode < 300) ? 'info' : 'warn'
+    const severity = typeof statusCode === 'number'
+      ? (statusCode >= 200 && statusCode < 300 ? 'info' : 'warn')
+      : 'error'
     log[severity]('outgoing HTTP request has completed: ', outgoingRequestDto({
       method,
       url,
