@@ -30,29 +30,31 @@
 'use strict'
 
 const http = require('node:http')
-const request = require('axios')
+const axios = require('axios')
 const stringify = require('fast-safe-stringify')
 const EventSdk = require('@mojaloop/event-sdk')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
-const Headers = require('./headers/transformer')
-const enums = require('../enums')
-const { logger } = require('../logger')
+
+const { logger: globalLogger } = require('../logger')
 const { API_TYPES } = require('../constants')
 const config = require('../config')
+const enums = require('../enums')
+const Headers = require('./headers/transformer')
+const dto = require('./otelDto')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
 // Delete the default headers that the `axios` module inserts as they can brake our conventions.
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
-delete request.defaults.headers.common.Accept
+delete axios.defaults.headers.common.Accept
 
 const keepAlive = (process.env.HTTP_AGENT_KEEP_ALIVE ?? 'true') === 'true'
-logger.verbose('http keepAlive:', { keepAlive })
+globalLogger.verbose('http keepAlive:', { keepAlive })
 
 // Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive })
-request.defaults.httpAgent.toJSON = () => ({})
+axios.defaults.httpAgent = new http.Agent({ keepAlive })
+axios.defaults.httpAgent.toJSON = () => ({})
 
 /**
  * @function sendRequest
@@ -96,8 +98,10 @@ const sendRequest = async ({
   protocolVersions = undefined,
   apiType = API_TYPES.fspiop,
   axiosRequestOptionsOverride = {},
+  logger = globalLogger,
   hubNameRegex
 }) => {
+  const startTime = Date.now()
   const histTimerEnd = Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -113,6 +117,12 @@ const sendRequest = async ({
     // think, if we can just avoid checking "destination"
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
+
+  let statusCode
+  let errorType
+  const log = logger.child({ component: 'httpRequest' })
+  log.setLevel(config.get('httpLogLevel'))
+
   try {
     const transformedHeaders = Headers.transformHeaders(headers, {
       httpMethod: method,
@@ -126,7 +136,7 @@ const sendRequest = async ({
       url,
       method,
       headers: transformedHeaders,
-      data: payload, // todo: think, if it's better to transform to ISO format here (based on apiType)
+      data: payload,
       params,
       responseType,
       timeout: config.get('httpRequestTimeoutMs'),
@@ -149,14 +159,25 @@ const sendRequest = async ({
       }
       span.audit({ ...rest, payload }, EventSdk.AuditEventAction.egress)
     }
-    logger.debug('sendRequest::requestOptions:', { requestOptions })
-    const response = await request(requestOptions)
+    log.debug('http request options:', { requestOptions })
+
+    const response = await axios(requestOptions)
+
+    statusCode = response?.status
+    log.verbose('http response details: ', {
+      data: response?.data,
+      headers: response?.headers,
+      statusCode,
+      requestOptions
+    })
 
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    logger.error('error in request.sendRequest:', {
+    statusCode = error.response?.status
+    errorType = error.code
+    log.error('error in request.sendRequest:', {
       code: error.code,
       message: error.message,
       stack: error.stack,
@@ -164,7 +185,7 @@ const sendRequest = async ({
       url,
       source,
       destination,
-      status: error.response?.status,
+      status: statusCode,
       data: error.response?.data
     })
 
@@ -244,6 +265,15 @@ const sendRequest = async ({
     }
     histTimerEnd({ success: false, source, destination, method })
     throw fspiopError
+  } finally {
+    const severity = (statusCode >= 200 && statusCode < 300) ? 'info' : 'warn'
+    log[severity]('outgoing HTTP request has completed: ', dto.outgoingRequestDto({
+      method,
+      url,
+      statusCode,
+      durationSec: (Date.now() - startTime) / 1000,
+      errorType
+    }))
   }
 }
 

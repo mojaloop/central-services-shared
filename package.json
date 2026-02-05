@@ -48,6 +48,7 @@
     "test:endpoints": "npx tape 'test/unit/util/endpoints.test.js'",
     "test:mysql": "npx tape 'test/unit/mysql/**/*.test.js'",
     "test:participants": "npx tape 'test/unit/util/participants.test.js'",
+    "test:request": "npx tape 'test/unit/util/request.test.js'",
     "test:trans": "npx tape 'test/unit/util/headers/transformer.test.js'",
     "test:unit": "npx tape 'test/unit/**/*.test.js' | tap-spec",
     "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
