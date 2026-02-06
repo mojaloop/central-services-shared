@@ -100,7 +100,7 @@
     "@mojaloop/central-services-logger": "11.10.3",
     "@mojaloop/central-services-metrics": "12.8.3",
     "@mojaloop/event-sdk": "14.8.2",
-    "@mojaloop/sdk-standard-components": "19.18.4",
+    "@mojaloop/sdk-standard-components": "19.18.6",
     "@opentelemetry/auto-instrumentations-node": "^0.69.0",
     "@types/hapi__joi": "17.1.15",
     "ajv": "^8.17.1",
@@ -145,6 +145,7 @@
       "swagger2openapi": "7.0.8"
     },
     "markdown-it": "12.3.2",
+    "fast-xml-parser": "5.3.4",
     "trim": "0.0.3",
     "cross-spawn": "7.0.6",
     "yargs-parser": "21.1.1",

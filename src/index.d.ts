@@ -366,7 +366,7 @@ declare namespace CentralServicesShared {
 
   enum TransferInternalStateEnum {
     ABORTED_ERROR = 'ABORTED_ERROR',
-    ABORTED_REJECTED= 'ABORTED_REJECTED',
+    ABORTED_REJECTED = 'ABORTED_REJECTED',
     COMMITTED = 'COMMITTED',
     EXPIRED_PREPARED = 'EXPIRED_PREPARED',
     EXPIRED_RESERVED = 'EXPIRED_RESERVED',
@@ -443,6 +443,56 @@ declare namespace CentralServicesShared {
     LIMIT_ADJUSTMENT = 'limit-adjustment'
   }
 
+  enum LedgerAccountTypeEnum {
+    POSITION = 1,
+    SETTLEMENT = 2,
+    HUB_RECONCILIATION = 3,
+    HUB_MULTILATERAL_SETTLEMENT = 4,
+    HUB_FEE = 5,
+    POSITION_REMITTANCE = 7,
+    SETTLEMENT_REMITTANCE = 8
+  }
+
+  enum LedgerEntryTypeEnum {
+    PRINCIPLE_VALUE = 1,
+    INTERCHANGE_FEE = 2,
+    HUB_FEE = 3,
+    POSITION_DEPOSIT = 4,
+    POSITION_WITHDRAWAL = 5,
+    SETTLEMENT_NET_RECIPIENT = 6,
+    SETTLEMENT_NET_SENDER = 7,
+    SETTLEMENT_NET_ZERO = 8,
+    SETTLEMENT_ACCOUNT_DEPOSIT = 9,
+    SETTLEMENT_ACCOUNT_WITHDRAWAL = 10
+  }
+
+  enum ParticipantLimitTypeEnum {
+    NET_DEBIT_CAP = 1
+  }
+
+  enum TransferParticipantRoleTypeEnum {
+    PAYER_DFSP = 1,
+    PAYEE_DFSP = 2,
+    HUB = 3,
+    DFSP_SETTLEMENT = 4,
+    DFSP_POSITION = 5,
+    INITIATING_FSP = 6,
+    COUNTER_PARTY_FSP = 7
+  }
+
+  enum PartyTypeEnum {
+    MSISDN = 'MSISDN',
+    EMAIL = 'EMAIL',
+    PERSONAL_ID = 'PERSONAL_ID',
+    BUSINESS = 'BUSINESS',
+    DEVICE = 'DEVICE',
+    ACCOUNT_ID = 'ACCOUNT_ID',
+    IBAN = 'IBAN',
+    ALIAS = 'ALIAS',
+    CONSENT = 'CONSENT',
+    THIRD_PARTY_LINK = 'THIRD_PARTY_LINK'
+  }
+
   interface Enum {
     Http: HttpEnum;
     EndPoints: EndPointsEnum;
@@ -451,8 +501,18 @@ declare namespace CentralServicesShared {
         CONSUMER: string,
         PRODUCER: string,
       }
+      Topics: {
+        NOTIFICATION: string;
+        POSITION: string;
+        TRANSFER: string;
+        [key: string]: string;
+      }
     }
     Events: {
+      EventStatus: {
+        FAILURE: { status: string };
+        SUCCESS: { status: string };
+      };
       Event: {
         Action: {
           ABORT: EventActionEnum.ABORT;
@@ -628,6 +688,53 @@ declare namespace CentralServicesShared {
         LIMIT_ADJUSTMENT: AdminNotificationActionsEnum.LIMIT_ADJUSTMENT;
       };
     };
+    Accounts: {
+      LedgerAccountType: {
+        POSITION: LedgerAccountTypeEnum.POSITION;
+        SETTLEMENT: LedgerAccountTypeEnum.SETTLEMENT;
+        HUB_RECONCILIATION: LedgerAccountTypeEnum.HUB_RECONCILIATION;
+        HUB_MULTILATERAL_SETTLEMENT: LedgerAccountTypeEnum.HUB_MULTILATERAL_SETTLEMENT;
+        HUB_FEE: LedgerAccountTypeEnum.HUB_FEE;
+        POSITION_REMITTANCE: LedgerAccountTypeEnum.POSITION_REMITTANCE;
+        SETTLEMENT_REMITTANCE: LedgerAccountTypeEnum.SETTLEMENT_REMITTANCE;
+      };
+      LedgerEntryType: {
+        PRINCIPLE_VALUE: LedgerEntryTypeEnum.PRINCIPLE_VALUE;
+        INTERCHANGE_FEE: LedgerEntryTypeEnum.INTERCHANGE_FEE;
+        HUB_FEE: LedgerEntryTypeEnum.HUB_FEE;
+        POSITION_DEPOSIT: LedgerEntryTypeEnum.POSITION_DEPOSIT;
+        POSITION_WITHDRAWAL: LedgerEntryTypeEnum.POSITION_WITHDRAWAL;
+        SETTLEMENT_NET_RECIPIENT: LedgerEntryTypeEnum.SETTLEMENT_NET_RECIPIENT;
+        SETTLEMENT_NET_SENDER: LedgerEntryTypeEnum.SETTLEMENT_NET_SENDER;
+        SETTLEMENT_NET_ZERO: LedgerEntryTypeEnum.SETTLEMENT_NET_ZERO;
+        SETTLEMENT_ACCOUNT_DEPOSIT: LedgerEntryTypeEnum.SETTLEMENT_ACCOUNT_DEPOSIT;
+        SETTLEMENT_ACCOUNT_WITHDRAWAL: LedgerEntryTypeEnum.SETTLEMENT_ACCOUNT_WITHDRAWAL;
+      };
+      ParticipantLimitType: {
+        NET_DEBIT_CAP: ParticipantLimitTypeEnum.NET_DEBIT_CAP;
+      };
+      TransferParticipantRoleType: {
+        PAYER_DFSP: TransferParticipantRoleTypeEnum.PAYER_DFSP;
+        PAYEE_DFSP: TransferParticipantRoleTypeEnum.PAYEE_DFSP;
+        HUB: TransferParticipantRoleTypeEnum.HUB;
+        DFSP_SETTLEMENT: TransferParticipantRoleTypeEnum.DFSP_SETTLEMENT;
+        DFSP_POSITION: TransferParticipantRoleTypeEnum.DFSP_POSITION;
+        INITIATING_FSP: TransferParticipantRoleTypeEnum.INITIATING_FSP;
+        COUNTER_PARTY_FSP: TransferParticipantRoleTypeEnum.COUNTER_PARTY_FSP;
+      };
+      PartyTypes: {
+        MSISDN: PartyTypeEnum.MSISDN;
+        EMAIL: PartyTypeEnum.EMAIL;
+        PERSONAL_ID: PartyTypeEnum.PERSONAL_ID;
+        BUSINESS: PartyTypeEnum.BUSINESS;
+        DEVICE: PartyTypeEnum.DEVICE;
+        ACCOUNT_ID: PartyTypeEnum.ACCOUNT_ID;
+        IBAN: PartyTypeEnum.IBAN;
+        ALIAS: PartyTypeEnum.ALIAS;
+        CONSENT: PartyTypeEnum.CONSENT;
+        THIRD_PARTY_LINK: PartyTypeEnum.THIRD_PARTY_LINK;
+      };
+    };
   }
 
   interface Cacheable {
@@ -662,13 +769,18 @@ declare namespace CentralServicesShared {
   }
 
   interface Kafka {
-    createGeneralTopicConf(template: string, functionality: string, action: string, key?: string, partition?: number, opaqueKey?: any, topicNameOverride?: string): {topicName: string, key: string | null, partition: number | null, opaqueKey: any }
+    createGeneralTopicConf(template: string, functionality: string, action: string, key?: string, partition?: number, opaqueKey?: any, topicNameOverride?: string): { topicName: string, key: string | null, partition: number | null, opaqueKey: any }
+    transformGeneralTopicName(template: string, functionality: string, action: string): string
+    getKafkaConfig(kafkaConfig: object, flow: string, functionality: string, action: string): object
   }
 
   type MimeTypes = 'text/plain' | 'application/json' | 'application/vnd.interoperability.'
   interface StreamingProtocol {
     decodePayload(input: string, options: Object): Object
     encodePayload(input: string | Buffer, mimeType: MimeTypes): string
+    createEventState(status: string, errorCode: string, errorDescription: string): any
+    createMetadataWithCorrelatedEvent(transferId: string, topic: string, action: string, state: any): any
+    createMessage(id: string, destination: string, source: string, metadata: any, headers: any, payload: any, uriParams: any, contentType: string): any
   }
 
   interface HeaderValidation {
@@ -686,8 +798,8 @@ declare namespace CentralServicesShared {
   type ProtocolVersions = (string | symbol)[]
   type ApiTypeValues = 'fspiop' | 'iso20022'
   type APIDocumentationPluginOptions =
-  | { documentPath: string; document?: never }
-  | { document?: string; documentPath?: never }
+    | { documentPath: string; document?: never }
+    | { document?: string; documentPath?: never }
 
   type LoggingPluginOptions = {
     log?: ILogger,
@@ -759,7 +871,7 @@ declare namespace CentralServicesShared {
 
   interface PubSub {
     (config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
-    new (config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
+    new(config: object, publisherClient?: IORedis, subscriberClient?: IORedis): PubSub;
     connect(): Promise<void>;
     disconnect(): Promise<boolean>;
     healthCheck(): Promise<boolean>;
@@ -772,7 +884,7 @@ declare namespace CentralServicesShared {
 
   interface RedisCache {
     (config: object, client?: IORedis): RedisCache;
-    new (config: object, client?: IORedis): RedisCache;
+    new(config: object, client?: IORedis): RedisCache;
     connect(): Promise<boolean>;
     disconnect(): Promise<boolean>;
     healthCheck(): Promise<boolean>;
@@ -788,16 +900,16 @@ declare namespace CentralServicesShared {
     RedisCache: RedisCache;
   }
 
-  type RedisInstanceConfig = 
+  type RedisInstanceConfig =
     | {
-        type: 'redis';
-        host: string;
-        port: number;
-      }
+      type: 'redis';
+      host: string;
+      port: number;
+    }
     | {
-        type: 'redis-cluster';
-        cluster: Array<{ host: string; port: number }>;
-      };
+      type: 'redis-cluster';
+      cluster: Array<{ host: string; port: number }>;
+    };
 
   interface DistributedLockConfig {
     redisConfigs: RedisInstanceConfig[];
@@ -824,6 +936,59 @@ declare namespace CentralServicesShared {
     createLock(config: DistributedLockConfig, logger?: ILogger): DistributedLock;
   }
 
+  interface RethrowOptions {
+    operation?: string;
+    step?: string;
+    loggerOverride?: ILogger;
+  }
+
+  interface RethrowModule {
+    rethrowAndCountFspiopError(error: Error, options?: RethrowOptions, context?: string): never;
+    rethrowDatabaseError(error: Error, options?: RethrowOptions): never;
+    rethrowCachedDatabaseError(error: Error, options?: RethrowOptions): never;
+    rethrowRedisError(error: Error, options?: RethrowOptions): never;
+    rethrowKafkaError(error: Error, options?: RethrowOptions): never;
+    rethrowCacheError(error: Error, options?: RethrowOptions): never;
+    constructSystemExtensionError(error: Error, system: string): Error;
+    countFspiopError(error: Error, options?: RethrowOptions, context?: string): Error;
+    with(context: string): RethrowModule;
+  }
+
+  interface SpanTags {
+    transactionType: string;
+    transactionAction: string;
+    transactionId: string | undefined;
+    source: string | undefined;
+    destination: string | undefined;
+    payerFsp?: string;
+    payeeFsp?: string;
+  }
+
+  interface QueryTags {
+    serviceName: string;
+    auditType: string;
+    contentType: string;
+    operation: string;
+    [key: string]: any;
+  }
+
+  interface TransferSpanInput {
+    payload?: any;
+    headers?: Record<string, string>;
+    params?: { id?: string };
+  }
+
+  interface EventFramework {
+    getTransferSpanTags(input: TransferSpanInput, transactionType: string, transactionAction: string): SpanTags;
+    getSpanTags(transactionType: string, transactionAction: string, transactionId: string, source: string, destination: string): SpanTags;
+    getQueryTags(serviceName: string, auditType: string, contentType: string, operation: string, additionalTags?: Record<string, any>): QueryTags;
+    Tags: {
+      getTransferSpanTags: (input: TransferSpanInput, transactionType: string, transactionAction: string) => SpanTags;
+      getSpanTags: (transactionType: string, transactionAction: string, transactionId: string, source: string, destination: string) => SpanTags;
+      getQueryTags: (serviceName: string, auditType: string, contentType: string, operation: string, additionalTags?: Record<string, any>) => QueryTags;
+    };
+  }
+
   interface Util {
     Endpoints: Endpoints;
     Participants: Participants;
@@ -836,6 +1001,12 @@ declare namespace CentralServicesShared {
     HeaderValidation: HeaderValidation;
     Redis: Redis;
     distLock: DistLock;
+    rethrow: RethrowModule;
+    EventFramework: EventFramework;
+    resourceVersions: Record<string, { contentVersion: string }>;
+    Http: {
+      SwitchDefaultHeaders: (destination: string, resource: string, hubName: string, contentVersion: string) => Record<string, any>;
+    };
   }
 
   const Enum: Enum
