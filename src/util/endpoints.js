@@ -197,6 +197,9 @@ exports.getEndpoint = async (switchUrl, fsp, endpointType, options = {}, renderO
       hit = endpoints.cached !== null
       endpoints = endpoints.value
     }
+    if (!hit) {
+      log.warn(`getEndpoint cache miss for fsp=${fsp}, endpointType=${endpointType}`)
+    }
 
     const result = renderEndpoint(endpoints)
     histTimer({ success: true, hit })
