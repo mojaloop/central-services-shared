@@ -1,6 +1,7 @@
 import { Utils as HapiUtil, Server } from '@hapi/hapi'
 import { ILogger } from '@mojaloop/central-services-logger/src/contextLogger'
 import { Knex } from 'knex';
+import { AxiosRequestConfig, AxiosResponse, ResponseType as AxiosResponseType } from 'axios'
 import IORedis from 'ioredis';
 
 declare namespace CentralServicesShared {
@@ -656,9 +657,27 @@ declare namespace CentralServicesShared {
     accept: string
   }
 
-  type RequestParams = { url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, hubNameRegex: RegExp, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any, protocolVersions?: ProtocolVersionsType }
-  interface Request {
-    sendRequest(params: RequestParams): Promise<any>
+  type RequestParams = {
+    url: string,
+    headers: HapiUtil.Dictionary<string>,
+    source: string,
+    destination?: string,
+    hubNameRegex: RegExp,
+    method?: RestMethodsEnum,
+    payload?: any,
+    params?: AxiosRequestConfig['params'],
+    responseType?: AxiosResponseType,
+    span?: any,
+    jwsSigner?: any,
+    protocolVersions?: ProtocolVersionsType,
+    apiType?: ApiTypeValues,
+    axiosRequestOptionsOverride?: Partial<AxiosRequestConfig>,
+    logger?: ILogger,
+    peerService?: string
+  }
+  export interface Request {
+    sendRequest(params: RequestParams): Promise<AxiosResponse>
+    sendBaseRequest(params?: AxiosRequestConfig & { logger?: ILogger, peerService?: string }): Promise<AxiosResponse>
   }
 
   interface Kafka {
@@ -788,7 +807,7 @@ declare namespace CentralServicesShared {
     RedisCache: RedisCache;
   }
 
-  type RedisInstanceConfig = 
+  type RedisInstanceConfig =
     | {
         type: 'redis';
         host: string;

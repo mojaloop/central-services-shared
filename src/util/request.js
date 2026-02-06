@@ -79,11 +79,12 @@ axios.defaults.httpAgent.toJSON = () => ({})
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
  * @param {'fspiop' | 'iso20022'} apiType the API type of the request being sent
  * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
+ * @param {ILogger} [logger] ContextLogger instance with specific context
+ * @param {string} [peerService] Logical service name to call (for OTel)
  * @param {regex} hubNameRegex hubName Regex
  *
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
-
 const sendRequest = async ({
   url,
   headers,
@@ -98,10 +99,10 @@ const sendRequest = async ({
   protocolVersions = undefined,
   apiType = API_TYPES.fspiop,
   axiosRequestOptionsOverride = {},
-  logger = globalLogger,
+  logger = createHttpLogger(),
+  peerService = '',
   hubNameRegex
 }) => {
-  const startTime = Date.now()
   const histTimerEnd = Metrics.getHistogram(
     'sendRequest',
     `sending ${method} request to: ${url} from: ${source} to: ${destination}`,
@@ -118,10 +119,7 @@ const sendRequest = async ({
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
 
-  let statusCode
-  let errorType
   const log = logger.child({ component: 'httpRequest' })
-  log.setLevel(config.get('httpLogLevel'))
 
   try {
     const transformedHeaders = Headers.transformHeaders(headers, {
@@ -139,6 +137,7 @@ const sendRequest = async ({
       data: payload,
       params,
       responseType,
+      peerService,
       timeout: config.get('httpRequestTimeoutMs'),
       ...axiosRequestOptionsOverride
     }
@@ -159,24 +158,17 @@ const sendRequest = async ({
       }
       span.audit({ ...rest, payload }, EventSdk.AuditEventAction.egress)
     }
-    log.debug('http request options:', { requestOptions })
 
-    const response = await axios(requestOptions)
-
-    statusCode = response?.status
-    log.verbose('http response details: ', {
-      data: response?.data,
-      headers: response?.headers,
-      statusCode,
-      requestOptions
+    const response = await sendBaseRequest({
+      ...requestOptions,
+      logger: log,
+      peerService
     })
 
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    statusCode = error.response?.status
-    errorType = error.code
     log.error('error in request.sendRequest:', {
       code: error.code,
       message: error.message,
@@ -185,7 +177,7 @@ const sendRequest = async ({
       url,
       source,
       destination,
-      status: statusCode,
+      status: error.response?.status,
       data: error.response?.data
     })
 
@@ -265,20 +257,63 @@ const sendRequest = async ({
     }
     histTimerEnd({ success: false, source, destination, method })
     throw fspiopError
+  }
+}
+
+// todo: think better name
+//       it's for http calls without params validation and transformHeaders
+const sendBaseRequest = async ({
+  logger = createHttpLogger(),
+  peerService = '',
+  ...reqOptions
+} = {}) => {
+  const log = logger.child({ component: 'sendBaseRequest' })
+  const { method, url } = reqOptions
+  const methodUrl = `${method?.toUpperCase()} ${url}`
+  const startTime = Date.now()
+  let statusCode
+  let errorType
+
+  try {
+    log.debug(`[-->] options for ${methodUrl}: `, { reqOptions })
+
+    const response = await axios(reqOptions)
+
+    statusCode = response?.status
+    log.verbose(`[<--] details of ${methodUrl}: `, {
+      data: response?.data,
+      headers: response?.headers, // todo: extract only needed headers
+      statusCode,
+      reqOptions
+    })
+
+    return response
+  } catch (error) {
+    statusCode = error.response?.status
+    errorType = error.code
+    throw error // todo: think, if we need to rethrow our custom error here
   } finally {
     const severity = typeof statusCode === 'number'
       ? (statusCode >= 200 && statusCode < 300 ? 'info' : 'warn')
       : 'error'
-    log[severity]('outgoing HTTP request has completed: ', outgoingRequestDto({
+    log[severity](`[<--] ${methodUrl}  [${statusCode || errorType}]: `, outgoingRequestDto({
       method,
       url,
       statusCode,
       durationSec: (Date.now() - startTime) / 1000,
-      errorType
+      errorType,
+      peerService
     }))
   }
 }
 
+const createHttpLogger = () => {
+  const logger = globalLogger.child()
+  logger.setLevel(config.get('httpLogLevel'))
+  return logger
+}
+
 module.exports = {
-  sendRequest
+  sendRequest,
+  sendBaseRequest
 }
