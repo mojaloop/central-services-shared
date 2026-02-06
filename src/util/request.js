@@ -296,7 +296,7 @@ const sendBaseRequest = async ({
     const severity = typeof statusCode === 'number'
       ? (statusCode >= 200 && statusCode < 300 ? 'info' : 'warn')
       : 'error'
-    log[severity](`[<--] ${methodUrl}  [${statusCode || errorType}]: `, outgoingRequestDto({
+    log[severity](`[<--] ${methodUrl}  [${statusCode || errorType || 'N/A'}]: `, outgoingRequestDto({
       method,
       url,
       statusCode,
