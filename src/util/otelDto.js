@@ -29,8 +29,12 @@
 const otel = require('@opentelemetry/semantic-conventions')
 
 const ATTR_SERVICE_PEER_NAME = 'service.peer.name' // using string literal because ATTR_SERVICE_PEER_NAME is only available in @opentelemetry/semantic-conventions/incubating as of now
+const CUSTOM_REQUEST_ID = 'request.id'
 
-const outgoingRequestDto = ({
+/** @typedef { attributes: Record<string, any> } OTelAttributes */
+
+/** @returns OTelAttributes */
+const outgoingRequestAttributesDto = ({
   method, url, durationSec, statusCode, errorType, peerService
 }) => ({
   attributes: {
@@ -45,9 +49,27 @@ const outgoingRequestDto = ({
   }
 })
 
-const incomingRequestDto = () => ({ attributes: {} }) // todo: add impl.
+/** @returns OTelAttributes */
+const incomingRequestAttributesDto = ({
+  method, url, path, route,
+  serverAddress, clientAddress, userAgent, durationSec, requestId, statusCode, errorType
+}) => ({
+  attributes: {
+    [otel.ATTR_HTTP_REQUEST_METHOD]: method,
+    [otel.ATTR_URL_FULL]: url,
+    [otel.ATTR_URL_PATH]: path,
+    [otel.ATTR_HTTP_ROUTE]: route,
+    [otel.ATTR_SERVER_ADDRESS]: serverAddress,
+    [otel.ATTR_CLIENT_ADDRESS]: clientAddress,
+    [otel.ATTR_USER_AGENT_ORIGINAL]: userAgent,
+    [CUSTOM_REQUEST_ID]: requestId,
+    ...(durationSec && { [otel.METRIC_HTTP_SERVER_REQUEST_DURATION]: durationSec }), // 'duration.ms' is a custom attribute
+    ...(statusCode && { [otel.ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode }),
+    ...(errorType && { [otel.ATTR_ERROR_TYPE]: errorType })
+  }
+})
 
 module.exports = {
-  outgoingRequestDto,
-  incomingRequestDto
+  outgoingRequestAttributesDto,
+  incomingRequestAttributesDto
 }

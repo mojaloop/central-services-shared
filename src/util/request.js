@@ -41,7 +41,7 @@ const { API_TYPES } = require('../constants')
 const config = require('../config')
 const enums = require('../enums')
 const Headers = require('./headers/transformer')
-const { outgoingRequestDto } = require('./otelDto')
+const { outgoingRequestAttributesDto } = require('./otelDto')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
@@ -271,6 +271,7 @@ const sendBaseRequest = async ({
   const { method, url } = reqOptions
   const methodUrl = `${method?.toUpperCase()} ${url}`
   const startTime = Date.now()
+
   let statusCode
   let errorType
 
@@ -296,7 +297,7 @@ const sendBaseRequest = async ({
     const severity = typeof statusCode === 'number'
       ? (statusCode >= 200 && statusCode < 300 ? 'info' : 'warn')
       : 'error'
-    log[severity](`[<--] ${methodUrl}  [${statusCode || errorType || 'N/A'}]: `, outgoingRequestDto({
+    log[severity](`[<--] ${methodUrl}  [${statusCode || errorType || 'N/A'}]: `, outgoingRequestAttributesDto({
       method,
       url,
       statusCode,
