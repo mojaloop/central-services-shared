@@ -66,7 +66,7 @@ const loggingPlugin = {
         asyncStorage.enterWith({ requestId })
 
         if (shouldLog(request.path)) {
-          extractRequestOtelContext(request, log)
+          logRequest(request, log)
         }
         return h.continue
       }
@@ -76,7 +76,7 @@ const loggingPlugin = {
       type: 'onPreResponse',
       method: (request, h) => {
         if (shouldLog(request.path)) {
-          extractResponseOtelContext(request, log)
+          logResponse(request, log)
         }
         return h.continue
       }
@@ -89,12 +89,10 @@ const loggingPlugin = {
  * @param {ILogger} log
  * @returns OTelAttributes
  */
-const extractRequestOtelContext = (request, log) => {
-  const { method, path, headers, payload } = request
-
-  log.info(`[==> req] ${method.toUpperCase()} ${path} `, {
-    headers: extractHeadersForLogs(headers),
-    payload, // check if payload has already been parsed by this moment
+const logRequest = (request, log) => {
+  log.info(`[==> req] ${request.method.toUpperCase()} ${request.path} `, {
+    headers: extractHeadersForLogs(request.headers),
+    // payload is not parsed yet
     ...extractAttributes({ request })
   })
 }
@@ -104,7 +102,7 @@ const extractRequestOtelContext = (request, log) => {
  * @param {ILogger} log
  * @returns OTelAttributes
  */
-const extractResponseOtelContext = (request, log) => {
+const logResponse = (request, log) => {
   const { method, path, response } = request
 
   const statusCode = response instanceof Error
@@ -117,9 +115,9 @@ const extractResponseOtelContext = (request, log) => {
 
   const durationSec = (Date.now() - request.info.received) / 1000
 
-  log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path}  [${durationSec} sec]`, {
+  log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path}  [${durationSec} s]`, {
     headers: extractHeadersForLogs(response?.output?.headers),
-    payload: response?.output?.payload,
+    payload: response?.output?.payload, // think if we need to log payload only with debug severity
     ...extractAttributes({ request, durationSec, statusCode, errorType })
   })
 }

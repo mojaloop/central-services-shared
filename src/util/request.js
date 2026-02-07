@@ -297,11 +297,12 @@ const sendBaseRequest = async ({
     const severity = typeof statusCode === 'number'
       ? (statusCode >= 200 && statusCode < 300 ? 'info' : 'warn')
       : 'error'
-    log[severity](`[<--] ${methodUrl}  [${statusCode || errorType || 'N/A'}]: `, outgoingRequestAttributesDto({
+    const durationSec = (Date.now() - startTime) / 1000
+    log[severity](`[<-- ${statusCode || errorType || ''}] ${methodUrl}  [${durationSec} s]:`, outgoingRequestAttributesDto({
       method,
       url,
       statusCode,
-      durationSec: (Date.now() - startTime) / 1000,
+      durationSec,
       errorType,
       peerService
     }))
