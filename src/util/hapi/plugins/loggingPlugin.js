@@ -30,6 +30,7 @@
 const { env } = require('node:process')
 const { asyncStorage } = require('@mojaloop/central-services-logger/src/contextLogger')
 const { logger } = require('../../../logger')
+const { incomingRequestAttributesDto } = require('../../otelDto')
 
 const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(',') : ['/health', '/metrics', '/live']
 const TRACE_ID_HEADER = env.LOG_TRACE_ID_HEADER ?? 'traceid'
@@ -61,13 +62,11 @@ const loggingPlugin = {
     server.ext({
       type: 'onRequest',
       method: (request, h) => {
-        const { path, method, headers, payload, query } = request
-        const { remoteAddress } = request.info
-        const requestId = request.info.id = `${request.info.id}__${headers[traceIdHeader]}`
+        const requestId = request.info.id = `${request.info.id}__${request.headers[traceIdHeader]}`
         asyncStorage.enterWith({ requestId })
 
-        if (shouldLog(path)) {
-          log.info(`[==> req] ${method.toUpperCase()} ${path}`, { headers, payload, query, remoteAddress })
+        if (shouldLog(request.path)) {
+          logRequest(request, log)
         }
         return h.continue
       }
@@ -77,21 +76,77 @@ const loggingPlugin = {
       type: 'onPreResponse',
       method: (request, h) => {
         if (shouldLog(request.path)) {
-          const { path, method, payload, response } = request
-          const { received } = request.info
-
-          const statusCode = response instanceof Error
-            ? response.output?.statusCode
-            : response.statusCode
-          const { output } = response
-          const respTimeSec = ((Date.now() - received) / 1000).toFixed(1)
-
-          log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path} [${respTimeSec} sec]`, { payload, output })
+          logResponse(request, log)
         }
         return h.continue
       }
     })
   }
+}
+
+/**
+ * @param {import('@hapi/hapi').Request} request
+ * @param {ILogger} log
+ * @returns OTelAttributes
+ */
+const logRequest = (request, log) => {
+  log.info(`[==> req] ${request.method.toUpperCase()} ${request.path} `, {
+    headers: extractHeadersForLogs(request.headers),
+    // payload is not parsed yet
+    ...extractAttributes({ request })
+  })
+}
+
+/**
+ * @param {import('@hapi/hapi').Request} request
+ * @param {ILogger} log
+ * @returns OTelAttributes
+ */
+const logResponse = (request, log) => {
+  const { method, path, response } = request
+
+  const statusCode = response instanceof Error
+    ? response.output?.statusCode
+    : response?.statusCode
+
+  const errorType = response instanceof Error
+    ? response.output?.payload?.error
+    : undefined
+
+  const durationSec = (Date.now() - request.info.received) / 1000
+
+  log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path}  [${durationSec} s]`, {
+    headers: extractHeadersForLogs(response?.output?.headers),
+    payload: response?.output?.payload, // think if we need to log payload only with debug severity
+    ...extractAttributes({ request, durationSec, statusCode, errorType })
+  })
+}
+
+const extractAttributes = ({ request, durationSec, statusCode, errorType }) => {
+  return incomingRequestAttributesDto({
+    method: request.method,
+    path: request.path,
+    url: getFullUrl(request),
+    route: request.route.path,
+    serverAddress: request.info.hostname,
+    clientAddress: request.info.remoteAddress,
+    userAgent: request.headers['user-agent'],
+    requestId: request.info.id,
+    durationSec,
+    statusCode,
+    errorType
+  })
+}
+
+/** @param {import('@hapi/hapi').Request} req */
+const getFullUrl = (req) => {
+  const search = req.url?.search || ''
+  return `${req.server.info.protocol}://${req.info.host}${req.path}${search}`
+}
+
+const extractHeadersForLogs = (headers = {}) => {
+  // todo: add impl.
+  return headers
 }
 
 module.exports = loggingPlugin

@@ -48,6 +48,7 @@
     "test:endpoints": "npx tape 'test/unit/util/endpoints.test.js'",
     "test:mysql": "npx tape 'test/unit/mysql/**/*.test.js'",
     "test:participants": "npx tape 'test/unit/util/participants.test.js'",
+    "test:request": "npx tape 'test/unit/util/request.test.js'",
     "test:trans": "npx tape 'test/unit/util/headers/transformer.test.js'",
     "test:unit": "npx tape 'test/unit/**/*.test.js' | tap-spec",
     "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
@@ -71,6 +72,7 @@
     "@hapi/joi-date": "2.0.1",
     "@mojaloop/inter-scheme-proxy-cache-lib": "2.9.0",
     "@opentelemetry/api": "1.9.0",
+    "@opentelemetry/semantic-conventions": "1.39.0",
     "async-exit-hook": "2.0.1",
     "async-retry": "1.3.3",
     "axios": "1.13.5",
@@ -97,7 +99,7 @@
   },
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.1.6",
-    "@mojaloop/central-services-logger": "11.10.4",
+    "@mojaloop/central-services-logger": "11.11.0-infitx.0",
     "@mojaloop/central-services-metrics": "12.8.4",
     "@mojaloop/event-sdk": "14.8.2",
     "@mojaloop/sdk-standard-components": "19.18.7",
@@ -125,6 +127,7 @@
     "tapes": "4.1.0"
   },
   "overrides": {
+    "@mojaloop/central-services-logger": "$@mojaloop/central-services-logger",
     "axios": "1.13.5",
     "qs": "6.14.1",
     "brace-expansion": "2.0.2",

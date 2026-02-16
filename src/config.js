@@ -9,6 +9,13 @@ const config = convict({
     env: 'SHARED_CACHE_LOG_LEVEL'
   },
 
+  httpLogLevel: {
+    doc: 'Log level for HTTP wrapper.',
+    format: logLevelValues,
+    default: logLevelsMap.warn,
+    env: 'LOG_LEVEL_HTTP'
+  },
+
   defaultTtlSec: {
     doc: 'Default cache TTL.',
     format: Number,

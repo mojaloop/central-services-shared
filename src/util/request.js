@@ -30,29 +30,31 @@
 'use strict'
 
 const http = require('node:http')
-const request = require('axios')
+const axios = require('axios')
 const stringify = require('fast-safe-stringify')
 const EventSdk = require('@mojaloop/event-sdk')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
-const Headers = require('./headers/transformer')
-const enums = require('../enums')
-const { logger } = require('../logger')
+
+const { logger: globalLogger } = require('../logger')
 const { API_TYPES } = require('../constants')
 const config = require('../config')
+const enums = require('../enums')
+const Headers = require('./headers/transformer')
+const { outgoingRequestAttributesDto } = require('./otelDto')
 
 const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 
 // Delete the default headers that the `axios` module inserts as they can brake our conventions.
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
-delete request.defaults.headers.common.Accept
+delete axios.defaults.headers.common.Accept
 
 const keepAlive = (process.env.HTTP_AGENT_KEEP_ALIVE ?? 'true') === 'true'
-logger.verbose('http keepAlive:', { keepAlive })
+globalLogger.verbose('http keepAlive:', { keepAlive })
 
 // Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive })
-request.defaults.httpAgent.toJSON = () => ({})
+axios.defaults.httpAgent = new http.Agent({ keepAlive })
+axios.defaults.httpAgent.toJSON = () => ({})
 
 /**
  * @function sendRequest
@@ -77,11 +79,12 @@ request.defaults.httpAgent.toJSON = () => ({})
  * @param {SendRequestProtocolVersions | undefined} protocolVersions the config for Protocol versions to be used
  * @param {'fspiop' | 'iso20022'} apiType the API type of the request being sent
  * @param {object} axiosRequestOptionsOverride axios request options to override https://axios-http.com/docs/req_config
+ * @param {ILogger} [logger] ContextLogger instance with specific context
+ * @param {string} [peerService] Logical service name to call (for OTel)
  * @param {regex} hubNameRegex hubName Regex
  *
  *@return {Promise<any>} The response for the request being sent or error object with response included
  */
-
 const sendRequest = async ({
   url,
   headers,
@@ -96,6 +99,8 @@ const sendRequest = async ({
   protocolVersions = undefined,
   apiType = API_TYPES.fspiop,
   axiosRequestOptionsOverride = {},
+  logger = createHttpLogger(),
+  peerService = '',
   hubNameRegex
 }) => {
   const histTimerEnd = Metrics.getHistogram(
@@ -113,6 +118,9 @@ const sendRequest = async ({
     // think, if we can just avoid checking "destination"
     throw ErrorHandler.Factory.createInternalServerFSPIOPError(MISSING_FUNCTION_PARAMETERS)
   }
+
+  const log = logger.child({ component: 'httpRequest' })
+
   try {
     const transformedHeaders = Headers.transformHeaders(headers, {
       httpMethod: method,
@@ -126,9 +134,10 @@ const sendRequest = async ({
       url,
       method,
       headers: transformedHeaders,
-      data: payload, // todo: think, if it's better to transform to ISO format here (based on apiType)
+      data: payload,
       params,
       responseType,
+      peerService,
       timeout: config.get('httpRequestTimeoutMs'),
       ...axiosRequestOptionsOverride
     }
@@ -149,14 +158,18 @@ const sendRequest = async ({
       }
       span.audit({ ...rest, payload }, EventSdk.AuditEventAction.egress)
     }
-    logger.debug('sendRequest::requestOptions:', { requestOptions })
-    const response = await request(requestOptions)
+
+    const response = await sendBaseRequest({
+      ...requestOptions,
+      logger: log,
+      peerService
+    })
 
     !!sendRequestSpan && await sendRequestSpan.finish()
     histTimerEnd({ success: true, source, destination, method })
     return response
   } catch (error) {
-    logger.error('error in request.sendRequest:', {
+    log.error('error in request.sendRequest:', {
       code: error.code,
       message: error.message,
       stack: error.stack,
@@ -247,6 +260,62 @@ const sendRequest = async ({
   }
 }
 
+// todo: think better name
+//       it's for http calls without params validation and transformHeaders
+const sendBaseRequest = async ({
+  logger = createHttpLogger(),
+  peerService = '',
+  ...reqOptions
+} = {}) => {
+  const log = logger.child({ component: 'sendBaseRequest' })
+  const { method, url } = reqOptions
+  const methodUrl = `${method?.toUpperCase()} ${url}`
+  const startTime = Date.now()
+
+  let statusCode
+  let errorType
+
+  try {
+    log.debug(`[-->] options for ${methodUrl}: `, { reqOptions })
+
+    const response = await axios(reqOptions)
+
+    statusCode = response?.status
+    log.verbose(`[<--] details of ${methodUrl}: `, {
+      data: response?.data,
+      headers: response?.headers, // todo: extract only needed headers
+      statusCode,
+      reqOptions
+    })
+
+    return response
+  } catch (error) {
+    statusCode = error.response?.status
+    errorType = error.code
+    throw error // todo: think, if we need to rethrow our custom error here
+  } finally {
+    const severity = typeof statusCode === 'number'
+      ? (statusCode >= 200 && statusCode < 300 ? 'info' : 'warn')
+      : 'error'
+    const durationSec = (Date.now() - startTime) / 1000
+    log[severity](`[<-- ${statusCode || errorType || ''}] ${methodUrl}  [${durationSec} s]:`, outgoingRequestAttributesDto({
+      method,
+      url,
+      statusCode,
+      durationSec,
+      errorType,
+      peerService
+    }))
+  }
+}
+
+const createHttpLogger = () => {
+  const logger = globalLogger.child()
+  logger.setLevel(config.get('httpLogLevel'))
+  return logger
+}
+
 module.exports = {
-  sendRequest
+  sendRequest,
+  sendBaseRequest
 }
