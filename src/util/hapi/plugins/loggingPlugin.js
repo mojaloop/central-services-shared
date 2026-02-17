@@ -90,7 +90,7 @@ const loggingPlugin = {
  * @returns OTelAttributes
  */
 const logRequest = (request, log) => {
-  log.info(`[==> req] ${request.method.toUpperCase()} ${request.path} `, {
+  log.info(`[==> req] ${reqDetails(request)}`, {
     headers: extractHeadersForLogs(request.headers),
     // payload is not parsed yet
     ...extractAttributes({ request })
@@ -103,7 +103,7 @@ const logRequest = (request, log) => {
  * @returns OTelAttributes
  */
 const logResponse = (request, log) => {
-  const { method, path, response } = request
+  const { response } = request
 
   const statusCode = response instanceof Error
     ? response.output?.statusCode
@@ -115,7 +115,7 @@ const logResponse = (request, log) => {
 
   const durationSec = (Date.now() - request.info.received) / 1000
 
-  log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path}  [${durationSec} s]`, {
+  log.info(`[<== ${statusCode}] ${reqDetails(request)} ${durationSec}s`, {
     headers: extractHeadersForLogs(response?.output?.headers),
     payload: response?.output?.payload, // think if we need to log payload only with debug severity
     ...extractAttributes({ request, durationSec, statusCode, errorType })
@@ -147,6 +147,11 @@ const getFullUrl = (req) => {
 const extractHeadersForLogs = (headers = {}) => {
   // todo: add impl.
   return headers
+}
+
+const reqDetails = (request) => {
+  const reqCounter = request.info.id?.split('__')[0].split(':').pop() || 'N/A'
+  return `${request.method.toUpperCase()} ${request.path}  [${reqCounter}]`
 }
 
 module.exports = loggingPlugin
