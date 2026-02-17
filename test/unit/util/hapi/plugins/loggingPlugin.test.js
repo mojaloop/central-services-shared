@@ -134,7 +134,7 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     t.true(statusCode === 500, 'handler failed')
     t.true(log.info.callCount === 2, 'log request/response')
     t.true(log.info.lastCall.firstArg.startsWith('[<== 500]'), 'error code is logged')
-    t.ok(log.info.lastCall.lastArg.output.payload, 'error output is logged')
+    t.ok(log.info.lastCall.lastArg.payload, 'error output is logged')
   }))
 
   pluginTests.test('should not log requests on internal routes', tryCatchEndTest(async t => {
