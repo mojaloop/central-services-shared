@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.35.4](https://github.com/mojaloop/central-services-shared/compare/v18.35.3...v18.35.4) (2026-02-19)
+
+
+### Chore
+
+* update dependencies, node.js 22.22.0, and security patches ([#508](https://github.com/mojaloop/central-services-shared/issues/508)) ([51281d8](https://github.com/mojaloop/central-services-shared/commit/51281d8eaaa8b9da53214f2b6543d1aef165a682))
+
 ### [18.35.3](https://github.com/mojaloop/central-services-shared/compare/v18.35.2...v18.35.3) (2026-02-06)
 
 
