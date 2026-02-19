@@ -3,7 +3,10 @@ disabled: false
 ignore:
   - vulnerability: GHSA-2g4f-4pwh-qvx6
     include-aliases: true
-    reason: "Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-02-19"
+    reason: "Unfixable npm transitive vulnerability: ajv ReDoS (moderate) as of 2026-02-19"
+  - vulnerability: GHSA-3ppc-4f35-3m26
+    include-aliases: true
+    reason: "Unfixable npm transitive vulnerability: minimatch ReDoS - fix requires v10 major version break as of 2026-02-19"
 output:
   - table
   - json
