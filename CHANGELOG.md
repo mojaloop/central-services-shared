@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.35.5](https://github.com/mojaloop/central-services-shared/compare/v18.35.4...v18.35.5) (2026-02-20)
+
+
+### Chore
+
+* update orb and dep ver ([#509](https://github.com/mojaloop/central-services-shared/issues/509)) ([7293cff](https://github.com/mojaloop/central-services-shared/commit/7293cffea15145d115b25625eb4352ceb651bb35))
+
 ### [18.35.4](https://github.com/mojaloop/central-services-shared/compare/v18.35.3...v18.35.4) (2026-02-19)
 
 
