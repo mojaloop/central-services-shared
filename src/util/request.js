@@ -273,6 +273,7 @@ const sendBaseRequest = async ({
   const startTime = Date.now()
 
   let statusCode
+  let errorMessage
   let errorType
 
   try {
@@ -291,7 +292,8 @@ const sendBaseRequest = async ({
     return response
   } catch (error) {
     statusCode = error.response?.status
-    errorType = error.code
+    errorMessage = error.response?.data || error.message
+    errorType = error.code || error.name
     throw error // todo: think, if we need to rethrow our custom error here
   } finally {
     const severity = typeof statusCode === 'number'
@@ -303,6 +305,7 @@ const sendBaseRequest = async ({
       url,
       statusCode,
       durationSec,
+      errorMessage,
       errorType,
       peerService
     }))
