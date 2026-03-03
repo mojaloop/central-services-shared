@@ -82,12 +82,14 @@ const constructSystemExtensionError = (error, system) => {
     key: 'system',
     value: system
   }]
-  return ErrorHandler.Factory.reformatFSPIOPError(
+  const result = ErrorHandler.Factory.reformatFSPIOPError(
     error,
     undefined,
     undefined,
     extensions
   )
+  result.errorCode = error?.code
+  return result
 }
 
 const rethrowError = (error, options = {}, system) => {

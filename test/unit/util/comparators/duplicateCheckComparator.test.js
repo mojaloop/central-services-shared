@@ -60,7 +60,7 @@ Test('Duplicate check comparator', dccTest => {
         const object = { key: 'value' }
         const getDuplicateDataFuncOverrideResult = { id, hash }
         const getDuplicateDataFuncOverride = sandbox.stub().resolves(getDuplicateDataFuncOverrideResult)
-        const saveHashFuncOverride = sandbox.stub().resolves(true)
+        const saveHashFuncOverride = sandbox.stub().throws({ errorCode: 'ER_DUP_ENTRY' }) // Simulate duplicate entry error when trying to save the hash for an existing id
 
         const expected = {
           hasDuplicateId: true,
@@ -74,7 +74,7 @@ Test('Duplicate check comparator', dccTest => {
 
         // Assert
         test.deepEqual(result, expected, 'hash matched')
-        test.ok(saveHashFuncOverride.called === false)
+        test.ok(saveHashFuncOverride.called === true)
         test.end()
       } catch (err) {
         // Assert
@@ -133,7 +133,7 @@ Test('Duplicate check comparator', dccTest => {
         const id = 1
         const getDuplicateDataFuncOverrideResult = { id, hash: generatedHashOverride }
         const getDuplicateDataFuncOverride = sandbox.stub().resolves(getDuplicateDataFuncOverrideResult)
-        const saveHashFuncOverride = sandbox.stub().resolves(true)
+        const saveHashFuncOverride = sandbox.stub().throws({ errorCode: 'ER_DUP_ENTRY' }) // Simulate duplicate entry error when trying to save the hash for an existing id
 
         const expected = {
           hasDuplicateId: true,
@@ -149,7 +149,7 @@ Test('Duplicate check comparator', dccTest => {
 
         // Assert
         test.deepEqual(result, expected, 'hash matched')
-        test.ok(saveHashFuncOverride.called === false)
+        test.ok(saveHashFuncOverride.called === true)
         test.end()
       } catch (err) {
         // Assert
