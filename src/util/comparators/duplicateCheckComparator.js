@@ -57,7 +57,7 @@ const duplicateCheckComparator = async (id, objectOrHashOverride, getDuplicateDa
   try {
     saveHashFuncOverrideResult = await saveHashFuncOverride(id, generatedHash)
   } catch (err) {
-    if (err.errorCode !== 'ER_DUP_ENTRY') throw err
+    if (err.code !== 'ER_DUP_ENTRY' && err.errorCode !== 'ER_DUP_ENTRY') throw err // make sure wrapped error code is checked too
     if (await compareById()) {
       compareByHash()
     }

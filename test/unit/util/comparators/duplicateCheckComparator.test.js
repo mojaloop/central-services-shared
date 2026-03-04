@@ -32,8 +32,10 @@ const Test = require('tapes')(require('tape'))
 const Sinon = require('sinon')
 const Proxyquire = require('proxyquire')
 const Logger = require('@mojaloop/central-services-logger')
-const dupError = new Error('foo')
-dupError.errorCode = 'ER_DUP_ENTRY'
+const dupError1 = new Error('foo')
+dupError1.code = 'ER_DUP_ENTRY'
+const dupError2 = new Error('foo')
+dupError2.errorCode = 'ER_DUP_ENTRY'
 
 Test('Duplicate check comparator', dccTest => {
   let sandbox
@@ -62,7 +64,7 @@ Test('Duplicate check comparator', dccTest => {
         const object = { key: 'value' }
         const getDuplicateDataFuncOverrideResult = { id, hash }
         const getDuplicateDataFuncOverride = sandbox.stub().resolves(getDuplicateDataFuncOverrideResult)
-        const saveHashFuncOverride = sandbox.stub().rejects(dupError)
+        const saveHashFuncOverride = sandbox.stub().rejects(dupError1)
 
         const expected = {
           hasDuplicateId: true,
@@ -314,7 +316,7 @@ Test('Duplicate check comparator', dccTest => {
       const id = 1
       const object = { key: 'value' }
       const getDuplicateDataFuncOverride = sandbox.stub().resolves(null)
-      const saveHashFuncOverride = sandbox.stub().rejects(dupError)
+      const saveHashFuncOverride = sandbox.stub().rejects(dupError2)
       const compareByHashSpy = sandbox.spy()
 
       // Act
