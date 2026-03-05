@@ -103,7 +103,7 @@
     "@mojaloop/central-services-metrics": "12.8.5",
     "@mojaloop/event-sdk": "14.8.3",
     "@mojaloop/sdk-standard-components": "19.18.8",
-    "@opentelemetry/auto-instrumentations-node": "^0.70.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.71.0",
     "@types/hapi__joi": "17.1.15",
     "ajv": "^8.18.0",
     "ajv-formats": "^3.0.1",
