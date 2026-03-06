@@ -61,14 +61,14 @@
     "audit:fix": "npm audit fix",
     "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
     "dep:check": "npx ncu -e 2",
-    "dep:update": "npx ncu -u",
+    "dep:update": "npx ncu -u --target @minor-infitx",
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
   "dependencies": {
     "@hapi/catbox": "12.1.1",
     "@hapi/catbox-memory": "5.0.1",
-    "@hapi/hapi": "21.4.6",
+    "@hapi/hapi": "21.4.7",
     "@hapi/joi-date": "2.0.1",
     "@mojaloop/inter-scheme-proxy-cache-lib": "2.9.0",
     "@opentelemetry/api": "1.9.0",
@@ -99,7 +99,7 @@
   },
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.1.6",
-    "@mojaloop/central-services-logger": "11.11.0-infitx.0",
+    "@mojaloop/central-services-logger": "11.11.0-infitx.2",
     "@mojaloop/central-services-metrics": "12.8.5",
     "@mojaloop/event-sdk": "14.8.3",
     "@mojaloop/sdk-standard-components": "19.18.8",
@@ -168,7 +168,7 @@
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": "13.x.x",
-    "@mojaloop/central-services-logger": "11.x.x",
+    "@mojaloop/central-services-logger": ">=11.11.0-infitx.0 <=11.11.0-infitx.9999",
     "@mojaloop/central-services-metrics": "12.x.x",
     "@mojaloop/event-sdk": "14.x.x",
     "ajv": "8.x.x",
