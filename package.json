@@ -99,7 +99,7 @@
   },
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.1.6",
-    "@mojaloop/central-services-logger": "11.11.0-infitx.2",
+    "@mojaloop/central-services-logger": "11.11.0-infitx.3",
     "@mojaloop/central-services-metrics": "12.8.5",
     "@mojaloop/event-sdk": "14.9.0-infitx.0",
     "@mojaloop/sdk-standard-components": "19.18.8",
