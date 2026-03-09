@@ -1,7 +1,7 @@
 /*****
  License
  --------------
- Copyright © 2020-2025 Mojaloop Foundation
+ Copyright © 2020-2026 Mojaloop Foundation
  The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
 
  http://www.apache.org/licenses/LICENSE-2.0
@@ -20,16 +20,15 @@
  optionally within square brackets <email>.
 
  * Mojaloop Foundation
- - Name Surname <name.surname@mojaloop.io>
-
- * Kevin Leyow <kevin.leyow@infitx.com>
+ * Eugen Klymniuk <eugen.klymniuk@infitx.com>
 
  --------------
  ******/
 
-const { logger } = require('../logger')
+const { logger } = require('../../logger')
+const config = require('../../config')
 
-exports.createLogger = (component) => {
-  process.emitWarning('createLogger() is deprecated. Use logger.child({ component }) directly.', 'DeprecationWarning')
-  return logger.child({ component })
-}
+const log = logger.child('redis')
+log.setLevel(config.get('logLevelRedis'))
+
+module.exports = log

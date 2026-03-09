@@ -29,11 +29,13 @@
 
 'use strict'
 const Redis = require('ioredis')
-const { createLogger } = require('../createLogger')
-const isClusterConfig = (config) => { return 'cluster' in config }
-const { rethrowRedisError } = require('../rethrow')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
+const { rethrowRedisError } = require('../rethrow')
 const { retryCommand } = require('./shared')
+const logger = require('./redisLogger')
+
+const isClusterConfig = (config) => { return 'cluster' in config }
+
 const RECREATE_RE = /Cannot read properties of undefined \(reading 'getInstance'\)|Too many Cluster redirections/
 
 class PubSub {
@@ -46,7 +48,7 @@ class PubSub {
   constructor (config, publisherClient, subscriberClient, options = {}) {
     this.config = config
     this.isCluster = isClusterConfig(config)
-    this.log = createLogger(this.constructor.name)
+    this.log = logger.child({ component: this.constructor.name })
     this.publisherClient = publisherClient || this.createRedisClient()
     this.subscriberClient = subscriberClient || this.createRedisClient()
     this.addEventListeners(this.publisherClient)

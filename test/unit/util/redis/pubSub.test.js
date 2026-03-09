@@ -664,7 +664,6 @@ Test('PubSub', (t) => {
     const redisClusterStub = sandbox.stub()
     const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
       ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
-      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
       './shared': { retryCommand: retryCommandStub }
     })
 
@@ -685,7 +684,6 @@ Test('PubSub', (t) => {
     const redisClusterStub = sandbox.stub()
     const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
       ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
-      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
       './shared': { retryCommand: retryCommandStub }
     })
 
@@ -707,7 +705,6 @@ Test('PubSub', (t) => {
     const redisClusterStub = sandbox.stub().returns(redisClusterClient)
     const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
       ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
-      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
       './shared': { retryCommand: retryCommandStub }
     })
 
@@ -729,7 +726,6 @@ Test('PubSub', (t) => {
     const redisClusterStub = sandbox.stub()
     const PubSubWithRedisStub = Proxyquire('../../../../src/util/redis/pubSub', {
       ioredis: Object.assign(redisStub, { default: redisStub, Cluster: redisClusterStub }),
-      '../createLogger': { createLogger: () => ({ info: sandbox.stub(), error: sandbox.stub(), warn: sandbox.stub(), debug: sandbox.stub() }) },
       './shared': { retryCommand: retryCommandStub }
     })
 

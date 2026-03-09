@@ -242,7 +242,7 @@ Test('RedisCache', redisCacheTest => {
     }
     const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
       './shared': { retryCommand: retryCommandStub },
-      '../createLogger': { createLogger: () => log }
+      './redisLogger': { child: () => log }
     })
     const redisCache = new RedisCacheWithStub({ cluster: [{}] }, redisClient)
     t.ok(redisCache, 'RedisCache instance created')
@@ -269,7 +269,7 @@ Test('RedisCache', redisCacheTest => {
     }
     const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
       './shared': { retryCommand: retryCommandStub },
-      '../createLogger': { createLogger: () => log }
+      './redisLogger': { child: () => log }
     })
     const redisCache = new RedisCacheWithStub({ cluster: [{}] }, redisClient)
     t.ok(redisCache, 'RedisCache instance created')
@@ -302,7 +302,7 @@ Test('RedisCache', redisCacheTest => {
     }
     const RedisCacheWithStub = Proxyquire('../../../../src/util/redis/redisCache', {
       './shared': { retryCommand: retryCommandStub },
-      '../createLogger': { createLogger: () => log }
+      './redisLogger': { child: () => log }
     })
     // Instantiating will attach listeners
     const redisCache = new RedisCacheWithStub({ cluster: [{}] }, redisClient)

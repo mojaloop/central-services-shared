@@ -122,7 +122,7 @@ const logResponse = (request, log) => {
 const extractAttributes = ({ request, durationSec, statusCode, errorType }) => {
   const query = request.url?.search?.slice(1) || undefined
   return incomingRequestAttributesDto({
-    method: request.method.toUpperCase(),
+    method: request.method,
     path: request.path,
     url: getFullUrl(request),
     route: request.route?.path,

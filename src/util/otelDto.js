@@ -36,19 +36,24 @@ const CUSTOM_REQUEST_ID = 'request.id'
 /** @returns OTelAttributes */
 const outgoingRequestAttributesDto = ({
   method, url, durationSec, statusCode, errorType, errorMessage, peerService
-}) => ({
-  attributes: {
-    [otel.ATTR_HTTP_REQUEST_METHOD]: method,
-    [otel.ATTR_URL_FULL]: url,
-    ...(durationSec != null && { [otel.METRIC_HTTP_CLIENT_REQUEST_DURATION]: durationSec }),
-    ...(statusCode && { [otel.ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode }),
-    ...(errorType && { [otel.ATTR_EXCEPTION_TYPE]: errorType }),
-    ...(errorMessage && { [otel.ATTR_EXCEPTION_MESSAGE]: errorMessage }),
-    ...(peerService && { [ATTR_SERVICE_PEER_NAME]: peerService })
-    // peerService - logical service name, must be explicitly provided by caller (not derived from URL hostname)
-    //               think if we should extract it for internal http://... calls from url hostname
+}) => {
+  const { hostname, port } = parseHostPort(url)
+  return {
+    attributes: {
+      [otel.ATTR_HTTP_REQUEST_METHOD]: method?.toUpperCase(),
+      [otel.ATTR_URL_FULL]: url,
+      ...(hostname && { [otel.ATTR_SERVER_ADDRESS]: hostname }),
+      ...(port && { [otel.ATTR_SERVER_PORT]: port }),
+      ...(durationSec != null && { [otel.METRIC_HTTP_CLIENT_REQUEST_DURATION]: durationSec }),
+      ...(statusCode != null && { [otel.ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode }),
+      ...(errorType && { [otel.ATTR_ERROR_TYPE]: errorType }),
+      ...(errorMessage && { [otel.ATTR_EXCEPTION_MESSAGE]: errorMessage }),
+      ...(peerService && { [ATTR_SERVICE_PEER_NAME]: peerService })
+      // peerService - logical service name, must be explicitly provided by caller (not derived from URL hostname)
+      //               think if we should extract it for internal http://... calls from url hostname
+    }
   }
-})
+}
 
 /** @returns OTelAttributes */
 const incomingRequestAttributesDto = ({
@@ -57,7 +62,7 @@ const incomingRequestAttributesDto = ({
   durationSec, requestId, statusCode, errorType
 }) => ({
   attributes: {
-    [otel.ATTR_HTTP_REQUEST_METHOD]: method,
+    [otel.ATTR_HTTP_REQUEST_METHOD]: method?.toUpperCase(),
     [otel.ATTR_URL_FULL]: url,
     [otel.ATTR_URL_PATH]: path,
     [otel.ATTR_URL_SCHEME]: scheme,
@@ -69,10 +74,22 @@ const incomingRequestAttributesDto = ({
     ...(clientAddress && { [otel.ATTR_CLIENT_ADDRESS]: clientAddress }),
     ...(userAgent && { [otel.ATTR_USER_AGENT_ORIGINAL]: userAgent }),
     ...(durationSec != null && { [otel.METRIC_HTTP_SERVER_REQUEST_DURATION]: durationSec }),
-    ...(statusCode && { [otel.ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode }),
+    ...(statusCode != null && { [otel.ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode }),
     ...(errorType && { [otel.ATTR_ERROR_TYPE]: errorType })
   }
 })
+
+const parseHostPort = (url) => {
+  try {
+    const { hostname, port, protocol } = new URL(url)
+    return {
+      hostname,
+      port: Number(port) || (protocol === 'https:' ? 443 : 80)
+    }
+  } catch {
+    return {}
+  }
+}
 
 module.exports = {
   outgoingRequestAttributesDto,

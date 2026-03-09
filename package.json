@@ -51,7 +51,7 @@
     "test:request": "npx tape 'test/unit/util/request.test.js'",
     "test:trans": "npx tape 'test/unit/util/headers/transformer.test.js'",
     "test:unit": "npx tape 'test/unit/**/*.test.js' | tap-spec",
-    "test:xunit": "npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
+    "test:xunit": "mkdir -p ./test/results && npx tape 'test/unit/**/**.test.js' | tap-xunit > ./test/results/xunit.xml",
     "test:unit:header": "npx tape 'test/unit/util/headerValidation/**/*.test.js'",
     "test:coverage:mysql": "npx nyc --reporter=lcov --reporter=text tapes -- 'test/unit/mysql/**.test.js'",
     "test:coverage": "npx nyc --reporter=lcov --reporter=text-summary tapes -- 'test/unit/**/**.test.js'",
