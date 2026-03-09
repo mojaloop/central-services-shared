@@ -26,6 +26,7 @@
 
  --------------
  ******/
+/* istanbul ignore file */
 
 const { logger } = require('../logger')
 

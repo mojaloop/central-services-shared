@@ -30,7 +30,7 @@
   },
   "pre-commit": [
     "lint",
-    "test",
+    "test:coverage-check",
     "dep:check",
     "audit:check"
   ],
