@@ -100,7 +100,7 @@
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.1.6",
     "@mojaloop/central-services-logger": "11.11.0-infitx.4",
-    "@mojaloop/central-services-metrics": "12.8.5",
+    "@mojaloop/central-services-metrics": "12.9.0-infitx.0",
     "@mojaloop/event-sdk": "14.9.0-infitx.0",
     "@mojaloop/sdk-standard-components": "19.18.8",
     "@opentelemetry/auto-instrumentations-node": "^0.71.0",
@@ -169,7 +169,7 @@
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": "13.x.x",
     "@mojaloop/central-services-logger": ">=11.11.0-infitx.0 <=11.11.0-infitx.9999",
-    "@mojaloop/central-services-metrics": "12.x.x",
+    "@mojaloop/central-services-metrics": ">=12.9.0-infitx.0 <=12.9.0-infitx.9999",
     "@mojaloop/event-sdk": ">=14.9.0-infitx.0 <=14.9.0-infitx.9999",
     "ajv": "8.x.x",
     "ajv-formats": "3.x.x",
