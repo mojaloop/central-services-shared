@@ -1,17 +1,17 @@
 const convict = require('convict')
-const { logLevelsMap, logLevelValues } = require('./types')
+const { logLevelsMap } = require('./logger')
 
 const config = convict({
-  logLevel: {
-    doc: 'Log level for the library.',
-    format: logLevelValues,
+  logLevelRedis: {
+    doc: 'Log level for Redis components.',
+    format: Object.values(logLevelsMap),
     default: logLevelsMap.warn,
-    env: 'SHARED_CACHE_LOG_LEVEL'
+    env: 'LOG_LEVEL_REDIS'
   },
 
-  httpLogLevel: {
+  logLevelHttp: {
     doc: 'Log level for HTTP wrapper.',
-    format: logLevelValues,
+    format: Object.values(logLevelsMap),
     default: logLevelsMap.warn,
     env: 'LOG_LEVEL_HTTP'
   },

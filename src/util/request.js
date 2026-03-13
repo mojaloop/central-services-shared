@@ -56,6 +56,12 @@ globalLogger.verbose('http keepAlive:', { keepAlive })
 axios.defaults.httpAgent = new http.Agent({ keepAlive })
 axios.defaults.httpAgent.toJSON = () => ({})
 
+const createHttpLogger = () => {
+  const logger = globalLogger.child()
+  logger.setLevel(config.get('logLevelHttp'))
+  return logger
+}
+
 /**
  * @function sendRequest
  *
@@ -293,7 +299,9 @@ const sendBaseRequest = async ({
   } catch (error) {
     statusCode = error.response?.status
     errorMessage = error.response?.data || error.message
-    errorType = error.code || error.name
+    errorType = statusCode
+      ? String(statusCode)
+      : (error.code || error.name || 'UnknownError')
     throw error // todo: think, if we need to rethrow our custom error here
   } finally {
     const severity = typeof statusCode === 'number'
@@ -310,12 +318,6 @@ const sendBaseRequest = async ({
       peerService
     }))
   }
-}
-
-const createHttpLogger = () => {
-  const logger = globalLogger.child()
-  logger.setLevel(config.get('httpLogLevel'))
-  return logger
 }
 
 module.exports = {

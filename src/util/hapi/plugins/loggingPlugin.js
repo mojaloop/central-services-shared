@@ -108,10 +108,7 @@ const logResponse = (request, log) => {
   const statusCode = response instanceof Error
     ? response.output?.statusCode
     : response?.statusCode
-
-  const errorType = response instanceof Error
-    ? response.output?.payload?.error
-    : undefined
+  const errorType = statusCode >= 400 ? String(statusCode) : undefined
 
   const durationSec = (Date.now() - request.info.received) / 1000
 
@@ -123,12 +120,16 @@ const logResponse = (request, log) => {
 }
 
 const extractAttributes = ({ request, durationSec, statusCode, errorType }) => {
+  const query = request.url?.search?.slice(1) || undefined
   return incomingRequestAttributesDto({
     method: request.method,
     path: request.path,
     url: getFullUrl(request),
-    route: request.route.path,
+    route: request.route?.path,
+    scheme: request.server.info.protocol,
+    query,
     serverAddress: request.info.hostname,
+    serverPort: request.server.info.port,
     clientAddress: request.info.remoteAddress,
     userAgent: request.headers['user-agent'],
     requestId: request.info.id,

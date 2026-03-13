@@ -28,17 +28,18 @@
  ******/
 
 const Redis = require('ioredis')
-const { createLogger } = require('../createLogger')
 const { REDIS_SUCCESS, REDIS_IS_CONNECTED_STATUSES } = require('../../constants')
-const isClusterConfig = (config) => { return 'cluster' in config }
 const { rethrowRedisError } = require('../rethrow')
 const { retryCommand } = require('./shared')
+const logger = require('./redisLogger')
+
+const isClusterConfig = (config) => { return 'cluster' in config }
 
 class RedisCache {
   constructor (config, client, options = {}) {
     this.config = config
     this.isCluster = isClusterConfig(config)
-    this.log = createLogger(this.constructor.name)
+    this.log = logger.child({ component: this.constructor.name })
     this.redisClient = client || this.createRedisClient()
     this.addEventListeners(this.redisClient)
     this.retryAttempts = options.retryAttempts ?? undefined
