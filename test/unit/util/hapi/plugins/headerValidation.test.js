@@ -151,7 +151,8 @@ Test('headerValidation plugin test', async (pluginTest) => {
     t.end()
   })
 
-  pluginTest.test('accept validation is not performed on post, put requests without an accept header', async t => {
+  pluginTest.test('accept validation is performed on post, put requests without an accept header', async t => {
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MISSING_ELEMENT
     const opts = {
       url: `/${resource}`,
       headers: {
@@ -161,8 +162,10 @@ Test('headerValidation plugin test', async (pluginTest) => {
     }
     await Promise.all(['post', 'put'].map(async method => {
       const res = await server.inject({ ...opts, method })
-      t.is(res.payload, '')
-      t.is(res.statusCode, 202)
+      t.is(res.statusCode, fspiopCode.httpStatusCode)
+      const payload = JSON.parse(res.payload)
+      t.is(payload.apiErrorCode.code, fspiopCode.code)
+      t.is(payload.message, errorMessages.REQUIRE_ACCEPT_HEADER)
     }))
     t.end()
   })

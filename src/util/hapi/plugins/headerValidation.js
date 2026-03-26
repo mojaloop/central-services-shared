@@ -81,29 +81,26 @@ const plugin = {
 
       if (needProxySourceValidation) validateProxySourceHeaders(request.headers)
 
-      // Always validate the accept header for a get request, or optionally if it has been
-      // supplied
-      if (request.method.toLowerCase() === 'get' || request.headers.accept) {
-        if (request.headers.accept === undefined) {
-          throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_ACCEPT_HEADER)
-        }
-        const accept = parseAcceptHeader(resource, request.headers.accept, apiType)
-        if (!accept.valid) {
-          throw createFSPIOPError(
-            Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX,
-            errorMessages.INVALID_ACCEPT_HEADER
-          )
-        }
-        if (!supportedProtocolAcceptVersions.some(supportedVer => accept.versions.has(supportedVer))) {
-          const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolAcceptVersions)
-          throw createFSPIOPError(
-            Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
-            errorMessages.REQUESTED_VERSION_NOT_SUPPORTED,
-            null,
-            null,
-            supportedVersionExtensionListMap
-          )
-        }
+      // Always validate the accept header (required per FSPIOP API spec for all methods)
+      if (request.headers.accept === undefined) {
+        throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_ACCEPT_HEADER)
+      }
+      const accept = parseAcceptHeader(resource, request.headers.accept, apiType)
+      if (!accept.valid) {
+        throw createFSPIOPError(
+          Enums.FSPIOPErrorCodes.MALFORMED_SYNTAX,
+          errorMessages.INVALID_ACCEPT_HEADER
+        )
+      }
+      if (!supportedProtocolAcceptVersions.some(supportedVer => accept.versions.has(supportedVer))) {
+        const supportedVersionExtensionListMap = convertSupportedVersionToExtensionList(supportedProtocolAcceptVersions)
+        throw createFSPIOPError(
+          Enums.FSPIOPErrorCodes.UNACCEPTABLE_VERSION,
+          errorMessages.REQUESTED_VERSION_NOT_SUPPORTED,
+          null,
+          null,
+          supportedVersionExtensionListMap
+        )
       }
 
       const dateHeader = request.headers.date
