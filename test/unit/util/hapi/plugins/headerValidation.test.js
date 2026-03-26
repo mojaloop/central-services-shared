@@ -339,6 +339,42 @@ Test('headerValidation plugin test', async (pluginTest) => {
     t.end()
   })
 
+  pluginTest.test('TOO_LARGE_PAYLOAD when content-length exceeds max', async t => {
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.TOO_LARGE_PAYLOAD
+    const res = await server.inject({
+      method: 'get',
+      url: `/${resource}`,
+      headers: {
+        'content-type': generateContentTypeHeader(resource, 1),
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString(),
+        'content-length': '999999999'
+      }
+    })
+    t.is(res.statusCode, fspiopCode.httpStatusCode)
+    const payload = JSON.parse(res.payload)
+    t.is(payload.apiErrorCode.code, fspiopCode.code)
+    t.is(payload.message, 'Payload size is too large')
+    t.end()
+  })
+
+  pluginTest.test('MISSING_ELEMENT when content-type header is missing', async t => {
+    const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MISSING_ELEMENT
+    const res = await server.inject({
+      method: 'get',
+      url: `/${resource}`,
+      headers: {
+        accept: generateAcceptHeader(resource, [1]),
+        date: new Date().toUTCString()
+      }
+    })
+    t.is(res.statusCode, fspiopCode.httpStatusCode)
+    const payload = JSON.parse(res.payload)
+    t.is(payload.apiErrorCode.code, fspiopCode.code)
+    t.is(payload.message, 'Content-type is required')
+    t.end()
+  })
+
   pluginTest.test('throws missing element error on missing date header', async t => {
     const fspiopCode = ErrorHandling.Enums.FSPIOPErrorCodes.MISSING_ELEMENT
     const res = await server.inject({

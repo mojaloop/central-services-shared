@@ -5,6 +5,8 @@ const API_TYPES = Object.freeze({
 
 const ISO_HEADER_PART = 'iso20022'
 
+const MAX_CONTENT_LENGTH = 5242880 // 5 MB
+
 const CLIENT_ID_HEADER = 'x-client-id'
 
 const REDIS_SUCCESS = 'OK'
@@ -24,6 +26,7 @@ const errorMessages = {
 module.exports = {
   API_TYPES,
   ISO_HEADER_PART,
+  MAX_CONTENT_LENGTH,
   CLIENT_ID_HEADER,
   REDIS_SUCCESS,
   REDIS_IS_CONNECTED_STATUSES,
