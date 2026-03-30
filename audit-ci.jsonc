@@ -4,7 +4,11 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
-    "GHSA-2g4f-4pwh-qvx6",
-    "GHSA-3ppc-4f35-3m26" // minimatch ReDoS - fix requires v10 (major version break), unfixable via override
+    "GHSA-2g4f-4pwh-qvx6", // ajv ReDoS - transitive via inter-scheme-proxy-cache-lib
+    "GHSA-3ppc-4f35-3m26", // minimatch ReDoS - transitive via replace, fix requires major version break
+    "GHSA-7r86-cg39-jmmj", // minimatch ReDoS - transitive via replace
+    "GHSA-23c5-xmqv-rm74", // minimatch ReDoS - transitive via replace
+    "GHSA-44fc-8fm5-q62h", // convict prototype pollution - transitive via inter-scheme-proxy-cache-lib
+    "GHSA-hf2r-9gf9-rwch"  // convict prototype pollution - transitive via inter-scheme-proxy-cache-lib
   ]
 }

@@ -81,9 +81,10 @@ const plugin = {
 
       if (needProxySourceValidation) validateProxySourceHeaders(request.headers)
 
-      // Always validate the accept header for a get request, or optionally if it has been
-      // supplied
-      if (request.method.toLowerCase() === 'get' || request.headers.accept) {
+      // Require accept header for request-initiating methods (GET, POST, DELETE)
+      // per FSPIOP API spec. PUT/PATCH callbacks do not require Accept.
+      const methodRequiresAccept = ['get', 'post', 'delete'].includes(request.method.toLowerCase())
+      if (methodRequiresAccept || request.headers.accept) {
         if (request.headers.accept === undefined) {
           throw createFSPIOPError(Enums.FSPIOPErrorCodes.MISSING_ELEMENT, errorMessages.REQUIRE_ACCEPT_HEADER)
         }
