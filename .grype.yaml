@@ -1,6 +1,12 @@
 scan-type: source
 disabled: false
-ignore: []
+ignore:
+  - vulnerability: GHSA-44fc-8fm5-q62h
+    include-aliases: true
+    reason: "Unfixable npm transitive vulnerability: convict prototype pollution via inter-scheme-proxy-cache-lib (critical) as of 2026-04-02"
+  - vulnerability: GHSA-hf2r-9gf9-rwch
+    include-aliases: true
+    reason: "Unfixable npm transitive vulnerability: convict prototype pollution via inter-scheme-proxy-cache-lib (critical) as of 2026-04-02"
 output:
   - table
   - json
