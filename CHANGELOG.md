@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.35.7](https://github.com/mojaloop/central-services-shared/compare/v18.35.6...v18.35.7) (2026-04-07)
+
+
+### Bug Fixes
+
+* require Accept header for initiating methods per FSPIOP spec ([#516](https://github.com/mojaloop/central-services-shared/issues/516)) ([4d29c23](https://github.com/mojaloop/central-services-shared/commit/4d29c23464ceaf31961991fa82d6ac986d47e4d4)), closes [mojaloop/project#4183](https://github.com/mojaloop/project/issues/4183)
+
 ### [18.35.6](https://github.com/mojaloop/central-services-shared/compare/v18.35.5...v18.35.6) (2026-02-26)
 
 
