@@ -18,6 +18,8 @@
     "GHSA-442j-39wm-28r2",
     "GHSA-44fc-8fm5-q62h",
     "GHSA-hf2r-9gf9-rwch",
-    "GHSA-48c2-rrv3-qjmp"
+    "GHSA-48c2-rrv3-qjmp",
+    "GHSA-r4q5-vmmm-2653", // follow-redirects
+    "GHSA-xq3m-2v4x-88gg"  // @mojaloop/event-sdk>protobufjs
   ]
 }
