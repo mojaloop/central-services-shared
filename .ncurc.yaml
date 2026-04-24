@@ -2,5 +2,6 @@
 reject: [
   # TODO: Added "@hapi/catbox-memory" to ncurc for dep:check to ignore updates due to breaking changes which should be handled by another story
   "@hapi/catbox-memory",
-  "ioredis" # version 5.7.0 caused failures of unit-tests in QS
+  "ioredis", # version 5.7.0 caused failures of unit-tests in QS
+  "undici"  # TODO: v7+ requires Node 20+, pin to v6 until Node upgraded
 ]
