@@ -20,6 +20,18 @@
     "GHSA-hf2r-9gf9-rwch",
     "GHSA-48c2-rrv3-qjmp",
     "GHSA-r4q5-vmmm-2653", // follow-redirects
-    "GHSA-xq3m-2v4x-88gg"  // @mojaloop/event-sdk>protobufjs
+    "GHSA-xq3m-2v4x-88gg",  // @mojaloop/event-sdk>protobufjs
+    "GHSA-2pr8-phx7-x9h3",
+    "GHSA-5wm8-gmm8-39j9",
+    "GHSA-66ff-xgx4-vchm",
+    "GHSA-685m-2w69-288q",
+    "GHSA-75px-5xx7-5xc7",
+    "GHSA-fx83-v9x8-x52w",
+    "GHSA-gh4j-gqv2-49f6",
+    "GHSA-jvwf-75h9-cwgg",
+    "GHSA-q3j6-qgpj-74h6",
+    "GHSA-q6x5-8v7m-xcrf",
+    "GHSA-qx2v-qp2m-jg93",
+    "GHSA-v39h-62p7-jpjc"
   ]
 }
