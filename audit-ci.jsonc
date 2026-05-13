@@ -27,7 +27,7 @@
     "GHSA-75px-5xx7-5xc7", // protobufjs - via @opentelemetry packages
     "GHSA-fx83-v9x8-x52w", // protobufjs - via @opentelemetry packages
     "GHSA-jvwf-75h9-cwgg", // protobufjs - via @opentelemetry packages
-    "GHSA-q6x5-8v7m-xcrf", // protobufjs - via @opentelemetry packages and @protobufjs/utf8
+    "GHSA-q6x5-8v7m-xcrf", // protobufjs and @protobufjs/utf8
     "GHSA-5wm8-gmm8-39j9", // fast-xml-builder
     "GHSA-gh4j-gqv2-49f6", // fast-xml-parser - via openapi-sampler
     "GHSA-q3j6-qgpj-74h6", // fast-uri
