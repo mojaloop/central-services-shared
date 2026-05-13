@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.36.0](https://github.com/mojaloop/central-services-shared/compare/v18.35.7...v18.36.0) (2026-05-13)
+
+
+### Features
+
+* add new endpoints for tppConsentRequest ([#519](https://github.com/mojaloop/central-services-shared/issues/519)) ([635a383](https://github.com/mojaloop/central-services-shared/commit/635a3830b22ee1e01914b9a17be6df802772dc3c))
+* add tppConsents request endpoints ([#520](https://github.com/mojaloop/central-services-shared/issues/520)) ([5fb9873](https://github.com/mojaloop/central-services-shared/commit/5fb98739f330736ca74d3a9934dbf971d4c46c0b))
+
 ### [18.35.7](https://github.com/mojaloop/central-services-shared/compare/v18.35.6...v18.35.7) (2026-04-07)
 
 
