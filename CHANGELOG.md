@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.36.1](https://github.com/mojaloop/central-services-shared/compare/v18.36.0...v18.36.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* issue 4297 aligning tpp accounts request naming ([#521](https://github.com/mojaloop/central-services-shared/issues/521)) ([da0335d](https://github.com/mojaloop/central-services-shared/commit/da0335d46fabe5547ba622c9d9a3f446936827e0))
+
 ## [18.36.0](https://github.com/mojaloop/central-services-shared/compare/v18.35.7...v18.36.0) (2026-05-13)
 
 
