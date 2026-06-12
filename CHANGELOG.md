@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.37.0](https://github.com/mojaloop/central-services-shared/compare/v18.36.1...v18.37.0) (2026-06-12)
+
+
+### Features
+
+* make maxsocket configurable so it doesnt use infinite number of sockets ([#4482](https://github.com/mojaloop/central-services-shared/issues/4482)) ([#522](https://github.com/mojaloop/central-services-shared/issues/522)) ([46e9e16](https://github.com/mojaloop/central-services-shared/commit/46e9e16cef638824bd17b8adfe95da27a12fc3cf))
+
 ### [18.36.1](https://github.com/mojaloop/central-services-shared/compare/v18.36.0...v18.36.1) (2026-05-18)
 
 
