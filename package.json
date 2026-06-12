@@ -32,7 +32,8 @@
     "lint",
     "test",
     "dep:check",
-    "audit:check"
+    "audit:check",
+    "license:check"
   ],
   "scripts": {
     "pretest": "npm run lint",
@@ -61,6 +62,7 @@
     "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
     "dep:check": "npx ncu -e 2",
     "dep:update": "npx ncu -u",
+    "license:check": "npx @mojaloop/license-scanner-tool .",
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
@@ -101,6 +103,7 @@
     "@mojaloop/central-services-metrics": "12.8.5",
     "@mojaloop/event-sdk": "14.8.4",
     "@opentelemetry/auto-instrumentations-node": "^0.77.0",
+    "@mojaloop/license-scanner-tool": "^1.0.0",
     "@types/hapi__joi": "17.1.15",
     "ajv": "8.20.0",
     "ajv-formats": "^3.0.1",
