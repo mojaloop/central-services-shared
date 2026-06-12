@@ -1,9 +1,7 @@
 scan-type: source
 disabled: false
 ignore:
-  - vulnerability: GHSA-rpr9-rxv7-x643
-    include-aliases: true
-    reason: "[05-16-2026][Critical][sanitize-html 2.12.1] No available fix. Apostrophe has default XSS via `xmp` raw-text passthrough in `sanitize-html"
+
 output:
   - table
   - json

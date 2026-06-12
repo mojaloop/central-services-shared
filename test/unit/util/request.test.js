@@ -626,6 +626,64 @@ Test('ParticipantEndpoint Model Test', modelTest => {
       test.end()
     })
 
+    const configStub = (overrides = {}) => ({
+      '@noCallThru': true,
+      get: (key) => ({
+        httpAgentKeepAlive: true,
+        httpAgentMaxSockets: 512,
+        httpAgentMaxFreeSockets: 512,
+        httpAgentKeepAliveMsecs: 30000,
+        httpRequestTimeoutMs: 20000,
+        ...overrides
+      })[key]
+    })
+
+    getEndpointTest.test('create bounded http and https agents from the config defaults', async (test) => {
+      request = sandbox.stub().returns(Helper.getEndPointsResponse)
+      Model = proxyquire('../../../src/util/request', { axios: request, '../config': configStub() })
+
+      for (const [name, agent] of [['http', request.defaults.httpAgent], ['https', request.defaults.httpsAgent]]) {
+        test.equal(agent.maxSockets, 512, `${name} maxSockets defaults to 512 (not Infinity)`)
+        test.equal(agent.maxFreeSockets, 512, `${name} maxFreeSockets defaults to 512`)
+        test.equal(agent.keepAliveMsecs, 30000, `${name} keepAliveMsecs defaults to 30000`)
+        test.ok(agent.keepAlive, `${name} keepAlive is enabled by default`)
+      }
+
+      test.end()
+    })
+
+    getEndpointTest.test('honor config values for the http and https agent socket pools', async (test) => {
+      request = sandbox.stub().returns(Helper.getEndPointsResponse)
+      Model = proxyquire('../../../src/util/request', {
+        axios: request,
+        '../config': configStub({
+          httpAgentMaxSockets: 1000,
+          httpAgentMaxFreeSockets: 256,
+          httpAgentKeepAliveMsecs: 60000,
+          httpAgentKeepAlive: false
+        })
+      })
+
+      for (const [name, agent] of [['http', request.defaults.httpAgent], ['https', request.defaults.httpsAgent]]) {
+        test.equal(agent.maxSockets, 1000, `${name} maxSockets honors httpAgentMaxSockets`)
+        test.equal(agent.maxFreeSockets, 256, `${name} maxFreeSockets honors httpAgentMaxFreeSockets`)
+        test.equal(agent.keepAliveMsecs, 60000, `${name} keepAliveMsecs honors httpAgentKeepAliveMsecs`)
+        test.notOk(agent.keepAlive, `${name} keepAlive honors httpAgentKeepAlive`)
+      }
+
+      test.end()
+    })
+
+    getEndpointTest.test('redact both the http and https agents from serialized request options', async (test) => {
+      request = sandbox.stub().returns(Helper.getEndPointsResponse)
+      Model = proxyquire('../../../src/util/request', { axios: request, '../config': configStub() })
+
+      test.same(request.defaults.httpAgent.toJSON(), {}, 'httpAgent.toJSON() is redacted to {}')
+      test.same(request.defaults.httpsAgent.toJSON(), {}, 'httpsAgent.toJSON() is redacted to {}')
+
+      test.end()
+    })
+
     getEndpointTest.end()
   })
 

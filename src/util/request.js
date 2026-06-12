@@ -30,6 +30,7 @@
 'use strict'
 
 const http = require('node:http')
+const https = require('node:https')
 const request = require('axios')
 const stringify = require('fast-safe-stringify')
 const EventSdk = require('@mojaloop/event-sdk')
@@ -47,12 +48,24 @@ const MISSING_FUNCTION_PARAMETERS = 'Missing parameters for function'
 // By default it would insert `"Accept":"application/json, text/plain, */*"`.
 delete request.defaults.headers.common.Accept
 
-const keepAlive = (process.env.HTTP_AGENT_KEEP_ALIVE ?? 'true') === 'true'
-logger.verbose('http keepAlive:', { keepAlive })
+// http.Agent defaults to maxSockets: Infinity / maxFreeSockets: 256,
+// which churns sockets open/close under sustained load).
+const keepAlive = config.get('httpAgentKeepAlive')
+const maxSockets = config.get('httpAgentMaxSockets')
+const maxFreeSockets = config.get('httpAgentMaxFreeSockets')
+const keepAliveMsecs = config.get('httpAgentKeepAliveMsecs')
 
-// Enable keepalive for http
-request.defaults.httpAgent = new http.Agent({ keepAlive })
+const agentOpts = { keepAlive, maxSockets, maxFreeSockets, keepAliveMsecs }
+logger.verbose('http keepAlive:', { keepAlive })
+logger.verbose('http agent options:', agentOpts)
+
+// Enable keepalive with a bounded connection pool for both http and https outbound
+// requests, so https:// callback URLs get the same socket pooling as http:// ones
+// (axios otherwise falls back to a default https.Agent with maxSockets: Infinity).
+request.defaults.httpAgent = new http.Agent(agentOpts)
 request.defaults.httpAgent.toJSON = () => ({})
+request.defaults.httpsAgent = new https.Agent(agentOpts)
+request.defaults.httpsAgent.toJSON = () => ({})
 
 /**
  * @function sendRequest

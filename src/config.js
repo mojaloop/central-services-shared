@@ -20,6 +20,30 @@ const config = convict({
     format: Number,
     default: 20000,
     env: 'SHARED_HTTP_REQUEST_TIMEOUT_MS'
+  },
+  httpAgentKeepAlive: {
+    doc: 'Enable HTTP keep-alive for the shared outbound http agent.',
+    format: Boolean,
+    default: true,
+    env: 'HTTP_AGENT_KEEP_ALIVE'
+  },
+  httpAgentMaxSockets: {
+    doc: 'Maximum number of sockets per host for the shared outbound http agent.',
+    format: Number,
+    default: 512,
+    env: 'HTTP_AGENT_MAX_SOCKETS'
+  },
+  httpAgentMaxFreeSockets: {
+    doc: 'Maximum number of idle sockets kept open for the shared outbound http agent.',
+    format: Number,
+    default: 512,
+    env: 'HTTP_AGENT_MAX_FREE_SOCKETS'
+  },
+  httpAgentKeepAliveMsecs: {
+    doc: 'Keep-alive interval in milliseconds for the shared outbound http agent.',
+    format: Number,
+    default: 30000,
+    env: 'HTTP_AGENT_KEEP_ALIVE_MSECS'
   }
 })
 
