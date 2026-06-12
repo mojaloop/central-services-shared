@@ -4,10 +4,5 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
-    /** 
-      [05-16-2026] - No fix available for this vulnerability
-      Apostrophe has default XSS via `xmp` raw-text passthrough in `sanitize-html`
-    **/
-    "GHSA-rpr9-rxv7-x643"
   ]
 }

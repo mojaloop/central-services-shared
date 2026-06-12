@@ -7,6 +7,21 @@
 
 Shared code for central services
 
+## Configuration
+
+### Outbound HTTP agent
+
+The shared `sendRequest` helper (`src/util/request.js`) configures the default outbound `http.Agent` with a **bounded** connection pool to prevent outbound connection churn under sustained high load. The pool is configurable via the following environment variables:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `HTTP_AGENT_KEEP_ALIVE` | `true` | Whether to keep sockets alive for reuse. Set to `false` to disable. |
+| `HTTP_AGENT_MAX_SOCKETS` | `512` | Maximum number of sockets per host. Bounds the pool so bursty concurrency queues requests instead of opening unbounded sockets (node's default is `Infinity`). |
+| `HTTP_AGENT_MAX_FREE_SOCKETS` | `512` | Maximum number of idle (free) sockets kept warm per host (node's default is `256`). |
+| `HTTP_AGENT_KEEP_ALIVE_MSECS` | `30000` | Initial delay (ms) for TCP Keep-Alive packets on kept-alive sockets. |
+
+Numeric values are parsed with `Number(...)` and fall back to the defaults above when unset or non-numeric.
+
 ## CI/CD
 
 This repository uses the [mojaloop/build](https://github.com/mojaloop/ci-config-orb-build) CircleCI orb for standardized CI/CD workflows, including automated Grype vulnerability scanning for source code security.
