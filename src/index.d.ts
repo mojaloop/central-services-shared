@@ -255,9 +255,6 @@ declare namespace CentralServicesShared {
       TP_SERVICES_GET: string;
       TP_SERVICES_PUT: string;
       TP_SERVICES_PUT_ERROR: string;
-      TPP_TRANSFERS_POST: string;
-      TPP_TRANSFERS_GET: string;
-      TPP_TRANSFERS_PUT_ERROR: string;
     };
   }
 
