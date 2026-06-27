@@ -26,6 +26,7 @@
  * Miguel de Barros <miguel.debarros@modusbox.com>
  * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  * Steven Oderayi <steven.oderayi@modusbox.com>
+ * Justin Theodorus <justin.theodorus@gmail.com>
  --------------
  ******/
 
@@ -196,7 +197,10 @@ const FspEndpointTemplates = {
   TPP_CONSENTS_GET: '/tppConsents/{{ID}}',
   TPP_CONSENTS_PUT: '/tppConsents/{{ID}}',
   TPP_CONSENTS_PUT_ERROR: '/tppConsents/{{ID}}/error',
-  TPP_CONSENTS_DELETE: '/tppConsents/{{ID}}'
+  TPP_CONSENTS_DELETE: '/tppConsents/{{ID}}',
+  TPP_TRANSFERS_POST: '/tppTransfers',
+  TPP_TRANSFERS_GET: '/tppTransfers/{{ID}}',
+  TPP_TRANSFERS_PUT_ERROR: '/tppTransfers/{{ID}}/error'
 }
 
 module.exports = {
