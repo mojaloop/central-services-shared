@@ -23,6 +23,7 @@
  - Name Surname <name.surname@mojaloop.io>
 
  * Eugen Klymniuk <eugen.klymniuk@infitx.com>
+ * Samarth Bhatia <bhatia.samarth.03@mail.com> [Assisted by {Claude Sonnet 4.6}]
  --------------
  **********/
 /* istanbul ignore file */
