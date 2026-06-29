@@ -34,6 +34,9 @@ const { logger } = require('../../../logger')
 const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(',') : ['/health', '/metrics', '/live']
 const TRACE_ID_HEADER = env.LOG_TRACE_ID_HEADER ?? 'traceid'
 
+const isStream = (val) => val !== null && typeof val === 'object' && typeof val.pipe === 'function'
+const sanitisePayload = (payload) => (isStream(payload) || payload === null) ? undefined : payload
+
 const loggingPlugin = {
   name: 'loggingPlugin',
   version: '1.0.0',
@@ -67,7 +70,7 @@ const loggingPlugin = {
         asyncStorage.enterWith({ requestId })
 
         if (shouldLog(path)) {
-          log.info(`[==> req] ${method.toUpperCase()} ${path}`, { headers, payload, query, remoteAddress })
+          log.info(`[==> req] ${method.toUpperCase()} ${path}`, { headers, payload: sanitisePayload(payload), query, remoteAddress })
         }
         return h.continue
       }
@@ -86,7 +89,7 @@ const loggingPlugin = {
           const { output } = response
           const respTimeSec = ((Date.now() - received) / 1000).toFixed(1)
 
-          log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path} [${respTimeSec} sec]`, { payload, output })
+          log.info(`[<== ${statusCode}] ${method.toUpperCase()} ${path} [${respTimeSec} sec]`, { payload: sanitisePayload(payload), output })
         }
         return h.continue
       }

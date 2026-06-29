@@ -165,5 +165,32 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     // requestId: "1733825870277:eugen-laptop:930049:m4ib5nli:10000__x-123456"
   }))
 
+  pluginTests.test('should not log stream payload on DELETE request (onRequest)', tryCatchEndTest(async t => {
+    server = await createHapiServer({ log })
+    await server.route({
+      method: 'DELETE',
+      path: '/participants/{Type}/{ID}',
+      handler: async (request, h) => h.response().code(202)
+    })
+    await server.inject({ method: 'DELETE', url: '/participants/MSISDN/12345678' })
+
+    const onRequestCall = log.info.firstCall
+    const loggedPayload = onRequestCall.lastArg.payload
+    t.equal(loggedPayload, undefined, 'stream payload is not logged on inbound DELETE request')
+  }))
+
+  pluginTests.test('should not log stream payload on DELETE response (onPreResponse)', tryCatchEndTest(async t => {
+    server = await createHapiServer({ log })
+    await server.route({
+      method: 'DELETE',
+      path: '/participants/{Type}/{ID}',
+      handler: async (request, h) => h.response().code(202)
+    })
+    await server.inject({ method: 'DELETE', url: '/participants/MSISDN/12345678' })
+
+    const onPreResponseCall = log.info.lastCall
+    const loggedPayload = onPreResponseCall.lastArg.payload
+    t.equal(loggedPayload, undefined, 'stream payload is not logged on DELETE response')
+  }))
   pluginTests.end()
 })
