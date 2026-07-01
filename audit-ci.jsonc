@@ -4,5 +4,15 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
+    // GHSA-h67p-54hq-rp68 — js-yaml quadratic-complexity DoS via merge keys.
+    // Dev-only path: nyc (>@istanbuljs/load-nyc-config) and tap-xunit (>tap-parser), both test tooling.
+    // No non-breaking fix: the fixed js-yaml@4.2.0 cannot be overridden onto the ^3.x consumers without breaking their API.
+    // Not in the published runtime surface. TODO: revisit when nyc/tap-xunit ship a patched js-yaml.
+    "GHSA-h67p-54hq-rp68",
+    // GHSA-6v5v-wf23-fmfq — markdown-it smartquotes quadratic-complexity DoS.
+    // Dev-only path: shins / markdown-it-attrs (OpenAPI doc generation).
+    // npm reports "No fix available": markdown-it-attrs caps markdown-it below the patched range.
+    // Not in the published runtime surface. TODO: revisit when shins/widdershins update markdown-it.
+    "GHSA-6v5v-wf23-fmfq"
   ]
 }
