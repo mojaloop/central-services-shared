@@ -1,7 +1,10 @@
 scan-type: source
 disabled: false
 ignore:
-
+  # GHSA-22p9-wv53-3rq4: linkify-it<=5.0.0 - ReDoS, no fix available upstream, dev-only doc-generation tooling (shins/widdershins), not reachable at runtime. Review by: 2026-10-01
+  - vulnerability: GHSA-22p9-wv53-3rq4
+  # GHSA-6v5v-wf23-fmfq: markdown-it<=14.1.1 - quadratic DoS in smartquotes, no fix available upstream, dev-only doc-generation tooling (shins/widdershins), not reachable at runtime. Review by: 2026-10-01
+  - vulnerability: GHSA-6v5v-wf23-fmfq
 output:
   - table
   - json
