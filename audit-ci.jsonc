@@ -8,30 +8,6 @@
     // Dev-only path: nyc (>@istanbuljs/load-nyc-config) and tap-xunit (>tap-parser), both test tooling.
     // No non-breaking fix: the fixed js-yaml@4.2.0 cannot be overridden onto the ^3.x consumers without breaking their API.
     // Not in the published runtime surface. TODO: revisit when nyc/tap-xunit ship a patched js-yaml.
-    "GHSA-h67p-54hq-rp68",
-    // GHSA-hmw2-7cc7-3qxx — form-data CRLF injection via unescaped multipart field names.
-    // Transitive via axios and httpsnippet. Awaiting upstream fix.
-    "GHSA-hmw2-7cc7-3qxx",
-    // GHSA-p88m-4jfj-68fv — undici HTTP header injection via Set-Cookie percent-decoding.
-    // Transitive via cheerio. Awaiting upstream fix.
-    "GHSA-p88m-4jfj-68fv",
-    // GHSA-vxpw-j846-p89q — undici WebSocket DoS via fragment count bypass.
-    // Transitive via cheerio. Awaiting upstream fix.
-    "GHSA-vxpw-j846-p89q",
-    // GHSA-wcpc-wj8m-hjx6 — protobufjs memory amplification in binary decode.
-    // Transitive via @mojaloop/event-sdk > @grpc/proto-loader. Awaiting upstream fix.
-    "GHSA-wcpc-wj8m-hjx6",
-    // GHSA-94rc-8x27-4472 — protobufjs schema-derived name shadowing.
-    // Transitive via @mojaloop/event-sdk > @grpc/proto-loader. Awaiting upstream fix.
-    "GHSA-94rc-8x27-4472",
-    // GHSA-f38q-mgvj-vph7 — protobufjs DoS via unbounded Any expansion.
-    // Transitive via @mojaloop/event-sdk > @grpc/proto-loader. Awaiting upstream fix.
-    "GHSA-f38q-mgvj-vph7",
-    // GHSA-22p9-wv53-3rq4 — linkify-it quadratic complexity DoS.
-    // Transitive via markdown-it / shins / widdershins (doc tooling only). Awaiting upstream fix.
-    "GHSA-22p9-wv53-3rq4",
-    // GHSA-6v5v-wf23-fmfq — markdown-it quadratic complexity DoS.
-    // Transitive via shins / widdershins (doc tooling only). Awaiting upstream fix.
-    "GHSA-6v5v-wf23-fmfq"
+    "GHSA-h67p-54hq-rp68"
   ]
 }
