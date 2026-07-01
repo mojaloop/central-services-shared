@@ -4,5 +4,14 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
+    "GHSA-22p9-wv53-3rq4", // linkify-it: quadratic complexity DoS — transitive via markdown-it/shins/widdershins (doc tooling only, not runtime)
+    "GHSA-6v5v-wf23-fmfq", // markdown-it: quadratic complexity DoS — transitive via shins/widdershins (doc tooling only, not runtime)
+    "GHSA-94rc-8x27-4472", // protobufjs: schema-derived name shadowing — transitive via @mojaloop/event-sdk, awaiting upstream fix
+    "GHSA-f38q-mgvj-vph7", // protobufjs: DoS via unbounded Any expansion — transitive via @mojaloop/event-sdk, awaiting upstream fix
+    "GHSA-h67p-54hq-rp68", // js-yaml: quadratic complexity DoS in merge key handling — transitive dependency, awaiting upstream fix
+    "GHSA-hmw2-7cc7-3qxx", // form-data: CRLF injection — transitive via axios/httpsnippet, awaiting upstream fix
+    "GHSA-p88m-4jfj-68fv", // undici: HTTP header injection via Set-Cookie — transitive via cheerio, awaiting upstream fix
+    "GHSA-vxpw-j846-p89q", // undici: WebSocket DoS via fragment count bypass — transitive via cheerio, awaiting upstream fix
+    "GHSA-wcpc-wj8m-hjx6"  // protobufjs: memory amplification in binary decode — transitive via @mojaloop/event-sdk, awaiting upstream fix
   ]
 }
