@@ -28,7 +28,7 @@
 
 const Mustache = require('mustache')
 const Catbox = require('@hapi/catbox')
-const CatboxMemory = require('@hapi/catbox-memory')
+const { Engine: CatboxMemory } = require('@hapi/catbox-memory')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Logger = require('@mojaloop/central-services-logger')
 const Metrics = require('@mojaloop/central-services-metrics')

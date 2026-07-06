@@ -31,7 +31,7 @@
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const Metrics = require('@mojaloop/central-services-metrics')
 const Catbox = require('@hapi/catbox')
-const CatboxMemory = require('@hapi/catbox-memory')
+const { Engine: CatboxMemory } = require('@hapi/catbox-memory')
 const Mustache = require('mustache')
 
 const logger = require('../logger').logger.child({ component: 'participantCache' })
