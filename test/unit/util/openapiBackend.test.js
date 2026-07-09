@@ -96,6 +96,44 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
       }
     })
 
+    validationFailTest.test('select a specific validation error over a generic anyOf branch error', async (test) => {
+      const context = {
+        validation: {
+          errors: [
+            {
+              instancePath: '/requestBody/CdtTrfTxInf/Dbtr/Id',
+              keyword: 'required',
+              params: { missingProperty: 'OrgId' },
+              message: "must have required property 'OrgId'"
+            },
+            {
+              instancePath: '/requestBody/CdtTrfTxInf/Dbtr/Id/PrvtId/DtAndPlcOfBirth/CtryOfBirth',
+              keyword: 'pattern',
+              params: { pattern: '^[A-Z]{2,2}$' },
+              message: 'must match pattern "^[A-Z]{2,2}$"'
+            },
+            {
+              instancePath: '/requestBody/CdtTrfTxInf/Dbtr/Id',
+              keyword: 'anyOf',
+              params: {},
+              message: 'must match a schema in anyOf'
+            }
+          ]
+        }
+      }
+
+      try {
+        await OpenapiBackend.validationFail(context)
+        test.fail('Expected validationFail to throw')
+      } catch (err) {
+        test.equal(err.apiErrorCode.code, '3100', 'errorCode returned 3100')
+        test.match(err.message, /CtryOfBirth/, 'error message contains specific field')
+        test.notOk(err.message.includes('OrgId'), 'error message does not contain misleading branch error')
+      }
+
+      test.end()
+    })
+
     validationFailTest.end()
   })
 
