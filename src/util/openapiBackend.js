@@ -73,7 +73,7 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
  * @param context {Object} - the OpenAPI backend context
  * @throws {FSPIOPError}
  */
-const selectRelevantValidationError = (errors = []) => {
+const selectRelevantValidationError = (errors) => {
   return errors.find(e =>
     ['pattern', 'format', 'enum', 'type', 'minLength', 'maxLength', 'minimum', 'maximum'].includes(e.keyword)
   ) || errors[0]

@@ -134,6 +134,38 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
       test.end()
     })
 
+    validationFailTest.test('preserve original behaviour when no specific validation error is present', async (test) => {
+      const context = {
+        validation: {
+          errors: [
+            {
+              instancePath: '/requestBody/CdtTrfTxInf/Dbtr/Id',
+              keyword: 'required',
+              params: { missingProperty: 'OrgId' },
+              message: "must have required property 'OrgId'"
+            },
+            {
+              instancePath: '/requestBody/CdtTrfTxInf/Dbtr/Id',
+              keyword: 'anyOf',
+              params: {},
+              message: 'must match a schema in anyOf'
+            }
+          ]
+        }
+      }
+
+      try {
+        await OpenapiBackend.validationFail(context)
+        test.fail('Expected validationFail to throw')
+      } catch (err) {
+        test.equal(err.apiErrorCode.code, '3102', 'errorCode returned 3102')
+        test.match(err.message, /OrgId/, 'error message contains first validation error')
+        test.notOk(err.message.includes('anyOf'), 'error message does not use generic anyOf error')
+      }
+
+      test.end()
+    })
+
     validationFailTest.end()
   })
 
