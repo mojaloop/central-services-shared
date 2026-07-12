@@ -1,7 +1,6 @@
 'use strict'
 
 const assert = require('assert').strict
-const _ = require('lodash')
 const { API_TYPES } = require('../../constants')
 const { isoHeaderPart } = require('../helpers')
 
@@ -81,22 +80,29 @@ const parseAcceptHeader = (resource, header, apiType = API_TYPES.fspiop) => {
 }
 
 const convertSupportedVersionToExtensionList = (supportedVersions) => {
-  const supportedVersionsExtensionListMap = []
+  const extensionSet = {}
   for (const version of supportedVersions) {
     const versionList = version.toString().split('.').filter(num => num !== '')
-    if (versionList != null && versionList.length === 2) {
+    if (!versionList) {
+      continue
+    }
+
+    if (versionList.length === 2) {
       const versionMap = {}
       versionMap.key = versionList[0]
       versionMap.value = versionList[1]
-      supportedVersionsExtensionListMap.push(versionMap)
-    } else if (versionList != null && versionList.length === 1 && version !== protocolVersions.anyVersion) {
+      extensionSet[`${versionMap.key}_${versionMap.value}`] = versionMap
+      continue
+    }
+
+    if (versionList.length === 1 && version !== protocolVersions.anyVersion) {
       const versionMap = {}
       versionMap.key = versionList[0]
       versionMap.value = '0'
-      supportedVersionsExtensionListMap.push(versionMap)
+      extensionSet[`${versionMap.key}_${versionMap.value}`] = versionMap
     }
   }
-  return _.uniqWith(supportedVersionsExtensionListMap, _.isEqual)
+  return Object.values(extensionSet)
 }
 
 let hubNameRegex

@@ -29,7 +29,6 @@
  ******/
 
 const Enum = require('../../enums')
-const _ = require('lodash')
 
 /**
  * Method to get span tags
@@ -43,7 +42,9 @@ const _ = require('lodash')
  */
 
 const getTransferSpanTags = ({ payload, headers, params }, transactionType, transactionAction) => {
-  const headersLowerCase = _.mapKeys(headers, function (v, k) { return k.toLowerCase() })
+  const headersLowerCase = Object.fromEntries(
+    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value])
+  )
   const tags = {
     transactionType,
     transactionAction,

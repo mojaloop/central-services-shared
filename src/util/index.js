@@ -30,8 +30,6 @@
  ******/
 'use strict'
 
-const _ = require('lodash')
-
 const Kafka = require('./kafka')
 const Endpoints = require('./endpoints')
 const Participants = require('./participants')
@@ -58,11 +56,19 @@ const createLogger = require('./createLogger')
 const distLock = require('./distLock')
 
 const omitNil = (object) => {
-  return _.omitBy(object, _.isNil)
+  return Object.fromEntries(
+    Object.entries(object)
+      .filter(([_, value]) => value !== null)
+  )
 }
 
 const pick = (object, properties) => {
-  return _.pick(object, properties)
+  return properties.reduce((result, key) => {
+    if (key in object) {
+      result[key] = object[key]
+    }
+    return result
+  }, {})
 }
 
 const assign = (target, source) => {
@@ -94,11 +100,14 @@ const parseJson = (value) => {
 }
 
 const squish = (array) => {
-  return _.join(array, '|')
+  return array.join('|')
 }
 
 const expand = (value) => {
-  return (value) ? _.split(value, '|') : value
+  if (value === null) {
+    return null
+  }
+  return value.split('|')
 }
 
 const filterUndefined = (fields) => {
@@ -113,14 +122,12 @@ const filterUndefined = (fields) => {
 /**
  * Method to provide object cloning
  *
- * TODO:
- *  Implement a better deep copy method
  *
  * @param value
  * @returns {any}
  */
 const clone = (value) => {
-  return _.cloneDeep(value)
+  return structuredClone(value)
 }
 
 /**
