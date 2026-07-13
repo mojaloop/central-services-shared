@@ -30,7 +30,7 @@
  ******/
 'use strict'
 
-const getRawBody = require('raw-body')
+const { buffer } = require('node:stream/consumers')
 const ErrorHandler = require('@mojaloop/central-services-error-handling')
 const { logger } = require('../../../logger')
 const { encodePayload } = require('../../streaming/protocol')
@@ -76,7 +76,7 @@ module.exports.plugin = {
         method: async (request, h) => {
           /* istanbul ignore next */
           if (request.payload) {
-            return getRawBody(request.payload)
+            return buffer(request.payload)
               .then(rawBuffer => {
                 if (Buffer.byteLength(rawBuffer) !== 0) {
                   request = requestRawPayloadTransform(request, rawBuffer)
