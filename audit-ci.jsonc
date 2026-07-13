@@ -7,12 +7,6 @@
     // GHSA-22p9-wv53-3rq4: linkify-it<=5.0.0 (via markdown-it>shins/widdershins) - ReDoS, no fix available upstream, dev-only doc-generation tooling, not reachable at runtime. Review by: 2026-10-01
     "GHSA-22p9-wv53-3rq4",
     // GHSA-6v5v-wf23-fmfq: markdown-it<=14.1.1 (via shins/widdershins) - quadratic DoS in smartquotes, no fix available upstream, dev-only doc-generation tooling, not reachable at runtime. Review by: 2026-10-01
-    "GHSA-6v5v-wf23-fmfq",
-    // GHSA-f38q-mgvj-vph7: protobufjs 8.0.0-8.5.0 (via @mojaloop/event-sdk>@grpc/proto-loader) - schema name shadowing, fix requires breaking event-sdk major bump. Review by: 2026-10-01
-    "GHSA-f38q-mgvj-vph7",
-    // GHSA-wcpc-wj8m-hjx6: protobufjs 8.0.0-8.4.0 (via @mojaloop/event-sdk>@grpc/proto-loader) - unbounded Any expansion DoS, fix requires breaking event-sdk major bump. Review by: 2026-10-01
-    "GHSA-wcpc-wj8m-hjx6",
-    // GHSA-94rc-8x27-4472: protobufjs 8.2.0-8.4.2 (via @mojaloop/event-sdk>@grpc/proto-loader) - memory amplification in binary decode, fix requires breaking event-sdk major bump. Review by: 2026-10-01
-    "GHSA-94rc-8x27-4472"
+    "GHSA-6v5v-wf23-fmfq"
   ]
 }
