@@ -39,11 +39,13 @@ const { tryCatchEndTest } = require('#test/util/helper')
 const createHapiServer = async ({
   log,
   internalRoutes,
-  handler = async () => true
+  handler = async () => true,
+  payload // optional payload routing
 }) => {
   const server = Hapi.server({
     host: 'localhost',
-    port: await getPortPromise()
+    port: await getPortPromise(),
+    ...(payload ? { routes: { payload } } : {})
   })
 
   await server.register({
@@ -166,32 +168,42 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     // requestId: "1733825870277:eugen-laptop:930049:m4ib5nli:10000__x-123456"
   }))
 
-  pluginTests.test('should not log stream payload on DELETE request (onRequest)', tryCatchEndTest(async t => {
-    server = await createHapiServer({ log })
-    await server.route({
+  pluginTests.test('should not log stream payload (onRequest)', tryCatchEndTest(async t => {
+    server = await createHapiServer({ log, payload: { output: 'stream', parse: true } })
+    server.route({
       method: 'DELETE',
       path: '/participants/{Type}/{ID}',
-      handler: async (request, h) => h.response().code(202)
+      handler: async (request, h) => {
+        // precondition: without the fix this is exactly what leaks
+        t.equal(typeof request.payload?.pipe, 'function', 'payload is a stream')
+        return h.response().code(202)
+      }
     })
-    await server.inject({ method: 'DELETE', url: '/participants/MSISDN/12345678' })
+    await server.inject({
+      method: 'DELETE',
+      url: '/participants/MSISDN/12345678',
+      headers: { 'content-type': 'application/json' },
+      payload: JSON.stringify({ any: 'body' })   // forces payload to be a stream
+    })
 
-    const onRequestCall = log.info.firstCall
-    const loggedPayload = onRequestCall.lastArg.payload
-    t.equal(loggedPayload, undefined, 'stream payload is not logged on inbound DELETE request')
+    t.equal(log.info.firstCall.lastArg.payload, undefined, 'stream payload not logged on inbound request')
   }))
 
-  pluginTests.test('should not log stream payload on DELETE response (onPreResponse)', tryCatchEndTest(async t => {
-    server = await createHapiServer({ log })
-    await server.route({
+  pluginTests.test('should not log stream payload (onPreResponse)', tryCatchEndTest(async t => {
+    server = await createHapiServer({ log, payload: { output: 'stream', parse: true } })
+    server.route({
       method: 'DELETE',
       path: '/participants/{Type}/{ID}',
       handler: async (request, h) => h.response().code(202)
     })
-    await server.inject({ method: 'DELETE', url: '/participants/MSISDN/12345678' })
+    await server.inject({
+      method: 'DELETE',
+      url: '/participants/MSISDN/12345678',
+      headers: { 'content-type': 'application/json' },
+      payload: JSON.stringify({ any: 'body' })
+    })
 
-    const onPreResponseCall = log.info.lastCall
-    const loggedPayload = onPreResponseCall.lastArg.payload
-    t.equal(loggedPayload, undefined, 'stream payload is not logged on DELETE response')
+    t.equal(log.info.lastCall.lastArg.payload, undefined, 'stream payload not logged on response')
   }))
   pluginTests.end()
 })
