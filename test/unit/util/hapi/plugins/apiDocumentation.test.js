@@ -34,7 +34,9 @@ const Test = require('tapes')(require('tape'))
 const Path = require('path')
 
 const APIDocPlugin = require('../../../../../src/util/hapi/plugins/apiDocumentation')
-const OpenAPIDocPath = Path.resolve(__dirname, '../../../../resources/interface/swagger.yaml')
+const OpenAPIDocPathYaml = Path.resolve(__dirname, '../../../../resources/interface/swagger.yaml')
+const OpenAPIDocPathJsonValid = Path.resolve(__dirname, 'test_swagger_valid.json')
+const OpenAPIDocPathJsonInvalid = Path.resolve(__dirname, 'test_swagger_invalid_json')
 
 Test('API Documentation plugin should', async (pluginTest) => {
   let server
@@ -55,7 +57,7 @@ Test('API Documentation plugin should', async (pluginTest) => {
   await pluginTest.test('return API documentation in HTML format', async assert => {
     try {
       await server.register(
-        { plugin: APIDocPlugin, options: { documentPath: OpenAPIDocPath } }
+        { plugin: APIDocPlugin, options: { pathToSwaggerFile: OpenAPIDocPathYaml } }
       )
 
       await server.start()
@@ -66,7 +68,7 @@ Test('API Documentation plugin should', async (pluginTest) => {
       })
 
       assert.equal(response.statusCode, 200, 'status code is correct')
-      assert.ok(response.payload.indexOf('<html ') >= 0)
+      assert.ok(response.payload.indexOf('<!DOCTYPE html') >= 0)
       assert.end()
     } catch (e) {
       console.log(e)
@@ -78,7 +80,7 @@ Test('API Documentation plugin should', async (pluginTest) => {
   await pluginTest.test('return API spec in JSON format', async assert => {
     try {
       await server.register(
-        { plugin: APIDocPlugin, options: { documentPath: OpenAPIDocPath } }
+        { plugin: APIDocPlugin, options: { pathToSwaggerFile: OpenAPIDocPathYaml } }
       )
 
       await server.start()
@@ -94,6 +96,46 @@ Test('API Documentation plugin should', async (pluginTest) => {
     } catch (e) {
       console.log(e)
       assert.fail()
+      assert.end()
+    }
+  })
+
+  await pluginTest.test('handles json input', async assert => {
+    try {
+      await server.register(
+        { plugin: APIDocPlugin, options: { pathToSwaggerFile: OpenAPIDocPathJsonValid } }
+      )
+
+      await server.start()
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/swagger.json'
+      })
+
+      assert.equal(response.statusCode, 200, 'status code is correct')
+      assert.ok(JSON.parse(response.payload))
+      assert.end()
+    } catch (e) {
+      console.log(e)
+      assert.fail()
+      assert.end()
+    }
+  })
+
+  await pluginTest.test('handles invalid json', async assert => {
+    try {
+      await server.register({
+        plugin: APIDocPlugin,
+        options: {
+          pathToSwaggerFile: OpenAPIDocPathJsonInvalid
+        }
+      })
+
+      assert.notOk('Should throw errow')
+      assert.end()
+    } catch (e) {
+      assert.ok('Error thrown')
       assert.end()
     }
   })

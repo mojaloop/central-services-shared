@@ -23,23 +23,46 @@
  - Name Surname <name.surname@mojaloop.io>
 
  * Steven Oderayi <steven.oderayi@modusbox.com>
+ * Lewis Daly     <lewis@tigerbeetle.com>
  --------------
  ******/
 'use strict'
 
-const APIDocBuilder = require('../../documentation').APIDocBuilder
+const assert = require('node:assert')
+const fs = require('node:fs')
+const yaml = require('yaml')
 
 /**
  * Hapi plugin to add '/swagger.json' and '/documentation' endpoints.
- * It generates API documentation from supplied OpenAPI spec (json or yaml).
+ * Embeds a small html page which uses @scalar/api-reference to render the documentation.
  *
- * options.documentPath - Full path to the OpenAPI (fka Swagger) document (JSON or YAML). Mutually exclusive to `document` option.
- * options.document     - OpenAPI document as string. Mutually exclusive to `documentPath` option.
+ * options.pathToSwaggerFile - Full path to the OpenAPI (fka Swagger) document (JSON or YAML).
  */
 const plugin = {
   name: 'apiDocumentation',
-  register: function (server, options) {
-    if (!options.documentPath && !options.document) throw new Error('API documentation plugin requires `options.documentPath` or `options.document` to be set.')
+  register: (server, options) => {
+    assert(options.pathToSwaggerFile, 'Expected `options.pathToSwaggerFile`.')
+
+    // Check the file exists.
+    let file
+    let contents
+    try {
+      file = fs.readFileSync(options.pathToSwaggerFile)
+      contents = parseJsonOrYaml(file.toString())
+    } catch (err) {
+      const errorMessage = `documentation - failed to read pathToSwaggerFile with error: ${err.message}`
+      console.error(errorMessage)
+      throw new Error(errorMessage)
+    }
+
+    const page = `<!DOCTYPE html>
+    <html>
+    <head><title>API Docs</title></head>
+    <body>
+      <script id="api-reference" data-url="/swagger.json"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    </body>
+    </html>`
 
     server.route([
       {
@@ -47,7 +70,9 @@ const plugin = {
         path: '/swagger.json',
         options: {
           tags: ['api', 'documentation'],
-          handler: swaggerJSONHandler,
+          handler: (request, h) => {
+            return h.response(contents).type('application/json')
+          },
           plugins: {
             apiDocumentation: false
           }
@@ -58,7 +83,10 @@ const plugin = {
         path: '/documentation',
         options: {
           tags: ['api', 'documentation'],
-          handler: documentationHandler,
+          handler: (_request, h) => {
+            return h.response(page)
+              .type('text/html')
+          },
           plugins: {
             apiDocumentation: false
           }
@@ -68,14 +96,22 @@ const plugin = {
   }
 }
 
-const documentationHandler = async (_, h) => {
-  return h.response(await APIDocBuilder.generateDocumentation(h.realm.pluginOptions))
-}
+/**
+ * Json parse, then yaml parse, otherwise throw
+ */
+const parseJsonOrYaml = (text) => {
+  assert(text)
+  try {
+    return JSON.parse(text)
+  } catch (_) {
+  }
+  try {
+    return yaml.parse(text)
+  } catch (_) {
 
-const swaggerJSONHandler = (_, h) => {
-  return h
-    .response(APIDocBuilder.swaggerJSON(h.realm.pluginOptions))
-    .header('content-type', 'application/json')
+  }
+
+  throw new Error('parseJsonOrYaml text was neither JSON nor YAML.')
 }
 
 module.exports = { plugin }

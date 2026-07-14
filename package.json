@@ -86,10 +86,8 @@
     "openapi-backend": "5.18.0",
     "rc": "1.2.8",
     "redlock": "5.0.0-beta.2",
-    "shins": "2.6.0",
     "ulidx": "2.4.1",
     "uuid4": "2.0.3",
-    "widdershins": "4.0.1",
     "yaml": "2.9.0"
   },
   "devDependencies": {
