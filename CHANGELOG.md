@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.38.0](https://github.com/mojaloop/central-services-shared/compare/v18.37.0...v18.38.0) (2026-07-14)
+
+
+### Features
+
+* remove widdershins based swagger documentation with simple html page ([#529](https://github.com/mojaloop/central-services-shared/issues/529)) ([0864a13](https://github.com/mojaloop/central-services-shared/commit/0864a136dce2b3bb5ade3bd6e85ed2bd38f020b4))
+
+
+### Refactors
+
+* remove lodash, replace with native functions ([#530](https://github.com/mojaloop/central-services-shared/issues/530)) ([6a8707d](https://github.com/mojaloop/central-services-shared/commit/6a8707df9ed2a29eab8efac3925e8b786d929e0e))
+
 ## [18.37.0](https://github.com/mojaloop/central-services-shared/compare/v18.36.1...v18.37.0) (2026-06-12)
 
 
