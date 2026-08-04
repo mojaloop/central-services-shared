@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.38.2](https://github.com/mojaloop/central-services-shared/compare/v18.38.1...v18.38.2) (2026-08-04)
+
+
+### Tests
+
+* fix flaky time test ([#531](https://github.com/mojaloop/central-services-shared/issues/531)) ([7f016de](https://github.com/mojaloop/central-services-shared/commit/7f016de0854566ba87d2789f41c38a0d318ca975))
+
 ### [18.38.1](https://github.com/mojaloop/central-services-shared/compare/v18.38.0...v18.38.1) (2026-08-03)
 
 
