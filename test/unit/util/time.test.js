@@ -58,7 +58,7 @@ Test('Time', async (timeTest) => {
       Model.sleep()
       const delay = new Date() - start
       // no upper-bound assertion: wall-clock limits on a busy-wait are not enforceable on shared CI runners
-      test.ok(defaultDelay <= delay, `pa4se script execution by default delay of ${defaultDelay} ms`)
+      test.ok(defaultDelay <= delay, `parse script execution by default delay of ${defaultDelay} ms`)
       test.end()
     } catch (err) {
       Logger.error(`sleep failed with error - ${err}`)
@@ -75,7 +75,7 @@ Test('Time', async (timeTest) => {
       const start = new Date()
       Model.sleep(testDelay, debug)
       const delay = new Date() - start
-      test.ok(testDelay <= delay, `pa4se script execution with given delay of ${testDelay} ms in debug mode`)
+      test.ok(testDelay <= delay, `parse script execution with given delay of ${testDelay} ms in debug mode`)
       test.end()
     } catch (err) {
       Logger.error(`sleep failed with error - ${err}`)
@@ -94,7 +94,7 @@ Test('Time', async (timeTest) => {
       const start = new Date()
       Model.sleep(testDelay, debug, caller, reason)
       const delay = new Date() - start
-      test.ok(testDelay <= delay, `pa4se script execution with given delay of ${testDelay} ms in debug mode with caller and reason`)
+      test.ok(testDelay <= delay, `parse script execution with given delay of ${testDelay} ms in debug mode with caller and reason`)
       test.end()
     } catch (err) {
       Logger.error(`sleep failed with error - ${err}`)
