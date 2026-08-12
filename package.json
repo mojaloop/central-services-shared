@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/central-services-shared",
-  "version": "18.38.2",
+  "version": "18.38.3-test.1",
   "description": "Shared code for mojaloop central services",
   "license": "Apache-2.0",
   "author": "ModusBox",
@@ -95,8 +95,8 @@
     "@mojaloop/central-services-logger": "11.10.6",
     "@mojaloop/central-services-metrics": "12.8.7",
     "@mojaloop/event-sdk": "14.8.5",
-    "@opentelemetry/auto-instrumentations-node": "^0.79.0",
     "@mojaloop/license-scanner-tool": "^1.1.2",
+    "@opentelemetry/auto-instrumentations-node": "^0.79.0",
     "@types/hapi__joi": "17.1.15",
     "ajv": "8.20.0",
     "ajv-formats": "^3.0.1",
@@ -206,7 +206,9 @@
     "ignore": []
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "provenance": "true",
+    "access": "public"
   },
   "standard-version": {
     "scripts": {
