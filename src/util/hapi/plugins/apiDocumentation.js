@@ -37,17 +37,21 @@ const yaml = require('yaml')
  * Embeds a small html page which uses @scalar/api-reference to render the documentation.
  *
  * options.pathToSwaggerFile - Full path to the OpenAPI (fka Swagger) document (JSON or YAML).
+ * options.documentPath - Legacy (pre-18.38) alias for pathToSwaggerFile; still accepted.
  */
 const plugin = {
   name: 'apiDocumentation',
   register: (server, options) => {
-    assert(options.pathToSwaggerFile, 'Expected `options.pathToSwaggerFile`.')
+    // 18.38.0 renamed the option from `documentPath` to `pathToSwaggerFile`; accept the
+    // legacy name so pre-18.38 consumers keep registering (mojaloop/#4479).
+    const pathToSwaggerFile = options.pathToSwaggerFile || options.documentPath
+    assert(pathToSwaggerFile, 'Expected `options.pathToSwaggerFile` (or legacy `options.documentPath`).')
 
     // Check the file exists.
     let file
     let contents
     try {
-      file = fs.readFileSync(options.pathToSwaggerFile)
+      file = fs.readFileSync(pathToSwaggerFile)
       contents = parseJsonOrYaml(file.toString())
     } catch (err) {
       const errorMessage = `documentation - failed to read pathToSwaggerFile with error: ${err.message}`

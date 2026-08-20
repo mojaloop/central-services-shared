@@ -797,7 +797,7 @@ declare namespace CentralServicesShared {
   type ProtocolResources = string[]
   type ProtocolVersions = (string | symbol)[]
   type ApiTypeValues = 'fspiop' | 'iso20022'
-  type APIDocumentationPluginOptions = { pathToSwaggerFile: string}
+  type APIDocumentationPluginOptions = { pathToSwaggerFile: string } | { documentPath: string }
 
   type LoggingPluginOptions = {
     log?: ILogger,

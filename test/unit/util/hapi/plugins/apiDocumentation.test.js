@@ -54,6 +54,29 @@ Test('API Documentation plugin should', async (pluginTest) => {
     test.end()
   })
 
+  await pluginTest.test('register with the legacy documentPath option name', async assert => {
+    try {
+      // pre-18.38 consumers pass `documentPath`; it must keep working (mojaloop/#4479)
+      await server.register(
+        { plugin: APIDocPlugin, options: { documentPath: OpenAPIDocPathYaml } }
+      )
+
+      await server.start()
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/swagger.json'
+      })
+
+      assert.equal(response.statusCode, 200, 'status code is correct')
+      assert.end()
+    } catch (e) {
+      console.log(e)
+      assert.fail()
+      assert.end()
+    }
+  })
+
   await pluginTest.test('return API documentation in HTML format', async assert => {
     try {
       await server.register(

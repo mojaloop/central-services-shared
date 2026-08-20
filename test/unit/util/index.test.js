@@ -163,6 +163,21 @@ Test('General util', utilTest => {
       test.deepEqual(result, expected)
       test.end()
     })
+    omitNilTest.test('remove undefined-valued keys entirely, not just null ones', test => {
+      // deepEqual cannot distinguish { b: undefined } from a missing key, so assert
+      // on key presence explicitly (regression for mojaloop/#4479: 18.38.0 kept
+      // undefined-valued keys, changing e.g. central-ledger's TransformService output).
+      const result = Util.omitNil({ a: 1, b: undefined, c: null })
+      test.deepEqual(Object.keys(result), ['a'], 'only the non-nil key remains')
+      test.notOk('b' in result, 'undefined-valued key is removed')
+      test.notOk('c' in result, 'null-valued key is removed')
+      test.end()
+    })
+    omitNilTest.test('mergeAndOmitNil must not let an undefined source value erase a target value', test => {
+      const merged = Util.mergeAndOmitNil({ expiration: '2016-06-24T09:38:08.699-04:00' }, Util.omitNil({ expiration: undefined }))
+      test.equal(merged.expiration, '2016-06-24T09:38:08.699-04:00', 'target value survives')
+      test.end()
+    })
     omitNilTest.end()
   })
 

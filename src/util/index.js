@@ -58,7 +58,9 @@ const distLock = require('./distLock')
 const omitNil = (object) => {
   return Object.fromEntries(
     Object.entries(object)
-      .filter(([_, value]) => value !== null)
+      // nil means null OR undefined (lodash _.isNil parity, see mojaloop/#4479):
+      // a loose != null comparison matches exactly those two values.
+      .filter(([_, value]) => value != null)
   )
 }
 
