@@ -126,7 +126,7 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
         await OpenapiBackend.validationFail(context)
         test.fail('Expected validationFail to throw')
       } catch (err) {
-        test.equal(err.apiErrorCode.code, '3100', 'errorCode returned 3100')
+        test.equal(err.apiErrorCode.code, '3101', 'errorCode returned 3101')
         test.match(err.message, /CtryOfBirth/, 'error message contains specific field')
         test.notOk(err.message.includes('OrgId'), 'error message does not contain misleading branch error')
       }
