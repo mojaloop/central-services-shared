@@ -4,7 +4,7 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
-    "GHSA-6v5v-wf23-fmfq" // About to be removed in `https://github.com/mojaloop/central-services-shared/pull/529`
-    
+    "GHSA-6v5v-wf23-fmfq",
+    "GHSA-5p4m-2wfm-xmqj"
   ]
 }
