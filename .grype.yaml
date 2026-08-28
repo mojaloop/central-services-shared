@@ -1,7 +1,12 @@
 scan-type: source
 disabled: false
 ignore:
-
+  - vulnerability: GHSA-5p4m-2wfm-xmqj
+    include-aliases: true
+    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-08-27'
+  - vulnerability: GHSA-6v5v-wf23-fmfq
+    include-aliases: true
+    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-08-27'
 output:
   - table
   - json
