@@ -274,7 +274,13 @@ const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
   if (!kafkaConsumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
     try {
       const consumer = kafkaConsumer.getConsumer(kafkaTopic)
-      await consumer.commitMessageSync(message)
+      // optional chaining: older @mojaloop/central-services-stream consumers without getOptions() fall back to sync
+      const commitStrategy = consumer.getOptions?.()?.commitStrategy
+      if (commitStrategy === 'async') {
+        consumer.commitMessage(message)
+      } else {
+        await consumer.commitMessageSync(message)
+      }
     } catch (err) {
       Logger.isDebugEnabled && Logger.debug(`No consumer found for topic ${kafkaTopic}`)
       rethrowKafkaError(err)
