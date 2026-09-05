@@ -36,7 +36,7 @@ const INTERNAL_ROUTES = env.LOG_INTERNAL_ROUTES ? env.LOG_INTERNAL_ROUTES.split(
 const TRACE_ID_HEADER = env.LOG_TRACE_ID_HEADER ?? 'traceid'
 
 const isStream = (val) => val !== null && typeof val === 'object' && typeof val.pipe === 'function'
-const sanitisePayload = (payload) => (isStream(payload) || payload === null) ? undefined : payload
+const sanitisePayload = (payload) => isStream(payload) ? undefined : payload
 
 const loggingPlugin = {
   name: 'loggingPlugin',
