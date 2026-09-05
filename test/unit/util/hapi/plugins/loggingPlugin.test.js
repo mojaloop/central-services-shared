@@ -183,7 +183,7 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
       method: 'DELETE',
       url: '/participants/MSISDN/12345678',
       headers: { 'content-type': 'application/json' },
-      payload: JSON.stringify({ any: 'body' })   // forces payload to be a stream
+      payload: JSON.stringify({ any: 'body' }) // forces payload to be a stream
     })
 
     t.equal(log.info.firstCall.lastArg.payload, undefined, 'stream payload not logged on inbound request')
