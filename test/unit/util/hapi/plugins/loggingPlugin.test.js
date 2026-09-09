@@ -23,6 +23,7 @@
  - Name Surname <name.surname@mojaloop.io>
 
  * Eugen Klymniuk <eugen.klymniuk@infitx.com>
+ * Samarth Bhatia <bhatia.samarth.03@mail.com> [Assisted by {Claude Sonnet 4.6}]
  --------------
  **********/
 
@@ -38,11 +39,13 @@ const { tryCatchEndTest } = require('#test/util/helper')
 const createHapiServer = async ({
   log,
   internalRoutes,
-  handler = async () => true
+  handler = async () => true,
+  payload // optional payload routing
 }) => {
   const server = Hapi.server({
     host: 'localhost',
-    port: await getPortPromise()
+    port: await getPortPromise(),
+    ...(payload ? { routes: { payload } } : {})
   })
 
   await server.register({
@@ -165,5 +168,42 @@ Tape('loggingPlugin Tests -->', (pluginTests) => {
     // requestId: "1733825870277:eugen-laptop:930049:m4ib5nli:10000__x-123456"
   }))
 
+  pluginTests.test('should not log stream payload (onRequest)', tryCatchEndTest(async t => {
+    server = await createHapiServer({ log, payload: { output: 'stream', parse: true } })
+    server.route({
+      method: 'DELETE',
+      path: '/participants/{Type}/{ID}',
+      handler: async (request, h) => {
+        // precondition: without the fix this is exactly what leaks
+        t.equal(typeof request.payload?.pipe, 'function', 'payload is a stream')
+        return h.response().code(202)
+      }
+    })
+    await server.inject({
+      method: 'DELETE',
+      url: '/participants/MSISDN/12345678',
+      headers: { 'content-type': 'application/json' },
+      payload: JSON.stringify({ any: 'body' }) // forces payload to be a stream
+    })
+
+    t.equal(log.info.firstCall.lastArg.payload, undefined, 'stream payload not logged on inbound request')
+  }))
+
+  pluginTests.test('should not log stream payload (onPreResponse)', tryCatchEndTest(async t => {
+    server = await createHapiServer({ log, payload: { output: 'stream', parse: true } })
+    server.route({
+      method: 'DELETE',
+      path: '/participants/{Type}/{ID}',
+      handler: async (request, h) => h.response().code(202)
+    })
+    await server.inject({
+      method: 'DELETE',
+      url: '/participants/MSISDN/12345678',
+      headers: { 'content-type': 'application/json' },
+      payload: JSON.stringify({ any: 'body' })
+    })
+
+    t.equal(log.info.lastCall.lastArg.payload, undefined, 'stream payload not logged on response')
+  }))
   pluginTests.end()
 })
