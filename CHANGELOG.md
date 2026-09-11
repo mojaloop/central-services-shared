@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.39.0](https://github.com/mojaloop/central-services-shared/compare/v18.38.3...v18.39.0) (2026-09-11)
+
+
+### Features
+
+* honor opt-in async offset-commit strategy in Kafka.proceed ([#535](https://github.com/mojaloop/central-services-shared/issues/535)) ([84b5f0f](https://github.com/mojaloop/central-services-shared/commit/84b5f0f4b943772c361e3b3869e8d7c7e824845d))
+
 ### [18.38.3](https://github.com/mojaloop/central-services-shared/compare/v18.38.2...v18.38.3) (2026-09-09)
 
 
