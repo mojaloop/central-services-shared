@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.38.3](https://github.com/mojaloop/central-services-shared/compare/v18.38.2...v18.38.3) (2026-09-09)
+
+
+### Bug Fixes
+
+* **loggingPlugin:** don't serialise raw stream payload on request log ([#524](https://github.com/mojaloop/central-services-shared/issues/524)) ([b486ccf](https://github.com/mojaloop/central-services-shared/commit/b486ccf0087daf514e9bb31e2175dcac3f40b172))
+
 ### [18.38.2](https://github.com/mojaloop/central-services-shared/compare/v18.38.1...v18.38.2) (2026-08-04)
 
 
