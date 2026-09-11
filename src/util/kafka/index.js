@@ -1,7 +1,7 @@
 /*****
  License
  --------------
- Copyright © 2020-2025 Mojaloop Foundation
+ Copyright © 2020-2026 Mojaloop Foundation
  The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
 
  http://www.apache.org/licenses/LICENSE-2.0
@@ -21,6 +21,7 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Shashikant Hirugade <shashi.mojaloop@gmail.com>
 
  * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
  * Miguel de Barros <miguel.debarros@modusbox.com>
@@ -270,11 +271,32 @@ const produceParticipantMessage = async (defaultKafkaConfig, kafkaProducer, part
   return true
 }
 
+/**
+ * @function CommitMessageSync
+ *
+ * @async
+ *
+ * @description Commits the offset for a consumed Kafka message, if the topic's
+ * consumer does not have auto-commit enabled. Commits synchronously by default.
+ * When the consumer's commitStrategy is 'async', the commit is non-blocking
+ * (Consumer.commitMessage) and any failure surfaces via the consumer's
+ * offset.commit.error event, not as a rejection here.
+ *
+ * @param {object} kafkaConsumer - the consumer group wrapper for the topic being committed
+ * @param {string} kafkaTopic - the topic the message was consumed from
+ * @param {object} message - the Kafka message whose offset is being committed
+ */
 const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
   if (!kafkaConsumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
     try {
       const consumer = kafkaConsumer.getConsumer(kafkaTopic)
-      await consumer.commitMessageSync(message)
+      // optional chaining: older @mojaloop/central-services-stream consumers without getOptions() fall back to sync
+      const commitStrategy = consumer.getOptions?.()?.commitStrategy
+      if (commitStrategy === 'async') {
+        consumer.commitMessage(message)
+      } else {
+        await consumer.commitMessageSync(message)
+      }
     } catch (err) {
       Logger.isDebugEnabled && Logger.debug(`No consumer found for topic ${kafkaTopic}`)
       rethrowKafkaError(err)
