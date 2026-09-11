@@ -271,6 +271,21 @@ const produceParticipantMessage = async (defaultKafkaConfig, kafkaProducer, part
   return true
 }
 
+/**
+ * @function CommitMessageSync
+ *
+ * @async
+ *
+ * @description Commits the offset for a consumed Kafka message, if the topic's
+ * consumer does not have auto-commit enabled. Commits synchronously by default.
+ * When the consumer's commitStrategy is 'async', the commit is non-blocking
+ * (Consumer.commitMessage) and any failure surfaces via the consumer's
+ * offset.commit.error event, not as a rejection here.
+ *
+ * @param {object} kafkaConsumer - the consumer group wrapper for the topic being committed
+ * @param {string} kafkaTopic - the topic the message was consumed from
+ * @param {object} message - the Kafka message whose offset is being committed
+ */
 const commitMessageSync = async (kafkaConsumer, kafkaTopic, message) => {
   if (!kafkaConsumer.isConsumerAutoCommitEnabled(kafkaTopic)) {
     try {

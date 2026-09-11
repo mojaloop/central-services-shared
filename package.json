@@ -81,7 +81,7 @@
     "fast-safe-stringify": "2.1.1",
     "immutable": "5.1.9",
     "ioredis": "5.6.1",
-    "joi": "18.2.8",
+    "joi": "18.2.9",
     "mustache": "4.2.0",
     "openapi-backend": "5.20.1",
     "rc": "1.2.8",
