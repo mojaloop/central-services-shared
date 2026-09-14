@@ -127,6 +127,19 @@ Test('Proxies Participants Test', proxiesTest => {
       }
     })
 
+    initCacheTest.test('not mutate the policyOptions object passed in', async (test) => {
+      try {
+        const policyOptions = { ...Config.ENDPOINT_CACHE_CONFIG }
+        await proxies.initializeCache(policyOptions, { hubName, hubNameRegex })
+        test.notOk(policyOptions.generateFunc, 'policyOptions was not mutated')
+        await proxies.stopCache()
+        test.end()
+      } catch (err) {
+        test.fail('Error thrown', err)
+        test.end()
+      }
+    })
+
     await initCacheTest.end()
   })
 
