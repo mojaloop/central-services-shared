@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.39.1](https://github.com/mojaloop/central-services-shared/compare/v18.39.0...v18.39.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* remove the object mutation introduced by clone ([#536](https://github.com/mojaloop/central-services-shared/issues/536)) ([f67b3ad](https://github.com/mojaloop/central-services-shared/commit/f67b3ad5de36f0c5485f8db29dd70d8ddc2eb01f))
+
 ## [18.39.0](https://github.com/mojaloop/central-services-shared/compare/v18.38.3...v18.39.0) (2026-09-11)
 
 
