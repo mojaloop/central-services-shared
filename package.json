@@ -88,7 +88,7 @@
     "redlock": "5.0.0-beta.2",
     "ulidx": "2.4.1",
     "uuid4": "2.0.3",
-    "yaml": "2.9.0"
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@mojaloop/central-services-error-handling": "13.2.0",
@@ -163,7 +163,7 @@
     },
     "path-to-regexp": "0.1.13",
     "picomatch": "2.3.2",
-    "yaml": "2.9.0"
+    "yaml": "2.9.1"
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": "13.x.x",

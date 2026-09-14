@@ -142,8 +142,13 @@ const getKafkaConfig = (kafkaConfig, flow, functionality, action) => {
     const flowObject = kafkaConfig[flow]
     const functionalityObject = flowObject[functionality]
     const actionObject = action ? functionalityObject[action] : functionalityObject
-    actionObject.config.logger = Logger
-    return actionObject.config
+    return {
+      ...actionObject.config,
+      logger: Logger,
+      options: { ...actionObject.config.options },
+      rdkafkaConf: { ...actionObject.config.rdkafkaConf },
+      topicConf: { ...actionObject.config.topicConf }
+    }
   } catch (err) {
     const error = ErrorHandler.Factory.createInternalServerFSPIOPError(`No config found for flow='${flow}', functionality='${functionality}', action='${action}'`, err)
     rethrowKafkaError(error)

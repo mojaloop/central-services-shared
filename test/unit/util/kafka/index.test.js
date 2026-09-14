@@ -266,6 +266,13 @@ Test('Utility Test', utilityTest => {
       test.end()
     })
 
+    getKafkaConfigTest.test('not mutate the passed-in kafkaConfig object', test => {
+      const kafkaConfigClone = JSON.parse(JSON.stringify(Config.KAFKA_CONFIG))
+      Utility.getKafkaConfig(kafkaConfigClone, CONSUMER, TRANSFER.toUpperCase(), PREPARE.toUpperCase())
+      test.notOk(kafkaConfigClone[CONSUMER][TRANSFER.toUpperCase()][PREPARE.toUpperCase()].config.logger, 'source config was not mutated')
+      test.end()
+    })
+
     getKafkaConfigTest.test('throw and error if Kafka config not in default.json', test => {
       try {
         Utility.getKafkaConfig(Config.KAFKA_CONFIG, CONSUMER, TRANSFER, PREPARE)

@@ -97,9 +97,9 @@ exports.initializeCache = async (policyOptions, config) => {
     Logger.isDebugEnabled && Logger.debug(`proxiesCache::initializeCache::start::clientOptions - ${JSON.stringify(clientOptions)}`)
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
-    policyOptions.generateFunc = fetchProxies
-    Logger.isDebugEnabled && Logger.debug(`proxiesCache::initializeCache::start::policyOptions - ${JSON.stringify(policyOptions)}`)
-    policy = new Catbox.Policy(policyOptions, client, partition)
+    const policySettings = { ...policyOptions, generateFunc: fetchProxies }
+    Logger.isDebugEnabled && Logger.debug(`proxiesCache::initializeCache::start::policyOptions - ${JSON.stringify(policySettings)}`)
+    policy = new Catbox.Policy(policySettings, client, partition)
     Logger.isDebugEnabled && Logger.debug('proxiesCache::initializeCache::Cache initialized successfully')
     hubName = config.hubName
     hubNameRegex = config.hubNameRegex

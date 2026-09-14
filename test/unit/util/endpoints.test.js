@@ -516,6 +516,22 @@ Test('endpointsUtil Test', (cacheTest) => {
       }
     )
 
+    initializeCacheTest.test(
+      'not mutate the policyOptions object passed in',
+      async (test) => {
+        try {
+          const policyOptions = { ...Config.ENDPOINT_CACHE_CONFIG }
+          await endpointsUtil.initializeCache(policyOptions, { hubName, hubNameRegex })
+          test.notOk(policyOptions.generateFunc, 'policyOptions was not mutated')
+          await endpointsUtil.stopCache()
+          test.end()
+        } catch (err) {
+          test.fail('Error thrown', err)
+          test.end()
+        }
+      }
+    )
+
     initializeCacheTest.test('should throw error', async (test) => {
       try {
         sandbox.stub(Catbox, 'Client').throws(new Error())

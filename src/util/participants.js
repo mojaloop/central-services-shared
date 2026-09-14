@@ -116,8 +116,8 @@ exports.initializeCache = async (policyOptions, config) => {
     logger.debug('participantCache::initializeCache start', { clientOptions, policyOptions })
     client = new Catbox.Client(CatboxMemory, clientOptions)
     await client.start()
-    policyOptions.generateFunc = fetchParticipant
-    policy = new Catbox.Policy(policyOptions, client, partition)
+    const policySettings = { ...policyOptions, generateFunc: fetchParticipant }
+    policy = new Catbox.Policy(policySettings, client, partition)
     hubName = config.hubName
     hubNameRegex = config.hubNameRegex
     logger.verbose('participantCache::initializeCache is done', { hubName })
