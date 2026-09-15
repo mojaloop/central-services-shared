@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.39.3](https://github.com/mojaloop/central-services-shared/compare/v18.39.2...v18.39.3) (2026-09-15)
+
+
+### Bug Fixes
+
+* restore lodash-equivalent null/undefined handling lost in the lodash-removal refactor ([#537](https://github.com/mojaloop/central-services-shared/issues/537)) ([0569ef8](https://github.com/mojaloop/central-services-shared/commit/0569ef8b010a083cc2b6facfd904e33ba53944a8))
+
 ### [18.39.2](https://github.com/mojaloop/central-services-shared/compare/v18.39.1...v18.39.2) (2026-09-15)
 
 
