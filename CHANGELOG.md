@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.39.2](https://github.com/mojaloop/central-services-shared/compare/v18.39.1...v18.39.2) (2026-09-15)
+
+
+### Chore
+
+* add Util.Hash type to index.d.ts ([#538](https://github.com/mojaloop/central-services-shared/issues/538)) ([42b5f0d](https://github.com/mojaloop/central-services-shared/commit/42b5f0dbc9c705858180fe70fbe707c025611421))
+
 ### [18.39.1](https://github.com/mojaloop/central-services-shared/compare/v18.39.0...v18.39.1) (2026-09-14)
 
 
