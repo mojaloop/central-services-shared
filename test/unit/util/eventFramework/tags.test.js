@@ -99,6 +99,23 @@ Test('Get tags tests', test => {
     assert.end()
   })
 
+  test.test('should not throw when headers is undefined', assert => {
+    const params = { id: 'transferId' }
+    const payload = null
+
+    const expectations = {
+      transactionType: 'transfer',
+      transactionAction: 'prepare',
+      transactionId: 'transferId',
+      source: undefined,
+      destination: undefined
+    }
+
+    const result = Util.EventFramework.getTransferSpanTags({ payload, headers: undefined, params }, transactionType, transactionAction)
+    assert.deepEqual(result, expectations, 'tags match')
+    assert.end()
+  })
+
   test.test('should get tags', assert => {
     const expectations = {
       transactionType: 'transfer',

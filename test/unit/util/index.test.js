@@ -140,7 +140,7 @@ Test('General util', utilTest => {
   })
 
   utilTest.test('omitNil should', omitNilTest => {
-    omitNilTest.test('return object with undefined values stripped out', test => {
+    omitNilTest.test('return object with null values stripped out', test => {
       const obj1 = {
         prop1: 'test',
         prop2: {
@@ -149,6 +149,30 @@ Test('General util', utilTest => {
         },
         prop3: null,
         prop4: null
+      }
+
+      const expected = {
+        prop1: 'test',
+        prop2: {
+          date_time: new Date().toDateString(),
+          number: 1000
+        }
+      }
+
+      const result = Util.omitNil(obj1)
+      test.deepEqual(result, expected)
+      test.end()
+    })
+
+    omitNilTest.test('return object with undefined values stripped out', test => {
+      const obj1 = {
+        prop1: 'test',
+        prop2: {
+          date_time: new Date().toDateString(),
+          number: 1000
+        },
+        prop3: undefined,
+        prop4: undefined
       }
 
       const expected = {
@@ -311,6 +335,27 @@ Test('General util', utilTest => {
       test.deepEqual(result, expected)
       test.end()
     })
+
+    mergeAndOmitNilTest.test('not let an undefined source property clobber a real target property, when the source was itself built via omitNil (e.g. transform.js\'s pick/mergeAndOmitNil pattern)', test => {
+      const target = {
+        expiration: '2016-06-24T09:38:08.699-04:00'
+      }
+
+      // mirrors src/domain/transfer/transform.js: cleanProperties is built via omitNil()
+      // before being merged, so an undefined field is dropped from source entirely rather
+      // than surviving to clobber target's real value during the Object.assign-based merge.
+      const source = Util.omitNil({
+        expiration: undefined
+      })
+
+      const expected = {
+        expiration: '2016-06-24T09:38:08.699-04:00'
+      }
+
+      const result = Util.mergeAndOmitNil(target, source)
+      test.deepEqual(result, expected)
+      test.end()
+    })
     mergeAndOmitNilTest.end()
   })
 
@@ -322,6 +367,18 @@ Test('General util', utilTest => {
 
       const result = Util.squish(array1)
       test.equal(result, expected)
+      test.end()
+    })
+
+    squishTest.test('return an empty string if undefined is passed', test => {
+      const result = Util.squish(undefined)
+      test.equal(result, '')
+      test.end()
+    })
+
+    squishTest.test('return an empty string if null is passed', test => {
+      const result = Util.squish(null)
+      test.equal(result, '')
       test.end()
     })
     squishTest.end()
@@ -345,6 +402,18 @@ Test('General util', utilTest => {
 
       const result = Util.expand(string)
       test.deepEqual(result, expected)
+      test.end()
+    })
+
+    expandTest.test('return undefined unchanged if undefined is passed', test => {
+      const result = Util.expand(undefined)
+      test.equal(result, undefined)
+      test.end()
+    })
+
+    expandTest.test('return empty string unchanged if empty string is passed', test => {
+      const result = Util.expand('')
+      test.equal(result, '')
       test.end()
     })
     expandTest.end()
