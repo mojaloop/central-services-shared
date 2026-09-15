@@ -58,7 +58,7 @@ const distLock = require('./distLock')
 const omitNil = (object) => {
   return Object.fromEntries(
     Object.entries(object)
-      .filter(([_, value]) => value !== null)
+      .filter(([_, value]) => value !== null && value !== undefined)
   )
 }
 
@@ -100,14 +100,11 @@ const parseJson = (value) => {
 }
 
 const squish = (array) => {
-  return array.join('|')
+  return array == null ? '' : array.join('|')
 }
 
 const expand = (value) => {
-  if (value === null) {
-    return null
-  }
-  return value.split('|')
+  return value ? value.split('|') : value
 }
 
 const filterUndefined = (fields) => {

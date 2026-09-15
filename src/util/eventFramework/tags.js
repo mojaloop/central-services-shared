@@ -43,7 +43,7 @@ const Enum = require('../../enums')
 
 const getTransferSpanTags = ({ payload, headers, params }, transactionType, transactionAction) => {
   const headersLowerCase = Object.fromEntries(
-    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value])
+    Object.entries(headers || {}).map(([key, value]) => [key.toLowerCase(), value])
   )
   const tags = {
     transactionType,
