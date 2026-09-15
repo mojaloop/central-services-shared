@@ -1005,6 +1005,9 @@ declare namespace CentralServicesShared {
     Http: {
       SwitchDefaultHeaders: (destination: string, resource: string, hubName: string, contentVersion: string) => Record<string, any>;
     };
+    Hash: {
+      generateSha256: (object: any) => string
+    }
   }
 
   const Enum: Enum
