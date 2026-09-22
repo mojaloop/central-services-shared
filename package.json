@@ -83,7 +83,7 @@
     "ioredis": "5.6.1",
     "joi": "18.2.9",
     "mustache": "4.2.0",
-    "openapi-backend": "5.21.0",
+    "openapi-backend": "5.21.1",
     "rc": "1.2.8",
     "redlock": "5.0.0-beta.2",
     "ulidx": "2.4.1",
@@ -120,8 +120,10 @@
     "tapes": "4.1.0"
   },
   "overrides": {
-    "undici": "6.27.0",
-    "js-yaml": "4.3.2",
+    "undici": "6.28.1",
+    "js-yaml@3": "3.15.2",
+    "js-yaml@4": "4.3.2",
+    "js-yaml@5": "5.4.2",
     "nyc": {
       "js-yaml": "3.15.2"
     },
