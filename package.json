@@ -83,7 +83,7 @@
     "ioredis": "5.6.1",
     "joi": "18.2.9",
     "mustache": "4.2.0",
-    "openapi-backend": "5.20.1",
+    "openapi-backend": "5.21.1",
     "rc": "1.2.8",
     "redlock": "5.0.0-beta.2",
     "ulidx": "2.4.1",
@@ -94,7 +94,7 @@
     "@mojaloop/central-services-error-handling": "13.2.0",
     "@mojaloop/central-services-logger": "11.10.6",
     "@mojaloop/central-services-metrics": "12.8.8",
-    "@mojaloop/event-sdk": "14.8.5",
+    "@mojaloop/event-sdk": "14.8.6",
     "@opentelemetry/auto-instrumentations-node": "^0.80.0",
     "@mojaloop/license-scanner-tool": "^1.1.2",
     "@types/hapi__joi": "17.1.15",
@@ -127,6 +127,10 @@
     },
     "tap-xunit": {
       "js-yaml": "3.15.2"
+    },
+    "openapi-backend": {
+      "js-yaml": "5.4.2",
+      "undici": "8.10.2"
     },
     "linkify-it": "5.0.1",
     "@grpc/grpc-js": "1.14.4",
