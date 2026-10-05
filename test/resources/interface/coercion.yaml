@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Type coercion fixture
+  version: 1.0.0
+  description: >-
+    Minimal definition used by test/unit/util/openapiBackend.test.js to prove that
+    path and query parameters declared as integer/number/boolean are coerced from the
+    strings a HTTP router delivers, as hapi-openapi used to do.
+servers:
+  - url: /
+paths:
+  '/items/{id}':
+    get:
+      operationId: getItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: ratio
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: verbose
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
