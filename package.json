@@ -130,10 +130,6 @@
     "tap-xunit": {
       "js-yaml": "3.15.2"
     },
-    "openapi-backend": {
-      "js-yaml": "5.4.2",
-      "undici": "8.10.2"
-    },
     "linkify-it": "5.0.1",
     "@grpc/grpc-js": "1.14.5",
     "axios": "1.20.0",
