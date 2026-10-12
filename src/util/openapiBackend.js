@@ -48,6 +48,7 @@ const initialise = async (definitionPath, handlers, ajvOpts = { $data: true, coe
     definition: definitionPath,
     strict: false,
     validate: true,
+    coerceTypes: true,
     ajvOpts: {
       coerceTypes: true
     },

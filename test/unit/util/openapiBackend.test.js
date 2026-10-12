@@ -72,6 +72,91 @@ Test('OpenapiBackend tests', OpenapiBackendTest => {
     initializeTest.end()
   })
 
+  OpenapiBackendTest.test('initialise should coerce request parameter types', async (coerceTest) => {
+    // hapi-openapi coerced request parameters to the types declared in the API definition
+    // before calling the handler. openapi-backend only does this when its top-level
+    // `coerceTypes` option is set: `ajvOpts.coerceTypes` alone lets validation *accept*
+    // "123" for an integer, but the handler would still receive the raw string.
+    // Note: openapi-backend (5.21) re-parses path parameters from the URL after validation,
+    // so only query parameters arrive coerced on `context.request`; the coerced path
+    // parameters are exposed on `context.validation.coerced.params`.
+    const definition = Path.resolve(__dirname, '../../resources/interface/coercion.yaml')
+
+    coerceTest.test('pass coerced query parameters to the operation handler', async (test) => {
+      let received
+      const api = await OpenapiBackend.initialise(definition, {
+        getItem: async (context) => {
+          received = context
+          return 'ok'
+        },
+        validationFail: OpenapiBackend.validationFail,
+        notFound: OpenapiBackend.notFound
+      })
+
+      const result = await api.handleRequest({
+        method: 'GET',
+        path: '/items/42',
+        query: { limit: '10', ratio: '0.5', verbose: 'true' },
+        headers: {}
+      })
+
+      test.equal(result, 'ok', 'handler was invoked')
+      test.strictEqual(received.request.query.limit, 10, 'integer query parameter coerced')
+      test.strictEqual(received.request.query.ratio, 0.5, 'number query parameter coerced')
+      test.strictEqual(received.request.query.verbose, true, 'boolean query parameter coerced')
+      test.strictEqual(received.validation.coerced.params.id, 42, 'path parameter coerced during validation')
+      test.strictEqual(received.validation.coerced.query.limit, 10, 'coerced query available on the validation result')
+      test.end()
+    })
+
+    coerceTest.test('still reject values that cannot be coerced to the declared type', async (test) => {
+      const api = await OpenapiBackend.initialise(definition, {
+        getItem: async () => test.fail('handler must not run for an invalid request'),
+        validationFail: OpenapiBackend.validationFail,
+        notFound: OpenapiBackend.notFound
+      })
+
+      try {
+        await api.handleRequest({
+          method: 'GET',
+          path: '/items/not-a-number',
+          query: {},
+          headers: {}
+        })
+        test.fail('Expected validation to fail')
+      } catch (err) {
+        test.equal(err.httpStatusCode, 400, 'statusCode 400 thrown')
+        test.equal(err.toApiErrorObject().errorInformation.errorCode, '3101', 'errorCode returned 3101 (malformed syntax)')
+      }
+      test.end()
+    })
+
+    coerceTest.test('coerce parameters when custom ajv options are supplied', async (test) => {
+      let received
+      const api = await OpenapiBackend.initialise(definition, {
+        getItem: async (context) => {
+          received = context
+          return 'ok'
+        },
+        validationFail: OpenapiBackend.validationFail,
+        notFound: OpenapiBackend.notFound
+      }, { $data: true })
+
+      await api.handleRequest({
+        method: 'GET',
+        path: '/items/7',
+        query: { limit: '3' },
+        headers: {}
+      })
+
+      test.strictEqual(received.request.query.limit, 3, 'query parameter coerced with custom ajv options')
+      test.strictEqual(received.validation.coerced.params.id, 7, 'path parameter coerced with custom ajv options')
+      test.end()
+    })
+
+    coerceTest.end()
+  })
+
   OpenapiBackendTest.test('validationFail should', async (validationFailTest) => {
     validationFailTest.test('throw a FSPIOP error', async (test) => {
       const context = {

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [18.39.4](https://github.com/mojaloop/central-services-shared/compare/v18.39.3...v18.39.4) (2026-10-05)
+
+
+### Bug Fixes
+
+* Renable previous behavior of coercing types after move to OpenAPI Backend ([#539](https://github.com/mojaloop/central-services-shared/issues/539)) ([ea1a55e](https://github.com/mojaloop/central-services-shared/commit/ea1a55ecd69bec7ae3c694c0755cd7b18032c543))
+
 ### [18.39.3](https://github.com/mojaloop/central-services-shared/compare/v18.39.2...v18.39.3) (2026-09-15)
 
 
