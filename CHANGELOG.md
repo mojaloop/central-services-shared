@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [19.0.0](https://github.com/mojaloop/central-services-shared/compare/v18.39.4...v19.0.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* add missing TPP endpoint types and templates to index.d.ts (#540)
+
+### Bug Fixes
+
+* add missing TPP endpoint types and templates to index.d.ts ([#540](https://github.com/mojaloop/central-services-shared/issues/540)) ([3833c68](https://github.com/mojaloop/central-services-shared/commit/3833c68b32e698fb5c46c1c3a857af67dbf2281f))
+
 ### [18.39.4](https://github.com/mojaloop/central-services-shared/compare/v18.39.3...v18.39.4) (2026-10-05)
 
 
