@@ -83,7 +83,7 @@
     "ioredis": "5.6.1",
     "joi": "18.2.9",
     "mustache": "4.2.0",
-    "openapi-backend": "5.21.2",
+    "openapi-backend": "5.21.3",
     "rc": "1.2.8",
     "redlock": "5.0.0-beta.2",
     "ulidx": "2.4.1",
@@ -91,11 +91,11 @@
     "yaml": "2.9.1"
   },
   "devDependencies": {
-    "@mojaloop/central-services-error-handling": "13.2.0",
-    "@mojaloop/central-services-logger": "11.10.6",
-    "@mojaloop/central-services-metrics": "12.8.8",
+    "@mojaloop/central-services-error-handling": "13.2.1",
+    "@mojaloop/central-services-logger": "11.10.7",
+    "@mojaloop/central-services-metrics": "12.8.9",
     "@mojaloop/event-sdk": "14.8.6",
-    "@opentelemetry/auto-instrumentations-node": "^0.80.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.81.0",
     "@mojaloop/license-scanner-tool": "^1.1.2",
     "@types/hapi__joi": "17.1.15",
     "ajv": "8.20.0",
@@ -104,7 +104,7 @@
     "audit-ci": "7.1.0",
     "base64url": "3.0.1",
     "chance": "1.1.13",
-    "npm-check-updates": "23.1.0",
+    "npm-check-updates": "23.1.1",
     "nyc": "18.0.0",
     "portfinder": "1.0.38",
     "pre-commit": "2.0.0",
@@ -168,7 +168,8 @@
     "path-to-regexp": "0.1.13",
     "picomatch": "2.3.2",
     "yaml": "2.9.1",
-    "moment": "2.31.0"
+    "moment": "2.31.0",
+    "handlebars": "4.7.10"
   },
   "peerDependencies": {
     "@mojaloop/central-services-error-handling": "13.x.x",

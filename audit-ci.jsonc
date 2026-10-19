@@ -4,5 +4,6 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
+    "GHSA-hp3w-g68c-fv3c" // sprintf-js <=1.1.3 DoS (no patched release yet). Dev-only: nyc and tap-xunit via js-yaml@3 > argparse@1. Remove once a fixed sprintf-js is published.
   ]
 }
