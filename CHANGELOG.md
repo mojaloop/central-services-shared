@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [19.0.1](https://github.com/mojaloop/central-services-shared/compare/v19.0.0...v19.0.1) (2026-11-24)
+
+
+### Chore
+
+* **deps:** bump deps, node 26 and orb 2.3.0 ([#542](https://github.com/mojaloop/central-services-shared/issues/542)) ([c3d07e3](https://github.com/mojaloop/central-services-shared/commit/c3d07e311a5ada0c2c25ee9d97fcbc7b57fe007c))
+
 ## [19.0.0](https://github.com/mojaloop/central-services-shared/compare/v18.39.4...v19.0.0) (2026-10-19)
 
 
