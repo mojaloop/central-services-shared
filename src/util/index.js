@@ -54,6 +54,7 @@ const rethrow = require('./rethrow')
 const Redis = require('./redis')
 const createLogger = require('./createLogger')
 const distLock = require('./distLock')
+const { startingProcess } = require('./startingProcess')
 
 const omitNil = (object) => {
   return Object.fromEntries(
@@ -273,5 +274,6 @@ module.exports = {
   resourceVersions: Helpers.resourceVersions,
   rethrow,
   Redis,
-  distLock
+  distLock,
+  startingProcess
 }
