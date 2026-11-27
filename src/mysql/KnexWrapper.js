@@ -27,7 +27,6 @@
 
 const knex = require('knex')
 const retry = require('async-retry')
-const exitHook = require('async-exit-hook')
 
 const defaultRetryOptionsDto = (logger) => ({
   retries: 10,
@@ -65,9 +64,6 @@ class KnexWrapper {
       await retry(async (_, attempt) => {
         this.log.verbose(`Attempting database connection. Attempt ${attempt} of ${opts.retries + 1}`)
         await this.knex.raw('SELECT 1')
-        exitHook(callback => {
-          this.knex.destroy().finally(callback)
-        })
         this.#isConnected = true
         this.log.info('Database connected')
       }, opts)

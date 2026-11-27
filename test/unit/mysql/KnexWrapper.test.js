@@ -27,6 +27,8 @@
 
 const Tape = require('tapes')(require('tape'))
 const sinon = require('sinon')
+const path = require('node:path')
+const { execFileSync } = require('node:child_process')
 
 const { KnexWrapper } = require('#src/mysql/index')
 const { logger } = require('#src/logger')
@@ -106,6 +108,31 @@ Tape('KnexWrapper Tests -->', (wrapperTests) => {
     await wrapper.connect()
     t.true(wrapper.isConnected, 'wrapper is connected')
     t.true(countIncStub.notCalled, 'errorCounter is not incremented')
+  }))
+
+  wrapperTests.test('should leave the process exit to the application', tryCatchEndTest(t => {
+    const marker = 'process-listeners:'
+    const script = `
+      const events = ['SIGTERM', 'SIGINT', 'SIGHUP', 'SIGBREAK', 'beforeExit', 'exit', 'uncaughtException']
+      const count = () => events.map(event => process.listenerCount(event))
+      const before = count()
+      const { KnexWrapper } = require(${JSON.stringify(path.resolve(__dirname, '../../../src/mysql/index'))})
+      const { logger } = require(${JSON.stringify(path.resolve(__dirname, '../../../src/logger'))})
+      const wrapper = new KnexWrapper({
+        logger,
+        knexOptions: { client: 'mysql2', connection: {} },
+        metrics: { getCounter: () => ({ inc: () => {} }) },
+        retryOptions: { retries: 0 }
+      })
+      wrapper.knex = { raw: async () => ({}), destroy: async () => {} }
+      wrapper.connect().then(() => {
+        console.log(${JSON.stringify(marker)} + JSON.stringify({ before, after: count() }))
+      })
+    `
+    const output = execFileSync(process.execPath, ['-e', script], { encoding: 'utf8' })
+    const { before, after } = JSON.parse(output.split('\n').find(line => line.startsWith(marker)).slice(marker.length))
+
+    t.deepEqual(after, before, 'no process listeners are added')
   }))
 
   wrapperTests.test('should throw connection error, and increment errorCount', tryCatchEndTest(async t => {

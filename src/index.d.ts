@@ -1049,6 +1049,7 @@ declare namespace CentralServicesShared {
     Hash: {
       generateSha256: (object: any) => string
     }
+    startingProcess: (startFn: () => Promise<unknown>, stopFn: () => Promise<unknown>) => Promise<void>;
   }
 
   const Enum: Enum
