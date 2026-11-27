@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [20.0.0](https://github.com/mojaloop/central-services-shared/compare/v19.0.1...v20.0.0) (2026-11-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* add startingProcess, which owns the process exit (#543)
+
+### Features
+
+* add startingProcess, which owns the process exit ([#543](https://github.com/mojaloop/central-services-shared/issues/543)) ([3c957c3](https://github.com/mojaloop/central-services-shared/commit/3c957c3cf11a6694749a873cc207c2885e063d74))
+
 ### [19.0.1](https://github.com/mojaloop/central-services-shared/compare/v19.0.0...v19.0.1) (2026-11-24)
 
 
